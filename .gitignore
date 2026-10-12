@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+bin/Picasa3.exe
+ghidra/picasa3.rep/
+ghidra/*.log
