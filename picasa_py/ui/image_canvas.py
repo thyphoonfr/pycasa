@@ -19,10 +19,12 @@ from typing import Optional, Tuple, List, Any
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt, QRect, QRectF, QPoint, QPointF, Signal
 from PySide6.QtGui import (
-    QPainter, QColor, QPixmap, QImage, QMouseEvent, QWheelEvent,
+    QPainter, QColor, QPixmap, QImage, QImageReader, QMouseEvent, QWheelEvent,
     QPaintEvent, QResizeEvent, QCursor, QPen, QFont
 )
 from PIL import Image
+
+Image.MAX_IMAGE_PIXELS = None
 
 from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.style import PicasaStyle
@@ -91,6 +93,7 @@ class PicasaImageCanvas(QWidget):
     def load_image(self, path: str, rotation: int = 0) -> bool:
         """
         Charge une image haute résolution depuis le disque.
+        Gère les images panoramiques, gigapixel, et formats spéciaux (PSD, TIFF, WEBP).
         """
         self.image_path = path
         self.rotation_degrees = rotation % 360
@@ -99,12 +102,43 @@ class PicasaImageCanvas(QWidget):
 
         p = Path(path)
         if p.exists():
-            pix = QPixmap(str(p))
-            if not pix.isNull():
-                self._raw_pixmap = pix
+            # 1. Tenter via QImageReader avec allocation illimitée
+            reader = QImageReader(str(p))
+            reader.setAutoTransform(True)
+            reader.setAllocationLimit(0)
+            qimg = reader.read()
+            if not qimg.isNull():
+                self._raw_pixmap = QPixmap.fromImage(qimg)
                 self._update_display_pixmap()
                 self.update()
                 return True
+
+            # 2. Fallback via PIL pour formats spéciaux ou très grandes résolutions
+            try:
+                from PIL import ImageOps
+                with Image.open(str(p)) as raw_img:
+                    if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                        raw_img = raw_img.convert("RGBA")
+                    try:
+                        pil_img = ImageOps.exif_transpose(raw_img)
+                    except Exception:
+                        pil_img = raw_img
+                    if pil_img.mode not in ("RGB", "RGBA"):
+                        pil_img = pil_img.convert("RGB")
+                    pil_img.load()
+                    if pil_img.mode == "RGBA":
+                        data = pil_img.tobytes("raw", "BGRA")
+                        qimg = QImage(data, pil_img.width, pil_img.height, pil_img.width * 4, QImage.Format.Format_ARGB32).copy()
+                    else:
+                        data = pil_img.tobytes("raw", "RGB")
+                        qimg = QImage(data, pil_img.width, pil_img.height, pil_img.width * 3, QImage.Format.Format_RGB888).copy()
+                    if not qimg.isNull():
+                        self._raw_pixmap = QPixmap.fromImage(qimg)
+                        self._update_display_pixmap()
+                        self.update()
+                        return True
+            except Exception:
+                pass
 
         self._raw_pixmap = None
         self._display_pixmap = None

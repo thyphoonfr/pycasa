@@ -21,6 +21,8 @@ from typing import Dict, List, Optional, Set, Tuple
 from PIL import Image, ImageOps, ExifTags
 from PySide6.QtCore import QThread, Signal
 
+Image.MAX_IMAGE_PIXELS = None
+
 from picasa_py.db.database import PicasaDatabase
 from picasa_py.db.thumbindex import ThumbIndexRecord
 
@@ -60,12 +62,14 @@ def extract_image_metadata_and_thumb(
     calcule la date OLE, et génère le buffer JPEG de la vignette.
     """
     try:
-        with Image.open(file_path) as img:
-            # 1. Orientation automatique selon les balises EXIF
+        with Image.open(file_path) as raw_img:
+            # 1. Orientation automatique selon les balises EXIF et conversion propre de la transparence
+            if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                raw_img = raw_img.convert("RGBA")
             try:
-                img = ImageOps.exif_transpose(img)
+                img = ImageOps.exif_transpose(raw_img)
             except Exception:
-                pass
+                img = raw_img
 
             orig_w, orig_h = img.size
 
@@ -99,7 +103,11 @@ def extract_image_metadata_and_thumb(
             # 3. Génération de la miniature (JPEG 256x256 conservant le ratio)
             thumb_img = img.copy()
             thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.LANCZOS)
-            if thumb_img.mode != "RGB":
+            if thumb_img.mode in ("RGBA", "LA"):
+                bg = Image.new("RGB", thumb_img.size, (255, 255, 255))
+                bg.paste(thumb_img, mask=thumb_img.split()[3])
+                thumb_img = bg
+            elif thumb_img.mode != "RGB":
                 thumb_img = thumb_img.convert("RGB")
 
             buf = io.BytesIO()

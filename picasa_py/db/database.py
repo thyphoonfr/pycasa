@@ -171,7 +171,13 @@ class PicasaDatabase:
             if parent_rec.type == 1:
                 folder_path = parent_rec.path
         if folder_path:
-            return os.path.join(folder_path, rec.path)
+            clean_child = rec.path.lstrip("\\/")
+            full = os.path.join(folder_path, clean_child)
+            if os.path.exists(full):
+                return full
+            if os.path.exists(rec.path):
+                return rec.path
+            return full
         return rec.path
 
     def load_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:

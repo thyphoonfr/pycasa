@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QStackedWidget, QStatusBar, QMessageBox, QFileDialog
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QImageReader
 
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
@@ -42,6 +42,7 @@ class PicasaMainWindow(QMainWindow):
 
     def __init__(self, db_path: Optional[str] = None, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        QImageReader.setAllocationLimit(0)
         self.style = PicasaStyle.load()
         self.res_mgr = PicasaResourceManager.get()
         self.watcher: Optional[PicasaFolderWatcher] = None
@@ -172,7 +173,7 @@ class PicasaMainWindow(QMainWindow):
 
         item = self.thumb_view.items[item_idx]
         available_indices = [self.thumb_view.items[i].index for i in self.thumb_view.filtered_indices]
-        self.one_up_view.open_photo(self.db, item.index, available_indices)
+        self.one_up_view.open_photo(self.db, item.index, available_indices, direct_path=item.path)
         self.top_bar.hide()
         self.photo_tray.hide()
         self.stack.setCurrentIndex(1)

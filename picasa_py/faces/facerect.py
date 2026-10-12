@@ -10,8 +10,8 @@ Ref: picasa3.exe @ 0x009B9290 (Coordinate scaling to width & height)
 from __future__ import annotations
 import math
 from dataclasses import dataclass
-from typing import Optional, Tuple
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
 from PySide6.QtGui import QImage, QPixmap, QPainter, QPainterPath, QColor, QPen
 from PySide6.QtCore import Qt, QRectF
 
@@ -144,12 +144,14 @@ class FaceRect:
 
         cropped = source_image.crop((int(x1), int(y1), int(x2), int(y2)))
         cropped = cropped.resize((avatar_size, avatar_size), Image.Resampling.LANCZOS)
+        if cropped.mode in ("P", "PA") or "transparency" in cropped.info:
+            cropped = cropped.convert("RGBA")
         if cropped.mode != "RGB":
             cropped = cropped.convert("RGB")
 
         # Convertir en QImage puis QPixmap
         data = cropped.tobytes("raw", "RGB")
-        qimg = QImage(data, avatar_size, avatar_size, avatar_size * 3, QImage.Format.Format_RGB888)
+        qimg = QImage(data, avatar_size, avatar_size, avatar_size * 3, QImage.Format.Format_RGB888).copy()
         pix = QPixmap.fromImage(qimg)
 
         if not circular:

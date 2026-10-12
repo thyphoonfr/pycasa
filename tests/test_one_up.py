@@ -283,3 +283,49 @@ def test_one_up_top_bar_and_comparison_modes(qapp, sample_image):
     assert "Photo 1 sur 3" in view.lbl_top_info.text()
 
 
+def test_palette_transparency_and_huge_image_support(qapp, tmp_path):
+    """
+    Vérifie le chargement sans avertissement ni rejet des images en mode palette avec transparence,
+    ainsi que les images très haute résolution dépassant les limites par défaut de Qt/PIL.
+    """
+    import warnings
+    from PIL import Image
+    from picasa_py.ui.one_up_view import PicasaOneUpView
+    from picasa_py.ui.image_canvas import PicasaImageCanvas
+
+    view = PicasaOneUpView()
+
+    # 1. Image en palette (mode P) avec transparence
+    pal_img = Image.new("P", (128, 128))
+    pal_img.info["transparency"] = b"\x00"
+
+    with warnings.catch_warnings(record=True) as recorded_warnings:
+        warnings.simplefilter("always")
+        pix = view._pil_to_pixmap(pal_img)
+        assert not pix.isNull()
+        assert pix.width() == 128
+        assert pix.height() == 128
+        # Aucun UserWarning émis par PIL concernant la palette
+        assert not any("Palette images with Transparency" in str(w.message) for w in recorded_warnings)
+
+    # 2. Image volumineuse (> 100 Mo en mémoire décompressée)
+    huge_img = Image.new("RGB", (4000, 3000), (45, 90, 135))
+    pix_huge = view._pil_to_pixmap(huge_img)
+    assert not pix_huge.isNull()
+    assert pix_huge.width() == 4000
+    assert pix_huge.height() == 3000
+
+    # 3. Canvas load_image avec image sauvegardée sur disque
+    test_path = str(tmp_path / "huge_test.png")
+    huge_img.save(test_path)
+
+    canvas = PicasaImageCanvas()
+    canvas.resize(800, 600)
+    success = canvas.load_image(test_path)
+    assert success is True
+    assert canvas._raw_pixmap is not None
+    assert canvas._raw_pixmap.width() == 4000
+    assert canvas._raw_pixmap.height() == 3000
+
+
+

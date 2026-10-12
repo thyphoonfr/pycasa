@@ -19,8 +19,8 @@ from pathlib import Path
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt, QRect, QSize, Signal, QPoint
 from PySide6.QtGui import (
-    QPainter, QColor, QFont, QPen, QBrush, QPixmap, QImage, QMouseEvent,
-    QWheelEvent, QPaintEvent, QResizeEvent, QPolygon
+    QPainter, QColor, QFont, QPen, QBrush, QPixmap, QImage, QImageReader,
+    QMouseEvent, QWheelEvent, QPaintEvent, QResizeEvent, QPolygon
 )
 
 from picasa_py.ui.style import PicasaStyle
@@ -559,9 +559,16 @@ class PicasaThumbnailView(QWidget):
 
         # Fallback si absent du cache binaire Picasa
         if os.path.exists(item.path):
-            img = QImage(item.path)
+            reader = QImageReader(item.path)
+            reader.setAutoTransform(True)
+            orig_sz = reader.size()
+            if orig_sz.isValid() and orig_sz.width() > 0 and orig_sz.height() > 0:
+                scale = min(256.0 / orig_sz.width(), 256.0 / orig_sz.height(), 1.0)
+                target_sz = QSize(max(1, int(orig_sz.width() * scale)), max(1, int(orig_sz.height() * scale)))
+                reader.setScaledSize(target_sz)
+            img = reader.read()
             if not img.isNull():
-                pix = QPixmap.fromImage(img.scaled(256, 256, Qt.AspectRatioMode.KeepAspectRatio))
+                pix = QPixmap.fromImage(img)
                 if len(self._pixmap_cache) < self._cache_limit:
                     self._pixmap_cache[item_idx] = pix
                 return pix

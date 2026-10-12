@@ -20,6 +20,9 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QImage
 from PIL import Image
 
+# Permettre l'ouverture des images gigapixel et panoramiques sans limitation de décompression
+Image.MAX_IMAGE_PIXELS = None
+
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.image_canvas import PicasaImageCanvas
@@ -310,21 +313,30 @@ class PicasaOneUpView(QWidget):
     def _on_active_pane_changed(self, pane: str) -> None:
         self._update_top_bar_info()
 
-    def _load_pil_image_at_index(self, index: int) -> Optional[Image.Image]:
+    def _load_pil_image_at_index(self, index: int, direct_path: Optional[str] = None) -> Optional[Image.Image]:
         """Charge une image PIL haute résolution depuis le disque ou le cache."""
         if self.db is None or index < 0 or index >= len(self.db.index):
             return None
 
-        full_path = self.db.get_media_full_path(index)
+        # Priorité au chemin direct connu ou reconstitution depuis thumbindex.db
+        full_path = direct_path if (direct_path and os.path.exists(direct_path)) else self.db.get_media_full_path(index)
         pil_img: Optional[Image.Image] = None
 
         if full_path and os.path.exists(full_path):
             try:
                 with Image.open(full_path) as raw_img:
+                    # Gérer les palettes avec transparence pour éviter UserWarning de PIL
+                    if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                        raw_img = raw_img.convert("RGBA")
                     from PIL import ImageOps
-                    pil_img = ImageOps.exif_transpose(raw_img)
-                    if pil_img.mode != "RGB":
+                    try:
+                        pil_img = ImageOps.exif_transpose(raw_img)
+                    except Exception:
+                        pil_img = raw_img
+                    if pil_img.mode not in ("RGB", "RGBA"):
                         pil_img = pil_img.convert("RGB")
+                    # Forcer le décodage effectif des données en RAM avant de fermer le descripteur de fichier
+                    pil_img.load()
             except Exception:
                 pass
 
@@ -333,22 +345,44 @@ class PicasaOneUpView(QWidget):
                 raw_thumb = self.db.load_thumbnail(index, size=sz)
                 if raw_thumb:
                     try:
-                        pil_img = Image.open(io.BytesIO(raw_thumb)).convert("RGB")
-                        break
+                        with Image.open(io.BytesIO(raw_thumb)) as thumb_raw:
+                            if thumb_raw.mode in ("P", "PA") or "transparency" in thumb_raw.info:
+                                thumb_raw = thumb_raw.convert("RGBA")
+                            if thumb_raw.mode not in ("RGB", "RGBA"):
+                                thumb_raw = thumb_raw.convert("RGB")
+                            pil_img = thumb_raw.copy()
+                            break
                     except Exception:
                         pass
 
         return pil_img
 
     def _pil_to_pixmap(self, img: Image.Image) -> QPixmap:
-        """Convertit une image PIL en QPixmap optimisé."""
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=95)
-        qimg = QImage()
-        qimg.loadFromData(buf.getvalue(), "JPEG")
+        """
+        Convertit une image PIL en QPixmap de façon directe et ultra-rapide en mémoire.
+        Évite le goulot d'étranglement de ré-encodage JPEG et la limite d'allocation Qt.
+        """
+        if img.mode in ("P", "PA") or "transparency" in img.info:
+            img = img.convert("RGBA")
+
+        if img.mode == "RGBA":
+            bgra_data = img.tobytes("raw", "BGRA")
+            qimg = QImage(bgra_data, img.width, img.height, img.width * 4, QImage.Format.Format_ARGB32).copy()
+        else:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            rgb_data = img.tobytes("raw", "RGB")
+            qimg = QImage(rgb_data, img.width, img.height, img.width * 3, QImage.Format.Format_RGB888).copy()
+
         return QPixmap.fromImage(qimg)
 
-    def open_photo(self, db: PicasaDatabase, index: int, available_indices: List[int]) -> None:
+    def open_photo(
+        self,
+        db: PicasaDatabase,
+        index: int,
+        available_indices: List[int],
+        direct_path: Optional[str] = None
+    ) -> None:
         self.db = db
         self.current_index = index
         self.available_indices = available_indices
@@ -361,7 +395,7 @@ class PicasaOneUpView(QWidget):
         if index < 0 or index >= len(db.index):
             return
 
-        pil_img = self._load_pil_image_at_index(index)
+        pil_img = self._load_pil_image_at_index(index, direct_path=direct_path)
         if pil_img:
             self._original_pil_img = pil_img.copy()
             self._history = [pil_img.copy()]
