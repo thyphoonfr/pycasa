@@ -3,6 +3,7 @@ Main Application Window for PyCasa (faithful reproduction of ytWindow).
 
 Ref: picasa3.exe @ 0x00983940 (ytWindow WndProc)
 Ref: picasa3.exe @ 0x0070494B (Magic signature 0x47506332 'GPc2')
+Ref: picasa3.exe @ OneUp, editoneup
 Ref: AGENTS.md §4 bis (Disposition et fonctionnement identiques)
 """
 
@@ -11,7 +12,7 @@ from typing import Optional, List, Dict, Any
 from pathlib import Path
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
-    QStatusBar, QMessageBox, QFileDialog
+    QStackedWidget, QStatusBar, QMessageBox, QFileDialog
 )
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
@@ -24,6 +25,7 @@ from picasa_py.ui.library_tree import PicasaLibraryTree
 from picasa_py.ui.thumbnail_view import PicasaThumbnailView
 from picasa_py.ui.photo_tray import PicasaPhotoTray
 from picasa_py.ui.right_drawer import PicasaRightDrawer
+from picasa_py.ui.one_up_view import PicasaOneUpView
 from picasa_py.db.database import PicasaDatabase
 
 
@@ -31,6 +33,7 @@ from picasa_py.db.database import PicasaDatabase
 class PicasaMainWindow(QMainWindow):
     """
     Fenêtre principale de l'application reproduisant ytWindow de Picasa 3.
+    Gère la bascule entre la vue Bibliothèque (grille) et la vue Édition (One-Up).
     """
     WINDOW_MAGIC = 0x47506332  # 'GPc2'
 
@@ -54,7 +57,10 @@ class PicasaMainWindow(QMainWindow):
         self.top_bar = PicasaTopBar(self.style, self)
         main_layout.addWidget(self.top_bar)
 
-        # 2. Zone centrale (Splitter 3 volets: Bibliothèque | Grille | Tiroir)
+        # 2. Sélecteur de mode (Bibliothèque / One-Up View)
+        self.stack = QStackedWidget(self)
+
+        # Page 0: Bibliothèque (Splitter 3 volets: Arborescence | Grille | Tiroir)
         self.splitter = QSplitter(Qt.Orientation.Horizontal, self)
         self.splitter.setHandleWidth(4)
         self.splitter.setStyleSheet("""
@@ -76,9 +82,14 @@ class PicasaMainWindow(QMainWindow):
         self.right_drawer = PicasaRightDrawer(self.style, self)
         self.splitter.addWidget(self.right_drawer)
 
-        # Proportions initiales: 220px gauche, reste centre, 260px droite
         self.splitter.setSizes([220, 720, 260])
-        main_layout.addWidget(self.splitter, 1)
+        self.stack.addWidget(self.splitter)
+
+        # Page 1: Vue d'édition One-Up (Ref: picasa3.exe @ OneUp)
+        self.one_up_view = PicasaOneUpView(self.style, self)
+        self.stack.addWidget(self.one_up_view)
+
+        main_layout.addWidget(self.stack, 1)
 
         # 3. Bac à photos inférieur (Photo Tray)
         self.photo_tray = PicasaPhotoTray(self.style, self)
@@ -108,6 +119,12 @@ class PicasaMainWindow(QMainWindow):
         # Sélection d'éléments dans la grille
         self.thumb_view.selection_changed.connect(self._on_selection_changed)
 
+        # Double-clic pour ouvrir la photo en grand (One-Up View)
+        self.thumb_view.item_double_clicked.connect(self._open_one_up_view)
+
+        # Retour à la bibliothèque
+        self.one_up_view.back_to_library_requested.connect(self._back_to_library)
+
         # Curseur de zoom du plateau
         self.photo_tray.zoom_changed.connect(self.thumb_view.set_thumb_size)
 
@@ -131,6 +148,37 @@ class PicasaMainWindow(QMainWindow):
             self.status_bar.showMessage(f"Base de données chargée : {count} photos indexées")
         except Exception as e:
             self.status_bar.showMessage(f"Mode sans base active : {e}")
+
+    def _open_one_up_view(self, item_idx: int) -> None:
+        """
+        Bascule en mode visualiseur/retouche plein écran pour la photo sélectionnée.
+        """
+        if self.db is None:
+            return
+
+        self.one_up_view.open_photo(self.db, item_idx, self.thumb_view.filtered_indices)
+        self.top_bar.hide()
+        self.photo_tray.hide()
+        self.stack.setCurrentIndex(1)
+        self.one_up_view.setFocus()
+
+        entry = self.db.index[item_idx]
+        p = Path(entry.path)
+        self.status_bar.showMessage(f"Éditeur Picasa : {p.name}")
+
+    def _back_to_library(self) -> None:
+        """
+        Revient à la grille de la photothèque.
+        """
+        self.stack.setCurrentIndex(0)
+        self.top_bar.show()
+        self.photo_tray.show()
+        if self.one_up_view.current_index >= 0:
+            self.thumb_view.selected_indices = {self.one_up_view.current_index}
+            self.thumb_view.update()
+            self._on_selection_changed([self.one_up_view.current_index])
+        self.thumb_view.setFocus()
+        self.status_bar.showMessage("Bibliothèque")
 
     def _on_folder_selected(self, key: str, target_type: str, display_name: str) -> None:
         if target_type == "folder":

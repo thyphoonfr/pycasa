@@ -138,6 +138,21 @@ Ce document consigne toutes les questions, hypothèses et points de doute confor
 
 ---
 
-## 10. Prochaines étapes
-- [ ] Phase 5 : Mesures de performances initiales, profilage et benchmarks comparatifs (`docs/perf/targets.md`).
-- [ ] Phase 6 : Implémentation de la vue d'édition (« One-Up View » / retouche et filtres `filterdesc.xml`).
+## 10. Mode Éditeur Plein Écran (« One-Up View »)
+*Statut : Résolu & validé par tests unitaires.*
+
+- [x] Identification des structures du visualiseur :
+  - Identifiants binaire : `OneUp`, `AVOneUpUI`, `editoneup`.
+  - Spécification : `ONEUPTEXT.XML`, `filterdesc.xml`.
+- [x] Implémentation complète dans `picasa_py/ui/` :
+  - `image_canvas.py` : Affichage haute résolution, zoom centré, panoramique fluide avec curseur main (`cursor_7.cur`), rotations 90°.
+  - `edit_panel.py` : Volet latéral de retouche avec bouton « Revenir à la bibliothèque », Annuler/Rétablir et onglets (Retouches de base, Lumière et couleur, Effets).
+  - `image_processor.py` : Moteur de filtres matriciels exécutant Contraste auto, Couleur auto, N&B, Sépia, Warmify, Lumière d'appoint, Netteté et Grain photo.
+  - `one_up_view.py` : Orchestrateur assemblant panneau d'édition, canvas et barre de transport (navigation Précédente / Suivante, rotations, zoom).
+  - Intégration dans `main_window.py` via `QStackedWidget` pour bascule transparente au double-clic et retour par `Échap` / bouton.
+
+---
+
+## 11. Prochaines étapes
+- [ ] Phase 6 : Mesures de performances initiales, profilage et benchmarks comparatifs (`docs/perf/targets.md`).
+- [ ] Phase 7 : Moteur de scan de dossiers & Gestionnaire de dossiers (`FOLDERMGR_TEXT.XML`).

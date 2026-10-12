@@ -40,6 +40,10 @@ class ThumbIndexRecord:
     flags: int
     parent_idx: int
 
+    @property
+    def file_size(self) -> int:
+        return self.size
+
     # Ref: picasa3.exe @ 0x004F571B
     def to_bytes(self, encoding: str = "utf-8") -> bytes:
         encoded_path = self.path.encode(encoding) + b"\x00"

@@ -92,6 +92,34 @@ class PicasaDatabase:
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
             self.contacts = ContactsFile.from_xml((self.contacts_dir / "contacts.xml").read_text(encoding="utf-8"))
 
+    @classmethod
+    def open(cls, db3_dir: str | Path, contacts_dir: str | Path | None = None) -> PicasaDatabase:
+        p_db3 = Path(db3_dir)
+        p_cont = Path(contacts_dir) if contacts_dir else p_db3.parent / "contacts"
+        db = cls(db3_dir=p_db3, contacts_dir=p_cont)
+        db.load_all()
+        return db
+
+    @property
+    def index(self) -> List[ThumbIndexRecord]:
+        return self.thumbindex.records if self.thumbindex else []
+
+    @property
+    def catdata(self) -> Dict[str, PmpFile]:
+        return {k.replace("catdata_", ""): v for k, v in self.pmps.items() if k.startswith("catdata_")}
+
+    @property
+    def search_index(self) -> Optional[WordHashFile]:
+        return self.wordhash
+
+    def search(self, word: str) -> List[int]:
+        if not self.wordhash:
+            return []
+        return self.wordhash.search(word)
+
+    def load_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
+        return self.get_thumbnail(index, size)
+
     def get_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
         """
         Extrait la miniature d'une image à un index donné.
@@ -113,3 +141,4 @@ class PicasaDatabase:
         if entry.is_empty:
             return None
         return container.get_blob(entry)
+
