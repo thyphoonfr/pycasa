@@ -153,18 +153,17 @@ class PicasaMainWindow(QMainWindow):
         """
         Bascule en mode visualiseur/retouche plein écran pour la photo sélectionnée.
         """
-        if self.db is None:
+        if self.db is None or item_idx >= len(self.thumb_view.items):
             return
 
-        self.one_up_view.open_photo(self.db, item_idx, self.thumb_view.filtered_indices)
+        item = self.thumb_view.items[item_idx]
+        available_indices = [self.thumb_view.items[i].index for i in self.thumb_view.filtered_indices]
+        self.one_up_view.open_photo(self.db, item.index, available_indices)
         self.top_bar.hide()
         self.photo_tray.hide()
         self.stack.setCurrentIndex(1)
         self.one_up_view.setFocus()
-
-        entry = self.db.index[item_idx]
-        p = Path(entry.path)
-        self.status_bar.showMessage(f"Éditeur Picasa : {p.name}")
+        self.status_bar.showMessage(f"Éditeur Picasa : {item.filename}")
 
     def _back_to_library(self) -> None:
         """
@@ -173,10 +172,13 @@ class PicasaMainWindow(QMainWindow):
         self.stack.setCurrentIndex(0)
         self.top_bar.show()
         self.photo_tray.show()
-        if self.one_up_view.current_index >= 0:
-            self.thumb_view.selected_indices = {self.one_up_view.current_index}
-            self.thumb_view.update()
-            self._on_selection_changed([self.one_up_view.current_index])
+        curr_db_idx = self.one_up_view.current_index
+        if curr_db_idx >= 0:
+            found = [i for i, it in enumerate(self.thumb_view.items) if it.index == curr_db_idx]
+            if found:
+                self.thumb_view.selected_indices = {found[0]}
+                self.thumb_view.update()
+                self._on_selection_changed([found[0]])
         self.thumb_view.setFocus()
         self.status_bar.showMessage("Bibliothèque")
 
@@ -194,16 +196,17 @@ class PicasaMainWindow(QMainWindow):
 
         if count == 1 and self.db is not None:
             idx = indices[0]
-            entry = self.db.index[idx]
-            p = Path(entry.path)
-            info = {
-                "filename": p.name,
-                "date": "—",
-                "size": f"{entry.file_size // 1024} Ko" if entry.file_size else "—",
-                "resolution": "—",
-                "camera": "—"
-            }
-            self.right_drawer.display_item_info(info)
+            if idx < len(self.thumb_view.items):
+                item = self.thumb_view.items[idx]
+                entry = self.db.index[item.index]
+                info = {
+                    "filename": item.filename,
+                    "date": "—",
+                    "size": f"{entry.size // 1024} Ko" if entry.size else "—",
+                    "resolution": "—",
+                    "camera": "—"
+                }
+                self.right_drawer.display_item_info(info)
         elif count == 0:
             self.right_drawer.display_item_info(None)
         else:
