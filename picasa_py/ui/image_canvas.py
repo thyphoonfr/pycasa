@@ -1,9 +1,13 @@
 """
 High-Resolution Interactive Image Canvas for PyCasa One-Up View.
 Supports smooth zooming, panning, rotation, and non-destructive preview.
+Includes Picasa's signature Loupe Navigator with interactive orange viewfinder frame.
 
-Ref: picasa3.exe @ OneUp, AVOneUpUI
-Ref: AGENTS.md §4 bis (Fonctionnement identique: zoom, pan, molette)
+Ref: picasa3.exe @ OneUp, AVOneUpUI (0x0094355C)
+Ref: picasa3.exe @ CLoupeNode (0x00942AE4), CLoupeMaker (0x00942AC8)
+Ref: picasa3.exe @ PanHandler (0x0093F3A8)
+Ref: picasa3.exe @ thumbui/loupe (0x0088F9C4)
+Ref: AGENTS.md §4 bis (Fonctionnement identique: zoom, pan, molette, navigateur de cadrage)
 """
 
 from __future__ import annotations
@@ -22,11 +26,12 @@ from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.style import PicasaStyle
 
 
-# Ref: picasa3.exe @ OneUp
+# Ref: picasa3.exe @ OneUp (0x0094355C)
 class PicasaImageCanvas(QWidget):
     """
-    Zone d'affichage haute résolution d'une photo avec zoom, panoramique (pan),
-    et affichage temps réel des retouches.
+    Zone d'affichage haute résolution d'une photo avec zoom continu ancré,
+    panoramique (pan) fluide, balises de visages, et navigateur Loupe d'ensemble
+    avec rectangle de cadrage interactif orange.
     """
     zoom_changed = Signal(float)
     navigate_prev = Signal()
@@ -45,14 +50,23 @@ class PicasaImageCanvas(QWidget):
         self._display_pixmap: Optional[QPixmap] = None
 
         # Paramètres de vue
-        self.zoom_level: float = 1.0  # 1.0 = Fit to window
+        self.zoom_level: float = 1.0  # 1.0 = 100% échelle 1:1
         self.fit_to_window: bool = True
         self.pan_offset: QPointF = QPointF(0, 0)
         self.rotation_degrees: int = 0  # 0, 90, 180, 270
 
-        # État d'interaction souris (pan/drag)
+        # État d'interaction souris (pan/drag principal)
         self._is_dragging: bool = False
         self._last_mouse_pos: QPoint = QPoint(0, 0)
+
+        # Loupe Overview Navigator (Ref: picasa3.exe @ CLoupeNode, 0x00942AE4)
+        self._nav_card_rect: QRectF = QRectF()
+        self._nav_img_rect: QRectF = QRectF()
+        self._vbox_rect: QRectF = QRectF()
+        self._nav_thumbnail: Optional[QPixmap] = None
+        self._is_dragging_nav_box: bool = False
+        self._last_nav_drag_pos: QPointF = QPointF(0, 0)
+        self.show_loupe_navigator: bool = True
 
         # Balises de visages (Face Tags, Ref: 0x008AAD76)
         self.face_rects: List[Any] = []
@@ -65,7 +79,7 @@ class PicasaImageCanvas(QWidget):
 
     def load_image(self, path: str, rotation: int = 0) -> bool:
         """
-        Charge une image haute résolution depuis le disque ou le conteneur.
+        Charge une image haute résolution depuis le disque.
         """
         self.image_path = path
         self.rotation_degrees = rotation % 360
@@ -83,6 +97,7 @@ class PicasaImageCanvas(QWidget):
 
         self._raw_pixmap = None
         self._display_pixmap = None
+        self._nav_thumbnail = None
         self.update()
         return False
 
@@ -108,25 +123,54 @@ class PicasaImageCanvas(QWidget):
     def _update_display_pixmap(self) -> None:
         if self._raw_pixmap is None or self._raw_pixmap.isNull():
             self._display_pixmap = None
+            self._nav_thumbnail = None
             return
 
         if self.rotation_degrees != 0:
             from PySide6.QtGui import QTransform
             transform = QTransform().rotate(self.rotation_degrees)
-            self._display_pixmap = self._raw_pixmap.transformed(transform, Qt.TransformationMode.SmoothTransformation)
+            self._display_pixmap = self._raw_pixmap.transformed(
+                transform, Qt.TransformationMode.SmoothTransformation
+            )
         else:
             self._display_pixmap = self._raw_pixmap
 
+        # Précalcul de la miniature de cadrage pour la Loupe (60 FPS garanti)
+        if self._display_pixmap and not self._display_pixmap.isNull():
+            self._nav_thumbnail = self._display_pixmap.scaled(
+                180, 180,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        else:
+            self._nav_thumbnail = None
+
+    def get_current_scale(self) -> float:
+        """Retourne le facteur d'échelle actuel de l'image."""
+        if self.fit_to_window:
+            return self._get_fit_scale()
+        return self.zoom_level
+
+    def is_zoomed_in(self) -> bool:
+        """Vérifie si l'image dépasse les dimensions de la fenêtre."""
+        if self._display_pixmap is None or self._display_pixmap.isNull():
+            return False
+        scale = self.get_current_scale()
+        draw_w = self._display_pixmap.width() * scale
+        draw_h = self._display_pixmap.height() * scale
+        return (draw_w > self.width() + 10) or (draw_h > self.height() + 10)
+
     def set_zoom(self, zoom: float) -> None:
-        self.zoom_level = max(0.1, min(5.0, zoom))
+        self.zoom_level = max(0.1, min(6.0, zoom))
         self.fit_to_window = False
+        self._clamp_pan_offset()
         self.zoom_changed.emit(self.zoom_level)
         self.update()
 
     def reset_zoom_to_fit(self) -> None:
         self.fit_to_window = True
         self.pan_offset = QPointF(0, 0)
-        self.zoom_level = 1.0
+        self.zoom_level = self._get_fit_scale()
         self.zoom_changed.emit(self.zoom_level)
         self.update()
 
@@ -141,12 +185,149 @@ class PicasaImageCanvas(QWidget):
         scale_y = view_h / img_h
         return min(scale_x, scale_y)
 
+    def _clamp_pan_offset(self) -> None:
+        """
+        Contraint le panoramique pour maintenir l'image visible et centrée.
+        Ref: picasa3.exe @ PanHandler 0x0093F3A8
+        """
+        if self._display_pixmap is None or self._display_pixmap.isNull():
+            self.pan_offset = QPointF(0, 0)
+            return
+
+        scale = self.get_current_scale()
+        draw_w = self._display_pixmap.width() * scale
+        draw_h = self._display_pixmap.height() * scale
+
+        # Axe horizontal
+        if draw_w <= self.width():
+            new_x = 0.0
+        else:
+            max_delta_x = (draw_w - self.width()) / 2.0
+            bound_x = max_delta_x + 40.0
+            new_x = max(-bound_x, min(bound_x, self.pan_offset.x()))
+
+        # Axe vertical
+        if draw_h <= self.height():
+            new_y = 0.0
+        else:
+            max_delta_y = (draw_h - self.height()) / 2.0
+            bound_y = max_delta_y + 40.0
+            new_y = max(-bound_y, min(bound_y, self.pan_offset.y()))
+
+        self.pan_offset = QPointF(new_x, new_y)
+
+    def set_zoom_anchored(self, new_zoom: float, anchor: QPointF) -> None:
+        """
+        Zoom ancré au niveau du curseur : le point de la photo sous la souris reste stable.
+        Ref: picasa3.exe @ CLoupeMaker / OneUpUI 0x0094355C
+        """
+        if self._display_pixmap is None or self._display_pixmap.isNull():
+            return
+
+        old_scale = self.get_current_scale()
+        clamped_zoom = max(0.1, min(6.0, new_zoom))
+        fit_scale = self._get_fit_scale()
+
+        # Si l'utilisateur dézoome en-deçà de la vue ajustée, réinitialiser proprement au Fit
+        if clamped_zoom <= fit_scale * 0.98:
+            self.reset_zoom_to_fit()
+            return
+
+        draw_w_old = self._display_pixmap.width() * old_scale
+        draw_h_old = self._display_pixmap.height() * old_scale
+        cx_old = (self.width() - draw_w_old) / 2.0 + self.pan_offset.x()
+        cy_old = (self.height() - draw_h_old) / 2.0 + self.pan_offset.y()
+
+        # Coordonnées normalisées [0..1] du point sous la souris
+        u = (anchor.x() - cx_old) / draw_w_old if draw_w_old > 0 else 0.5
+        v = (anchor.y() - cy_old) / draw_h_old if draw_h_old > 0 else 0.5
+        u = max(0.0, min(1.0, u))
+        v = max(0.0, min(1.0, v))
+
+        draw_w_new = self._display_pixmap.width() * clamped_zoom
+        draw_h_new = self._display_pixmap.height() * clamped_zoom
+
+        cx_new = anchor.x() - u * draw_w_new
+        cy_new = anchor.y() - v * draw_h_new
+
+        self.pan_offset = QPointF(
+            cx_new - (self.width() - draw_w_new) / 2.0,
+            cy_new - (self.height() - draw_h_new) / 2.0
+        )
+        self.zoom_level = clamped_zoom
+        self.fit_to_window = False
+        self._clamp_pan_offset()
+        self.zoom_changed.emit(self.zoom_level)
+        self.update()
+
+    def _update_loupe_geometry(self) -> None:
+        """
+        Calcule la géométrie du navigateur Loupe et du cadre de visée orange.
+        Ref: picasa3.exe @ CLoupeNode (0x00942AE4)
+        """
+        if not self.is_zoomed_in() or self._display_pixmap is None:
+            self._nav_card_rect = QRectF()
+            self._nav_img_rect = QRectF()
+            self._vbox_rect = QRectF()
+            return
+
+        img_w = self._display_pixmap.width()
+        img_h = self._display_pixmap.height()
+        if img_w <= 0 or img_h <= 0:
+            return
+
+        aspect = img_w / img_h
+        max_w, max_h = 160.0, 120.0
+        if aspect >= (max_w / max_h):
+            nw = max_w
+            nh = max(24.0, max_w / aspect)
+        else:
+            nh = max_h
+            nw = max(24.0, max_h * aspect)
+
+        pad = 6.0
+        card_w = nw + pad * 2.0
+        card_h = nh + pad * 2.0
+        margin_right = 18.0
+        margin_bottom = 18.0
+
+        card_x = self.width() - card_w - margin_right
+        card_y = self.height() - card_h - margin_bottom
+
+        self._nav_card_rect = QRectF(card_x, card_y, card_w, card_h)
+        self._nav_img_rect = QRectF(card_x + pad, card_y + pad, nw, nh)
+
+        # Calcul de la zone visible en coordonnées normalisées [0..1]
+        scale = self.get_current_scale()
+        draw_w = img_w * scale
+        draw_h = img_h * scale
+
+        cx = (self.width() - draw_w) / 2.0 + self.pan_offset.x()
+        cy = (self.height() - draw_h) / 2.0 + self.pan_offset.y()
+
+        u1 = max(0.0, min(1.0, -cx / draw_w))
+        u2 = max(0.0, min(1.0, (self.width() - cx) / draw_w))
+        v1 = max(0.0, min(1.0, -cy / draw_h))
+        v2 = max(0.0, min(1.0, (self.height() - cy) / draw_h))
+
+        if u2 < u1:
+            u2 = u1
+        if v2 < v1:
+            v2 = v1
+
+        vx = self._nav_img_rect.x() + u1 * self._nav_img_rect.width()
+        vy = self._nav_img_rect.y() + v1 * self._nav_img_rect.height()
+        vw = max(8.0, (u2 - u1) * self._nav_img_rect.width())
+        vh = max(8.0, (v2 - v1) * self._nav_img_rect.height())
+
+        self._vbox_rect = QRectF(vx, vy, vw, vh)
+
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
 
-        # Fond neutre sombre (Picasa One-Up utilise un fond gris foncé/noir #1A1A1A)
+        # Fond neutre sombre Picasa (#1A1A1A)
         painter.fillRect(self.rect(), QColor(0x1A, 0x1A, 0x1A))
 
         if self._display_pixmap is None or self._display_pixmap.isNull():
@@ -154,7 +335,7 @@ class PicasaImageCanvas(QWidget):
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Impossible de charger l'image")
             return
 
-        scale = self._get_fit_scale() if self.fit_to_window else self.zoom_level
+        scale = self.get_current_scale()
         draw_w = self._display_pixmap.width() * scale
         draw_h = self._display_pixmap.height() * scale
 
@@ -167,12 +348,79 @@ class PicasaImageCanvas(QWidget):
         shadow_rect = target_rect.translated(4, 4)
         painter.fillRect(shadow_rect, QColor(0, 0, 0, 90))
 
-        # Dessin de l'image
+        # Dessin de l'image haute définition
         painter.drawPixmap(target_rect, self._display_pixmap, QRectF(self._display_pixmap.rect()))
 
-        # Dessin des balises de visages (Face Tags, Ref: 0x008AAD76, 0x009B9290)
+        # Dessin des balises de visages (Face Tags, Ref: 0x008AAD76)
         if self.show_face_tags and self.face_rects:
             self._draw_face_tags(painter, target_rect)
+
+        # Dessin du navigateur Loupe d'ensemble (Ref: 0x00942AE4)
+        self._update_loupe_geometry()
+        self._draw_overview_navigator(painter)
+
+    def _draw_overview_navigator(self, painter: QPainter) -> None:
+        """
+        Dessine la miniature flottante de vue d'ensemble avec le cadre de visée orange.
+        Ref: picasa3.exe @ CLoupeNode 0x00942AE4
+        """
+        if not self.is_zoomed_in() or not self.show_loupe_navigator:
+            return
+        if self._nav_card_rect.isEmpty() or self._nav_img_rect.isEmpty():
+            return
+
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+
+        # 1. Ombre portée de la carte Loupe
+        shadow_rect = self._nav_card_rect.translated(2, 3)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor(0, 0, 0, 110))
+        painter.drawRoundedRect(shadow_rect, 6.0, 6.0)
+
+        # 2. Carte d'arrière-plan semi-transparente sombre
+        painter.setBrush(QColor(22, 24, 28, 230))
+        painter.setPen(QPen(QColor(70, 75, 85, 220), 1.0))
+        painter.drawRoundedRect(self._nav_card_rect, 6.0, 6.0)
+
+        # 3. Miniature de l'image
+        if self._nav_thumbnail and not self._nav_thumbnail.isNull():
+            painter.drawPixmap(self._nav_img_rect, self._nav_thumbnail, QRectF(self._nav_thumbnail.rect()))
+        elif self._display_pixmap:
+            painter.drawPixmap(self._nav_img_rect, self._display_pixmap, QRectF(self._display_pixmap.rect()))
+
+        # 4. Voile sombre atténuant les zones hors du cadrage actuel
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor(0, 0, 0, 70))
+        painter.drawRect(self._nav_img_rect)
+
+        # 5. Cadre de visée (Viewfinder Frame - Orange Picasa #FF9900)
+        painter.setBrush(QColor(255, 145, 0, 50))
+        painter.setPen(QPen(QColor(255, 155, 0, 240), 1.8))
+        painter.drawRect(self._vbox_rect)
+
+        # Coins renforcés (corner accents) caractéristiques de Picasa Loupe
+        c_len = min(6.0, min(self._vbox_rect.width(), self._vbox_rect.height()) / 2.0)
+        c_pen = QPen(QColor(255, 220, 130, 255), 2.2)
+        painter.setPen(c_pen)
+        x1, y1 = self._vbox_rect.left(), self._vbox_rect.top()
+        x2, y2 = self._vbox_rect.right(), self._vbox_rect.bottom()
+
+        # Coin Haut-Gauche
+        painter.drawLine(QPointF(x1, y1), QPointF(x1 + c_len, y1))
+        painter.drawLine(QPointF(x1, y1), QPointF(x1, y1 + c_len))
+        # Coin Haut-Droit
+        painter.drawLine(QPointF(x2, y1), QPointF(x2 - c_len, y1))
+        painter.drawLine(QPointF(x2, y1), QPointF(x2, y1 + c_len))
+        # Coin Bas-Gauche
+        painter.drawLine(QPointF(x1, y2), QPointF(x1 + c_len, y2))
+        painter.drawLine(QPointF(x1, y2), QPointF(x1, y2 - c_len))
+        # Coin Bas-Droit
+        painter.drawLine(QPointF(x2, y2), QPointF(x2 - c_len, y2))
+        painter.drawLine(QPointF(x2, y2), QPointF(x2, y2 - c_len))
+
+        painter.restore()
 
     def set_face_rects(self, rects: List[Any]) -> None:
         self.face_rects = rects
@@ -221,28 +469,97 @@ class PicasaImageCanvas(QWidget):
 
     def wheelEvent(self, event: QWheelEvent) -> None:
         delta = event.angleDelta().y()
-        if delta > 0:
-            new_zoom = (self._get_fit_scale() if self.fit_to_window else self.zoom_level) * 1.15
-            self.set_zoom(new_zoom)
-        elif delta < 0:
-            new_zoom = (self._get_fit_scale() if self.fit_to_window else self.zoom_level) / 1.15
-            self.set_zoom(new_zoom)
+        if delta == 0:
+            return
+
+        factor = 1.18 if delta > 0 else (1.0 / 1.18)
+        current_s = self.get_current_scale()
+        new_zoom = current_s * factor
+        self.set_zoom_anchored(new_zoom, event.position())
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
+            pos = event.position()
+            # 1. Interaction avec la Loupe si active
+            if self.is_zoomed_in() and self.show_loupe_navigator and self._nav_card_rect.contains(pos):
+                if self._nav_img_rect.contains(pos):
+                    if self._vbox_rect.contains(pos):
+                        self._is_dragging_nav_box = True
+                        self._last_nav_drag_pos = pos
+                    else:
+                        self._center_on_nav_point(pos)
+                        self._is_dragging_nav_box = True
+                        self._last_nav_drag_pos = pos
+                return
+
+            # 2. Panoramique sur le canvas principal
             self._is_dragging = True
             self._last_mouse_pos = event.pos()
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
+
+    def _center_on_nav_point(self, click_pos: QPointF) -> None:
+        """Recentrer la vue principale sur le point cliqué dans la Loupe."""
+        if self._nav_img_rect.isEmpty() or self._display_pixmap is None:
+            return
+        u = (click_pos.x() - self._nav_img_rect.x()) / self._nav_img_rect.width()
+        v = (click_pos.y() - self._nav_img_rect.y()) / self._nav_img_rect.height()
+        u = max(0.0, min(1.0, u))
+        v = max(0.0, min(1.0, v))
+
+        scale = self.get_current_scale()
+        draw_w = self._display_pixmap.width() * scale
+        draw_h = self._display_pixmap.height() * scale
+
+        self.pan_offset = QPointF(draw_w * (0.5 - u), draw_h * (0.5 - v))
+        self._clamp_pan_offset()
+        self.update()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        pos = event.position()
+
+        # 1. Déplacement du cadre de cadrage dans la Loupe
+        if self._is_dragging_nav_box:
+            delta = pos - self._last_nav_drag_pos
+            self._last_nav_drag_pos = pos
+
+            if not self._nav_img_rect.isEmpty() and self._display_pixmap:
+                scale = self.get_current_scale()
+                draw_w = self._display_pixmap.width() * scale
+                draw_h = self._display_pixmap.height() * scale
+
+                ratio_x = draw_w / self._nav_img_rect.width()
+                ratio_y = draw_h / self._nav_img_rect.height()
+
+                self.pan_offset = QPointF(
+                    self.pan_offset.x() - delta.x() * ratio_x,
+                    self.pan_offset.y() - delta.y() * ratio_y
+                )
+                self._clamp_pan_offset()
+                self.update()
+            return
+
+        # 2. Déplacement panoramique (Pan) de la photo
         if self._is_dragging:
             delta = event.pos() - self._last_mouse_pos
             self._last_mouse_pos = event.pos()
             self.pan_offset += QPointF(delta.x(), delta.y())
             self.fit_to_window = False
+            self._clamp_pan_offset()
             self.update()
-        elif self.show_face_tags and self.face_rects and self._display_pixmap:
-            # Survol des visages pour mise en surbrillance
-            scale = self._get_fit_scale() if self.fit_to_window else self.zoom_level
+            return
+
+        # 3. Adaptation du curseur de survol
+        if self.is_zoomed_in() and self.show_loupe_navigator and self._nav_card_rect.contains(pos):
+            if self._vbox_rect.contains(pos):
+                self.setCursor(Qt.CursorShape.SizeAllCursor)
+            else:
+                self.setCursor(Qt.CursorShape.PointingHandCursor)
+        else:
+            self.setCursor(self._pan_cursor)
+
+        # 4. Survol des balises de visages
+        if self.show_face_tags and self.face_rects and self._display_pixmap:
+            scale = self.get_current_scale()
             draw_w = self._display_pixmap.width() * scale
             draw_h = self._display_pixmap.height() * scale
             cx = (self.width() - draw_w) / 2.0 + self.pan_offset.x()
@@ -251,7 +568,6 @@ class PicasaImageCanvas(QWidget):
 
             prev_hovered = self.hovered_face_idx
             self.hovered_face_idx = -1
-            pos = event.position()
             for i, fr in enumerate(self.face_rects):
                 fx = t_rect.x() + fr.left * t_rect.width()
                 fy = t_rect.y() + fr.top * t_rect.height()
@@ -266,9 +582,27 @@ class PicasaImageCanvas(QWidget):
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             self._is_dragging = False
+            self._is_dragging_nav_box = False
+            self.setCursor(self._pan_cursor)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
-        if self.fit_to_window:
-            self.set_zoom(1.0)
+        if event.button() == Qt.MouseButton.LeftButton:
+            pos = event.position()
+            if self.fit_to_window:
+                # Double-clic zoome sur le point cliqué à 100% ou 200%
+                fit_scale = self._get_fit_scale()
+                target_zoom = 1.0 if fit_scale < 0.8 else max(1.5, fit_scale * 2.0)
+                self.set_zoom_anchored(target_zoom, pos)
+            else:
+                self.reset_zoom_to_fit()
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self._clamp_pan_offset()
+
+    def keyPressEvent(self, event) -> None:
+        # Laisser remonter les touches de transport (Gauche/Droite/Échap/Entrée) au parent OneUpView
+        if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            event.ignore()
         else:
-            self.reset_zoom_to_fit()
+            super().keyPressEvent(event)

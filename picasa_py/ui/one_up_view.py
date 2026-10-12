@@ -7,6 +7,8 @@ Ref: AGENTS.md §4 bis (Mode visualiseur/retouche fidèle)
 """
 
 from __future__ import annotations
+import os
+import io
 from pathlib import Path
 from typing import List, Optional, Tuple
 from PySide6.QtWidgets import (
@@ -147,6 +149,7 @@ class PicasaOneUpView(QWidget):
         self.zoom_slider.setValue(100)
         self.zoom_slider.setFixedWidth(120)
         self.zoom_slider.valueChanged.connect(lambda v: self.canvas.set_zoom(v / 100.0))
+        self.canvas.zoom_changed.connect(self._on_canvas_zoom_changed)
         layout.addWidget(self.zoom_slider)
 
         self.btn_fit = QPushButton("Ajuster")
@@ -163,6 +166,11 @@ class PicasaOneUpView(QWidget):
         layout.addWidget(self.btn_toggle_faces)
 
         return bar
+
+    def _on_canvas_zoom_changed(self, zoom: float) -> None:
+        self.zoom_slider.blockSignals(True)
+        self.zoom_slider.setValue(int(zoom * 100))
+        self.zoom_slider.blockSignals(False)
 
     def _on_toggle_face_tags(self, checked: bool) -> None:
         self.btn_toggle_faces.setText("Visages (On)" if checked else "Visages (Off)")
@@ -182,27 +190,31 @@ class PicasaOneUpView(QWidget):
         if index < 0 or index >= len(db.index):
             return
 
-        entry = db.index[index]
-        path_str = entry.path
-
-        # Vérifier si le fichier existe sur disque
-        p = Path(path_str)
+        full_path = db.get_media_full_path(index)
         pil_img: Optional[Image.Image] = None
-        if p.exists():
+
+        # 1. Chargement de l'image originale haute résolution sur disque
+        if full_path and os.path.exists(full_path):
             try:
-                pil_img = Image.open(str(p)).convert("RGB")
+                with Image.open(full_path) as raw_img:
+                    from PIL import ImageOps
+                    pil_img = ImageOps.exif_transpose(raw_img)
+                    if pil_img.mode != "RGB":
+                        pil_img = pil_img.convert("RGB")
             except Exception:
                 pass
 
-        # Si pas sur disque, charger depuis la base thumbs
+        # 2. Si introuvable (disque déconnecté), repli sur previews puis thumbs
         if pil_img is None:
-            raw_thumb = db.load_thumbnail(index)
-            if raw_thumb:
-                import io
-                try:
-                    pil_img = Image.open(io.BytesIO(raw_thumb)).convert("RGB")
-                except Exception:
-                    pass
+            for sz in ("preview", "large", "medium", "small"):
+                raw_thumb = db.load_thumbnail(index, size=sz)
+                if raw_thumb:
+                    import io
+                    try:
+                        pil_img = Image.open(io.BytesIO(raw_thumb)).convert("RGB")
+                        break
+                    except Exception:
+                        pass
 
         if pil_img:
             self._history = [pil_img.copy()]

@@ -28,7 +28,7 @@ class PicasaDatabase:
     Instance complète d'une base de données Picasa 3.
     """
 
-    def __init__(self, db3_dir: Path, contacts_dir: Path | None = None):
+    def __init__(self, db3_dir: Path = Path("."), contacts_dir: Path | None = None):
         self.db3_dir = db3_dir
         self.contacts_dir = contacts_dir
 
@@ -152,6 +152,27 @@ class PicasaDatabase:
         if not self.repository:
             self.repository = KeyValueTableFile()
         self.repository.set(norm_path, str(status))
+
+    def get_media_full_path(self, index: int) -> Optional[str]:
+        """
+        Reconstitue le chemin d'accès complet du fichier image sur disque
+        en combinant le répertoire parent et le nom de fichier stockés dans thumbindex.db.
+        Ref: picasa3.exe @ 0x0045C0A0
+        """
+        if not self.thumbindex or index < 0 or index >= len(self.thumbindex.records):
+            return None
+        rec = self.thumbindex.records[index]
+        if rec.type not in (2, 6, 7, 13, 18, 31):
+            return None
+        parent_idx = rec.parent_idx
+        folder_path = ""
+        if 0 <= parent_idx < len(self.thumbindex.records):
+            parent_rec = self.thumbindex.records[parent_idx]
+            if parent_rec.type == 1:
+                folder_path = parent_rec.path
+        if folder_path:
+            return os.path.join(folder_path, rec.path)
+        return rec.path
 
     def load_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
 

@@ -130,3 +130,95 @@ def test_main_window_one_up_switching(qapp):
         assert not win.photo_tray.isHidden()
 
     win.close()
+
+
+def test_get_media_full_path_resolution():
+    """
+    Test que PicasaDatabase.get_media_full_path reconstitue correctement
+    le chemin disque absolu parent_path + filename.
+    Ref: picasa3.exe @ 0x0045C0A0
+    """
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.db.thumbindex import ThumbIndexFile, ThumbIndexRecord
+
+    db = PicasaDatabase()
+    ti = ThumbIndexFile()
+    # Dossier (type 1)
+    rec_folder = ThumbIndexRecord(
+        path=r"C:\Photos\Vacances",
+        ft1=0, ft2=0, size=0, type=1, flags=0, parent_idx=-1
+    )
+    ti.records.append(rec_folder)
+
+    # Photo (type 2) rattachée au dossier 0
+    rec_photo = ThumbIndexRecord(
+        path="DSC_0001.JPG",
+        ft1=0, ft2=0, size=1024, type=2, flags=0, parent_idx=0
+    )
+    ti.records.append(rec_photo)
+
+    db.thumbindex = ti
+
+    full_path = db.get_media_full_path(1)
+    assert full_path is not None
+    assert full_path == os.path.join(r"C:\Photos\Vacances", "DSC_0001.JPG")
+
+    # Index invalide ou record type 1 (dossier)
+    assert db.get_media_full_path(-1) is None
+    assert db.get_media_full_path(0) is None
+    assert db.get_media_full_path(999) is None
+
+
+def test_image_canvas_loupe_and_anchored_zoom(qapp):
+    """
+    Test du système de zoom ancré et du navigateur Loupe avec cadre de visée orange.
+    Ref: picasa3.exe @ CLoupeNode (0x00942AE4), OneUpUI (0x0094355C)
+    """
+    from PySide6.QtCore import QPointF, QSize
+    canvas = PicasaImageCanvas()
+    canvas.resize(800, 600)
+
+    # Image haute résolution 4000x3000
+    pix = QPixmap(4000, 3000)
+    canvas.set_pixmap_direct(pix)
+
+    # 1. État initial : mode Ajuster (Fit)
+    assert canvas.fit_to_window is True
+    fit_scale = canvas._get_fit_scale()
+    assert fit_scale > 0
+    # En mode ajuster, l'image n'est pas zoomée au-delà de la fenêtre
+    assert canvas.is_zoomed_in() is False
+
+    # 2. Zoom à 100% (1:1) : l'image dépasse l'écran (4000x3000 > 800x600)
+    canvas.set_zoom(1.0)
+    assert canvas.fit_to_window is False
+    assert canvas.is_zoomed_in() is True
+
+    # 3. Calcul de la géométrie de la Loupe
+    canvas._update_loupe_geometry()
+    assert not canvas._nav_card_rect.isEmpty()
+    assert not canvas._nav_img_rect.isEmpty()
+    assert not canvas._vbox_rect.isEmpty()
+
+    # Le cadre de visée _vbox_rect doit être contenu dans la miniature _nav_img_rect
+    assert canvas._nav_img_rect.contains(canvas._vbox_rect.center())
+    assert canvas._vbox_rect.width() <= canvas._nav_img_rect.width()
+    assert canvas._vbox_rect.height() <= canvas._nav_img_rect.height()
+
+    # 4. Zoom ancré au curseur (400, 300)
+    canvas.set_zoom_anchored(1.5, QPointF(400, 300))
+    assert canvas.zoom_level == 1.5
+
+    # 5. Recentrage via clic sur la Loupe
+    nav_pt = canvas._nav_img_rect.topLeft() + QPointF(10, 10)
+    canvas._center_on_nav_point(nav_pt)
+    canvas._update_loupe_geometry()
+    # Le cadre s'est déplacé vers le haut-gauche
+    assert canvas._vbox_rect.left() >= canvas._nav_img_rect.left() - 1.0
+
+    # 6. Réinitialisation au Fit
+    canvas.reset_zoom_to_fit()
+    assert canvas.fit_to_window is True
+    assert canvas.pan_offset == QPointF(0, 0)
+    assert canvas.is_zoomed_in() is False
+
