@@ -12,10 +12,42 @@ from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSlider, QFrame
 )
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPixmap
+from PySide6.QtGui import QColor, QFont, QPixmap, QPainter, QPen, QBrush, QPaintEvent
+from PySide6.QtCore import QRect
 
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
+
+
+class PicasaZoomIcon(QWidget):
+    """
+    Icône de zoom de vignette (petite grille 2x2 ou grande vignette unique).
+    Ref: picasa3.exe @ zoomslider (0x0088E914)
+    """
+
+    def __init__(self, is_large: bool = False, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.is_large = is_large
+        self.setFixedSize(18, 18)
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        color = QColor("#8A92A0")
+        painter.setPen(QPen(color, 1))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+
+        if not self.is_large:
+            # Petite grille de 4 carrés (2x2)
+            for row in range(2):
+                for col in range(2):
+                    r = QRect(2 + col * 7, 2 + row * 7, 6, 6)
+                    painter.drawRect(r)
+        else:
+            # Grande vignette unique
+            r = QRect(2, 2, 13, 13)
+            painter.drawRect(r)
 
 
 class PicasaPhotoTray(QWidget):
@@ -109,21 +141,19 @@ class PicasaPhotoTray(QWidget):
 
         main_layout.addStretch(1)
 
-        # 3. Curseur de zoom de vignettes
-        lbl_small = QLabel("−")
-        lbl_small.setStyleSheet("font-size: 14px; font-weight: bold;")
-        main_layout.addWidget(lbl_small)
+        # 3. Curseur de zoom de vignettes (zoomslider / scaleslider)
+        self.icon_small = PicasaZoomIcon(is_large=False)
+        main_layout.addWidget(self.icon_small)
 
         self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
         self.zoom_slider.setRange(64, 256)
         self.zoom_slider.setValue(140)
-        self.zoom_slider.setFixedWidth(100)
+        self.zoom_slider.setFixedWidth(110)
         self.zoom_slider.valueChanged.connect(self.zoom_changed.emit)
         main_layout.addWidget(self.zoom_slider)
 
-        lbl_large = QLabel("+")
-        lbl_large.setStyleSheet("font-size: 14px; font-weight: bold;")
-        main_layout.addWidget(lbl_large)
+        self.icon_large = PicasaZoomIcon(is_large=True)
+        main_layout.addWidget(self.icon_large)
 
         sep2 = QFrame()
         sep2.setFrameShape(QFrame.Shape.VLine)
