@@ -120,6 +120,9 @@ class PicasaDatabase:
     def load_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
         return self.get_thumbnail(index, size)
 
+    def get_thumbnail_jpeg(self, index: int, size: str = "small") -> Optional[bytes]:
+        return self.get_thumbnail(index, size)
+
     def get_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
         """
         Extrait la miniature d'une image à un index donné.

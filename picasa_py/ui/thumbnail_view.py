@@ -373,36 +373,39 @@ class PicasaThumbnailView(QWidget):
     # -------------------------------------------------------------------------
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        try:
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # Fond de la photothèque
-        painter.fillRect(self.rect(), self.style.grid_bgcolor)
+            # Fond de la photothèque
+            painter.fillRect(self.rect(), self.style.grid_bgcolor)
 
-        viewport_h = self.height()
+            viewport_h = self.height()
 
-        for sec in self.visible_sections:
-            sec_top = sec.y_start - self.scroll_y
-            sec_bottom = sec_top + sec.height
+            for sec in self.visible_sections:
+                sec_top = sec.y_start - self.scroll_y
+                sec_bottom = sec_top + sec.height
 
-            # Ne dessiner que les sections recoupant l'écran
-            if sec_bottom < -10:
-                continue
-            if sec_top > viewport_h + 10:
-                break
-
-            # 1. Dessiner l'en-tête de section (Album Header)
-            if sec_top > -45 and sec_top < viewport_h:
-                self._draw_section_header(painter, sec, sec_top)
-
-            # 2. Dessiner les vignettes de la section
-            for slot_idx, item_idx in enumerate(sec.item_indices):
-                r = self._get_item_rect(sec, slot_idx)
-                if r.bottom() < -20:
+                # Ne dessiner que les sections recoupant l'écran
+                if sec_bottom < -10:
                     continue
-                if r.top() > viewport_h + 20:
+                if sec_top > viewport_h + 10:
                     break
 
-                self._draw_thumbnail(painter, r, item_idx)
+                # 1. Dessiner l'en-tête de section (Album Header)
+                if sec_top > -45 and sec_top < viewport_h:
+                    self._draw_section_header(painter, sec, sec_top)
+
+                # 2. Dessiner les vignettes de la section
+                for slot_idx, item_idx in enumerate(sec.item_indices):
+                    r = self._get_item_rect(sec, slot_idx)
+                    if r.bottom() < -20:
+                        continue
+                    if r.top() > viewport_h + 20:
+                        break
+
+                    self._draw_thumbnail(painter, r, item_idx)
+        finally:
+            painter.end()
 
     def _draw_section_header(self, painter: QPainter, sec: AlbumSection, y: int) -> None:
         """
@@ -520,7 +523,7 @@ class PicasaThumbnailView(QWidget):
             return None
 
         item = self.items[item_idx]
-        raw_bytes = self.db.get_thumbnail_jpeg(item.index)
+        raw_bytes = self.db.get_thumbnail(item.index)
 
         if raw_bytes:
             img = QImage.fromData(raw_bytes)

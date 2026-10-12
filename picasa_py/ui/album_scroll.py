@@ -350,26 +350,29 @@ class PicasaAlbumScroll(QWidget):
     # -------------------------------------------------------------------------
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        try:
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # 1. Piste de défilement (thumbui/albumscroll)
-        painter.fillRect(self.rect(), QColor("#282B30"))
-        painter.setPen(QColor("#1E2024"))
-        painter.drawLine(0, 0, 0, self.height())
+            # 1. Piste de défilement (thumbui/albumscroll)
+            painter.fillRect(self.rect(), QColor("#282B30"))
+            painter.setPen(QColor("#1E2024"))
+            painter.drawLine(0, 0, 0, self.height())
 
-        # 2. Boutons de navigation Haut
-        self._draw_arrow_button(painter, 0, 0, self.width(), self.btn_size, up=True, double=False)
-        self._draw_arrow_button(painter, 0, self.btn_size, self.width(), self.album_btn_size, up=True, double=True)
+            # 2. Boutons de navigation Haut
+            self._draw_arrow_button(painter, 0, 0, self.width(), self.btn_size, up=True, double=False)
+            self._draw_arrow_button(painter, 0, self.btn_size, self.width(), self.album_btn_size, up=True, double=True)
 
-        # 3. Curseur (Thumb - AVCScrollBox)
-        thumb_r = self._get_thumb_rect()
-        if self.max_val > self.min_val:
-            self._draw_thumb(painter, thumb_r)
+            # 3. Curseur (Thumb - AVCScrollBox)
+            thumb_r = self._get_thumb_rect()
+            if self.max_val > self.min_val:
+                self._draw_thumb(painter, thumb_r)
 
-        # 4. Boutons de navigation Bas
-        next_album_y = self.height() - (self.btn_size + self.album_btn_size)
-        self._draw_arrow_button(painter, 0, next_album_y, self.width(), self.album_btn_size, up=False, double=True)
-        self._draw_arrow_button(painter, 0, self.height() - self.btn_size, self.width(), self.btn_size, up=False, double=False)
+            # 4. Boutons de navigation Bas
+            next_album_y = self.height() - (self.btn_size + self.album_btn_size)
+            self._draw_arrow_button(painter, 0, next_album_y, self.width(), self.album_btn_size, up=False, double=True)
+            self._draw_arrow_button(painter, 0, self.height() - self.btn_size, self.width(), self.btn_size, up=False, double=False)
+        finally:
+            painter.end()
 
     def _draw_thumb(self, painter: QPainter, rect: QRect) -> None:
         """Dessine la capsule du curseur avec reflets et états."""
