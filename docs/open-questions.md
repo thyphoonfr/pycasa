@@ -93,7 +93,51 @@ Ce document consigne toutes les questions, hypothèses et points de doute confor
 
 ---
 
-## 8. Prochaines étapes (Interface & Performances)
-- [ ] Phase 3 : Extraction des ressources PE (dialogues, menus, icônes, curseurs, tables de chaînes) de `Picasa3.exe`.
-- [ ] Phase 4 : Spécification et squelette de l'interface utilisateur PyQt/PySide6 conforme au pixel près.
-- [ ] Phase 5 : Mesures de performances initiales et benchmarks de navigation dans la photothèque.
+---
+
+## 8. Ressources PE et Définition d'Interface (`Picasa3.exe`, `Picasa3i18n.dll`, `runtime/`)
+*Statut : Résolu & validé par tests unitaires.*
+
+- [x] Extraction de l'intégralité des ressources PE via `pefile` :
+  - 11 groupes d'icônes (`RT_GROUP_ICON` / `RT_ICON`) exportés en fichiers `.ico` valides, dont l'icône principale `group_icon_105.ico` (256x256).
+  - 12 curseurs (`RT_GROUP_CURSOR` / `RT_CURSOR`) exportés en `.cur` avec leurs points chauds originaux respectés (loupe, crop, pipette, yeux rouges, etc.).
+  - 265 chaînes extraites de `RT_STRING` vers `strings.json`.
+  - 13 dialogues bruts `RT_DIALOG`.
+  - Manifeste d'application `picasa.manifest`.
+- [x] Extraction des ressources d'internationalisation :
+  - 3 084 fichiers XML extraits de `Picasa3i18n.dll` (type `XMLF`), dont `SHORTCUTS.XML`.
+- [x] Définitions de gabarits d'interface :
+  - 47 fichiers `.fen` (XML de mise en page Picasa).
+  - Métriques et styles `constants.ui` (`alist_*`, `alabel_*`, `alayout_*`, `thumbsel_*`).
+- [x] Structure de menu interne :
+  - Table binaire `eMenu*` mappée à `0x0088C3EC` (167 entrées structurées avec libellés et raccourcis).
+
+---
+
+## 9. Fenêtre Principale et Architecture UI (`ytWindow`)
+*Statut : Résolu & implémenté dans `picasa_py/ui/`.*
+
+- [x] Identification de la classe de fenêtre principale :
+  - Nom Win32 : `ytWindow` (`picasa3.exe @ 0x00C7F35C`).
+  - Procédure de fenêtre : `picasa3.exe @ 0x00983940`.
+  - Enregistrement : `0x009838D0` (Style `0x400B`, `cbWndExtra=4`).
+  - Signature d'instance : `0x47506332` (`GPc2`) dans `GetWindowLong(hwnd, 0)`.
+- [x] Choix du Toolkit : **PySide6** justifié dans `docs/ui/toolkit.md` (rendu `QPainter` custom pixel-exact, virtual scrolling 60 FPS).
+- [x] Architecture modulaire implémentée dans `picasa_py/ui/` :
+  - `style.py` : styles et métriques issus de `constants.ui`.
+  - `resources.py` : gestionnaire d'icônes, curseurs et textes.
+  - `menu.py` : constructeur des menus et raccourcis clavier.
+  - `top_bar.py` : barre d'outils, bouton Import, filtres rapides et recherche.
+  - `library_tree.py` : volet de navigation gauche connecté à `PicasaDatabase`.
+  - `thumbnail_view.py` : grille de vignettes virtuelle optimisée (60 FPS, sélection bicolore, zoom slider).
+  - `photo_tray.py` : bac inférieur caractéristique avec boutons d'action.
+  - `right_drawer.py` : volet escamotable d'informations EXIF et balises.
+  - `main_window.py` : fenêtre principale `PicasaMainWindow`.
+  - `app.py` : point d'entrée exécutable.
+- [x] Respect de l'isolation : aucune écriture directe de l'UI vers la base ; passage obligatoire par `picasa_py/db/` et `picasa_py/ini/`.
+
+---
+
+## 10. Prochaines étapes
+- [ ] Phase 5 : Mesures de performances initiales, profilage et benchmarks comparatifs (`docs/perf/targets.md`).
+- [ ] Phase 6 : Implémentation de la vue d'édition (« One-Up View » / retouche et filtres `filterdesc.xml`).
