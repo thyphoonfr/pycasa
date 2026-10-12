@@ -23,21 +23,23 @@ Dans `picasa3.exe`, la navigation et le défilement des photos ne reposent pas s
 
 ## 2. Fonctionnalités et Comportement Implémentés
 
-### 2.1 PicasaAlbumScroll (`picasa_py/ui/album_scroll.py`)
-1. **Piste sombre** (`#282B30` / `#1E2024`) de 18 px de largeur.
-2. **Curseur capsule arrondi (Thumb / AVCScrollBox)** :
-   - Dégradés selon l'état : Normal (`#5A616E` à `#464C57`), Survol (`#707886` à `#5A626F`), Déplacement (`#858D9C` à `#6B7382`).
-   - Rainures décoratives centrales fidèles à l'original.
-   - Hauteur proportionnelle à la taille visible sur la taille totale du contenu.
-3. **Badge flottant chronologique (PicasaScrollTooltip)** :
-   - Suit en temps réel le centre du curseur lorsqu'on le fait glisser ou lorsqu'on survole la piste.
-   - Affiche le nom de l'album (`album_title`) en gras et la date (ex. `Juin 2024 • 48 photos`).
-   - Pointeur triangulaire orienté vers la capsule.
-   - Minuterie de fondu/disparition lors de l'inactivité.
-4. **Commandes de navigation** :
-   - Clic flèche simple haut/bas : défilement par pas de 40 px.
-   - Clic double chevron : saut instantané à l'album précédent / suivant.
-   - Clic dans la piste : déplacement proportionnel direct.
+### 2.1 Manette des gaz / Jog-Shuttle (`AVCScrollThrottle` dans `picasa_py/ui/album_scroll.py`)
+1. **Curseur centré au repos (Point mort central)** :
+   - Le curseur (capsule métallique de 14x28 px) reste calé au centre vertical de la piste au repos (`rest_thumb_y`), face à un repère neutre horizontal.
+2. **Accélération proportionnelle et non-linéaire** :
+   - **Glisser vers le bas** : défilement avant dans le temps (vitesse positive).
+   - **Glisser vers le haut** : défilement arrière dans le temps (vitesse négative).
+   - Plus on écarte le curseur du centre, plus la vitesse croît rapidement (combinaison linéaire, quadratique et cubique : contrôle très fin à faible écartement, balayage à haute vitesse à pleine déviation).
+   - Zone morte centrale de 3 px pour éviter toute dérive involontaire.
+   - Ruban indicateur de tension lumineux bleu reliant le point mort au curseur pour matérialiser visuellement la puissance du défilement.
+3. **Retour élastique automatique (Spring-back)** :
+   - Dès le relâchement du bouton de la souris, une animation 60 FPS ramène immédiatement et avec souplesse le curseur à sa position centrale neutre, stoppant le défilement.
+4. **Badge flottant chronologique (PicasaScrollTooltip)** :
+   - Suit en temps réel le curseur pendant le throttle, affichant le dossier en cours de survol et sa date.
+   - S'estompe avec une temporisation d'inactivité après relâchement.
+5. **Commandes de pas et de saut** :
+   - Clic flèches simples : défilement pas à pas (60 px).
+   - Clic doubles chevrons (`prevalbum`, `nextalbum`) : saut direct à l'en-tête de l'album précédent / suivant.
 
 ### 2.2 Défilement Continu Multi-Albums (`picasa_py/ui/thumbnail_view.py`)
 1. Les photos sont regroupées en `AlbumSection` basées sur les dossiers réels et `albumdata`.

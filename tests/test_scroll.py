@@ -1,6 +1,6 @@
 """
-Tests for PicasaAlbumScroll, PicasaScrollTooltip and Multi-Album Continuous Scrolling.
-Ref: picasa3.exe @ 0x00573767, 0x005DE8E0, 0x0072E520
+Tests for PicasaAlbumScroll (AVCScrollThrottle), PicasaScrollTooltip and Multi-Album Continuous Scrolling.
+Ref: picasa3.exe @ 0x0072E6E6, 0x00CAD944, 0x005DE8E0, 0x005CE090
 """
 
 import os
@@ -32,33 +32,44 @@ def test_format_ole_date():
     assert format_ole_date(-5.0) == ""
 
 
-def test_album_scroll_range_and_thumb(qapp):
+def test_album_scroll_throttle_centered_and_deflection(qapp):
     scroll = PicasaAlbumScroll()
-    scroll.resize(18, 500)
+    scroll.resize(20, 500)
     scroll.set_range(0, 1000, page_step=200)
 
-    # Initial value
-    assert scroll.value() == 0
+    # Au repos, le curseur doit être exactement centré verticalement sur le point mort
     thumb_r = scroll._get_thumb_rect()
-    assert thumb_r.width() == 12
-    assert thumb_r.height() >= 24
+    assert abs(thumb_r.center().y() - scroll.center_y) <= 1
+    assert thumb_r.width() == scroll.thumb_width
+    assert thumb_r.height() == scroll.thumb_height
 
-    # Setting value
-    scroll.set_value(500)
-    assert scroll.value() == 500
-    thumb_r_mid = scroll._get_thumb_rect()
-    assert thumb_r_mid.y() > thumb_r.y()
+    # Glisser vers le bas (mouse_y > center_y) -> vitesse positive (scroll down)
+    center_y = scroll.center_y
+    scroll._update_throttle_from_mouse_y(center_y + 30)
+    assert scroll._throttle_speed > 0
+    thumb_down = scroll._get_thumb_rect()
+    assert thumb_down.center().y() > center_y
 
-    # Clamping
-    scroll.set_value(2000)
-    assert scroll.value() == 1000
-    scroll.set_value(-50)
-    assert scroll.value() == 0
+    speed_small = scroll._throttle_speed
+
+    # Plus on s'éloigne du centre, plus la vitesse augmente (non-linéarité)
+    scroll._update_throttle_from_mouse_y(center_y + 80)
+    assert scroll._throttle_speed > speed_small * 2
+
+    # Glisser vers le haut (mouse_y < center_y) -> vitesse négative (scroll up)
+    scroll._update_throttle_from_mouse_y(center_y - 40)
+    assert scroll._throttle_speed < 0
+    thumb_up = scroll._get_thumb_rect()
+    assert thumb_up.center().y() < center_y
+
+    # Zone morte au centre (écarts <= 3px donnent vitesse 0)
+    scroll._update_throttle_from_mouse_y(center_y + 2)
+    assert scroll._throttle_speed == 0.0
 
 
 def test_album_scroll_tooltip_provider(qapp):
     scroll = PicasaAlbumScroll()
-    scroll.resize(18, 500)
+    scroll.resize(20, 500)
     scroll.set_range(0, 1000, page_step=200)
 
     # Setup provider
