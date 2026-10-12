@@ -141,6 +141,11 @@ class PicasaMainWindow(QMainWindow):
         self.photo_tray.action_clear.connect(self.action_clear_selection)
         self.photo_tray.action_export.connect(self.action_export)
 
+        # Volet latéral droit dans la bibliothèque (Ref: thumbui/*_toggle)
+        self.photo_tray.panel_toggled.connect(self._on_tray_panel_toggled)
+        self.right_drawer.drawer_closed.connect(self._on_drawer_state_changed)
+        self.right_drawer.panel_changed.connect(self._on_drawer_state_changed)
+
     def _init_database(self, db_path: Optional[str] = None) -> None:
         try:
             if db_path:
@@ -218,26 +223,18 @@ class PicasaMainWindow(QMainWindow):
             idx = indices[0]
             if idx < len(self.thumb_view.items):
                 item = self.thumb_view.items[idx]
-                entry = self.db.index[item.index]
-                info = {
-                    "filename": item.filename,
-                    "date": "—",
-                    "size": f"{entry.size // 1024} Ko" if entry.size else "—",
-                    "resolution": "—",
-                    "camera": "—"
-                }
-                self.right_drawer.display_item_info(info)
+                self.right_drawer.set_current_photo(self.db, item.index, item.path)
         elif count == 0:
-            self.right_drawer.display_item_info(None)
-        else:
-            info = {
-                "filename": f"{count} fichiers sélectionnés",
-                "date": "—",
-                "size": "—",
-                "resolution": "—",
-                "camera": "—"
-            }
-            self.right_drawer.display_item_info(info)
+            self.right_drawer.set_current_photo(self.db, -1, "")
+
+    def _on_tray_panel_toggled(self, panel_name: str) -> None:
+        self.right_drawer.toggle_panel(panel_name)
+        self._on_drawer_state_changed()
+
+    def _on_drawer_state_changed(self) -> None:
+        is_open = self.right_drawer.isVisible()
+        curr = self.right_drawer.current_panel_name if is_open else ""
+        self.photo_tray.update_panel_buttons(is_open, curr)
 
     def _on_search_query(self, query: str) -> None:
         if not self.db or not self.db.search_index:

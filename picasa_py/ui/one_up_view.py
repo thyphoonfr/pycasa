@@ -28,6 +28,7 @@ from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.image_canvas import PicasaImageCanvas
 from picasa_py.ui.edit_panel import PicasaEditPanel
 from picasa_py.ui.image_processor import PicasaImageProcessor
+from picasa_py.ui.right_drawer import PicasaRightDrawer
 from picasa_py.db.database import PicasaDatabase
 
 
@@ -86,6 +87,14 @@ class PicasaOneUpView(QWidget):
         right_layout.addWidget(self.transport_bar)
 
         main_layout.addWidget(right_container, 1)
+
+        # 4. Volet latéral droit escamotable (Personnes, Lieux, Tags, Propriétés)
+        self.right_drawer = PicasaRightDrawer(self.style, self)
+        self.right_drawer.hide()
+        self.right_drawer.drawer_closed.connect(self._on_drawer_closed)
+        self.right_drawer.panel_changed.connect(self._on_drawer_panel_changed)
+        self.right_drawer.panel_people.face_hovered.connect(self._on_drawer_face_hovered)
+        main_layout.addWidget(self.right_drawer)
 
     def _create_viewer_top_bar(self) -> QWidget:
         """
@@ -278,7 +287,64 @@ class PicasaOneUpView(QWidget):
         self.btn_toggle_faces.toggled.connect(self._on_toggle_face_tags)
         layout.addWidget(self.btn_toggle_faces)
 
+        # Séparateur vertical
+        sep_drawer = QFrame()
+        sep_drawer.setFrameShape(QFrame.Shape.VLine)
+        sep_drawer.setStyleSheet("color: #404550;")
+        layout.addWidget(sep_drawer)
+
+        # 4 Boutons du panneau latéral droit (Ref: thumbui/people_toggle, places_toggle, tags_toggle, properties_toggle)
+        self.btn_panel_people = QPushButton("👤 Personnes")
+        self.btn_panel_people.setCheckable(True)
+        self.btn_panel_people.setToolTip("Afficher/masquer le panneau des personnes")
+        self.btn_panel_people.clicked.connect(lambda: self.toggle_drawer_panel("people"))
+        layout.addWidget(self.btn_panel_people)
+
+        self.btn_panel_places = QPushButton("📍 Lieux")
+        self.btn_panel_places.setCheckable(True)
+        self.btn_panel_places.setToolTip("Afficher/masquer le panneau des lieux (Carte Leaflet)")
+        self.btn_panel_places.clicked.connect(lambda: self.toggle_drawer_panel("places"))
+        layout.addWidget(self.btn_panel_places)
+
+        self.btn_panel_tags = QPushButton("🏷️ Tags")
+        self.btn_panel_tags.setCheckable(True)
+        self.btn_panel_tags.setToolTip("Afficher/masquer le panneau des tags")
+        self.btn_panel_tags.clicked.connect(lambda: self.toggle_drawer_panel("tags"))
+        layout.addWidget(self.btn_panel_tags)
+
+        self.btn_panel_props = QPushButton("ℹ️ Propriétés")
+        self.btn_panel_props.setCheckable(True)
+        self.btn_panel_props.setToolTip("Afficher/masquer le panneau des propriétés (Données EXIF)")
+        self.btn_panel_props.clicked.connect(lambda: self.toggle_drawer_panel("properties"))
+        layout.addWidget(self.btn_panel_props)
+
         return bar
+
+    def toggle_drawer_panel(self, panel_name: str) -> None:
+        """
+        Bascule l'ouverture/fermeture du volet latéral droit pour le panneau demandé.
+        Ref: picasa3.exe @ thumbui/people_toggle, places_toggle, tags_toggle, properties_toggle
+        """
+        self.right_drawer.toggle_panel(panel_name)
+        self._update_drawer_buttons_state()
+
+    def _on_drawer_closed(self) -> None:
+        self._update_drawer_buttons_state()
+
+    def _on_drawer_panel_changed(self, panel_name: str) -> None:
+        self._update_drawer_buttons_state()
+
+    def _on_drawer_face_hovered(self, face_idx: int) -> None:
+        self.canvas.hovered_face_idx = face_idx
+        self.canvas.update()
+
+    def _update_drawer_buttons_state(self) -> None:
+        is_open = self.right_drawer.isVisible()
+        curr = self.right_drawer.current_panel_name if is_open else ""
+        self.btn_panel_people.setChecked(is_open and curr == "people")
+        self.btn_panel_places.setChecked(is_open and curr == "places")
+        self.btn_panel_tags.setChecked(is_open and curr == "tags")
+        self.btn_panel_props.setChecked(is_open and curr == "properties")
 
     def _on_canvas_zoom_changed(self, zoom: float) -> None:
         self.zoom_slider.blockSignals(True)
@@ -411,6 +477,10 @@ class PicasaOneUpView(QWidget):
         # Si en mode A|B, charger automatiquement la photo secondaire
         if self.canvas.view_mode == "A_B":
             self._load_secondary_photo()
+
+        # Mettre à jour le volet latéral droit (Personnes, Lieux, Tags, Propriétés)
+        full_path = direct_path if (direct_path and os.path.exists(direct_path)) else (self.db.get_media_full_path(index) if self.db else None)
+        self.right_drawer.set_current_photo(db, index, full_path or "")
 
         self._update_top_bar_info()
 

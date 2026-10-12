@@ -188,6 +188,24 @@ class PicasaIniDocument:
         else:
             sec.remove("star")
 
+    # Ref: picasa3.exe @ 0x0068B8D0 ("keywords=%s\r\n")
+    def get_keywords(self, filename: str) -> List[str]:
+        sec = self.get_section(filename)
+        if not sec:
+            return []
+        val = sec.get("keywords")
+        if not val:
+            return []
+        return [k.strip() for k in val.split(",") if k.strip()]
+
+    def set_keywords(self, filename: str, keywords: List[str]) -> None:
+        sec = self.get_or_create_section(filename)
+        clean = [k.strip() for k in keywords if k.strip()]
+        if not clean:
+            sec.remove("keywords")
+        else:
+            sec.set("keywords", ",".join(clean))
+
     # Ref: picasa3.exe @ 0x00CA7810 - Contacts2
     def get_contacts(self) -> Dict[str, ContactInfo]:
         sec = self.get_section("Contacts2")

@@ -60,6 +60,7 @@ class PicasaPhotoTray(QWidget):
     action_email = Signal()
     action_hold = Signal()
     action_clear = Signal()
+    panel_toggled = Signal(str)
 
     def __init__(self, style: Optional[PicasaStyle] = None, parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -176,6 +177,42 @@ class PicasaPhotoTray(QWidget):
         self.btn_export = QPushButton("Export")
         self.btn_export.clicked.connect(self.action_export.emit)
         main_layout.addWidget(self.btn_export)
+
+        # 5. Boutons de bascule du panneau latéral droit (Ref: thumbui/*_toggle)
+        sep3 = QFrame()
+        sep3.setFrameShape(QFrame.Shape.VLine)
+        sep3.setStyleSheet("color: #44474E;")
+        main_layout.addWidget(sep3)
+
+        self.btn_panel_people = QPushButton("👤 Personnes")
+        self.btn_panel_people.setCheckable(True)
+        self.btn_panel_people.setToolTip("Afficher/masquer le panneau des personnes")
+        self.btn_panel_people.clicked.connect(lambda: self.panel_toggled.emit("people"))
+        main_layout.addWidget(self.btn_panel_people)
+
+        self.btn_panel_places = QPushButton("📍 Lieux")
+        self.btn_panel_places.setCheckable(True)
+        self.btn_panel_places.setToolTip("Afficher/masquer le panneau des lieux (Carte Leaflet)")
+        self.btn_panel_places.clicked.connect(lambda: self.panel_toggled.emit("places"))
+        main_layout.addWidget(self.btn_panel_places)
+
+        self.btn_panel_tags = QPushButton("🏷️ Tags")
+        self.btn_panel_tags.setCheckable(True)
+        self.btn_panel_tags.setToolTip("Afficher/masquer le panneau des tags")
+        self.btn_panel_tags.clicked.connect(lambda: self.panel_toggled.emit("tags"))
+        main_layout.addWidget(self.btn_panel_tags)
+
+        self.btn_panel_props = QPushButton("ℹ️ Propriétés")
+        self.btn_panel_props.setCheckable(True)
+        self.btn_panel_props.setToolTip("Afficher/masquer le panneau des propriétés (Données EXIF)")
+        self.btn_panel_props.clicked.connect(lambda: self.panel_toggled.emit("properties"))
+        main_layout.addWidget(self.btn_panel_props)
+
+    def update_panel_buttons(self, is_open: bool, current_panel: str) -> None:
+        self.btn_panel_people.setChecked(is_open and current_panel == "people")
+        self.btn_panel_places.setChecked(is_open and current_panel == "places")
+        self.btn_panel_tags.setChecked(is_open and current_panel == "tags")
+        self.btn_panel_props.setChecked(is_open and current_panel == "properties")
 
     def set_selected_count(self, count: int) -> None:
         if count == 0:
