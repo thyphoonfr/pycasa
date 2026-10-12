@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>Synchronizovat album s webem</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>Chcete nahrát toto album do Webových alb a udržovat ho synchronizované?</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>Aktuální nastavení:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>Velikost:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>zde se zobrazí výchozí velikost</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>Viditelnost:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>Neveřejné</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>Synchronizovat pouze fotky označené hvězdičkou</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>Neptat se znovu (vždy použít aktuální nastavení)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>Změnit nastavení...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>Synchronizovat</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

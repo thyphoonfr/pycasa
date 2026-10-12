@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>„Google“ nuotraukų atsarginis kopijavimas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>„Google“ nuotraukų atsarginis kopijavimas, versija %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>© „Google Inc.“, 2015 m. Visos teisės saugomos.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Programinė įranga iš dalies sukurta pagal nepriklausomos JPEG grupės darbą. Ši programa saugoma JAV ir tarptautinių autorių teisių įstatymų.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+</resources>

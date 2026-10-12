@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>خطاهای تکمیل خودکار</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>مخاطبین زیر در نوشتار کلیپ‌بورد به درستی جای‌گذاری نمی‌شوند</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>مخاطب</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>خطا</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>وضعیت</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+</resources>

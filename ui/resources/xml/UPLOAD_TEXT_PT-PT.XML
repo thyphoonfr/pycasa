@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="upload/public_label" xmbdesc="Text(upload/public_label)">
+  <xmbtext>Público na internet</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_label" xmbdesc="Text(upload/private_label)">
+  <xmbtext>Qualquer pessoa com o link</xmbtext>
+ </action>
+ <action type="Text" target="upload/public_description1" xmbdesc="Text(upload/public_description1)">
+  <xmbtext>Este álbum estará visível para todos os utilizadores em: %s</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_description1" xmbdesc="Text(upload/private_description1)">
+  <xmbtext>Partilhar com as pessoas seleccionadas</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadinfo" xmbdesc="Text(upload/uploadinfo)">
+  <xmbtext>A verificar estado on-line...</xmbtext>
+ </action>
+ <action type="Text" target="upload/webalbumstext" xmbdesc="Text(upload/webalbumstext)">
+  <xmbtext>A atualizar a lista do álbum Web...</xmbtext>
+ </action>
+ <action type="Text" target="upload/upload_label" xmbdesc="Text(upload/upload_label)">
+  <xmbtext>Carregar para este álbum:</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadsize_label" xmbdesc="Text(upload/uploadsize_label)">
+  <xmbtext>Tamanho para carregamento</xmbtext>
+ </action>
+ <action type="Text" target="upload/privacy_label" xmbdesc="Text(upload/privacy_label)">
+  <xmbtext>Privacidade</xmbtext>
+ </action>
+ <action type="Text" target="upload/require_login_text" xmbdesc="Text(upload/require_login_text)">
+  <xmbtext>Privado</xmbtext>
+ </action>
+ <action type="Label" target="upload/newalbum2" xmbdesc="Label(upload/newalbum2)">
+  <xmbtext>Novo</xmbtext>
+ </action>
+ <action type="Text" target="upload/titlelabel" xmbdesc="Text(upload/titlelabel)">
+  <xmbtext>Título do álbum</xmbtext>
+ </action>
+ <action type="Text" target="upload/desclabel" xmbdesc="Text(upload/desclabel)">
+  <xmbtext>Descrição</xmbtext>
+ </action>
+ <action type="Text" target="upload/choose_contact_label" xmbdesc="Text(upload/choose_contact_label)">
+  <xmbtext>Escolher um contacto:</xmbtext>
+ </action>
+ <action type="Text" target="upload/contact_album_list_label" xmbdesc="Text(upload/contact_album_list_label)">
+  <xmbtext>Álbuns de contactos para os quais pode contribuir:</xmbtext>
+ </action>
+ <action type="Label" target="upload/upgrade" xmbdesc="Label(upload/upgrade)">
+  <xmbtext>Actualização</xmbtext>
+ </action>
+ <action type="Label" target="upload/ok" xmbdesc="Label(upload/ok)">
+  <xmbtext>Carregar</xmbtext>
+ </action>
+ <action type="Label" target="upload/cancel" xmbdesc="Label(upload/cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Label" target="upload/storagetext" xmbdesc="Label(upload/storagetext)">
+  <xmbtext>Saiba mais...</xmbtext>
+ </action>
+ <action type="Text" target="upload/account_title" xmbdesc="Text(upload/account_title)">
+  <xmbtext>A sua conta:</xmbtext>
+ </action>
+ <action type="Text" target="upload/upsell_text" xmbdesc="Text(upload/upsell_text)">
+  <xmbtext>O armazenamento adicional pode ajudá-lo a fazer uma cópia de segurança das fotografias.</xmbtext>
+ </action>
+ <action type="Label" target="upload/collab_label" xmbdesc="Label(upload/collab_label)">
+  <xmbtext>Permitir que estas pessoas contribuam para o meu álbum</xmbtext>
+ </action>
+ <action type="Label" target="upload/sharing_label" xmbdesc="Label(upload/sharing_label)">
+  <xmbtext>Partilhar com:</xmbtext>
+ </action>
+</tooltips>

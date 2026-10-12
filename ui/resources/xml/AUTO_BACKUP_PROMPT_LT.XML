@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>„Google“ nuotraukų atsarginis kopijavimas</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Sukurkite atsargines „Picasa“ nuotraukų kopijas</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Automatiškai išsaugokite nuotraukas ir vaizdo įrašus internete naudodami „Google“ nuotraukų atsarginį kopijavimą. Šiuos elementus lengvai pasieksite bet kuriame savo įrenginyje ir jie bus privatūs, jei nenuspręsite jų bendrinti.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Gauti „Google“ nuotraukų atsarginį kopijavimą</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Ne, dėkui</xmbtext>
+ </stringres>
+</resources>

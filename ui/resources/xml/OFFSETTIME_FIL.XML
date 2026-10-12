@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Ayusin ang Petsa ng Larawan</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Kasalukuyang petsa ng larawan: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Bagong petsa ng larawan: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Ayusin lahat ng nga petsa ng larawan nang halagang ito</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Itakda lahat ng mga larawan sa parehong petsa at oras</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

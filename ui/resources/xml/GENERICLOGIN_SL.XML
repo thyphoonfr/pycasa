@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="genericlogin/window1.title">
+  <xmbtext>Prijava</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/emaillabel.title">
+  <xmbtext>E-pošta:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.title">
+  <xmbtext>Ustvari račun ...</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/labelgroup7.title">
+  <xmbtext>Geslo:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.title">
+  <xmbtext>Ste pozabili geslo?</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/savepassword.title">
+  <xmbtext>Shrani geslo</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/label14.title">
+  <xmbtext>Prijava je varnostno šifrirana s SSL</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/accept.title">
+  <xmbtext>Prijava</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/button17.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

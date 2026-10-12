@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Preimenuj datoteke</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Jedna je datoteka odabrana za preimenovanje.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Broj datoteka odabranih za preimenovanje: %s</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Unesite novi naziv za ove datoteke:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Dodaj u naziv datoteke:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Datum</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Razlučivost slike</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Primjer:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Preimenuj</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

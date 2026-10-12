@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>重新命名檔案</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>您選了 1 個檔案準備重新命名。</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>您選了 %s 個檔案準備重新命名。</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>請輸入這些檔案的新名稱：</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>加到檔名：</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>日期</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>圖像解析度</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>範例：</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>重新命名</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

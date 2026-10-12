@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>Поставете географски маркер на снимка, като се придвижите до мястото, на което сте я заснели. Позиционирайте мишената, след което натиснете бутона „Географски маркер“.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>Геомаркер</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>Геогр. маркери на всички</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>Готово</xmbtext>
+ </action>
+</tooltips>

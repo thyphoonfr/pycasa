@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>Sincronizaţi album pe web</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>Încărcaţi acest album în Picasa Web Albums şi menţineţi sincronizarea acestuia?</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>Setările curente:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>Dimensiune:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>aici se introduce dimensiunea prestabilită</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>Vizibilitate:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>Nelistate</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>Sincronizaţi numai fotografiile cu stea</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>Nu mă mai întreba (foloseşte mereu setările curente)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>Modificaţi setările...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>Sincronizaţi</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

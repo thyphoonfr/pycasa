@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="modalprogress/escmessage" xmbdesc="Text(modalprogress/escmessage)">
+  <xmbtext>Zrušenie vykonáte stlačením klávesu ESC na klávesnici</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printlayoutlabel" xmbdesc="Label(printpanel/printlayoutlabel)">
+  <xmbtext>Rozloženie pri tlači</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/walletbutton" xmbdesc="Label(printpanel/walletbutton)">
+  <xmbtext>Do peňaženky</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/walletbutton" xmbdesc="Tooltip(printpanel/walletbutton)">
+  <xmbtext>Vytlačiť fotografie podľa rozmerov peňaženky</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/3x5button" xmbdesc="Label(printpanel/3x5button)">
+  <xmbtext>3,5 x 5</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/3x5button" xmbdesc="Tooltip(printpanel/3x5button)">
+  <xmbtext>Vytlačiť fotografie v štandardnej veľkosti 3,5x5</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/4x6button" xmbdesc="Label(printpanel/4x6button)">
+  <xmbtext>4 x 6</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/4x6button" xmbdesc="Tooltip(printpanel/4x6button)">
+  <xmbtext>Vytlačiť fotografie v štandardnej veľkosti 4x6</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/5x7button" xmbdesc="Label(printpanel/5x7button)">
+  <xmbtext>5 x 7</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/5x7button" xmbdesc="Tooltip(printpanel/5x7button)">
+  <xmbtext>Vytlačiť fotografie v štandardnej veľkosti 5x7</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/8x10button" xmbdesc="Label(printpanel/8x10button)">
+  <xmbtext>8 x 10</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/8x10button" xmbdesc="Tooltip(printpanel/8x10button)">
+  <xmbtext>Vytlačiť fotografie v štandardnej veľkosti 8x10</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fullbutton" xmbdesc="Label(printpanel/fullbutton)">
+  <xmbtext>Celá strana</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fullbutton" xmbdesc="Tooltip(printpanel/fullbutton)">
+  <xmbtext>Vytlačiť fotografie s rovnakými rozmermi, aké má papier</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/croptogglelabel" xmbdesc="Label(printpanel/croptogglelabel)">
+  <xmbtext>Prispôsobiť orezaním</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/croptoggle" xmbdesc="Tooltip(printpanel/croptoggle)">
+  <xmbtext>Orezať fotografie tak, aby sa zhodovali s vybranými rozmermi tlače</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fittogglelabel" xmbdesc="Label(printpanel/fittogglelabel)">
+  <xmbtext>Prispôsobiť zmenšením</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fittoggle" xmbdesc="Tooltip(printpanel/fittoggle)">
+  <xmbtext>Zachovať pôvodné rozmery fotografií</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/captionoptionslabel" xmbdesc="Label(printpanel/captionoptionslabel)">
+  <xmbtext>Možnosti orámovania a textu</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printerlabel" xmbdesc="Label(printpanel/printerlabel)">
+  <xmbtext>Tlačiareň</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/setuplabel" xmbdesc="Label(printpanel/setuplabel)">
+  <xmbtext>Nastavenie tlačiarne</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/copieslabel" xmbdesc="Label(printpanel/copieslabel)">
+  <xmbtext>Počet kópií jednej fotografie</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/previewlabel" xmbdesc="Label(printpanel/previewlabel)">
+  <xmbtext>Ukážka</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/prevbutton" xmbdesc="Tooltip(printpanel/prevbutton)">
+  <xmbtext>Zobraziť predchádzajúcu stránku s ukážkami</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/nextbutton" xmbdesc="Tooltip(printpanel/nextbutton)">
+  <xmbtext>Zobraziť nasledujúcu stránku s ukážkami</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printsetuplabel" xmbdesc="Label(printpanel/printsetuplabel)">
+  <xmbtext>Nastavenia tlačiarne</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/captionoptionsbutton" xmbdesc="Tooltip(printpanel/captionoptionsbutton)">
+  <xmbtext>Konfigurovať orámovanie a text fotografií určených na tlač</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/selectprinterbutton" xmbdesc="Tooltip(printpanel/selectprinterbutton)">
+  <xmbtext>Poskytuje zoznam dostupných tlačiarní</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/psetupbutton" xmbdesc="Tooltip(printpanel/psetupbutton)">
+  <xmbtext>Otvoriť ovládacie prvky na nastavenie vybratej tlačiarne</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/addprintsbutton" xmbdesc="Tooltip(printpanel/addprintsbutton)">
+  <xmbtext>Pridať ďalšiu kópiu každej vytlačenej fotografie</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/subprintsbutton" xmbdesc="Tooltip(printpanel/subprintsbutton)">
+  <xmbtext>Odobrať kópiu každej vytlačenej fotografie</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/phelpbutton" xmbdesc="Label(printpanel/phelpbutton)">
+  <xmbtext>Pomocník</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/phelpbutton" xmbdesc="Tooltip(printpanel/phelpbutton)">
+  <xmbtext>Otvoriť centrum pomoci na riešenie problémov s tlačou</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/froogle" xmbdesc="Label(printpanel/froogle)">
+  <xmbtext>Hľadať spotrebný materiál na lokalite Froogle</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/froogle" xmbdesc="Tooltip(printpanel/froogle)">
+  <xmbtext>Hľadať položky a príslušenstvo na lokalite Froogle</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton" xmbdesc="Label(printpanel/reviewnowbutton)">
+  <xmbtext>Skontrolovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton" xmbdesc="Tooltip(printpanel/reviewnowbutton)">
+  <xmbtext>Uistite sa, že sú fotografie pripravené na tlač</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton2" xmbdesc="Label(printpanel/reviewnowbutton2)">
+  <xmbtext>Skontrolovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton2" xmbdesc="Tooltip(printpanel/reviewnowbutton2)">
+  <xmbtext>Uistite sa, že sú fotografie pripravené na tlač</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton" xmbdesc="Label(printpanel/pnowbutton)">
+  <xmbtext>Tlačiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton" xmbdesc="Tooltip(printpanel/pnowbutton)">
+  <xmbtext>Vytlačiť fotografie s aktuálnymi nastaveniami</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton2" xmbdesc="Label(printpanel/pnowbutton2)">
+  <xmbtext>Tlačiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton2" xmbdesc="Tooltip(printpanel/pnowbutton2)">
+  <xmbtext>Vytlačiť fotografie s aktuálnymi nastaveniami</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pcancelbutton" xmbdesc="Label(printpanel/pcancelbutton)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pcancelbutton" xmbdesc="Tooltip(printpanel/pcancelbutton)">
+  <xmbtext>Zrušenie procesu tlače a návrat do zobrazenia miniatúr</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/tllabel" xmbdesc="Label(editoneup/tllabel)">
+  <xmbtext>Časový sled</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/bcklabel" xmbdesc="Label(editoneup/bcklabel)">
+  <xmbtext>Skončiť</xmbtext>
+ </action>
+ <action type="Text" target="editoneup/tpslabel" xmbdesc="Text(editoneup/tpslabel)">
+  <xmbtext>Doba zobrazenia</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/sbutton" xmbdesc="Label(editpanel/sbutton)">
+  <xmbtext>Prehrať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/sbutton" xmbdesc="Tooltip(editpanel/sbutton)">
+  <xmbtext>Zobraziť prezentáciu týchto fotografií</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edithelpbutton" xmbdesc="Tooltip(editpanel/edithelpbutton)">
+  <xmbtext>Pomocník</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/weblink" xmbdesc="Tooltip(editpanel/weblink)">
+  <xmbtext>Prejsť na webovú lokalitu, ktorá súvisí s touto fotografiou</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editcollage" xmbdesc="Label(editpanel/editcollage)">
+  <xmbtext>Upraviť koláž</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editcollage" xmbdesc="Tooltip(editpanel/editcollage)">
+  <xmbtext>Upraviť koláž, z ktorej bol tento obrázok vytvorený</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/fit" xmbdesc="Tooltip(editpanel/fit)">
+  <xmbtext>Prispôsobiť fotografiu oblasti zobrazenia</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/1to1" xmbdesc="Tooltip(editpanel/1to1)">
+  <xmbtext>Zobraziť fotografiu v skutočnej veľkosti</xmbtext>
+ </action>
+ <action type="Text" target="nerdview/nvhead" xmbdesc="Text(nerdview/nvhead)">
+  <xmbtext>Histogram a informácie o fotoaparáte</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captionbutton" xmbdesc="Tooltip(editpanel/captionbutton)">
+  <xmbtext>Zobraziť alebo skryť popis</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/toggle_left_drawer" xmbdesc="Tooltip(editpanel/toggle_left_drawer)">
+  <xmbtext>Zobraziť/skryť ovládacie prvky úprav</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captiontrash" xmbdesc="Tooltip(editpanel/captiontrash)">
+  <xmbtext>Vymazať tento popis</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/refining_label" xmbdesc="Text(editpanel/refining_label)">
+  <xmbtext>Zjemňovanie...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_ok" xmbdesc="Label(editpanel/tool_ok)">
+  <xmbtext>POUŽIŤ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_cancel" xmbdesc="Label(editpanel/tool_cancel)">
+  <xmbtext>ZRUŠIŤ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editslideshow" xmbdesc="Label(editpanel/editslideshow)">
+  <xmbtext>Upraviť film</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editslideshow" xmbdesc="Tooltip(editpanel/editslideshow)">
+  <xmbtext>Upraviť túto filmovú prezentáciu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/albumview" xmbdesc="Label(editpanel/albumview)">
+  <xmbtext>Späť do knižnice</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/albumview" xmbdesc="Tooltip(editpanel/albumview)">
+  <xmbtext>Späť na usporiadané miniatúry</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/quickupload" xmbdesc="Tooltip(editpanel/quickupload)">
+  <xmbtext>Nahrať do schránky webových albumov</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/uploadchanges" xmbdesc="Tooltip(editpanel/uploadchanges)">
+  <xmbtext>Aktualizovať kópiu online touto verziou</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label" xmbdesc="Label(editpanel/selection_label)">
+  <xmbtext>Vybraté</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label_zoom" xmbdesc="Label(editpanel/selection_label_zoom)">
+  <xmbtext>Vybraté</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_focus" xmbdesc="Tooltip(editpanel/swap_2up_focus)">
+  <xmbtext>Prepnutie aktívneho obrázka</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_layout" xmbdesc="Tooltip(editpanel/swap_2up_layout)">
+  <xmbtext>Prepnutie medzi vodorovným a zvislým rozložením</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/aa_2up_toggle" xmbdesc="Tooltip(editpanel/aa_2up_toggle)">
+  <xmbtext>Zobraziť ten istý obrázok dvakrát</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ab_2up_toggle" xmbdesc="Tooltip(editpanel/ab_2up_toggle)">
+  <xmbtext>Zobrazenie dvoch rôznych obrázkov</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/only_1up_toggle" xmbdesc="Tooltip(editpanel/only_1up_toggle)">
+  <xmbtext>Zobrazenie iba jedného obrázka</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab1" xmbdesc="Tooltip(editpanel/tab1)">
+  <xmbtext>Najpoužívanejšie opravy</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab2" xmbdesc="Tooltip(editpanel/tab2)">
+  <xmbtext>Jemné vyladenie osvetlenia a opravy farieb</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab3" xmbdesc="Tooltip(editpanel/tab3)">
+  <xmbtext>Zábava a užitočné spracovanie obrázkov</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab4" xmbdesc="Tooltip(editpanel/tab4)">
+  <xmbtext>Väčšia zábava a užitočné spracovanie obrázkov</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab5" xmbdesc="Tooltip(editpanel/tab5)">
+  <xmbtext>Ešte väčšia zábava a užitočné spracovanie obrázkov</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop" xmbdesc="Label(editpanel/crop)">
+  <xmbtext>Orezať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop" xmbdesc="Tooltip(editpanel/crop)">
+  <xmbtext>Orezať túto fotografiu na iný formát</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye" xmbdesc="Label(editpanel/redeye)">
+  <xmbtext>Efekt červených očí</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeye" xmbdesc="Tooltip(editpanel/redeye)">
+  <xmbtext>Opraviť efekt červených očí na tejto fotografii</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autolighting" xmbdesc="Label(editpanel/autolighting)">
+  <xmbtext>Automatický kontrast</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autolighting" xmbdesc="Tooltip(editpanel/autolighting)">
+  <xmbtext>Opraviť expozíciu bez ovplyvnenia farby</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autocolor" xmbdesc="Label(editpanel/autocolor)">
+  <xmbtext>Automatická farba</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autocolor" xmbdesc="Tooltip(editpanel/autocolor)">
+  <xmbtext>Automaticky odstraňovať nežiadúci farebný nádych</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch" xmbdesc="Label(editpanel/retouch)">
+  <xmbtext>Retušovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouch" xmbdesc="Tooltip(editpanel/retouch)">
+  <xmbtext>Opraviť chyby, prach a škrabance</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/edittext" xmbdesc="Label(editpanel/edittext)">
+  <xmbtext>Text</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik" xmbdesc="Label(editpanel/picnik)">
+  <xmbtext>Upraviť v aplikácii Creative Kit</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik" xmbdesc="Tooltip(editpanel/picnik)">
+  <xmbtext>Upraviť fotografiu online pomocou aplikácie Creative Kit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/showtextlabel" xmbdesc="Label(editpanel/showtextlabel)">
+  <xmbtext>Zobraziť text</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edittext" xmbdesc="Tooltip(editpanel/edittext)">
+  <xmbtext>Pridať alebo upraviť text na fotografii</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/showtextcheckbox" xmbdesc="Tooltip(editpanel/showtextcheckbox)">
+  <xmbtext>Zobraziť alebo skryť text na fotografiách</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filllight_icon" xmbdesc="Tooltip(editpanel/filllight_icon)">
+  <xmbtext>Zjasnenie tieňov: Úprava svetla okolia na fotografii</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/horizonadjust" xmbdesc="Label(editpanel/horizonadjust)">
+  <xmbtext>Vyrovnať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/horizonadjust" xmbdesc="Tooltip(editpanel/horizonadjust)">
+  <xmbtext>Opraviť pokrivenú fotografiu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/enhance" xmbdesc="Label(editpanel/enhance)">
+  <xmbtext>Cítim sa šťastne</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/enhance" xmbdesc="Tooltip(editpanel/enhance)">
+  <xmbtext>Oprava osvetlenia a farieb jedným kliknutím</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/ok" xmbdesc="Label(editpanel/ok)">
+  <xmbtext>Použiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ok" xmbdesc="Tooltip(editpanel/ok)">
+  <xmbtext>Použiť zmeny</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cancel" xmbdesc="Label(editpanel/cancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cancel" xmbdesc="Tooltip(editpanel/cancel)">
+  <xmbtext>Zrušiť zmeny</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_undo" xmbdesc="Label(editpanel/filter_undo)">
+  <xmbtext>Späť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_undo" xmbdesc="Tooltip(editpanel/filter_undo)">
+  <xmbtext>Odstrániť poslednú opravu alebo úpravu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_redo" xmbdesc="Label(editpanel/filter_redo)">
+  <xmbtext>Znova</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_redo" xmbdesc="Tooltip(editpanel/filter_redo)">
+  <xmbtext>Znova použiť odstránenú opravu alebo úpravu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop_label" xmbdesc="Label(editpanel/crop_label)">
+  <xmbtext>Orezať fotografiu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croptext" xmbdesc="Label(editpanel/croptext)">
+  <xmbtext>Vyberte rozmer uvedený nižšie a potom kliknutím na obrázok a presunutím myšou vyberte časť obrázka, ktorú chcete orezať.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croprotatecrop" xmbdesc="Label(editpanel/croprotatecrop)">
+  <xmbtext>Otočiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croprotatecrop" xmbdesc="Tooltip(editpanel/croprotatecrop)">
+  <xmbtext>Prepínanie medzi orientáciou na výšku a na šírku</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croppreview" xmbdesc="Label(editpanel/croppreview)">
+  <xmbtext>Ukážka</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croppreview" xmbdesc="Tooltip(editpanel/croppreview)">
+  <xmbtext>Ukážka zvoleného orezania</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropdiscard" xmbdesc="Label(editpanel/cropdiscard)">
+  <xmbtext>Vynulovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropdiscard" xmbdesc="Tooltip(editpanel/cropdiscard)">
+  <xmbtext>Zrušiť všetko použité orezanie</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropapply" xmbdesc="Label(editpanel/cropapply)">
+  <xmbtext>Použiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropapply" xmbdesc="Tooltip(editpanel/cropapply)">
+  <xmbtext>Použiť úpravy orezania</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropcancel" xmbdesc="Label(editpanel/cropcancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropcancel" xmbdesc="Tooltip(editpanel/cropcancel)">
+  <xmbtext>Ukončenie nástroja na orezávanie</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop_delete_custom" xmbdesc="Tooltip(editpanel/crop_delete_custom)">
+  <xmbtext>Odstráni aktuálny pomer strán</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye_label" xmbdesc="Label(editpanel/redeye_label)">
+  <xmbtext>Korekcia efektu červených očí</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyetext" xmbdesc="Label(editpanel/redeyetext)">
+  <xmbtext>Kliknite, podržte tlačidlo myši a vyberte samostatne každé oko pretiahnutím ukazovateľa okolo oka. Vybraná oblasť bude ohraničená rámčekom. Výber dokončíte uvoľnením tlačidla myši. Fotografia bude zobrazená s odstráneným efektom červených očí.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeauto" xmbdesc="Label(editpanel/redeyeauto)">
+  <xmbtext>Automaticky</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeauto" xmbdesc="Tooltip(editpanel/redeyeauto)">
+  <xmbtext>Znova použiť automatické opravy červených očí</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyepreview" xmbdesc="Label(editpanel/redeyepreview)">
+  <xmbtext>Ukážka</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyepreview" xmbdesc="Tooltip(editpanel/redeyepreview)">
+  <xmbtext>Zobraziť ukážku zmien bez štvorcových obrysov</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyecancel" xmbdesc="Label(editpanel/redeyecancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyecancel" xmbdesc="Tooltip(editpanel/redeyecancel)">
+  <xmbtext>Skončiť opravu efektu červených očí bez použitia efektu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeapply" xmbdesc="Label(editpanel/redeyeapply)">
+  <xmbtext>Použiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeapply" xmbdesc="Tooltip(editpanel/redeyeapply)">
+  <xmbtext>Použiť efekt a ukončiť opravu efektu červených očí</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyediscard" xmbdesc="Label(editpanel/redeyediscard)">
+  <xmbtext>Vynulovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyediscard" xmbdesc="Tooltip(editpanel/redeyediscard)">
+  <xmbtext>Vrátiť späť zmeny efektu červených očí</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_label" xmbdesc="Label(editpanel/retouch_label)">
+  <xmbtext>Retušovať škvrny</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchtext" xmbdesc="Label(editpanel/retouchtext)">
+  <xmbtext>Kliknutím vyberte oblasť, ktorú chcete opraviť. Potom posunutím myši zobrazte oblasť nahradenia. Opätovným kliknutím na obrázok dokončíte akciu. Namydlite, opláchnite a zopakujte. Poznámka: Ak chcete obrázok posunúť, stlačte kláves Ctrl a potiahnite obrázok myšou.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_brush_label" xmbdesc="Label(editpanel/retouch_brush_label)">
+  <xmbtext>Veľkosť štetca</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchreset" xmbdesc="Label(editpanel/retouchreset)">
+  <xmbtext>Vynulovať</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchundo" xmbdesc="Label(editpanel/retouchundo)">
+  <xmbtext>Vrátiť opravu späť</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchredo" xmbdesc="Label(editpanel/retouchredo)">
+  <xmbtext>Obnoviť opravu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchapply" xmbdesc="Label(editpanel/retouchapply)">
+  <xmbtext>Použiť</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchcancel" xmbdesc="Label(editpanel/retouchcancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchreset" xmbdesc="Tooltip(editpanel/retouchreset)">
+  <xmbtext>Odstrániť všetky retušovacie opravy</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchundo" xmbdesc="Tooltip(editpanel/retouchundo)">
+  <xmbtext>Odstrániť poslednú retušovaciu opravu</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchredo" xmbdesc="Tooltip(editpanel/retouchredo)">
+  <xmbtext>Znova použiť odstránenú retušovaciu opravu</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchapply" xmbdesc="Tooltip(editpanel/retouchapply)">
+  <xmbtext>Použiť opravy a ukončiť retušovací nástroj</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchcancel" xmbdesc="Tooltip(editpanel/retouchcancel)">
+  <xmbtext>Ukončiť retušovací nástroj bez použitia úprav</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_lighting" xmbdesc="Tooltip(editpanel/magic_lighting)">
+  <xmbtext>Oprava osvetlenia jedným kliknutím</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_color" xmbdesc="Tooltip(editpanel/magic_color)">
+  <xmbtext>Oprava farieb jedným kliknutím</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/droppertoggle" xmbdesc="Tooltip(editpanel/droppertoggle)">
+  <xmbtext>Umožňuje vybrať neutrálnu šedú alebo bielu časť fotografie na odstránenie farebného odtieňa</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/greybalancelabel" xmbdesc="Label(editpanel/greybalancelabel)">
+  <xmbtext>Výber neutrálnych farieb</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filllightlabel" xmbdesc="Label(editpanel/filllightlabel)">
+  <xmbtext>Výplňové svetlo</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik_fx_label" xmbdesc="Label(editpanel/picnik_fx_label)">
+  <xmbtext>Efekty zo služby</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik_fx" xmbdesc="Tooltip(editpanel/picnik_fx)">
+  <xmbtext>Vyskúšať ďalšie efekty v aplikácii Creative Kit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/in_progress_label" xmbdesc="Label(editpanel/in_progress_label)">
+  <xmbtext>Prebieha...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/render_now" xmbdesc="Label(editpanel/render_now)">
+  <xmbtext>Vytvoriť</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnikcancel" xmbdesc="Label(editpanel/picnikcancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/picnikprogressdone" xmbdesc="Text(editpanel/picnikprogressdone)">
+  <xmbtext>Po ukončení úprav kliknite na položku „Uložiť do programu Picasa“.</xmbtext>
+ </action>
+ <action type="Text1" target="editpanel/picnikprogress" xmbdesc="Text1(editpanel/picnikprogress)">
+  <xmbtext>Fotografia sa prenáša do aplikácie Creative Kit...</xmbtext>
+ </action>
+ <action type="Text2" target="editpanel/picnikprogress" xmbdesc="Text2(editpanel/picnikprogress)">
+  <xmbtext>Pripája sa k aplikácii Creative Kit...</xmbtext>
+ </action>
+ <action type="Text3" target="editpanel/picnikprogress" xmbdesc="Text3(editpanel/picnikprogress)">
+  <xmbtext>Počkajte, fotografia sa prenáša z aplikácie Creative Kit...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label0" xmbdesc="Label(editpanel/colorwheel_label0)">
+  <xmbtext>Výber farby</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label1" xmbdesc="Label(editpanel/colorwheel_label1)">
+  <xmbtext>Výber farby</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_youtube" xmbdesc="Label(movieeditpanel/export_youtube)">
+  <xmbtext>Nahrať na lokalitu YouTube</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_movie" xmbdesc="Label(movieeditpanel/export_movie)">
+  <xmbtext>Exportovať klip</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/reset_trim" xmbdesc="Label(movieeditpanel/reset_trim)">
+  <xmbtext>Obnoviť začiatok a koniec</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/capture_frame" xmbdesc="Label(movieeditpanel/capture_frame)">
+  <xmbtext>Vytvoriť snímku</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_youtube" xmbdesc="Tooltip(movieeditpanel/export_youtube)">
+  <xmbtext>Nahrať film na lokalitu YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_movie" xmbdesc="Tooltip(movieeditpanel/export_movie)">
+  <xmbtext>Uložiť klip videa medzi počiatočným a koncovým bodom</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/reset_trim" xmbdesc="Tooltip(movieeditpanel/reset_trim)">
+  <xmbtext>Obnoviť pôvodnú dĺžku videa (odstrániť počiatočný a koncový bod)</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/capture_frame" xmbdesc="Tooltip(movieeditpanel/capture_frame)">
+  <xmbtext>Zachytiť aktuálny rámec</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>Tlačiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>Vytlačiť fotografie v Zásobníku na fotografie</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>E-mail</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>Odoslať fotografie v Zásobníku na fotografie prostredníctvom e-mailu</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>Koláž</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>Vytvoriť z výberu koláž fotografií</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>Film</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>Vytvoriť filmovú prezentáciu pomocou vlastného výberu</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>Odoslať fotografie v Zásobníku na fotografie do aplikácie Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Nahrať fotky do služby Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Nahrať fotky do služby Blogger</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>Kúpiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>Kúpa fotografií a produktov od vášho obľúbeného poskytovateľa v režime online </xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>Export</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>Skopírovať fotografie v Zásobníku na fotografie do priečinka na pevnom disku</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>Ďalšie...</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>Kliknutím zobrazíte ďalšie možnosti</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/makemovietab" xmbdesc="Label(panelroot/makemovietab)">
+  <xmbtext>Movie Maker</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/collagetab" xmbdesc="Label(panelroot/collagetab)">
+  <xmbtext>Koláž</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/acquiretab" xmbdesc="Label(panelroot/acquiretab)">
+  <xmbtext>Importovať</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/capturemovietab" xmbdesc="Label(panelroot/capturemovietab)">
+  <xmbtext>Záznam</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/picasatab" xmbdesc="Label(panelroot/picasatab)">
+  <xmbtext>Knižnica</xmbtext>
+ </action>
+ <action type="Label" target="publish/giftcdtext" xmbdesc="Label(publish/giftcdtext)">
+  <xmbtext>Položky vyššie označené zaškrtnutím sa zahrnú na darčekové CD. Ak chcete pridať ďalšie položky, kliknite na tlačidlo „Pridať ďalšie“ nachádzajúce sa nižšie.</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_cdname" xmbdesc="Text(publish/label_cdname)">
+  <xmbtext>Názov disku CD</xmbtext>
+ </action>
+ <action type="Text" target="publish/namelimitext" xmbdesc="Text(publish/namelimitext)">
+  <xmbtext>Limit 16 znakov</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox1" xmbdesc="Text(publish/label_optionbox1)">
+  <xmbtext>Zahrnúť prezentáciu</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox2" xmbdesc="Text(publish/label_optionbox2)">
+  <xmbtext>Vymazať médium</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox3" xmbdesc="Text(publish/label_optionbox3)">
+  <xmbtext>Zahrnúť program Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_go" xmbdesc="Label(publish/presentcd_go)">
+  <xmbtext>Napáliť disk</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_help" xmbdesc="Label(publish/presentcd_help)">
+  <xmbtext>Pomocník</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_eject" xmbdesc="Label(publish/presentcd_eject)">
+  <xmbtext>Vysunúť</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_cancel" xmbdesc="Label(publish/presentcd_cancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Pridať ďalšie...</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Pridať ďalšie...</xmbtext>
+ </action>
+ <action type="Text" target="publish/selectiontext" xmbdesc="Text(publish/selectiontext)">
+  <xmbtext>Výber a nastavenia</xmbtext>
+ </action>
+ <action type="Text" target="publish/picsizetext" xmbdesc="Text(publish/picsizetext)">
+  <xmbtext>Veľkosť fotografie</xmbtext>
+ </action>
+ <action type="Text" target="publish/cdnametext" xmbdesc="Text(publish/cdnametext)">
+  <xmbtext>Pomenovať darčekové CD</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backupcdheader" xmbdesc="Text1(publish/backupcdheader)">
+  <xmbtext>Vytvoriť záložný disk CD</xmbtext>
+ </action>
+ <action type="Text2" target="publish/backupcdheader" xmbdesc="Text2(publish/backupcdheader)">
+  <xmbtext>Vytvoriť sadu alebo použiť existujúcu</xmbtext>
+ </action>
+ <action type="Label" target="publish/backupcdheader2" xmbdesc="Label(publish/backupcdheader2)">
+  <xmbtext>Vybrať priečinky a albumy na zálohovanie</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backuptext" xmbdesc="Text1(publish/backuptext)">
+  <xmbtext>Záložná sada zaznamenáva, kde sa majú uložiť zálohované súbory a ktoré súbory už boli zálohované, takže ich nemusíte zálohovať znova.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext2" xmbdesc="Label(publish/backuptext2)">
+  <xmbtext>Program Picasa teraz zobrazuje súbory, ktoré ste ešte nezálohovali.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext3" xmbdesc="Label(publish/backuptext3)">
+  <xmbtext>Vyberte priečinky, ktoré chcete zálohovať, alebo vyberte všetky zvolením položky Vybrať všetko.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_go" xmbdesc="Label(publish/backup_go)">
+  <xmbtext>Napáliť disk</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_help" xmbdesc="Label(publish/backup_help)">
+  <xmbtext>Pomocník</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_eject" xmbdesc="Label(publish/backup_eject)">
+  <xmbtext>Vysunúť</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_cancel" xmbdesc="Label(publish/backup_cancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Label" target="publish/newbackupset" xmbdesc="Label(publish/newbackupset)">
+  <xmbtext>Nová sada</xmbtext>
+ </action>
+ <action type="Label" target="publish/deletebackupset" xmbdesc="Label(publish/deletebackupset)">
+  <xmbtext>Odstrániť množinu</xmbtext>
+ </action>
+ <action type="Label" target="publish/editbackupset" xmbdesc="Label(publish/editbackupset)">
+  <xmbtext>Upraviť sadu</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_backupname" xmbdesc="Text(publish/label_backupname)">
+  <xmbtext>Záložná sada</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectall" xmbdesc="Label(publish/selectall)">
+  <xmbtext>Vybrať všetky</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectnone" xmbdesc="Label(publish/selectnone)">
+  <xmbtext>Nevybrať nič</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox1" xmbdesc="Label(publish/label_rpoptionbox1)">
+  <xmbtext>Nahrať</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox1" xmbdesc="Tooltip(publish/rpoptionbox1)">
+  <xmbtext>Vybraté priečinky alebo albumy budú nahrané</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox2" xmbdesc="Label(publish/label_rpoptionbox2)">
+  <xmbtext>Zmeniť možnosti</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox2" xmbdesc="Tooltip(publish/rpoptionbox2)">
+  <xmbtext>Vybraté priečinky alebo albumy budú aktualizované online podľa možností zadaných v ponukách napravo</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox3" xmbdesc="Label(publish/label_rpoptionbox3)">
+  <xmbtext>Odstrániť online</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Vybraté priečinky alebo albumy budú odstránené zo služby Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Vybraté priečinky alebo albumy budú odstránené zo služby Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_go" xmbdesc="Label(publish/replicate_go)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_go" xmbdesc="Tooltip(publish/replicate_go)">
+  <xmbtext>Vami vybratá akcia začne</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_cancel" xmbdesc="Label(publish/replicate_cancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_cancel" xmbdesc="Tooltip(publish/replicate_cancel)">
+  <xmbtext>Vrátiť sa do knižnice bez vykonania zmien online</xmbtext>
+ </action>
+ <action type="Label" target="publish/upgradestorage" xmbdesc="Label(publish/upgradestorage)">
+  <xmbtext>Rozšíriť ukladací priestor</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/upgradestorage" xmbdesc="Tooltip(publish/upgradestorage)">
+  <xmbtext>Ďalší ukladací priestor vám umožní nahrať viac fotografií</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallactionstitle" xmbdesc="Text(publish/uploadallactionstitle)">
+  <xmbtext>Vyberte akciu pre vybraté priečinky a albumy:</xmbtext>
+ </action>
+ <action type="Text1" target="publish/uploadallinfotext" xmbdesc="Text1(publish/uploadallinfotext)">
+  <xmbtext>Program Picasa teraz zobrazuje len priečinky a albumy obsahujúce fotografie, ktoré ste doteraz neodovzdali.</xmbtext>
+ </action>
+ <action type="Text2" target="publish/uploadallinfotext" xmbdesc="Text2(publish/uploadallinfotext)">
+  <xmbtext>Program Picasa teraz zobrazuje len priečinky a albumy obsahujúce fotografie, ktoré už sú online a nevzťahujú sa na ne možnosti, ktoré ste vybrali.</xmbtext>
+ </action>
+ <action type="Text3" target="publish/uploadallinfotext" xmbdesc="Text3(publish/uploadallinfotext)">
+  <xmbtext>Program Picasa teraz zobrazuje len priečinky a albumy obsahujúce fotografie, ktoré už sú online.</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallstoragetitle" xmbdesc="Text(publish/uploadallstoragetitle)">
+  <xmbtext>Ukladací priestor:</xmbtext>
+ </action>
+ <action type="Text" target="publish/used_storage" xmbdesc="Text(publish/used_storage)">
+  <xmbtext>Momentálne využívaný ukladací priestor</xmbtext>
+ </action>
+ <action type="Text" target="publish/full_storage" xmbdesc="Text(publish/full_storage)">
+  <xmbtext>Po dokončení nahrávania budete využívať všetok svoj ukladací priestor.</xmbtext>
+ </action>
+ <action type="Text" target="publish/needed_storage" xmbdesc="Text(publish/needed_storage)">
+  <xmbtext>Na nahranie tohto všetkého potrebujete viac ukladacieho priestoru!</xmbtext>
+ </action>
+ <action type="Text" target="publish/final_storage" xmbdesc="Text(publish/final_storage)">
+  <xmbtext>Stav vášho ukladacieho priestoru po nahraní týchto súborov</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadalloptionstitle" xmbdesc="Text(publish/uploadalloptionstitle)">
+  <xmbtext>Možnosti nahrania:</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsize3" xmbdesc="Text(publish/uploadsize3)">
+  <xmbtext>Veľkosť:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Veľkosť fotografie po nahraní do služby Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Veľkosť fotografie po nahraní do služby Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadaccess3" xmbdesc="Text(publish/uploadaccess3)">
+  <xmbtext>Viditeľnosť:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Nastavte prístup k albumu v službe Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Nastavte prístup k albumu v službe Webové albumy programu Picasa</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsync3" xmbdesc="Text(publish/uploadsync3)">
+  <xmbtext>Synchronizovať:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsync" xmbdesc="Tooltip(publish/uploadallsync)">
+  <xmbtext>Zmeniť nastavenie synchronizácie pre vybraté priečinky alebo albumy</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/viewallbutton" xmbdesc="Label(searchoptions/viewallbutton)">
+  <xmbtext>Všetky položky</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchoptions/viewallbutton" xmbdesc="Tooltip(searchoptions/viewallbutton)">
+  <xmbtext>Ukončiť režim vyhľadávania</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/label_searchresult" xmbdesc="Label(searchoptions/label_searchresult)">
+  <xmbtext>Výsledok vyhľadávania:</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/timecontainer_label" xmbdesc="Tooltip(searchcontainer/timecontainer_label)">
+  <xmbtext>Filtrovať podľa rozsahu dátumov</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/searchclr" xmbdesc="Tooltip(searchcontainer/searchclr)">
+  <xmbtext>Vymazať vyhľadávanie</xmbtext>
+ </action>
+ <action type="Label" target="searchcontainer/filter_label" xmbdesc="Label(searchcontainer/filter_label)">
+  <xmbtext>Filtre</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/starsearch" xmbdesc="Tooltip(searchcontainer/starsearch)">
+  <xmbtext>Zobraziť len fotografie označené hviezdičkou </xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/moviesearch" xmbdesc="Tooltip(searchcontainer/moviesearch)">
+  <xmbtext>Zobraziť len filmy</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/webview" xmbdesc="Tooltip(searchcontainer/webview)">
+  <xmbtext>Zobraziť len položky nahrané do webových albumov</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/facesearch" xmbdesc="Tooltip(searchcontainer/facesearch)">
+  <xmbtext>Zobraziť len fotografie s tvárami</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/geotagsearch" xmbdesc="Tooltip(searchcontainer/geotagsearch)">
+  <xmbtext>Zobraziť len fotografie s geografickou značkou</xmbtext>
+ </action>
+ <action type="Text1" target="thumbui/lightbox_bgtext" xmbdesc="Text1(thumbui/lightbox_bgtext)">
+  <xmbtext>Nenašli sa žiadne fotografie</xmbtext>
+ </action>
+ <action type="Text2" target="thumbui/lightbox_bgtext" xmbdesc="Text2(thumbui/lightbox_bgtext)">
+  <xmbtext>V tejto sade sú zálohované všetky súbory</xmbtext>
+ </action>
+ <action type="Text3" target="thumbui/lightbox_bgtext" xmbdesc="Text3(thumbui/lightbox_bgtext)">
+  <xmbtext>Nenašli sa žiadne fotografie pre disk CD</xmbtext>
+ </action>
+ <action type="Text4" target="thumbui/lightbox_bgtext" xmbdesc="Text4(thumbui/lightbox_bgtext)">
+  <xmbtext>Všetky fotografie boli nahrané</xmbtext>
+ </action>
+ <action type="Text5" target="thumbui/lightbox_bgtext" xmbdesc="Text5(thumbui/lightbox_bgtext)">
+  <xmbtext>Pre všetky fotografie, ktoré sú momentálne online, sú použité tieto nastavenia</xmbtext>
+ </action>
+ <action type="Text6" target="thumbui/lightbox_bgtext" xmbdesc="Text6(thumbui/lightbox_bgtext)">
+  <xmbtext>Zo služby Webové albumy programu Picasa nemôžu byť odstránené žiadne fotografie</xmbtext>
+ </action>
+ <action type="Text7" target="thumbui/lightbox_bgtext" xmbdesc="Text7(thumbui/lightbox_bgtext)">
+  <xmbtext>Zo služby Fotky Google sa nedajú odstrániť žiadne fotky</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/albumview" xmbdesc="Label(thumbui/albumview)">
+  <xmbtext>Späť do knižnice</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/loupehit" xmbdesc="Tooltip(thumbui/loupehit)">
+  <xmbtext>Ak chcete fotografie zväčšiť, kliknite na ne a potiahnite myšou</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/albumview" xmbdesc="Tooltip(thumbui/albumview)">
+  <xmbtext>Späť na usporiadané miniatúry</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/fullview" xmbdesc="Label(thumbui/fullview)">
+  <xmbtext>Upraviť fotografie</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/fullview" xmbdesc="Tooltip(thumbui/fullview)">
+  <xmbtext>Upraviť fotografie</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/importbutton" xmbdesc="Label(thumbui/importbutton)">
+  <xmbtext>Importovať</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/importbutton" xmbdesc="Tooltip(thumbui/importbutton)">
+  <xmbtext>Získať fotografie z fotoaparátu, skenera alebo iného média</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/webcambutton" xmbdesc="Tooltip(thumbui/webcambutton)">
+  <xmbtext>Získať fotografie alebo video z webovej kamery alebo iného videozariadenia</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/sbutton" xmbdesc="Label(thumbui/sbutton)">
+  <xmbtext>Prezentácia</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/people_toggle" xmbdesc="Tooltip(thumbui/people_toggle)">
+  <xmbtext>Zobraziť/skryť panel Osoby</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/places_toggle" xmbdesc="Tooltip(thumbui/places_toggle)">
+  <xmbtext>Zobraziť/skryť panel Miesta</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/tags_toggle" xmbdesc="Tooltip(thumbui/tags_toggle)">
+  <xmbtext>Zobraziť/skryť panel Značky</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/properties_toggle" xmbdesc="Tooltip(thumbui/properties_toggle)">
+  <xmbtext>Zobraziť/skryť panel Vlastnosti</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/sbutton" xmbdesc="Tooltip(thumbui/sbutton)">
+  <xmbtext>Zobraziť prezentáciu fotografií vo vybranom priečinku alebo albume</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/timelinebutton" xmbdesc="Label(thumbui/timelinebutton)">
+  <xmbtext>Časový sled</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/timelinebutton" xmbdesc="Tooltip(thumbui/timelinebutton)">
+  <xmbtext>Zobrazenie časového sledu všetkých fotografií</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/cdmode" xmbdesc="Label(thumbui/cdmode)">
+  <xmbtext>Darčekové CD</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/cdmode" xmbdesc="Tooltip(thumbui/cdmode)">
+  <xmbtext>Vytvoriť CD so zabudovanou prezentáciou pre priateľov a členov rodiny</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/backup" xmbdesc="Label(thumbui/backup)">
+  <xmbtext>Záloha</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/backup" xmbdesc="Tooltip(thumbui/backup)">
+  <xmbtext>Archivovať fotografie na disk CD alebo DVD</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/visitweb" xmbdesc="Label(thumbui/visitweb)">
+  <xmbtext>Webové zobrazenie</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/visitweb" xmbdesc="Tooltip(thumbui/visitweb)">
+  <xmbtext>ZÁSTUPNÝ SYMBOL</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchhold" xmbdesc="Tooltip(thumbui/scratchhold)">
+  <xmbtext>Podržať vybraté položky</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchclear" xmbdesc="Tooltip(thumbui/scratchclear)">
+  <xmbtext>Zrušiť výber položiek</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/addtobuttcon" xmbdesc="Tooltip(thumbui/addtobuttcon)">
+  <xmbtext>Pridať vybraté položky do albumu</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/startoggle" xmbdesc="Tooltip(thumbui/startoggle)">
+  <xmbtext>Pridať alebo odstrániť hviezdičku</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Otočiť doľava</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Otočiť doľava</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/scratchlabel" xmbdesc="Text(thumbui/scratchlabel)">
+  <xmbtext>Výber</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/librarylabel" xmbdesc="Label(thumbui/librarylabel)">
+  <xmbtext>Knižnica</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newfolder" xmbdesc="Tooltip(thumbui/newfolder)">
+  <xmbtext>Presunúť vybraté súbory do nového priečinka</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderviewpopup" xmbdesc="Tooltip(thumbui/folderviewpopup)">
+  <xmbtext>Možnosti zobrazenia</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderview" xmbdesc="Tooltip(thumbui/folderview)">
+  <xmbtext>Nastaviť zobrazenie štruktúry stromu priečinkov</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/flatview" xmbdesc="Tooltip(thumbui/flatview)">
+  <xmbtext>Nastaviť zobrazenie jednotnej štruktúry priečinkov</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newalbum" xmbdesc="Tooltip(thumbui/newalbum)">
+  <xmbtext>Vytvoriť nový album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateright" xmbdesc="Tooltip(thumbui/rotateright)">
+  <xmbtext>Otočiť v smere hodinových ručičiek</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Otočiť doľava</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/smallthumbs" xmbdesc="Tooltip(thumbui/smallthumbs)">
+  <xmbtext>Zobraziť fotografie pomocou malých miniatúr</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/largethumbs" xmbdesc="Tooltip(thumbui/largethumbs)">
+  <xmbtext>Zobraziť fotografie pomocou veľkých miniatúr</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/next" xmbdesc="Tooltip(thumbui/next)">
+  <xmbtext>Zobraziť ďalšiu fotografiu</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/prev" xmbdesc="Tooltip(thumbui/prev)">
+  <xmbtext>Zobraziť predchádzajúcu fotografiu</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/cd_label" xmbdesc="Text(thumbui/cd_label)">
+  <xmbtext>Vytvoriť darčekové CD</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/backup_label" xmbdesc="Text(thumbui/backup_label)">
+  <xmbtext>Zálohovať fotografie</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/replication_label" xmbdesc="Text(thumbui/replication_label)">
+  <xmbtext>Dávkové nahrávanie</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_text" xmbdesc="Label(thumbui/lightbox_esolo_text)">
+  <xmbtext>V tomto albume sa nenašli žiadne výsledky</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_button" xmbdesc="Label(thumbui/lightbox_esolo_button)">
+  <xmbtext>Hľadať všetko</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/single_action_message" xmbdesc="Label(thumbui/single_action_message)">
+  <xmbtext>Vyberte položky, ktoré chcete pridať do zásobníka klipov projektu, a potom sa vráťte späť do projektu stlačením tlačidla Späť.</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_return" xmbdesc="Tooltip(thumbui/single_action_return)">
+  <xmbtext>Späť na upravovanú položku</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_close" xmbdesc="Tooltip(thumbui/single_action_close)">
+  <xmbtext>Zrušiť získanie ďalších položiek</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setin" xmbdesc="Tooltip(video_control_bar/setin)">
+  <xmbtext>Vytvoriť nový počiatočný bod</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setout" xmbdesc="Tooltip(video_control_bar/setout)">
+  <xmbtext>Vytvoriť nový koncový bod</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/moviemode1" xmbdesc="Tooltip(video_control_bar/moviemode1)">
+  <xmbtext>Prehrať na celej obrazovke</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/1to1" xmbdesc="Tooltip(video_control_bar2/1to1)">
+  <xmbtext>Zobraziť skutočnú veľkosť filmu (nerozťahovať)</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/fullscreen" xmbdesc="Tooltip(video_control_bar2/fullscreen)">
+  <xmbtext>Prehrať na celej obrazovke</xmbtext>
+ </action>
+ <action type="Label" target="oneup/tllabel" xmbdesc="Label(oneup/tllabel)">
+  <xmbtext>Časový sled</xmbtext>
+ </action>
+ <action type="Label" target="oneup/bcklabel" xmbdesc="Label(oneup/bcklabel)">
+  <xmbtext>Skončiť</xmbtext>
+ </action>
+ <action type="Text" target="oneup/tpslabel" xmbdesc="Text(oneup/tpslabel)">
+  <xmbtext>Doba zobrazenia</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>Пријавите се</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>Унесите корисничко име и лозинку коју обично користите за приступање услузи штампања фотографија. Ако већ немате налог код овог добављача, кликните на &amp;#132;Направи налог&amp;#147; да бисте се пријавили.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>Aдреса е-поште:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>Отворите налог...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.rs</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>Лозинка:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>Заборавили сте лозинку?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.rs</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>Сачувај лозинку</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>Приступ осигурава SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>Величина слике:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>Да бисмо обезбедили најбољи квалитет штампања, ваше слике се шаљу у највећој доступној резолуцији.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>Име албума:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>Пријави ме</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

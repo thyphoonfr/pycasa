@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Exportovať do priečinka</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Umiestnenie exportu:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Prehľadávať...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Názov exportovaného priečinka:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Pridať k názvom súborov čísla na zachovanie poradia</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Veľkosť obrázka:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Použiť pôvodnú veľkosť</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Zmeniť veľkosť na:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixlov</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Kvalita obrázka:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatické</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normálne</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximálne</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimálne</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Vlastné</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Zachová pôvodnú kvalitu obrázka</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Dobrá rovnováha kvality a veľkosti</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Veľmi veľké súbory, zachová jemné detaily</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Najmenšia veľkosť súboru, čiastočná strata kvality</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Exportovať filmy pomocou:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Prvá snímka</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Celý film (bez zmeny veľkosti)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vodoznak:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Pridať vodoznak</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Označte fotografie svojím menom, webovou doménou alebo oznámením o autorských právach.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="keywords/addbutton" xmbdesc="Label(keywords/addbutton)">
+  <xmbtext>Додати</xmbtext>
+ </action>
+ <action type="Label" target="keywords/removebutton" xmbdesc="Label(keywords/removebutton)">
+  <xmbtext>Видалити</xmbtext>
+ </action>
+ <action type="Label" target="keywords/closebutton" xmbdesc="Label(keywords/closebutton)">
+  <xmbtext>Готово</xmbtext>
+ </action>
+ <action type="Label" target="keywords/addkeywords_label" xmbdesc="Label(keywords/addkeywords_label)">
+  <xmbtext>Додати тег:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/keywords_label" xmbdesc="Label(keywords/keywords_label)">
+  <xmbtext>Теги:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/readonly_label" xmbdesc="Label(keywords/readonly_label)">
+  <xmbtext>Неможливо редагувати теги, оскільки один або кілька елементів призначені тільки для читання.</xmbtext>
+ </action>
+</tooltips>

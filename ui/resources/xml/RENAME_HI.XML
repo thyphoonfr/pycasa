@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>फ़ाइलें पुनर्नामित करें</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>पुनर्नामित करने के लिए 1 फ़ाइल(फ़ाइलें) चयनित.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>पुनर्नामित करने के लिए %s फ़ाइल(फ़ाइलें) चयनित.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>इन फ़ाइलों के लिए कृपया एक नया नाम दर्ज करें:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>फ़ाइल नाम में शामिल करें:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>तिथि</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>चित्र रिज़ॉल्यूशन</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>उदाहरण:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>पुनर्नामित करें</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

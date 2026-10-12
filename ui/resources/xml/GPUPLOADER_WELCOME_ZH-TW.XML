@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_welcome/window.title">
+  <xmbtext>Google 相簿備份</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/welcometext.title">
+  <xmbtext>自動備份您電腦中的相片和影片 (包括硬碟和記憶卡中的相片和影片)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_text.title">
+  <xmbtext>使用 Google 相簿備份即表示您同意接受</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.title">
+  <xmbtext>Google 服務條款</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.url">
+  <xmbtext>https://www.google.com/policies/terms</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/sign_in.title">
+  <xmbtext>繼續</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/switch_account.title">
+  <xmbtext>切換帳戶</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/get_started.title">
+  <xmbtext>繼續</xmbtext>
+ </stringres>
+</resources>

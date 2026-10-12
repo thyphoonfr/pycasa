@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Uždaryti</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Sveiki! Tai – paketų įkėlimas</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Pažymėkite žymimuosius langelius šalia aplankų ir albumų, su kuriais norite dirbti. Tada pasirinkite, kokius veiksmus norite atlikti. „Picasa“ atskirs elementus, kuriems atlikti pakeitimai nebus taikomi. Pavyzdžiui, jei visas aplankas ar albumas jau įkeltas į internetą, „Picasa“ neberodys jo kaip elemento, kurį galima įkelti.</xmbtext>
+ </action>
+</tooltips>

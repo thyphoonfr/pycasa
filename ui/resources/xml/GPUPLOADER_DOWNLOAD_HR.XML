@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_download/window.title">
+  <xmbtext>Sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/device_name.title">
+  <xmbtext>Želite li izraditi sigurnosne kopije fotografije iz uređaja %1$s?</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/action_prompt.title">
+  <xmbtext>Spremanje fotografija i videozapisa iz ovog uređaja na Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/never_btn.title">
+  <xmbtext>Nikad</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/once_btn.title">
+  <xmbtext>Samo jedanput</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/always_btn.title">
+  <xmbtext>Uvijek</xmbtext>
+ </stringres>
+</resources>

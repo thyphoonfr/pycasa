@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Записивање ознака лица</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Записивање лица или записивање свега може дуго да траје. Ако је евидентирање подешено на детаљно или више, network.log ће садржати поруке о датотекама само за читање које није било могуће ажурирати. Препоручује се да се одјавите док користите ову функцију.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Записивање изабраног</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Записивање лица</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Записивање свега</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

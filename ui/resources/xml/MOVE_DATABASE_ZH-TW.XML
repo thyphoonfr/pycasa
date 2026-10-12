@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>移動資料庫</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>您必須重新啟動 Picasa，才能使變更生效。</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>請注意：試用這個實驗性功能之前，請先備份您的資料庫。請勿將您的資料庫移至網路上、卸除式磁碟或外接式磁碟中，以避免發生遺失資料的情況。</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>目前資料庫位置：</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>新資料庫位置：</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>瀏覽...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>預設</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>下次重新啟動時移動</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

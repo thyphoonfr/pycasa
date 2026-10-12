@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="capturemoviepanelpopup/done" xmbdesc="Label(capturemoviepanelpopup/done)">
+  <xmbtext>완료</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/capture" xmbdesc="Label(capturemoviepanelpopup/capture)">
+  <xmbtext>녹화</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/stop" xmbdesc="Label(capturemoviepanelpopup/stop)">
+  <xmbtext>중지</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/live_video" xmbdesc="Label(capturemoviepanelpopup/live_video)">
+  <xmbtext>카메라</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/camchange" xmbdesc="Label(capturemoviepanelpopup/camchange)">
+  <xmbtext>환경설정</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/capture" xmbdesc="Tooltip(capturemoviepanelpopup/capture)">
+  <xmbtext>카메라에서 녹화를 시작합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/stop" xmbdesc="Tooltip(capturemoviepanelpopup/stop)">
+  <xmbtext>카메라에서 녹화를 중지합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/live_video" xmbdesc="Tooltip(capturemoviepanelpopup/live_video)">
+  <xmbtext>카메라에서 라이브 동영상을 녹화합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/camchange" xmbdesc="Tooltip(capturemoviepanelpopup/camchange)">
+  <xmbtext>카메라 설정 변경</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_cancel" xmbdesc="Label(capturemoviepanelpopup/settings_cancel)">
+  <xmbtext>취소</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_apply" xmbdesc="Label(capturemoviepanelpopup/settings_apply)">
+  <xmbtext>적용</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/video_label" xmbdesc="Label(capturemoviepanelpopup/video_label)">
+  <xmbtext>동영상</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/size_label" xmbdesc="Label(capturemoviepanelpopup/size_label)">
+  <xmbtext>크기</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/audio_label" xmbdesc="Label(capturemoviepanelpopup/audio_label)">
+  <xmbtext>오디오</xmbtext>
+ </action>
+</tooltips>

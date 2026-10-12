@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Před použitím aplikace Picasa si prosím přečtěte licenční smlouvu</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Používáním aplikace Picasa souhlasíte se smluvními podmínkami společnosti Google a se zásadami ochrany soukromí.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Smluvní podmínky</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/cs/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Zásady ochrany soukromí</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/cs/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Posílat společnosti Google anonymní statistiky používání (nastavení můžete kdykoli změnit)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Souhlasím</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

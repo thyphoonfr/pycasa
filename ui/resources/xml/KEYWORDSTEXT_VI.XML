@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="keywords/addbutton" xmbdesc="Label(keywords/addbutton)">
+  <xmbtext>Thêm</xmbtext>
+ </action>
+ <action type="Label" target="keywords/removebutton" xmbdesc="Label(keywords/removebutton)">
+  <xmbtext>Xóa</xmbtext>
+ </action>
+ <action type="Label" target="keywords/closebutton" xmbdesc="Label(keywords/closebutton)">
+  <xmbtext>Xong</xmbtext>
+ </action>
+ <action type="Label" target="keywords/addkeywords_label" xmbdesc="Label(keywords/addkeywords_label)">
+  <xmbtext>Thêm thẻ:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/keywords_label" xmbdesc="Label(keywords/keywords_label)">
+  <xmbtext>Thẻ:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/readonly_label" xmbdesc="Label(keywords/readonly_label)">
+  <xmbtext>Không thể sửa đổi thẻ vì một hoặc nhiều ảnh ở chế độ chỉ đọc.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>Autocomplete Errors</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>The following contacts found in the clipboard text could not be pasted correctly</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>Contact</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>Error</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>Status</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

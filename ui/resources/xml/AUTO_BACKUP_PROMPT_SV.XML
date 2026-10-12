@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Säkerhetskopiering i Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Säkerhetskopiera dina foton i Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Spara automatiskt dina foton och filmklipp online med Säkerhetskopiering i Google Foto. De är tillgängliga från alla dina enheter men alla objekt är privata tills du väljer att dela dem.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Skaffa Säkerhetskopiering i Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nej tack</xmbtext>
+ </stringres>
+</resources>

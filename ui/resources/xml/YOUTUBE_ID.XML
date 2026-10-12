@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Unggah ke YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Judul:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Keterangan:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Kategori video:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Memuat…</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tag:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Berikut kata-kata kunci yang digunakan untuk membantu menemukan video. (dipisahkan spasi)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Jadikan video ini publik</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Video Anda dibatasi hingga 10 menit dan 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Jangan unggah acara televisi, video musik, konser musik, atau iklan tanpa izin, kecuali materi itu terdiri sepenuhnya atas konten yang Anda buat sendiri. Laman Kiat Hak Cipta dan Panduan Komunitas dapat membantu Anda menentukan apakah video Anda melanggar hak cipta seseorang.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Dengan mengeklik &quot;Unggah Video,&quot; Anda menyatakan bahwa video ini tidak melanggar Persyaratan Penggunaan YouTube dan bahwa Anda memiliki seluruh hak cipta atas video ini atau berwenang mengunggahnya.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Unggah Video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

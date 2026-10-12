@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>Albümü Web&#039;e Eşitle</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>Bu albüm Web Albümleri&#039;ne yüklensin ve senkronizasyon durumu sürdürülsün mü?</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>Geçerli ayarlar:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>Boyut:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>varsayılan boyut konumu</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>Görünürlük:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>Liste dışı</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>Yalnızca yıldız işaretli fotoğrafları eşitle</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>Tekrar·sorma (her zaman geçerli ayarları kullan)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>Ayarları Değiştir...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>Eşitle</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

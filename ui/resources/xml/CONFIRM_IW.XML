@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>הודעה</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>אל תשאל שוב</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>כן</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>לא</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

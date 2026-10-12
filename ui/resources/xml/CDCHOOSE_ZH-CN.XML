@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="cdchoose/window1.title">
+  <xmbtext>选择可刻录光驱</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label5.title">
+  <xmbtext>Picasa 找到多个可写驱动器。\n要使用哪个驱动器？</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label7.title">
+  <xmbtext>驱动器：</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button10.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button11.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

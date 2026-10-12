@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_options/window.mac_title">
+  <xmbtext>Postavke automatske izrade sigurnosnih kopija</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/window.win_title">
+  <xmbtext>Opcije automatske izrade sigurnosnih kopija</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/auto_start.title">
+  <xmbtext>Automatsko pokretanje</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/networklabel.title">
+  <xmbtext>Postavke mreže:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/proxygroup.title">
+  <xmbtext>Proxy korisničko ime:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/passwordgroup.title">
+  <xmbtext>Proxy zaporka:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/autoproxy.title">
+  <xmbtext>Automatski otkrij postavke mreže</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loglevelgroup.title">
+  <xmbtext>Razina mrežnog zapisnika:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/disable_item.title">
+  <xmbtext>Onemogući bilježenje</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/errors_item.title">
+  <xmbtext>Bilježi samo pogreške</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/min_item.title">
+  <xmbtext>Bilježenje minimalnih informacija</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/detailed_item.title">
+  <xmbtext>Bilježenje detaljnih informacija</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/all_item.title">
+  <xmbtext>Bilježi sve informacije o mreži</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loggroup.title">
+  <xmbtext>Zapisnik:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/okbutton.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/cancelbutton.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

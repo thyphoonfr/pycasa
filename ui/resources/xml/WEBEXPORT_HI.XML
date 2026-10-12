@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>HTML पृष्ठ के रूप में निर्यात करें</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>इसपर चित्र निर्यात करें:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>मूल आकार</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 पिक्सेल (बड़े मॉनीटर के लिए)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 पिक्सेल (बड़े वेब पृष्ठों के लिए)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 पिक्सेल (वेब पृष्ठों के लिए)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 पिक्सेल (ईमेल के लिए)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>इसका उपयोग कर मूवी निर्यात करें:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>पहला फ्रे़म</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>पूर्ण मूवी</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>वेब पृष्ठ शीर्षक:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>फ़ोल्डर:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>ब्राउज़ करें...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>कोई उदाहरण देखने के लिए एक टेंप्लेट नाम क्लिक करें.  अपना चयन कर लेने पर, निर्यात करें क्लिक करें.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>टेम्पलेट वर्णन</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>निर्यात करें</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

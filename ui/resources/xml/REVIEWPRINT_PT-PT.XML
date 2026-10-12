@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>Rever para impressão</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>Remover seleccionados</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>Remover imagens de baixa qualidade</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>Pré-visualização de imagem</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>Informações</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

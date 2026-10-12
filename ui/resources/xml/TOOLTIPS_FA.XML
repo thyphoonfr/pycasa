@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="modalprogress/escmessage" xmbdesc="Text(modalprogress/escmessage)">
+  <xmbtext>‏کلید ESC روی صفحه‌کلید را برای لغو فشار دهید</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printlayoutlabel" xmbdesc="Label(printpanel/printlayoutlabel)">
+  <xmbtext>طرح‌بندی چاپ</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/walletbutton" xmbdesc="Label(printpanel/walletbutton)">
+  <xmbtext>قطع کیف‌پولی</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/walletbutton" xmbdesc="Tooltip(printpanel/walletbutton)">
+  <xmbtext>چاپ عکس در قطع کیف‌پولی</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/3x5button" xmbdesc="Label(printpanel/3x5button)">
+  <xmbtext>۵ × ۳/۵</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/3x5button" xmbdesc="Tooltip(printpanel/3x5button)">
+  <xmbtext>‏چاپ عکس‌ها در اندازه استاندارد ۳/۵x۵</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/4x6button" xmbdesc="Label(printpanel/4x6button)">
+  <xmbtext>۶ × ۴</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/4x6button" xmbdesc="Tooltip(printpanel/4x6button)">
+  <xmbtext>چاپ عکس در اندازه ۶×۴</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/5x7button" xmbdesc="Label(printpanel/5x7button)">
+  <xmbtext>۷ × ۵</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/5x7button" xmbdesc="Tooltip(printpanel/5x7button)">
+  <xmbtext>‏چاپ عکس‌ها در اندازه استاندارد ۵x۷</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/8x10button" xmbdesc="Label(printpanel/8x10button)">
+  <xmbtext>۱۰ × ۸</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/8x10button" xmbdesc="Tooltip(printpanel/8x10button)">
+  <xmbtext>‏چاپ عکس در اندازه استاندارد ۸x۱۰</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fullbutton" xmbdesc="Label(printpanel/fullbutton)">
+  <xmbtext>تمام صفحه</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fullbutton" xmbdesc="Tooltip(printpanel/fullbutton)">
+  <xmbtext>چاپ عکس به اندازه کاغذ</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/croptogglelabel" xmbdesc="Label(printpanel/croptogglelabel)">
+  <xmbtext>برش متناسب</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/croptoggle" xmbdesc="Tooltip(printpanel/croptoggle)">
+  <xmbtext>برش عکس‌ها برای مطابقت با ابعاد چاپ انتخابی</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fittogglelabel" xmbdesc="Label(printpanel/fittogglelabel)">
+  <xmbtext>فشرده‌سازی متن</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fittoggle" xmbdesc="Tooltip(printpanel/fittoggle)">
+  <xmbtext>حفظ ابعاد اولیه عکس‌ها</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/captionoptionslabel" xmbdesc="Label(printpanel/captionoptionslabel)">
+  <xmbtext>گزینه‌های نوشتار و حاشیه</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printerlabel" xmbdesc="Label(printpanel/printerlabel)">
+  <xmbtext>چاپگر</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/setuplabel" xmbdesc="Label(printpanel/setuplabel)">
+  <xmbtext>تنظیم چاپگر</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/copieslabel" xmbdesc="Label(printpanel/copieslabel)">
+  <xmbtext>کپی از هر عکس</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/previewlabel" xmbdesc="Label(printpanel/previewlabel)">
+  <xmbtext>پیش‌نمایش</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/prevbutton" xmbdesc="Tooltip(printpanel/prevbutton)">
+  <xmbtext>مشاهده صفحه پیش‌نمایش قبلی</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/nextbutton" xmbdesc="Tooltip(printpanel/nextbutton)">
+  <xmbtext>مشاهده صفحه پیش‌نمایش بعدی</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printsetuplabel" xmbdesc="Label(printpanel/printsetuplabel)">
+  <xmbtext>تنظیمات چاپگر</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/captionoptionsbutton" xmbdesc="Tooltip(printpanel/captionoptionsbutton)">
+  <xmbtext>پیکربندی حاشیه‌ها و نوشتار برای عکس‌های موردنظر جهت چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/selectprinterbutton" xmbdesc="Tooltip(printpanel/selectprinterbutton)">
+  <xmbtext>لیستی از چاپگرهای در دسترس را ارائه می‌کند</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/psetupbutton" xmbdesc="Tooltip(printpanel/psetupbutton)">
+  <xmbtext>باز کردن کنترل‌های تنظیم چاپگر برای چاپگر انتخابی</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/addprintsbutton" xmbdesc="Tooltip(printpanel/addprintsbutton)">
+  <xmbtext>افزودن رونوشت دیگری از هر عکس برای چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/subprintsbutton" xmbdesc="Tooltip(printpanel/subprintsbutton)">
+  <xmbtext>حذف یک کپی از هر عکس موردنظر برای چاپ</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/phelpbutton" xmbdesc="Label(printpanel/phelpbutton)">
+  <xmbtext>راهنمایی</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/phelpbutton" xmbdesc="Tooltip(printpanel/phelpbutton)">
+  <xmbtext>مرکز راهنمایی را برای عیب‌یابی چاپ باز کنید</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/froogle" xmbdesc="Label(printpanel/froogle)">
+  <xmbtext>‏جستجوی Froogle برای لوازم مورد نیاز</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/froogle" xmbdesc="Tooltip(printpanel/froogle)">
+  <xmbtext>‏موارد/لوازم جانبی را برای چاپگر خود در Froogle جستجو کنید</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton" xmbdesc="Label(printpanel/reviewnowbutton)">
+  <xmbtext>بازبینی</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton" xmbdesc="Tooltip(printpanel/reviewnowbutton)">
+  <xmbtext>مطمئن شوید که عکس‌های شما آماده چاپ هستند</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton2" xmbdesc="Label(printpanel/reviewnowbutton2)">
+  <xmbtext>نظر</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton2" xmbdesc="Tooltip(printpanel/reviewnowbutton2)">
+  <xmbtext>مطمئن شوید که عکس‌های شما آماده چاپ هستند</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton" xmbdesc="Label(printpanel/pnowbutton)">
+  <xmbtext>چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton" xmbdesc="Tooltip(printpanel/pnowbutton)">
+  <xmbtext>اکنون عکس‌ها با تنظیمات کنونی چاپ شوند</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton2" xmbdesc="Label(printpanel/pnowbutton2)">
+  <xmbtext>چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton2" xmbdesc="Tooltip(printpanel/pnowbutton2)">
+  <xmbtext>اکنون عکس‌ها با تنظیمات کنونی چاپ شوند</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pcancelbutton" xmbdesc="Label(printpanel/pcancelbutton)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pcancelbutton" xmbdesc="Tooltip(printpanel/pcancelbutton)">
+  <xmbtext>لغو مرحله چاپ و بازگشت به نمای تصاویر کوچک</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/tllabel" xmbdesc="Label(editoneup/tllabel)">
+  <xmbtext>خط زمان</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/bcklabel" xmbdesc="Label(editoneup/bcklabel)">
+  <xmbtext>خروج</xmbtext>
+ </action>
+ <action type="Text" target="editoneup/tpslabel" xmbdesc="Text(editoneup/tpslabel)">
+  <xmbtext>نمایش زمان</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/sbutton" xmbdesc="Label(editpanel/sbutton)">
+  <xmbtext>پخش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/sbutton" xmbdesc="Tooltip(editpanel/sbutton)">
+  <xmbtext>مشاهده یک نمایش اسلاید از این عکس‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edithelpbutton" xmbdesc="Tooltip(editpanel/edithelpbutton)">
+  <xmbtext>راهنمایی</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/weblink" xmbdesc="Tooltip(editpanel/weblink)">
+  <xmbtext>به وب‌سایت مرتبط با این عکس بروید</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editcollage" xmbdesc="Label(editpanel/editcollage)">
+  <xmbtext>ویرایش کلاژ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editcollage" xmbdesc="Tooltip(editpanel/editcollage)">
+  <xmbtext>ویرایش کلاژی که از آن این عکس ایجاد شده است</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/fit" xmbdesc="Tooltip(editpanel/fit)">
+  <xmbtext>جا دادن عکس در قسمت نمایش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/1to1" xmbdesc="Tooltip(editpanel/1to1)">
+  <xmbtext>نمایش عکس در اندازه واقعی</xmbtext>
+ </action>
+ <action type="Text" target="nerdview/nvhead" xmbdesc="Text(nerdview/nvhead)">
+  <xmbtext>اطلاعات دوربین و نمودار ستونی</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captionbutton" xmbdesc="Tooltip(editpanel/captionbutton)">
+  <xmbtext>نمایش/پنهان کردن شرح عکس</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/toggle_left_drawer" xmbdesc="Tooltip(editpanel/toggle_left_drawer)">
+  <xmbtext>نمایش/پنهان کردن کنترل‌های ویرایش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captiontrash" xmbdesc="Tooltip(editpanel/captiontrash)">
+  <xmbtext>حذف این شرح عکس</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/refining_label" xmbdesc="Text(editpanel/refining_label)">
+  <xmbtext>در حال پالایش...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_ok" xmbdesc="Label(editpanel/tool_ok)">
+  <xmbtext>اعمال</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_cancel" xmbdesc="Label(editpanel/tool_cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editslideshow" xmbdesc="Label(editpanel/editslideshow)">
+  <xmbtext>ویرایش فیلم</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editslideshow" xmbdesc="Tooltip(editpanel/editslideshow)">
+  <xmbtext>ویرایش این ارائه فیلم</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/albumview" xmbdesc="Label(editpanel/albumview)">
+  <xmbtext>بازگشت به عکسخانه</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/albumview" xmbdesc="Tooltip(editpanel/albumview)">
+  <xmbtext>بازگشت به تصاویر کوچک سازماندهی شده</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/quickupload" xmbdesc="Tooltip(editpanel/quickupload)">
+  <xmbtext>آپلود در آلبوم موقتی آلبوم‌های وب خود</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/uploadchanges" xmbdesc="Tooltip(editpanel/uploadchanges)">
+  <xmbtext>به‌روزرسانی کپی آنلاین با این نسخه</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label" xmbdesc="Label(editpanel/selection_label)">
+  <xmbtext>انتخاب شده</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label_zoom" xmbdesc="Label(editpanel/selection_label_zoom)">
+  <xmbtext>انتخاب شده</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_focus" xmbdesc="Tooltip(editpanel/swap_2up_focus)">
+  <xmbtext>تغییر تصویری که دارای فوکوس است</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_layout" xmbdesc="Tooltip(editpanel/swap_2up_layout)">
+  <xmbtext>تغییر بین طرح‌بندی عمودی و افقی</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/aa_2up_toggle" xmbdesc="Tooltip(editpanel/aa_2up_toggle)">
+  <xmbtext>دو بار مشاهده یک تصویر</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ab_2up_toggle" xmbdesc="Tooltip(editpanel/ab_2up_toggle)">
+  <xmbtext>مشاهده دو تصویر مختلف</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/only_1up_toggle" xmbdesc="Tooltip(editpanel/only_1up_toggle)">
+  <xmbtext>مشاهده تنها یک تصویر</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab1" xmbdesc="Tooltip(editpanel/tab1)">
+  <xmbtext>اصلاحات موردنیاز متداول</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab2" xmbdesc="Tooltip(editpanel/tab2)">
+  <xmbtext>نور تنظیم شده دقیق و اصلاحات رنگ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab3" xmbdesc="Tooltip(editpanel/tab3)">
+  <xmbtext>پردازش عکس مفید و سرگرم‌کننده</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab4" xmbdesc="Tooltip(editpanel/tab4)">
+  <xmbtext>پردازش عکس مفیدتر و سرگرم‌کننده‌تر</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab5" xmbdesc="Tooltip(editpanel/tab5)">
+  <xmbtext>پردازش عکس مفیدتر و سرگرم‌کننده‌تر</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop" xmbdesc="Label(editpanel/crop)">
+  <xmbtext>برش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop" xmbdesc="Tooltip(editpanel/crop)">
+  <xmbtext>برش این عکس به یک قالب دیگر</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye" xmbdesc="Label(editpanel/redeye)">
+  <xmbtext>سرخی چشم</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeye" xmbdesc="Tooltip(editpanel/redeye)">
+  <xmbtext>اصلاح اشکال سرخی چشم در این عکس</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autolighting" xmbdesc="Label(editpanel/autolighting)">
+  <xmbtext>تصحیح کنتراست</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autolighting" xmbdesc="Tooltip(editpanel/autolighting)">
+  <xmbtext>اصلاح نوردهی بدون تأثیر روی رنگ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autocolor" xmbdesc="Label(editpanel/autocolor)">
+  <xmbtext>تصحیح خودکار رنگ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autocolor" xmbdesc="Tooltip(editpanel/autocolor)">
+  <xmbtext>حذف ته‌رنگ به طور خودکار</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch" xmbdesc="Label(editpanel/retouch)">
+  <xmbtext>رتوش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouch" xmbdesc="Tooltip(editpanel/retouch)">
+  <xmbtext>برطرف کردن لکه، گرد و غبار و خش</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/edittext" xmbdesc="Label(editpanel/edittext)">
+  <xmbtext>نوشتار</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik" xmbdesc="Label(editpanel/picnik)">
+  <xmbtext>‏ویرایش در Creative Kit</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik" xmbdesc="Tooltip(editpanel/picnik)">
+  <xmbtext>‏ویرایش آنلاین عکس با استفاده از Creative Kit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/showtextlabel" xmbdesc="Label(editpanel/showtextlabel)">
+  <xmbtext>نمایش نوشتار</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edittext" xmbdesc="Tooltip(editpanel/edittext)">
+  <xmbtext>افزودن/ویرایش نوشتار در عکس</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/showtextcheckbox" xmbdesc="Tooltip(editpanel/showtextcheckbox)">
+  <xmbtext>جابجایی بین نمایش یا پنهان کردن نوشتار روی یک عکس</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filllight_icon" xmbdesc="Tooltip(editpanel/filllight_icon)">
+  <xmbtext>نور پرکننده: نور محیط را در عکس تنظیم کنید</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/horizonadjust" xmbdesc="Label(editpanel/horizonadjust)">
+  <xmbtext>تراز کردن</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/horizonadjust" xmbdesc="Tooltip(editpanel/horizonadjust)">
+  <xmbtext>تثبیت عکس کج</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/enhance" xmbdesc="Label(editpanel/enhance)">
+  <xmbtext>یا بخت و یا اقبال</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/enhance" xmbdesc="Tooltip(editpanel/enhance)">
+  <xmbtext>اصلاح نور و رنگ با یک کلیک</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/ok" xmbdesc="Label(editpanel/ok)">
+  <xmbtext>اعمال</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ok" xmbdesc="Tooltip(editpanel/ok)">
+  <xmbtext>اعمال تغییرات</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cancel" xmbdesc="Label(editpanel/cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cancel" xmbdesc="Tooltip(editpanel/cancel)">
+  <xmbtext>لغو تغییرات</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_undo" xmbdesc="Label(editpanel/filter_undo)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_undo" xmbdesc="Tooltip(editpanel/filter_undo)">
+  <xmbtext>حذف آخرین اصلاح یا ویرایش</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_redo" xmbdesc="Label(editpanel/filter_redo)">
+  <xmbtext>انجام مجدد</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_redo" xmbdesc="Tooltip(editpanel/filter_redo)">
+  <xmbtext>اعمال مجدد یک اصلاح یا ویرایش حذف شده</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop_label" xmbdesc="Label(editpanel/crop_label)">
+  <xmbtext>برش عکس</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croptext" xmbdesc="Label(editpanel/croptext)">
+  <xmbtext>یک بعد را در زیر انتخاب کرده و سپس برای انتخاب قسمتی از عکس که می‌خواهید برش دهید، روی عکس کلیک کرده و آنرا بکشید.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croprotatecrop" xmbdesc="Label(editpanel/croprotatecrop)">
+  <xmbtext>چرخش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croprotatecrop" xmbdesc="Tooltip(editpanel/croprotatecrop)">
+  <xmbtext>بین جهت افقی و عمودی تغییر می‌کند</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croppreview" xmbdesc="Label(editpanel/croppreview)">
+  <xmbtext>پیش‌نمایش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croppreview" xmbdesc="Tooltip(editpanel/croppreview)">
+  <xmbtext>پیش‌نمایش برش انتخابی را نمایش می‌دهد</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropdiscard" xmbdesc="Label(editpanel/cropdiscard)">
+  <xmbtext>بازنشانی</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropdiscard" xmbdesc="Tooltip(editpanel/cropdiscard)">
+  <xmbtext>موارد برش خورده را رد می‌کند</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropapply" xmbdesc="Label(editpanel/cropapply)">
+  <xmbtext>اعمال</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropapply" xmbdesc="Tooltip(editpanel/cropapply)">
+  <xmbtext>اعمال ویرایش‌های برش</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropcancel" xmbdesc="Label(editpanel/cropcancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropcancel" xmbdesc="Tooltip(editpanel/cropcancel)">
+  <xmbtext>از ابزار برش خارج می‌شود</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop_delete_custom" xmbdesc="Tooltip(editpanel/crop_delete_custom)">
+  <xmbtext>نسبت ابعادی کنونی را حذف می‌کند</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye_label" xmbdesc="Label(editpanel/redeye_label)">
+  <xmbtext>اصلاح سرخی چشم</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyetext" xmbdesc="Label(editpanel/redeyetext)">
+  <xmbtext>برای انتخاب جداگانه هر چشم، موشواره را اطراف آن کلیک کرده، نگهدارید و بکشید. یک کادر انتخاب در آن قسمت نمایش داده می‌شود. برای تکمیل انتخاب خود موشواره را رها کنید. سرخی چشم اصلاح شده و عکس نشان داده می‌شود.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeauto" xmbdesc="Label(editpanel/redeyeauto)">
+  <xmbtext>خودکار</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeauto" xmbdesc="Tooltip(editpanel/redeyeauto)">
+  <xmbtext>اعمال مجدد اصلاحات خودکار سرخی چشم</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyepreview" xmbdesc="Label(editpanel/redeyepreview)">
+  <xmbtext>پیش‌نمایش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyepreview" xmbdesc="Tooltip(editpanel/redeyepreview)">
+  <xmbtext>پیش‌نمایش بدون خطوط اصلی کلی مربعی تغییر می‌کند</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyecancel" xmbdesc="Label(editpanel/redeyecancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyecancel" xmbdesc="Tooltip(editpanel/redeyecancel)">
+  <xmbtext>خروج از اصلاح سرخی چشم بدون اعمال جلوه</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeapply" xmbdesc="Label(editpanel/redeyeapply)">
+  <xmbtext>اعمال</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeapply" xmbdesc="Tooltip(editpanel/redeyeapply)">
+  <xmbtext>اعمال جلوه و خروج از اصلاح سرخی چشم</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyediscard" xmbdesc="Label(editpanel/redeyediscard)">
+  <xmbtext>بازنشانی</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyediscard" xmbdesc="Tooltip(editpanel/redeyediscard)">
+  <xmbtext>لغو تغییرات سرخی چشم</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_label" xmbdesc="Label(editpanel/retouch_label)">
+  <xmbtext>رتوش لکه</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchtext" xmbdesc="Label(editpanel/retouchtext)">
+  <xmbtext>‏جهت انتخاب قسمت موردنظر برای اصلاح کلیک کنید. سپس موشواره را برای مشاهده یک پیش‌نمایش از قسمت جایگزین حرکت دهید. برای نهایی کردن دوباره روی تصویر کلیک کنید. مراحل را تکرار کنید. توجه: برای حرکت دادن می‌توانید از کشیدن ctrl استفاده کنید.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_brush_label" xmbdesc="Label(editpanel/retouch_brush_label)">
+  <xmbtext>اندازه قلم‌مو</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchreset" xmbdesc="Label(editpanel/retouchreset)">
+  <xmbtext>بازنشانی</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchundo" xmbdesc="Label(editpanel/retouchundo)">
+  <xmbtext>لغو وصله</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchredo" xmbdesc="Label(editpanel/retouchredo)">
+  <xmbtext>انجام مجدد وصله</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchapply" xmbdesc="Label(editpanel/retouchapply)">
+  <xmbtext>اعمال</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchcancel" xmbdesc="Label(editpanel/retouchcancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchreset" xmbdesc="Tooltip(editpanel/retouchreset)">
+  <xmbtext>حذف همه وصله‌های رتوش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchundo" xmbdesc="Tooltip(editpanel/retouchundo)">
+  <xmbtext>حذف آخرین وصله رتوش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchredo" xmbdesc="Tooltip(editpanel/retouchredo)">
+  <xmbtext>اعمال مجدد یک وصله نرم‌افزاری رتوش حذف شده</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchapply" xmbdesc="Tooltip(editpanel/retouchapply)">
+  <xmbtext>اعمال اصلاحات و خروج از ابزار رتوش</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchcancel" xmbdesc="Tooltip(editpanel/retouchcancel)">
+  <xmbtext>خروج از ابزار رتوش بدون اعمال ویرایش‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_lighting" xmbdesc="Tooltip(editpanel/magic_lighting)">
+  <xmbtext>اصلاح نور با یک کلیک</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_color" xmbdesc="Tooltip(editpanel/magic_color)">
+  <xmbtext>اصلاح رنگ با یک کلیک</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/droppertoggle" xmbdesc="Tooltip(editpanel/droppertoggle)">
+  <xmbtext>به شما امکان می‌دهد یک رنگ خاکستری خنثی یا قسمتی سفیدی از عکس را برای حذف ته‌رنگ انتخاب کنید</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/greybalancelabel" xmbdesc="Label(editpanel/greybalancelabel)">
+  <xmbtext>انتخاب رنگ خنثی</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filllightlabel" xmbdesc="Label(editpanel/filllightlabel)">
+  <xmbtext>نور پرکننده</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik_fx_label" xmbdesc="Label(editpanel/picnik_fx_label)">
+  <xmbtext>جلوه‌ها بر اساس</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik_fx" xmbdesc="Tooltip(editpanel/picnik_fx)">
+  <xmbtext>‏جلوه‌های بیشتری را در Creative Kit امتحان کنید</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/in_progress_label" xmbdesc="Label(editpanel/in_progress_label)">
+  <xmbtext>در حال انجام...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/render_now" xmbdesc="Label(editpanel/render_now)">
+  <xmbtext>ایجاد جدید</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnikcancel" xmbdesc="Label(editpanel/picnikcancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/picnikprogressdone" xmbdesc="Text(editpanel/picnikprogressdone)">
+  <xmbtext>‏بعد از پایان ویرایش، &#039;ذخیره در Picasa&#039; را کلیک کنید.</xmbtext>
+ </action>
+ <action type="Text1" target="editpanel/picnikprogress" xmbdesc="Text1(editpanel/picnikprogress)">
+  <xmbtext>‏انتقال عکس به Creative Kit...</xmbtext>
+ </action>
+ <action type="Text2" target="editpanel/picnikprogress" xmbdesc="Text2(editpanel/picnikprogress)">
+  <xmbtext>‏اتصال به Creative Kit...</xmbtext>
+ </action>
+ <action type="Text3" target="editpanel/picnikprogress" xmbdesc="Text3(editpanel/picnikprogress)">
+  <xmbtext>‏لطفاً صبر کنید، در حال انتقال عکس از Creative Kit...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label0" xmbdesc="Label(editpanel/colorwheel_label0)">
+  <xmbtext>انتخاب رنگ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label1" xmbdesc="Label(editpanel/colorwheel_label1)">
+  <xmbtext>انتخاب رنگ</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_youtube" xmbdesc="Label(movieeditpanel/export_youtube)">
+  <xmbtext>‏آپلود در YouTube</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_movie" xmbdesc="Label(movieeditpanel/export_movie)">
+  <xmbtext>صادر کردن کلیپ</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/reset_trim" xmbdesc="Label(movieeditpanel/reset_trim)">
+  <xmbtext>بازنشانی شروع و پایان</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/capture_frame" xmbdesc="Label(movieeditpanel/capture_frame)">
+  <xmbtext>گرفتن عکس فوری</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_youtube" xmbdesc="Tooltip(movieeditpanel/export_youtube)">
+  <xmbtext>‏آپلود فیلم خود در YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_movie" xmbdesc="Tooltip(movieeditpanel/export_movie)">
+  <xmbtext>ذخیره یک کلیپ از فیلم بین نقاط شروع و پایان</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/reset_trim" xmbdesc="Tooltip(movieeditpanel/reset_trim)">
+  <xmbtext>بازیابی فیلم به طول اولیه‌اش (حذف نفاط شروع و پایان)</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/capture_frame" xmbdesc="Tooltip(movieeditpanel/capture_frame)">
+  <xmbtext>ضبط قاب کنونی</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>چاپ عکس‌های موجود در سینی عکس</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>ایمیل</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>ارسال عکس‌های موجود در سینی عکس با ایمیل</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>کلاژ</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>ایجاد یک &quot;کلاژ عکس&quot; با انتخاب خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>فیلم</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>ایجاد یک ارائه &quot;فیلم&quot; با انتخاب خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>‏ارسال عکس‌های موجود در سینی عکس به Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>بلاگر</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>آپلود عکس‌ها در بلاگر</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>آپلود عکس‌ها در بلاگر</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>فروشگاه</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>خرید کارهای چاپی و محصولات از ارائه‌دهنده آنلاین دلخواه خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>صادر کردن</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>تهیه کپی از عکس‌های موجود در سینی عکس در یک پوشه در دیسک سخت خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>بیشتر…</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>برای مشاهده گزینه‌های بیشتر کلیک کنید</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/makemovietab" xmbdesc="Label(panelroot/makemovietab)">
+  <xmbtext>فیلم‌ساز</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/collagetab" xmbdesc="Label(panelroot/collagetab)">
+  <xmbtext>کلاژ</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/acquiretab" xmbdesc="Label(panelroot/acquiretab)">
+  <xmbtext>وارد کردن</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/capturemovietab" xmbdesc="Label(panelroot/capturemovietab)">
+  <xmbtext>ضبط</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/picasatab" xmbdesc="Label(panelroot/picasatab)">
+  <xmbtext>عکسخانه</xmbtext>
+ </action>
+ <action type="Label" target="publish/giftcdtext" xmbdesc="Label(publish/giftcdtext)">
+  <xmbtext>‏مواردی که با یک علامت در بالا انتخاب شدند در CD هدیه شما قرار می‌گیرند. برای افزودن موارد بیشتر، دکمه &quot;افزودن موارد بیشتر&quot; را در زیر کلیک کنید.</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_cdname" xmbdesc="Text(publish/label_cdname)">
+  <xmbtext>‏نام CD</xmbtext>
+ </action>
+ <action type="Text" target="publish/namelimitext" xmbdesc="Text(publish/namelimitext)">
+  <xmbtext>محدودیت ۱۶ نویسه</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox1" xmbdesc="Text(publish/label_optionbox1)">
+  <xmbtext>شامل نمایش اسلاید</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox2" xmbdesc="Text(publish/label_optionbox2)">
+  <xmbtext>پاک کردن رسانه</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox3" xmbdesc="Text(publish/label_optionbox3)">
+  <xmbtext>‏شامل Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_go" xmbdesc="Label(publish/presentcd_go)">
+  <xmbtext>رایت دیسک</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_help" xmbdesc="Label(publish/presentcd_help)">
+  <xmbtext>راهنمایی</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_eject" xmbdesc="Label(publish/presentcd_eject)">
+  <xmbtext>خروج</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_cancel" xmbdesc="Label(publish/presentcd_cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>افزودن موارد بیشتر...</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>افزودن موارد بیشتر...</xmbtext>
+ </action>
+ <action type="Text" target="publish/selectiontext" xmbdesc="Text(publish/selectiontext)">
+  <xmbtext>انتخاب و تنظیمات</xmbtext>
+ </action>
+ <action type="Text" target="publish/picsizetext" xmbdesc="Text(publish/picsizetext)">
+  <xmbtext>اندازه عکس</xmbtext>
+ </action>
+ <action type="Text" target="publish/cdnametext" xmbdesc="Text(publish/cdnametext)">
+  <xmbtext>‏نام‌گذاری CD هدیه</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backupcdheader" xmbdesc="Text1(publish/backupcdheader)">
+  <xmbtext>‏ایجاد یک CD پشتیبان</xmbtext>
+ </action>
+ <action type="Text2" target="publish/backupcdheader" xmbdesc="Text2(publish/backupcdheader)">
+  <xmbtext>ایجاد یک مجموعه یا استفاده از مجموعه موجود</xmbtext>
+ </action>
+ <action type="Label" target="publish/backupcdheader2" xmbdesc="Label(publish/backupcdheader2)">
+  <xmbtext>انتخاب پوشه‌ها و آلبوم‌ها برای تهیهٔ نسخهٔ پشتیبان</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backuptext" xmbdesc="Text1(publish/backuptext)">
+  <xmbtext>یک &quot;مجموعه نسخهٔ پشتیبان&quot; محل ذخیره فایل‌هایی که از آن‌ها نسخهٔ پشتیبان گرفته شده است را ثبت می‌کند و همچنین سوابق فایل‌هایی را که قبلاً از آن‌ها نسخهٔ پشتیبان تهیه شده است نگه می‌دارد، بنابراین دیگر مجبور نیستید از آن‌ها دوباره نسخهٔ پشتیبان تهیه کنید.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext2" xmbdesc="Label(publish/backuptext2)">
+  <xmbtext>‏Picasa اکنون فایل‌هایی را به شما نشان می‌دهد که از آن‌ها قبلاً نسخهٔ پشتیبان تهیه نشده است.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext3" xmbdesc="Label(publish/backuptext3)">
+  <xmbtext>پوشه‌هایی را که می‌خواهید از آن‌ها نسخهٔ پشتیبان تهیه کنید علامت‌گذاری کنید یا جهت انتخاب همهٔ موارد، &amp;#039انتخاب همه&#039; را انتخاب نمایید.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_go" xmbdesc="Label(publish/backup_go)">
+  <xmbtext>رایت دیسک</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_help" xmbdesc="Label(publish/backup_help)">
+  <xmbtext>راهنمایی</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_eject" xmbdesc="Label(publish/backup_eject)">
+  <xmbtext>خروج</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_cancel" xmbdesc="Label(publish/backup_cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Label" target="publish/newbackupset" xmbdesc="Label(publish/newbackupset)">
+  <xmbtext>تنظیم جدید</xmbtext>
+ </action>
+ <action type="Label" target="publish/deletebackupset" xmbdesc="Label(publish/deletebackupset)">
+  <xmbtext>حذف تنظیم</xmbtext>
+ </action>
+ <action type="Label" target="publish/editbackupset" xmbdesc="Label(publish/editbackupset)">
+  <xmbtext>ویرایش مجموعه</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_backupname" xmbdesc="Text(publish/label_backupname)">
+  <xmbtext>مجموعه نسخهٔ پشتیبان</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectall" xmbdesc="Label(publish/selectall)">
+  <xmbtext>انتخاب همه</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectnone" xmbdesc="Label(publish/selectnone)">
+  <xmbtext>انتخاب هیچ کدام</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox1" xmbdesc="Label(publish/label_rpoptionbox1)">
+  <xmbtext>آپلود</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox1" xmbdesc="Tooltip(publish/rpoptionbox1)">
+  <xmbtext>پوشه و/یا آلبوم‌های انتخاب شده آپلود می‌شوند</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox2" xmbdesc="Label(publish/label_rpoptionbox2)">
+  <xmbtext>تغییر گزینه‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox2" xmbdesc="Tooltip(publish/rpoptionbox2)">
+  <xmbtext>پوشه‌های انتخابی و/یا آلبوم‌ها با گزینه‌های مشخص شده در منوهای واقع در سمت راست به طور آنلاین به‌روزرسانی می‌شوند.</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox3" xmbdesc="Label(publish/label_rpoptionbox3)">
+  <xmbtext>حذف آنلاین</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>‏آلبوم‌ها و/یا پوشه‌های انتخابی از Picasa Web Albums حذف خواهند شد</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>‏آلبوم‌ها و/یا پوشه‌های انتخابی از Picasa Web Albums حذف خواهند شد</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_go" xmbdesc="Label(publish/replicate_go)">
+  <xmbtext>تأیید</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_go" xmbdesc="Tooltip(publish/replicate_go)">
+  <xmbtext>عملکرد انتخابی شما شروع خواهد شد</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_cancel" xmbdesc="Label(publish/replicate_cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_cancel" xmbdesc="Tooltip(publish/replicate_cancel)">
+  <xmbtext>بازگشت به عکسخانه بدون انجام هیچگونه تغییر آنلاین</xmbtext>
+ </action>
+ <action type="Label" target="publish/upgradestorage" xmbdesc="Label(publish/upgradestorage)">
+  <xmbtext>ارتفا حافظه</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/upgradestorage" xmbdesc="Tooltip(publish/upgradestorage)">
+  <xmbtext>ذخیره‌سازی بیشتر به شما امکان می‌دهد عکس‌های بیشتری را آپلود کنید</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallactionstitle" xmbdesc="Text(publish/uploadallactionstitle)">
+  <xmbtext>عملکردی را برای پوشه‌ها و آلبوم‌های انتخابی انتخاب کنید:</xmbtext>
+ </action>
+ <action type="Text1" target="publish/uploadallinfotext" xmbdesc="Text1(publish/uploadallinfotext)">
+  <xmbtext>‏Picasa اکنون فقط پوشه‌ها و آلبوم‌های حاوی عکس‌هایی  که قبلاً آپلود نکرده‌اید را نشان می‌دهد.</xmbtext>
+ </action>
+ <action type="Text2" target="publish/uploadallinfotext" xmbdesc="Text2(publish/uploadallinfotext)">
+  <xmbtext>‏Picasa اکنون فقط پوشه‌ها و آلبوم‌های حاوی عکس‌هایی که در حال حاضر آنلاین بوده و با گزینه‌های انتخابی شما مطابقت ندارند را نشان می‌دهد.</xmbtext>
+ </action>
+ <action type="Text3" target="publish/uploadallinfotext" xmbdesc="Text3(publish/uploadallinfotext)">
+  <xmbtext>‏Picasa اکنون فقط پوشه‌ها و آلبوم‌های حاوی عکس‌هایی که در حال حاضر آنلاین هستند را نشان می‌دهد.</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallstoragetitle" xmbdesc="Text(publish/uploadallstoragetitle)">
+  <xmbtext>ظرفیت ذخیره‌سازی:</xmbtext>
+ </action>
+ <action type="Text" target="publish/used_storage" xmbdesc="Text(publish/used_storage)">
+  <xmbtext>ظرفیت ذخیره‌سازی استفاده شده اخیر</xmbtext>
+ </action>
+ <action type="Text" target="publish/full_storage" xmbdesc="Text(publish/full_storage)">
+  <xmbtext>بعد از این آپلود، از همه حافظه خود استفاده می‌کنید.</xmbtext>
+ </action>
+ <action type="Text" target="publish/needed_storage" xmbdesc="Text(publish/needed_storage)">
+  <xmbtext>شما برای آپلود همه این موارد به حافظه بیشتری نیاز دارید!</xmbtext>
+ </action>
+ <action type="Text" target="publish/final_storage" xmbdesc="Text(publish/final_storage)">
+  <xmbtext>ظرفیت ذخیره‌سازی شما بعد از این آپلود</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadalloptionstitle" xmbdesc="Text(publish/uploadalloptionstitle)">
+  <xmbtext>گزینه‌های آپلود:</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsize3" xmbdesc="Text(publish/uploadsize3)">
+  <xmbtext>اندازه:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>‏اندازه عکس بعد از آپلود در Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>‏اندازه عکس بعد از آپلود در Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadaccess3" xmbdesc="Text(publish/uploadaccess3)">
+  <xmbtext>قابلیت مشاهده:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>‏تنظیم دسترسی به آلبوم برای Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>‏تنظیم دسترسی به آلبوم برای Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsync3" xmbdesc="Text(publish/uploadsync3)">
+  <xmbtext>همگام‌سازی:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsync" xmbdesc="Tooltip(publish/uploadallsync)">
+  <xmbtext>تغییر تنظیم همگام‌سازی برای پوشه‌ها و/یا آلبوم‌های انتخابی</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/viewallbutton" xmbdesc="Label(searchoptions/viewallbutton)">
+  <xmbtext>بازگشت به مشاهدهٔ همه</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchoptions/viewallbutton" xmbdesc="Tooltip(searchoptions/viewallbutton)">
+  <xmbtext>خروج از حالت جستجو</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/label_searchresult" xmbdesc="Label(searchoptions/label_searchresult)">
+  <xmbtext>نتیجهٔ جستجو:</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/timecontainer_label" xmbdesc="Tooltip(searchcontainer/timecontainer_label)">
+  <xmbtext>فیلتر کردن بر اساس محدوده تاریخ</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/searchclr" xmbdesc="Tooltip(searchcontainer/searchclr)">
+  <xmbtext>پاک کردن جستجوی خود</xmbtext>
+ </action>
+ <action type="Label" target="searchcontainer/filter_label" xmbdesc="Label(searchcontainer/filter_label)">
+  <xmbtext>فیلترها</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/starsearch" xmbdesc="Tooltip(searchcontainer/starsearch)">
+  <xmbtext>نمایش فقط عکس‌های ستاره‌دار</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/moviesearch" xmbdesc="Tooltip(searchcontainer/moviesearch)">
+  <xmbtext>فقط نمایش فیلم</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/webview" xmbdesc="Tooltip(searchcontainer/webview)">
+  <xmbtext>نمایش فقط موارد آپلود شده در آلبوم‌های وب</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/facesearch" xmbdesc="Tooltip(searchcontainer/facesearch)">
+  <xmbtext>نمایش فقط عکس‌های دارای چهره</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/geotagsearch" xmbdesc="Tooltip(searchcontainer/geotagsearch)">
+  <xmbtext>نمایش فقط عکس‌های دارای برچسب مکان</xmbtext>
+ </action>
+ <action type="Text1" target="thumbui/lightbox_bgtext" xmbdesc="Text1(thumbui/lightbox_bgtext)">
+  <xmbtext>هیچ عکسی یافت نشد</xmbtext>
+ </action>
+ <action type="Text2" target="thumbui/lightbox_bgtext" xmbdesc="Text2(thumbui/lightbox_bgtext)">
+  <xmbtext>از همه فایل‌ها در این مجموعه نسخه پشتبان تهیه می‌شود</xmbtext>
+ </action>
+ <action type="Text3" target="thumbui/lightbox_bgtext" xmbdesc="Text3(thumbui/lightbox_bgtext)">
+  <xmbtext>‏عکسی برای cd یافت نشد</xmbtext>
+ </action>
+ <action type="Text4" target="thumbui/lightbox_bgtext" xmbdesc="Text4(thumbui/lightbox_bgtext)">
+  <xmbtext>همه عکس‌هایی که آپلود شده‌اند</xmbtext>
+ </action>
+ <action type="Text5" target="thumbui/lightbox_bgtext" xmbdesc="Text5(thumbui/lightbox_bgtext)">
+  <xmbtext>همه عکس‌های در حال حاضر آنلاین دارای این تنظیمات هستند</xmbtext>
+ </action>
+ <action type="Text6" target="thumbui/lightbox_bgtext" xmbdesc="Text6(thumbui/lightbox_bgtext)">
+  <xmbtext>‏هیچ عکسی را نمی‌توانید از Picasa Web Albums حذف کنید</xmbtext>
+ </action>
+ <action type="Text7" target="thumbui/lightbox_bgtext" xmbdesc="Text7(thumbui/lightbox_bgtext)">
+  <xmbtext>‏هیچ عکسی را نمی‌توانید از Google Photos بردارید</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/albumview" xmbdesc="Label(thumbui/albumview)">
+  <xmbtext>بازگشت به عکسخانه</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/loupehit" xmbdesc="Tooltip(thumbui/loupehit)">
+  <xmbtext>برای بزرگنمایی عکس‌ها روی آن‌ها کلیک کرده و بکشید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/albumview" xmbdesc="Tooltip(thumbui/albumview)">
+  <xmbtext>بازگشت به تصاویر کوچک سازماندهی شده</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/fullview" xmbdesc="Label(thumbui/fullview)">
+  <xmbtext>ویرایش عکس‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/fullview" xmbdesc="Tooltip(thumbui/fullview)">
+  <xmbtext>ویرایش عکس‌های خود</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/importbutton" xmbdesc="Label(thumbui/importbutton)">
+  <xmbtext>وارد کردن</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/importbutton" xmbdesc="Tooltip(thumbui/importbutton)">
+  <xmbtext>دریافت عکس از یک دوربین، اسکنر یا رسانه دیگری</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/webcambutton" xmbdesc="Tooltip(thumbui/webcambutton)">
+  <xmbtext>ضبط عکس یا ویدئو از یک و‌ب‌کم یا دستگاه ویدئوی دیگری</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/sbutton" xmbdesc="Label(thumbui/sbutton)">
+  <xmbtext>نمایش اسلاید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/people_toggle" xmbdesc="Tooltip(thumbui/people_toggle)">
+  <xmbtext>نمایش/پنهان کردن پانل افراد</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/places_toggle" xmbdesc="Tooltip(thumbui/places_toggle)">
+  <xmbtext>‏نمایش/پنهان کردن پانل Places</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/tags_toggle" xmbdesc="Tooltip(thumbui/tags_toggle)">
+  <xmbtext>نمایش/پنهان کردن پانل نشان‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/properties_toggle" xmbdesc="Tooltip(thumbui/properties_toggle)">
+  <xmbtext>نمایش/پنهان کردن پانل مشخصات</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/sbutton" xmbdesc="Tooltip(thumbui/sbutton)">
+  <xmbtext>مشاهده یک نمایش اسلاید از عکس‌های موجود در آلبوم یا پوشه انتخابی</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/timelinebutton" xmbdesc="Label(thumbui/timelinebutton)">
+  <xmbtext>خط زمان</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/timelinebutton" xmbdesc="Tooltip(thumbui/timelinebutton)">
+  <xmbtext>نمایش خط زمان همه عکس‌های شما</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/cdmode" xmbdesc="Label(thumbui/cdmode)">
+  <xmbtext>‏CD هدیه</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/cdmode" xmbdesc="Tooltip(thumbui/cdmode)">
+  <xmbtext>‏ایجاد یک CD با نمایش اسلاید داخلی برای دوستان و خانواده</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/backup" xmbdesc="Label(thumbui/backup)">
+  <xmbtext>نسخهٔ پشتیبان</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/backup" xmbdesc="Tooltip(thumbui/backup)">
+  <xmbtext>‏بایگانی عکس‌های خود در یک CD یا DVD</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/visitweb" xmbdesc="Label(thumbui/visitweb)">
+  <xmbtext>نمای وب</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/visitweb" xmbdesc="Tooltip(thumbui/visitweb)">
+  <xmbtext>نگهدارنده مکان</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchhold" xmbdesc="Tooltip(thumbui/scratchhold)">
+  <xmbtext>نگهداشتن موارد انتخابی</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchclear" xmbdesc="Tooltip(thumbui/scratchclear)">
+  <xmbtext>پاک کردن موارد انتخابی</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/addtobuttcon" xmbdesc="Tooltip(thumbui/addtobuttcon)">
+  <xmbtext>افزودن موارد انتخابی به یک آلبوم</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/startoggle" xmbdesc="Tooltip(thumbui/startoggle)">
+  <xmbtext>افزودن/حذف ستاره</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>چرخش به چپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>چرخش به چپ</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/scratchlabel" xmbdesc="Text(thumbui/scratchlabel)">
+  <xmbtext>انتخاب</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/librarylabel" xmbdesc="Label(thumbui/librarylabel)">
+  <xmbtext>عکسخانه</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newfolder" xmbdesc="Tooltip(thumbui/newfolder)">
+  <xmbtext>انتقال فایل‌های انتخابی به یک پوشهٔ جدید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderviewpopup" xmbdesc="Tooltip(thumbui/folderviewpopup)">
+  <xmbtext>نمایش گزینه‌ها</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderview" xmbdesc="Tooltip(thumbui/folderview)">
+  <xmbtext>تنظیم نما برای نمایش ساختار درختی پوشه</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/flatview" xmbdesc="Tooltip(thumbui/flatview)">
+  <xmbtext>تنظیم نما برای نمایش ساختار پوشه یکنواخت</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newalbum" xmbdesc="Tooltip(thumbui/newalbum)">
+  <xmbtext>ایجاد یک آلبوم جدید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateright" xmbdesc="Tooltip(thumbui/rotateright)">
+  <xmbtext>چرخش در جهت عقربه‌های ساعت</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>چرخش به چپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/smallthumbs" xmbdesc="Tooltip(thumbui/smallthumbs)">
+  <xmbtext>نمایش عکس‌ها با استفاده از تصاویر کوچک</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/largethumbs" xmbdesc="Tooltip(thumbui/largethumbs)">
+  <xmbtext>نمایش عکس‌ها با استفاده از &quot;تصاویر کوچک&quot; بزرگ</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/next" xmbdesc="Tooltip(thumbui/next)">
+  <xmbtext>مشاهده عکس بعدی</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/prev" xmbdesc="Tooltip(thumbui/prev)">
+  <xmbtext>مشاهده عکس قبلی</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/cd_label" xmbdesc="Text(thumbui/cd_label)">
+  <xmbtext>‏ایجاد یک CD هدیه</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/backup_label" xmbdesc="Text(thumbui/backup_label)">
+  <xmbtext>تهیهٔ نسخهٔ پشتیبان از عکس‌های خود</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/replication_label" xmbdesc="Text(thumbui/replication_label)">
+  <xmbtext>بارگذاری دسته‌ای</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_text" xmbdesc="Label(thumbui/lightbox_esolo_text)">
+  <xmbtext>هیچ نتیجه‌ای در این آلبوم یافت نشد</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_button" xmbdesc="Label(thumbui/lightbox_esolo_button)">
+  <xmbtext>جستجوی همه</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/single_action_message" xmbdesc="Label(thumbui/single_action_message)">
+  <xmbtext>‏موارد را برای افزودن به سینی کلیپ‌های پروژه خود انتخاب نماید و سپس &quot;بازگشت&quot; را برای بازگشت به پروژه خود فشار دهید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_return" xmbdesc="Tooltip(thumbui/single_action_return)">
+  <xmbtext>بازگشت به آنچه که ویرایش می‌کردید</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_close" xmbdesc="Tooltip(thumbui/single_action_close)">
+  <xmbtext>‏لغو  &quot;دریافت موارد بیشتر &quot;</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setin" xmbdesc="Tooltip(video_control_bar/setin)">
+  <xmbtext>ایجاد یک نقطه شروع</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setout" xmbdesc="Tooltip(video_control_bar/setout)">
+  <xmbtext>ایجاد یک نقطه پایان جدید</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/moviemode1" xmbdesc="Tooltip(video_control_bar/moviemode1)">
+  <xmbtext>پخش تمام صفحه</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/1to1" xmbdesc="Tooltip(video_control_bar2/1to1)">
+  <xmbtext>نمایش اندازه واقعی فیلم (کشیده نشود)</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/fullscreen" xmbdesc="Tooltip(video_control_bar2/fullscreen)">
+  <xmbtext>پخش تمام صفحه</xmbtext>
+ </action>
+ <action type="Label" target="oneup/tllabel" xmbdesc="Label(oneup/tllabel)">
+  <xmbtext>خط زمان</xmbtext>
+ </action>
+ <action type="Label" target="oneup/bcklabel" xmbdesc="Label(oneup/bcklabel)">
+  <xmbtext>خروج</xmbtext>
+ </action>
+ <action type="Text" target="oneup/tpslabel" xmbdesc="Text(oneup/tpslabel)">
+  <xmbtext>نمایش زمان</xmbtext>
+ </action>
+</tooltips>

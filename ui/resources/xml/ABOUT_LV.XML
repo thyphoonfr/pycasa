@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Par Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Visi citi produktu, pakalpojumu nosaukumi, zīmoli vai preču zīmes ir to attiecīgo īpašnieku īpašums.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Šī programmatūra daļēji pamatojas uz Independent JPEG Group darbu. Šo programmu aizsargā ASV un starptautiskie autortiesības reglamentējošie tiesību akti.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Trešo pušu licences...</xmbtext>
+ </stringres>
+</resources>

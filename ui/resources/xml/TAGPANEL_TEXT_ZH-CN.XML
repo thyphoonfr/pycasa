@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="tagpanel/addtag" xmbdesc="Tooltip(tagpanel/addtag)">
+  <xmbtext>为当前选定的项添加标签</xmbtext>
+ </action>
+ <action type="Tooltip" target="tagpanel/quick_config" xmbdesc="Tooltip(tagpanel/quick_config)">
+  <xmbtext>配置快速标签</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/add_tag_label" xmbdesc="Label(tagpanel/add_tag_label)">
+  <xmbtext>键入要添加的标签：</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/quick_label" xmbdesc="Label(tagpanel/quick_label)">
+  <xmbtext>快速标签：</xmbtext>
+ </action>
+</tooltips>

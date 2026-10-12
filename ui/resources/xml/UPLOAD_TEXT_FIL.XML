@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="upload/public_label" xmbdesc="Text(upload/public_label)">
+  <xmbtext>Pampubliko sa web</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_label" xmbdesc="Text(upload/private_label)">
+  <xmbtext>Sinuman na may link</xmbtext>
+ </action>
+ <action type="Text" target="upload/public_description1" xmbdesc="Text(upload/public_description1)">
+  <xmbtext>Ang album na ito ay makikita ng lahat ng mga user ng: %s</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_description1" xmbdesc="Text(upload/private_description1)">
+  <xmbtext>Ibahagi sa piling mga tao</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadinfo" xmbdesc="Text(upload/uploadinfo)">
+  <xmbtext>Sinusuri ang online na kalagayan...</xmbtext>
+ </action>
+ <action type="Text" target="upload/webalbumstext" xmbdesc="Text(upload/webalbumstext)">
+  <xmbtext>Ina-update ang listahan ng web album...</xmbtext>
+ </action>
+ <action type="Text" target="upload/upload_label" xmbdesc="Text(upload/upload_label)">
+  <xmbtext>I-uplaod sa album na ito:</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadsize_label" xmbdesc="Text(upload/uploadsize_label)">
+  <xmbtext>Sukat na ia-upload</xmbtext>
+ </action>
+ <action type="Text" target="upload/privacy_label" xmbdesc="Text(upload/privacy_label)">
+  <xmbtext>Privacy</xmbtext>
+ </action>
+ <action type="Text" target="upload/require_login_text" xmbdesc="Text(upload/require_login_text)">
+  <xmbtext>Private</xmbtext>
+ </action>
+ <action type="Label" target="upload/newalbum2" xmbdesc="Label(upload/newalbum2)">
+  <xmbtext>Bago</xmbtext>
+ </action>
+ <action type="Text" target="upload/titlelabel" xmbdesc="Text(upload/titlelabel)">
+  <xmbtext>Pamagat ng Album</xmbtext>
+ </action>
+ <action type="Text" target="upload/desclabel" xmbdesc="Text(upload/desclabel)">
+  <xmbtext>Pagsasalarawan</xmbtext>
+ </action>
+ <action type="Text" target="upload/choose_contact_label" xmbdesc="Text(upload/choose_contact_label)">
+  <xmbtext>Pumili ng contact:</xmbtext>
+ </action>
+ <action type="Text" target="upload/contact_album_list_label" xmbdesc="Text(upload/contact_album_list_label)">
+  <xmbtext>Mga album ng contact na maaari kang magbigay:</xmbtext>
+ </action>
+ <action type="Label" target="upload/upgrade" xmbdesc="Label(upload/upgrade)">
+  <xmbtext>Mag-upgrade</xmbtext>
+ </action>
+ <action type="Label" target="upload/ok" xmbdesc="Label(upload/ok)">
+  <xmbtext>I-upload</xmbtext>
+ </action>
+ <action type="Label" target="upload/cancel" xmbdesc="Label(upload/cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Label" target="upload/storagetext" xmbdesc="Label(upload/storagetext)">
+  <xmbtext>Matuto nang higit pa...</xmbtext>
+ </action>
+ <action type="Text" target="upload/account_title" xmbdesc="Text(upload/account_title)">
+  <xmbtext>Ang Iyong Account:</xmbtext>
+ </action>
+ <action type="Text" target="upload/upsell_text" xmbdesc="Text(upload/upsell_text)">
+  <xmbtext>Ang karagdagang imbakan ay makakatulong na ligtas mong mai-back up ang mga larawan.</xmbtext>
+ </action>
+ <action type="Label" target="upload/collab_label" xmbdesc="Label(upload/collab_label)">
+  <xmbtext>Hayaan ang mga taong ito na magbigay sa aking album</xmbtext>
+ </action>
+ <action type="Label" target="upload/sharing_label" xmbdesc="Label(upload/sharing_label)">
+  <xmbtext>Ibahagi kay:</xmbtext>
+ </action>
+</tooltips>

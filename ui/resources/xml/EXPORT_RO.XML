@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Exportaţi în dosar</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Locaţie pentru export:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Răsfoiţi...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Numele dosarului exportat:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Adăugaţi numere în numele fişierelor pentru a păstra ordinea</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Dimensiunea imaginii:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Utilizaţi dimensiunea iniţială</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Redimensionaţi la:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixeli</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Calitatea imaginii:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automat</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maxim</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minim</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Personalizat</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Păstrează calitatea imaginii iniţiale</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Un echilibru bun între calitate şi dimensiune</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Dimensiuni de fişier foarte mari, păstrează detaliile fine</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Dimensiunile cele mai mici pentru fişier, unele pierderi de calitate</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Exportaţi filmele utilizând:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Primul cadru</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Film întreg (fără redimensionare)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Filigran:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Adăugaţi un filigran</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Inseraţi în fotografii numele dvs., un domeniu web sau o notă privind drepturile de autor.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Exportaţi</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

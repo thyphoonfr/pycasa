@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="edittextpanel/edittext_label" xmbdesc="Label(edittextpanel/edittext_label)">
+  <xmbtext>Измени текст</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/font_label" xmbdesc="Label(edittextpanel/font_label)">
+  <xmbtext>Фонт:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/size_label" xmbdesc="Label(edittextpanel/size_label)">
+  <xmbtext>Величина:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/style_label" xmbdesc="Label(edittextpanel/style_label)">
+  <xmbtext>Стил:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextapply" xmbdesc="Label(edittextpanel/edittextapply)">
+  <xmbtext>Примени</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextcancel" xmbdesc="Label(edittextpanel/edittextcancel)">
+  <xmbtext>Откажи</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/usecaption" xmbdesc="Label(edittextpanel/usecaption)">
+  <xmbtext>Копирај натпис</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/usecaption" xmbdesc="Tooltip(edittextpanel/usecaption)">
+  <xmbtext>Додајте текст на основу натписа слике</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/clearall" xmbdesc="Label(edittextpanel/clearall)">
+  <xmbtext>Обриши све</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/clearall" xmbdesc="Tooltip(edittextpanel/clearall)">
+  <xmbtext>Уклоните сав постојећи текст</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/transparency_label" xmbdesc="Label(edittextpanel/transparency_label)">
+  <xmbtext>Прозирност</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/align_label" xmbdesc="Label(edittextpanel/align_label)">
+  <xmbtext>Поравнање:</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/leftalign" xmbdesc="Tooltip(edittextpanel/leftalign)">
+  <xmbtext>Поравнајте текст са леве стране</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/centeralign" xmbdesc="Tooltip(edittextpanel/centeralign)">
+  <xmbtext>Обострано поравнајте текст по центру</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/rightalign" xmbdesc="Tooltip(edittextpanel/rightalign)">
+  <xmbtext>Поравнајте текст са десне стране</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/no_fill" xmbdesc="Tooltip(edittextpanel/no_fill)">
+  <xmbtext>Не приказујте пуну боју попуне (прикажите само контуру)</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/bold" xmbdesc="Tooltip(edittextpanel/bold)">
+  <xmbtext>Подебљано</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/italic" xmbdesc="Tooltip(edittextpanel/italic)">
+  <xmbtext>Курзив</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/underline" xmbdesc="Tooltip(edittextpanel/underline)">
+  <xmbtext>Подвучено</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextapply" xmbdesc="Tooltip(edittextpanel/edittextapply)">
+  <xmbtext>Примените промене у тексту и затворите алатку „Текст“</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextcancel" xmbdesc="Tooltip(edittextpanel/edittextcancel)">
+  <xmbtext>Изађите из алатке Текст без примене промена</xmbtext>
+ </action>
+</tooltips>

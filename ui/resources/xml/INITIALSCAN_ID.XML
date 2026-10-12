@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Ada versi lama Picasa terpasang.  Ingin memutakhirkan lokafoto yang ada atau menelusuri lagi foto di komputer?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Harap pilih dari pilihan berikut:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Perbarui lokafoto saya</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Ambil pilihan ini jika Anda menggunakan kata kunci atau album rekaan dengan Picasa 1, dan ingin mempertahankannya di Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Telusuri lagi foto di komputer saya</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Ambil opsi ini untuk penelusuran komputer secara lebih lengkap yang mencakup informasi foto tambahan.  Opsi ini akan menjaga hasil edit dan susunan yang ada, namun tidak mempertahankan kata kunci.  Penelusuran mungkin memerlukan beberapa menit.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Memindai foto tidak akan memindahkan atau menyalin file ke lokasi baru. Anda dapat memilih folder yang ditampilkan Picasa dengan menggunakan alat Pengelola Folder (tersedia di menu Alat)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Lanjutkan</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa siap menelusuri foto pada komputer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Harap pilih dari pilihan berikut:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Telusuri foto di seluruh komputer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Ambil opsi ini bila foto disimpan di berbagai folder pada komputer, apalagi bila tersebar di lebih dari satu disk.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Hanya telusuri Dokumen, Gambar, Desktop, dan Lokafoto iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Tetapkan opsi ini bila foto hanya disimpan dalam folder ini.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Menelusuri foto tidak pernah memindahkan atau menyalin file ke lokasi baru. Anda dapat memilih folder yang ditampilkan Picasa dengan menggunakan alat Pengelola Folder (tersedia di menu Alat)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Lanjutkan</xmbtext>
+ </action>
+</tooltips>

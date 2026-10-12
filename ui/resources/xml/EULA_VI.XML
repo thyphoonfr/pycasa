@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Vui lòng xem lại các điều khoản cấp phép trước khi sử dụng Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Bằng cách sử dụng Picasa, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Điều khoản dịch vụ</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Chính sách bảo mật</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Gửi số liệu thống kê sử dụng ẩn danh cho Google (Bạn luôn có thể thay đổi cài đặt này sau)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Tôi Đồng ý</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

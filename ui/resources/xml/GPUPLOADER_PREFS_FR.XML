@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_prefs/prefs_window.mac_title">
+  <xmbtext>Préférences – Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/prefs_window.win_title">
+  <xmbtext>Paramètres – Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/account_name.title">
+  <xmbtext>Obtention du nom de compte...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/log_off.title">
+  <xmbtext>Se déconnecter</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/source_lbl.title">
+  <xmbtext>Sources de sauvegarde</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.win_title">
+  <xmbtext>Appareils photo et cartes de stockage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.mac_title">
+  <xmbtext>Appareils photo et cartes de stockage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/devices_btn.title">
+  <xmbtext>Appareils...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder_chk.title">
+  <xmbtext>Copier également les photos/vidéos depuis le support externe vers</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder.title">
+  <xmbtext>Parcourir...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/watched_folders_lbl.title">
+  <xmbtext>Dossiers du Bureau</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/add_folder_btn.title">
+  <xmbtext>Ajouter...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_size_label.title">
+  <xmbtext>Taille de photo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size.title">
+  <xmbtext>Haute qualité (stockage gratuit illimité)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size_desc.title">
+  <xmbtext>Excellente qualité d&#039;image et taille de fichiers réduite</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size.title">
+  <xmbtext>Taille d&#039;origine (si l&#039;espace disponible sur le compte le permet)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size_desc.title">
+  <xmbtext>Résolution d&#039;origine, espace décompté de votre quota</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_raw.title">
+  <xmbtext>Importer des fichiers RAW</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/send_to_google.title">
+  <xmbtext>Envoyer des données d&#039;utilisation anonymes pour contribuer à l&#039;amélioration de Google Photos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/more_storage.title">
+  <xmbtext>Acheter davantage d&#039;espace de stockage...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/cancelbutton.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

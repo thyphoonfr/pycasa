@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Zálohovanie Fotiek Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Zálohovanie Fotiek Google verzia %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Copyright 2015, Google Inc. Všetky práva vyhradené.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Tento softvér je čiastočne založený na práci nezávislej skupiny JPEG. Tento program je chránený zákonom o autorských právach v USA a ďalších krajinách.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

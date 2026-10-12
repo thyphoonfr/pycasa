@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_options/window.mac_title">
+  <xmbtext>Einstellungen für die automatische Sicherung</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/window.win_title">
+  <xmbtext>Optionen für die automatische Sicherung</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/auto_start.title">
+  <xmbtext>Automatisch starten</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/networklabel.title">
+  <xmbtext>Netzwerkeinstellungen:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/proxygroup.title">
+  <xmbtext>Proxy-Nutzername:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/passwordgroup.title">
+  <xmbtext>Proxy-Passwort:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/autoproxy.title">
+  <xmbtext>Netzwerkeinstellungen automatisch erkennen</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loglevelgroup.title">
+  <xmbtext>Netzwerkprotokoll-Level:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/disable_item.title">
+  <xmbtext>Protokollierung deaktivieren</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/errors_item.title">
+  <xmbtext>Nur Fehler protokollieren</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/min_item.title">
+  <xmbtext>Minimale Protokollinformationen</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/detailed_item.title">
+  <xmbtext>Detaillierte Protokollinformationen</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/all_item.title">
+  <xmbtext>Alle Netzwerkinformationen protokollieren</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loggroup.title">
+  <xmbtext>Protokoll:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/cancelbutton.title">
+  <xmbtext>Abbrechen</xmbtext>
+ </stringres>
+</resources>

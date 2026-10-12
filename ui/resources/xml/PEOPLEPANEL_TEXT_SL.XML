@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Dodaj ime</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Izberi mapo za prikaz obrazov</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Prezri</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Ročno dodajanje osebe</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Prekliči</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Ko Picasa pregleda vaše fotografije, samodejno združi najdene obraze v skupine, da jih lažje poimenujete.\n\nKaj morate upoštevati:\n\nČe želite prepoznati osebo, kliknite »Dodaj ime«, vnesite ime osebe in pritisnite tipko Enter. Ko prvič poimenujete neko osebo, bo ustvarjen nov album »Osebe«.\n\n(NASVET: prijavite se z Google Računom, da boste imeli med poimenovanjem dostop do vseh svojih stikov.)\n\nČe želite prezreti osebo, kliknite gumb »X« na sličici obraza.\n\nPredlogi: ko poimenujete neko osebo, Picasa morda predlaga še druge obraze, ki se ujemajo s to osebo. Kliknite album osebe, če si želite ogledati in potrditi (ali zavrniti) morebitne predloge.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Ko Picasa pregleda vaše fotografije, samodejno združi najdene obraze v skupine, da jih lažje poimenujete.\n\nKaj morate upoštevati:\n\nČe želite prepoznati osebo, kliknite »Dodaj ime«, vnesite ime osebe in pritisnite tipko Enter. Ko prvič poimenujete neko novo osebo, bo ustvarjen nov album »Osebe«.\n\n(NASVET: prijavite se z Google Računom, da boste imeli med poimenovanjem dostop do vseh svojih stikov.)\n\nČe želite prezreti osebo, kliknite gumb »X« na sličici obraza.\n\nPredlogi: ko poimenujete neko osebo, Picasa morda predlaga še druge obraze, ki se ujemajo s to osebo. Kliknite album osebe, če si želite ogledati in potrditi (ali zavrniti) morebitne predloge.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Najdena ni bila še nobena oseba. Ko najdete obraze in jih združite v skupine, bodo prikazani v albumu »Neimenovani«. Med pregledovanjem so v elementu albuma »Neimenovani« prikazane informacije o napredovanju.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Poimenovane osebe, ki so na sliki skupaj s trenutno izbrano osebo, bodo na tem seznamu.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Osebe, ki so na trenutno izbranih fotografijah, bodo na tem seznamu.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>Adicionar &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; Remover</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>Mover para cima</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>Mover para baixo</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>Repor predefinições</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>Concluído</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>Localizar botões on-line...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>Mova os botões entre as duas listas, clicando em &quot;Adicionar&quot; e &quot;Remover&quot;. Os botões da lista &quot;Botões actuais&quot; vão aparecer na parte inferior do Picasa pela ordem que definir aqui. Utilize &quot;Mover para cima&quot; e &quot;Mover para baixo&quot; para definir a ordem dos botões. (Neste caso, de cima para baixo equivale a da esquerda para a direita na aplicação)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>Botões disponíveis:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>Botões actuais:</xmbtext>
+ </action>
+</tooltips>

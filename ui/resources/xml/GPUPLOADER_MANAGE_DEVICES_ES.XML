@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_manage_devices/manage_devices.title">
+  <xmbtext>Administrar dispositivos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/device_list_description.title">
+  <xmbtext>Puedes elegir importar o ignorar siempre las fotos y los vídeos de los dispositivos que incluyas en la lista correspondiente. Recibirás un aviso para los dispositivos que no figuren en ninguna lista.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_devices_label.title">
+  <xmbtext>Dispositivos adjuntos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/devicecolumn.title">
+  <xmbtext>Dispositivo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Tipo de dispositivo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/uniquecolumn.title">
+  <xmbtext>Identificación única</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_actions_label.title">
+  <xmbtext>Importar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist.title">
+  <xmbtext>Siempre</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist.title">
+  <xmbtext>Nunca</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist_description.title">
+  <xmbtext>Importar siempre de estos dispositivos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nombre</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_black.title">
+  <xmbtext>&gt;&gt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_white.title">
+  <xmbtext>&lt;&lt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/remove.title">
+  <xmbtext>Eliminar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist_description.title">
+  <xmbtext>No importar nunca de estos dispositivos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nombre</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/ok.title">
+  <xmbtext>Listo</xmbtext>
+ </stringres>
+</resources>

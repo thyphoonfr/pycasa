@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="capturemoviepanelpopup/done" xmbdesc="Label(capturemoviepanelpopup/done)">
+  <xmbtext>終了</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/capture" xmbdesc="Label(capturemoviepanelpopup/capture)">
+  <xmbtext>記録</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/stop" xmbdesc="Label(capturemoviepanelpopup/stop)">
+  <xmbtext>停止</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/live_video" xmbdesc="Label(capturemoviepanelpopup/live_video)">
+  <xmbtext>カメラ</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/camchange" xmbdesc="Label(capturemoviepanelpopup/camchange)">
+  <xmbtext>設定</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/capture" xmbdesc="Tooltip(capturemoviepanelpopup/capture)">
+  <xmbtext>カメラからの記録を開始</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/stop" xmbdesc="Tooltip(capturemoviepanelpopup/stop)">
+  <xmbtext>カメラからの記録を停止</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/live_video" xmbdesc="Tooltip(capturemoviepanelpopup/live_video)">
+  <xmbtext>ライブ動画をカメラから記録</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/camchange" xmbdesc="Tooltip(capturemoviepanelpopup/camchange)">
+  <xmbtext>カメラ設定を変更</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_cancel" xmbdesc="Label(capturemoviepanelpopup/settings_cancel)">
+  <xmbtext>キャンセル</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_apply" xmbdesc="Label(capturemoviepanelpopup/settings_apply)">
+  <xmbtext>適用</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/video_label" xmbdesc="Label(capturemoviepanelpopup/video_label)">
+  <xmbtext>動画</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/size_label" xmbdesc="Label(capturemoviepanelpopup/size_label)">
+  <xmbtext>サイズ</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/audio_label" xmbdesc="Label(capturemoviepanelpopup/audio_label)">
+  <xmbtext>音声</xmbtext>
+ </action>
+</tooltips>

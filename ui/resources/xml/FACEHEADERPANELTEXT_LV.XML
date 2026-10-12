@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="faceheaderpanel/set_thumbnail" xmbdesc="Tooltip(faceheaderpanel/set_thumbnail)">
+  <xmbtext>Iestatiet kā personu albuma sīktēlu</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_movie" xmbdesc="Tooltip(faceheaderpanel/create_movie)">
+  <xmbtext>Izveidojiet filmas prezentāciju</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_face_movie" xmbdesc="Tooltip(faceheaderpanel/create_face_movie)">
+  <xmbtext>Izveidojiet seju filmu</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_collage" xmbdesc="Tooltip(faceheaderpanel/create_collage)">
+  <xmbtext>Izveidojiet fotoattēlu kolāžu</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/play" xmbdesc="Tooltip(faceheaderpanel/play)">
+  <xmbtext>Demonstrējiet pilnekrāna slaidrādi</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/pwa_button" xmbdesc="Tooltip(faceheaderpanel/pwa_button)">
+  <xmbtext>Atveriet PWA tīmekļa lapu</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/sug_filter" xmbdesc="Tooltip(faceheaderpanel/sug_filter)">
+  <xmbtext>Rādiet tikai ieteikumus (ja pārslēgts)</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsug" xmbdesc="Label(faceheaderpanel/confirmsug)">
+  <xmbtext>Apstiprināt visu</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsel" xmbdesc="Label(faceheaderpanel/confirmsel)">
+  <xmbtext>Apstiprināt</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/removesel" xmbdesc="Label(faceheaderpanel/removesel)">
+  <xmbtext>Noņemt</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/moresug" xmbdesc="Label(faceheaderpanel/moresug)">
+  <xmbtext>Atrast citus ieteikumus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/removesel" xmbdesc="Tooltip(faceheaderpanel/removesel)">
+  <xmbtext>Noņemiet atlasītos ieteikumus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsug" xmbdesc="Tooltip(faceheaderpanel/confirmsug)">
+  <xmbtext>Apstipriniet visus ieteikumus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsel" xmbdesc="Tooltip(faceheaderpanel/confirmsel)">
+  <xmbtext>Apstipriniet atlasītos ieteikumus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/face_zoom" xmbdesc="Tooltip(faceheaderpanel/face_zoom)">
+  <xmbtext>Skatiet tuvinātu seju</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/picture_zoom" xmbdesc="Tooltip(faceheaderpanel/picture_zoom)">
+  <xmbtext>Skatiet tālināti līdz pilnam attēlam</xmbtext>
+ </action>
+ <action type="Text" target="faceheaderpanel/sug_label" xmbdesc="Text(faceheaderpanel/sug_label)">
+  <xmbtext>Ieteikumi:</xmbtext>
+ </action>
+</tooltips>

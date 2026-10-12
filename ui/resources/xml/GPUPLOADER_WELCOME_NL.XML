@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_welcome/window.title">
+  <xmbtext>Google Foto&#039;s Back-up</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/welcometext.title">
+  <xmbtext>Automatisch een back-up maken van foto&#039;s en video&#039;s op uw computer, inclusief harde schrijven en geheugenkaarten</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_text.title">
+  <xmbtext>Door Google Foto&#039;s Back-up te gebruiken, gaat u akkoord met de</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.title">
+  <xmbtext>Servicevoorwaarden van Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.url">
+  <xmbtext>https://www.google.com/policies/terms</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/sign_in.title">
+  <xmbtext>Doorgaan</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/switch_account.title">
+  <xmbtext>Schakelen tussen accounts</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/get_started.title">
+  <xmbtext>Doorgaan</xmbtext>
+ </stringres>
+</resources>

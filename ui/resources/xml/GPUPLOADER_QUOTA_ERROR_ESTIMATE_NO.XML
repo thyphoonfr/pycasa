@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Autolagring</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Lagringsplassen er oppbrukt</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Du har valgt mapper som tar mer plass enn det du har igjen av lagringsplass på Google Disk. Du kan enten kjøpe mer lagringsplass eller kostnadsfritt sikkerhetskopiere en ubegrenset mengde bilder og videoer med standardstørrelse.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Hvis du nettopp har kjøpt lagringsplass, kan det ta noen minutter før endringene trer i kraft.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Få mer lagringsplass</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Bytt til standardstørrelse</xmbtext>
+ </stringres>
+</resources>

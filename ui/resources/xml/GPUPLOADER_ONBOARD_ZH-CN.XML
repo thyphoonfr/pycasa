@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>选择备份来源</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Google 相册可自动将所选来源中的照片和视频备份至您的照片库。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>添加…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>照片尺寸</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>高品质（无限免费存储空间）</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>文件缩小，画质不减</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>原始大小（受帐户存储空间限制）</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>完整分辨率，会占用您的配额</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>发送匿名使用情况统计信息帮助改进 Google 相册。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>获取更多存储空间…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>开始备份</xmbtext>
+ </stringres>
+</resources>

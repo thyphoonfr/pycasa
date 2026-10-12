@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="modalprogress/escmessage" xmbdesc="Text(modalprogress/escmessage)">
+  <xmbtext>Premi il tasto ESC della tastiera per interrompere</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printlayoutlabel" xmbdesc="Label(printpanel/printlayoutlabel)">
+  <xmbtext>Layout di stampa</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/walletbutton" xmbdesc="Label(printpanel/walletbutton)">
+  <xmbtext>Formato tascabile</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/walletbutton" xmbdesc="Tooltip(printpanel/walletbutton)">
+  <xmbtext>Stampa foto in formato tascabile</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/3x5button" xmbdesc="Label(printpanel/3x5button)">
+  <xmbtext>3,5 x 5</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/3x5button" xmbdesc="Tooltip(printpanel/3x5button)">
+  <xmbtext>Stampa immagini con dimensione standard 3,5x5</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/4x6button" xmbdesc="Label(printpanel/4x6button)">
+  <xmbtext>4 x 6</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/4x6button" xmbdesc="Tooltip(printpanel/4x6button)">
+  <xmbtext>Stampa immagini con dimensione standard 4x6</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/5x7button" xmbdesc="Label(printpanel/5x7button)">
+  <xmbtext>5 x 7</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/5x7button" xmbdesc="Tooltip(printpanel/5x7button)">
+  <xmbtext>Stampa immagini con dimensione standard 5x7</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/8x10button" xmbdesc="Label(printpanel/8x10button)">
+  <xmbtext>8 x 10</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/8x10button" xmbdesc="Tooltip(printpanel/8x10button)">
+  <xmbtext>Stampa immagini con dimensione standard 8x10</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fullbutton" xmbdesc="Label(printpanel/fullbutton)">
+  <xmbtext>Pagina intera</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fullbutton" xmbdesc="Tooltip(printpanel/fullbutton)">
+  <xmbtext>Stampa immagini con lo stesso formato della carta</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/croptogglelabel" xmbdesc="Label(printpanel/croptogglelabel)">
+  <xmbtext>Ritaglia e adatta</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/croptoggle" xmbdesc="Tooltip(printpanel/croptoggle)">
+  <xmbtext>Ritaglia immagini per adattarsi alle dimensioni di stampa selezionate</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fittogglelabel" xmbdesc="Label(printpanel/fittogglelabel)">
+  <xmbtext>Riduci e adatta</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fittoggle" xmbdesc="Tooltip(printpanel/fittoggle)">
+  <xmbtext>Mantieni le dimensioni originali delle immagini</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/captionoptionslabel" xmbdesc="Label(printpanel/captionoptionslabel)">
+  <xmbtext>Opzioni bordo e testo</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printerlabel" xmbdesc="Label(printpanel/printerlabel)">
+  <xmbtext>Stampante</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/setuplabel" xmbdesc="Label(printpanel/setuplabel)">
+  <xmbtext>Impostazione stampante</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/copieslabel" xmbdesc="Label(printpanel/copieslabel)">
+  <xmbtext>Copie per immagine</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/previewlabel" xmbdesc="Label(printpanel/previewlabel)">
+  <xmbtext>Anteprima</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/prevbutton" xmbdesc="Tooltip(printpanel/prevbutton)">
+  <xmbtext>Visualizza la pagina di anteprima precedente</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/nextbutton" xmbdesc="Tooltip(printpanel/nextbutton)">
+  <xmbtext>Visualizza la successiva pagina di anteprima</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printsetuplabel" xmbdesc="Label(printpanel/printsetuplabel)">
+  <xmbtext>Impostazioni stampante</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/captionoptionsbutton" xmbdesc="Tooltip(printpanel/captionoptionsbutton)">
+  <xmbtext>Configura bordi e testo per le foto da stampare</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/selectprinterbutton" xmbdesc="Tooltip(printpanel/selectprinterbutton)">
+  <xmbtext>Visualizza un elenco di stampanti disponibili</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/psetupbutton" xmbdesc="Tooltip(printpanel/psetupbutton)">
+  <xmbtext>Apri i comandi di configurazione per la stampante selezionata</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/addprintsbutton" xmbdesc="Tooltip(printpanel/addprintsbutton)">
+  <xmbtext>Aggiungi un&#039;altra copia di ogni immagine da stampare</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/subprintsbutton" xmbdesc="Tooltip(printpanel/subprintsbutton)">
+  <xmbtext>Sottrai una copia di ogni foto da stampare</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/phelpbutton" xmbdesc="Label(printpanel/phelpbutton)">
+  <xmbtext>Guida</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/phelpbutton" xmbdesc="Tooltip(printpanel/phelpbutton)">
+  <xmbtext>Apri la guida per la risoluzione dei problemi di stampa</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/froogle" xmbdesc="Label(printpanel/froogle)">
+  <xmbtext>Ricerca materiali da stampa in Froogle</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/froogle" xmbdesc="Tooltip(printpanel/froogle)">
+  <xmbtext>Ricerca in Froogle articoli/accessori per la stampante</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton" xmbdesc="Label(printpanel/reviewnowbutton)">
+  <xmbtext>Verifica</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton" xmbdesc="Tooltip(printpanel/reviewnowbutton)">
+  <xmbtext>Assicurati che le immagini siano pronte da stampare</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton2" xmbdesc="Label(printpanel/reviewnowbutton2)">
+  <xmbtext>Verifica</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton2" xmbdesc="Tooltip(printpanel/reviewnowbutton2)">
+  <xmbtext>Assicurati che le immagini siano pronte da stampare</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton" xmbdesc="Label(printpanel/pnowbutton)">
+  <xmbtext>Stampa</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton" xmbdesc="Tooltip(printpanel/pnowbutton)">
+  <xmbtext>Stampa immagini adesso con le impostazioni attuali</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton2" xmbdesc="Label(printpanel/pnowbutton2)">
+  <xmbtext>Stampa</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton2" xmbdesc="Tooltip(printpanel/pnowbutton2)">
+  <xmbtext>Stampa immagini adesso con le impostazioni attuali</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pcancelbutton" xmbdesc="Label(printpanel/pcancelbutton)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pcancelbutton" xmbdesc="Tooltip(printpanel/pcancelbutton)">
+  <xmbtext>Annulla il processo di stampa e ritorna alla vista miniature</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/tllabel" xmbdesc="Label(editoneup/tllabel)">
+  <xmbtext>Cronologia</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/bcklabel" xmbdesc="Label(editoneup/bcklabel)">
+  <xmbtext>Esci</xmbtext>
+ </action>
+ <action type="Text" target="editoneup/tpslabel" xmbdesc="Text(editoneup/tpslabel)">
+  <xmbtext>Tempo visualizzazione</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/sbutton" xmbdesc="Label(editpanel/sbutton)">
+  <xmbtext>Riproduci</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/sbutton" xmbdesc="Tooltip(editpanel/sbutton)">
+  <xmbtext>Visualizza uno slideshow delle immagini</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edithelpbutton" xmbdesc="Tooltip(editpanel/edithelpbutton)">
+  <xmbtext>Guida</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/weblink" xmbdesc="Tooltip(editpanel/weblink)">
+  <xmbtext>Vai al sito web associato a questa immagine</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editcollage" xmbdesc="Label(editpanel/editcollage)">
+  <xmbtext>Modifica collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editcollage" xmbdesc="Tooltip(editpanel/editcollage)">
+  <xmbtext>Modifica il collage da cui è stata creata l&#039;immagine</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/fit" xmbdesc="Tooltip(editpanel/fit)">
+  <xmbtext>Adatta l&#039;immagine all&#039;area di visualizzazione</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/1to1" xmbdesc="Tooltip(editpanel/1to1)">
+  <xmbtext>Visualizza l&#039;immagine nelle dimensioni effettive</xmbtext>
+ </action>
+ <action type="Text" target="nerdview/nvhead" xmbdesc="Text(nerdview/nvhead)">
+  <xmbtext>Dati fotocamera e istogramma</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captionbutton" xmbdesc="Tooltip(editpanel/captionbutton)">
+  <xmbtext>Visualizza/nascondi didascalia</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/toggle_left_drawer" xmbdesc="Tooltip(editpanel/toggle_left_drawer)">
+  <xmbtext>Mostra/nascondi controlli di modifica</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captiontrash" xmbdesc="Tooltip(editpanel/captiontrash)">
+  <xmbtext>Elimina didascalia</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/refining_label" xmbdesc="Text(editpanel/refining_label)">
+  <xmbtext>Caricamento copia alta definizione in corso...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_ok" xmbdesc="Label(editpanel/tool_ok)">
+  <xmbtext>APPLICA</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_cancel" xmbdesc="Label(editpanel/tool_cancel)">
+  <xmbtext>ANNULLA</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editslideshow" xmbdesc="Label(editpanel/editslideshow)">
+  <xmbtext>Modifica il filmato</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editslideshow" xmbdesc="Tooltip(editpanel/editslideshow)">
+  <xmbtext>Modifica questa presentazione di filmato</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/albumview" xmbdesc="Label(editpanel/albumview)">
+  <xmbtext>Torna alla libreria</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/albumview" xmbdesc="Tooltip(editpanel/albumview)">
+  <xmbtext>Torna a miniature organizzate</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/quickupload" xmbdesc="Tooltip(editpanel/quickupload)">
+  <xmbtext>Carica nella tua Casella personale di Web Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/uploadchanges" xmbdesc="Tooltip(editpanel/uploadchanges)">
+  <xmbtext>Aggiorna la copia online con questa versione</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label" xmbdesc="Label(editpanel/selection_label)">
+  <xmbtext>Selezionato</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label_zoom" xmbdesc="Label(editpanel/selection_label_zoom)">
+  <xmbtext>Selezionato</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_focus" xmbdesc="Tooltip(editpanel/swap_2up_focus)">
+  <xmbtext>Passa all&#039;immagine messa a fuoco</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_layout" xmbdesc="Tooltip(editpanel/swap_2up_layout)">
+  <xmbtext>Passa da disposizione orizzontale a verticale</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/aa_2up_toggle" xmbdesc="Tooltip(editpanel/aa_2up_toggle)">
+  <xmbtext>Visualizza la stessa immagine due volte</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ab_2up_toggle" xmbdesc="Tooltip(editpanel/ab_2up_toggle)">
+  <xmbtext>Visualizza due immagini diverse</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/only_1up_toggle" xmbdesc="Tooltip(editpanel/only_1up_toggle)">
+  <xmbtext>Visualizza una sola immagine</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab1" xmbdesc="Tooltip(editpanel/tab1)">
+  <xmbtext>Correzioni comuni richieste</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab2" xmbdesc="Tooltip(editpanel/tab2)">
+  <xmbtext>Correzioni avanzate illuminazione e colore</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab3" xmbdesc="Tooltip(editpanel/tab3)">
+  <xmbtext>Editing delle immagini pratico e divertente</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab4" xmbdesc="Tooltip(editpanel/tab4)">
+  <xmbtext>Editing delle immagini più pratico e divertente</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab5" xmbdesc="Tooltip(editpanel/tab5)">
+  <xmbtext>Editing delle immagini ancora più pratico e divertente</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop" xmbdesc="Label(editpanel/crop)">
+  <xmbtext>Ritaglia</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop" xmbdesc="Tooltip(editpanel/crop)">
+  <xmbtext>Ritaglia l&#039;immagine in un formato differente</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye" xmbdesc="Label(editpanel/redeye)">
+  <xmbtext>Occhi rossi</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeye" xmbdesc="Tooltip(editpanel/redeye)">
+  <xmbtext>Correggi gli occhi rossi nell&#039;immagine</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autolighting" xmbdesc="Label(editpanel/autolighting)">
+  <xmbtext>Correzione automatica del contrasto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autolighting" xmbdesc="Tooltip(editpanel/autolighting)">
+  <xmbtext>Correggi l&#039;esposizione senza influenzare i colori</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autocolor" xmbdesc="Label(editpanel/autocolor)">
+  <xmbtext>Correzione automatica del colore</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autocolor" xmbdesc="Tooltip(editpanel/autocolor)">
+  <xmbtext>Rimuovi automaticamente dominante di colore</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch" xmbdesc="Label(editpanel/retouch)">
+  <xmbtext>Ritocco</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouch" xmbdesc="Tooltip(editpanel/retouch)">
+  <xmbtext>Correggi difetti, graffi e imperfezioni</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/edittext" xmbdesc="Label(editpanel/edittext)">
+  <xmbtext>Testo</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik" xmbdesc="Label(editpanel/picnik)">
+  <xmbtext>Modifica in Kit creativo</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik" xmbdesc="Tooltip(editpanel/picnik)">
+  <xmbtext>Modifica una foto online con Kit creativo</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/showtextlabel" xmbdesc="Label(editpanel/showtextlabel)">
+  <xmbtext>Mostra testo</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edittext" xmbdesc="Tooltip(editpanel/edittext)">
+  <xmbtext>Aggiungi/Modifica testo in una foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/showtextcheckbox" xmbdesc="Tooltip(editpanel/showtextcheckbox)">
+  <xmbtext>Mostra o nascondi il testo in una foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filllight_icon" xmbdesc="Tooltip(editpanel/filllight_icon)">
+  <xmbtext>Luce di riempimento: regola la luce d&#039;ambiente dell&#039;immagine</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/horizonadjust" xmbdesc="Label(editpanel/horizonadjust)">
+  <xmbtext>Raddrizza</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/horizonadjust" xmbdesc="Tooltip(editpanel/horizonadjust)">
+  <xmbtext>Correggi un&#039;immagine deformata</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/enhance" xmbdesc="Label(editpanel/enhance)">
+  <xmbtext>Mi sento fortunato</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/enhance" xmbdesc="Tooltip(editpanel/enhance)">
+  <xmbtext>Correzione illuminazione e colore con un solo clic</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/ok" xmbdesc="Label(editpanel/ok)">
+  <xmbtext>Applica</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ok" xmbdesc="Tooltip(editpanel/ok)">
+  <xmbtext>Applica modifiche</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cancel" xmbdesc="Label(editpanel/cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cancel" xmbdesc="Tooltip(editpanel/cancel)">
+  <xmbtext>Annulla modifiche</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_undo" xmbdesc="Label(editpanel/filter_undo)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_undo" xmbdesc="Tooltip(editpanel/filter_undo)">
+  <xmbtext>Rimuovi l&#039;ultima correzione o l&#039;ultima modifica</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_redo" xmbdesc="Label(editpanel/filter_redo)">
+  <xmbtext>Ripeti</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_redo" xmbdesc="Tooltip(editpanel/filter_redo)">
+  <xmbtext>Riapplica una modifica o una correzione rimossa</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop_label" xmbdesc="Label(editpanel/crop_label)">
+  <xmbtext>Ritaglia immagine</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croptext" xmbdesc="Label(editpanel/croptext)">
+  <xmbtext>Seleziona una delle seguenti dimensioni,  quindi fai clic e trascina il puntatore sull&#039;immagine per selezionare la porzione dell&#039;immagine da ritagliare.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croprotatecrop" xmbdesc="Label(editpanel/croprotatecrop)">
+  <xmbtext>Ruota</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croprotatecrop" xmbdesc="Tooltip(editpanel/croprotatecrop)">
+  <xmbtext>Commuta l&#039;orientamento verticale/orizzontale</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croppreview" xmbdesc="Label(editpanel/croppreview)">
+  <xmbtext>Anteprima</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croppreview" xmbdesc="Tooltip(editpanel/croppreview)">
+  <xmbtext>Visualizza anteprima del ritaglio selezionato</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropdiscard" xmbdesc="Label(editpanel/cropdiscard)">
+  <xmbtext>Ripristina</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropdiscard" xmbdesc="Tooltip(editpanel/cropdiscard)">
+  <xmbtext>Elimina ogni ritaglio applicato</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropapply" xmbdesc="Label(editpanel/cropapply)">
+  <xmbtext>Applica</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropapply" xmbdesc="Tooltip(editpanel/cropapply)">
+  <xmbtext>Applica il ritaglio</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropcancel" xmbdesc="Label(editpanel/cropcancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropcancel" xmbdesc="Tooltip(editpanel/cropcancel)">
+  <xmbtext>Chiude lo strumento di ritaglio</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop_delete_custom" xmbdesc="Tooltip(editpanel/crop_delete_custom)">
+  <xmbtext>Elimina le proporzioni correnti</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye_label" xmbdesc="Label(editpanel/redeye_label)">
+  <xmbtext>Correggi occhi rossi</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyetext" xmbdesc="Label(editpanel/redeyetext)">
+  <xmbtext>Fai clic, tieni premuto e trascina il mouse intorno ad ogni occhio per selezionarlo. Un riquadro di selezione viene visualizzato sull&#039;area. Rilascia il mouse per completare la selezione. Nell&#039;immagine visualizzata sono stati rimossi gli occhi rossi.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeauto" xmbdesc="Label(editpanel/redeyeauto)">
+  <xmbtext>Automatico</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeauto" xmbdesc="Tooltip(editpanel/redeyeauto)">
+  <xmbtext>Riapplica correzione automatica occhi rossi</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyepreview" xmbdesc="Label(editpanel/redeyepreview)">
+  <xmbtext>Anteprima</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyepreview" xmbdesc="Tooltip(editpanel/redeyepreview)">
+  <xmbtext>Visualizza in anteprima modifiche senza contorno</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyecancel" xmbdesc="Label(editpanel/redeyecancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyecancel" xmbdesc="Tooltip(editpanel/redeyecancel)">
+  <xmbtext>Chiude Correggi occhi rossi senza applicare l&#039;effetto.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeapply" xmbdesc="Label(editpanel/redeyeapply)">
+  <xmbtext>Applica</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeapply" xmbdesc="Tooltip(editpanel/redeyeapply)">
+  <xmbtext>Applica effetto ed esci da Correggi occhi rossi</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyediscard" xmbdesc="Label(editpanel/redeyediscard)">
+  <xmbtext>Ripristina</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyediscard" xmbdesc="Tooltip(editpanel/redeyediscard)">
+  <xmbtext>Annulla modifiche occhi rossi</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_label" xmbdesc="Label(editpanel/retouch_label)">
+  <xmbtext>Ritocca difetti</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchtext" xmbdesc="Label(editpanel/retouchtext)">
+  <xmbtext>Fai clic per selezionare l&#039;area da modificare. Sposta quindi il mouse per visualizzare un&#039;anteprima dell&#039;area di sostituzione. Fai di nuovo clic sull&#039;immagine per completare l&#039;operazione. Ripeti l&#039;operazione. Nota. Puoi anche utilizzare la funzione di trascinamento per visualizzare una panoramica.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_brush_label" xmbdesc="Label(editpanel/retouch_brush_label)">
+  <xmbtext>Dimensione pennello</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchreset" xmbdesc="Label(editpanel/retouchreset)">
+  <xmbtext>Ripristina</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchundo" xmbdesc="Label(editpanel/retouchundo)">
+  <xmbtext>Annulla patch</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchredo" xmbdesc="Label(editpanel/retouchredo)">
+  <xmbtext>Ripeti patch</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchapply" xmbdesc="Label(editpanel/retouchapply)">
+  <xmbtext>Applica</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchcancel" xmbdesc="Label(editpanel/retouchcancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchreset" xmbdesc="Tooltip(editpanel/retouchreset)">
+  <xmbtext>Rimuovi tutte le patch di ritocco</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchundo" xmbdesc="Tooltip(editpanel/retouchundo)">
+  <xmbtext>Rimuovi l&#039;ultima patch di ritocco</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchredo" xmbdesc="Tooltip(editpanel/retouchredo)">
+  <xmbtext>Riapplica una patch di ritocco rimossa</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchapply" xmbdesc="Tooltip(editpanel/retouchapply)">
+  <xmbtext>Applica le correzioni ed esci dallo strumento Ritocco</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchcancel" xmbdesc="Tooltip(editpanel/retouchcancel)">
+  <xmbtext>Esci dallo strumento Ritocco senza applicare modifiche</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_lighting" xmbdesc="Tooltip(editpanel/magic_lighting)">
+  <xmbtext>Correzione illuminazione con un solo clic</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_color" xmbdesc="Tooltip(editpanel/magic_color)">
+  <xmbtext>Correzione colore con un solo clic</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/droppertoggle" xmbdesc="Tooltip(editpanel/droppertoggle)">
+  <xmbtext>Ti consente di selezionare una parte dell&#039;immagine di color grigio neutro o bianco per rimuovere la tonalità di colore</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/greybalancelabel" xmbdesc="Label(editpanel/greybalancelabel)">
+  <xmbtext>Selettore colori neutri</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filllightlabel" xmbdesc="Label(editpanel/filllightlabel)">
+  <xmbtext>Luce di riempimento</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik_fx_label" xmbdesc="Label(editpanel/picnik_fx_label)">
+  <xmbtext>Effetti di</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik_fx" xmbdesc="Tooltip(editpanel/picnik_fx)">
+  <xmbtext>Prova più effetti in Kit creativo</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/in_progress_label" xmbdesc="Label(editpanel/in_progress_label)">
+  <xmbtext>Operazione in corso...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/render_now" xmbdesc="Label(editpanel/render_now)">
+  <xmbtext>Crea adesso</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnikcancel" xmbdesc="Label(editpanel/picnikcancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/picnikprogressdone" xmbdesc="Text(editpanel/picnikprogressdone)">
+  <xmbtext>Al termine della modifica, fai clic su &#039;Salva in Picasa&#039;.</xmbtext>
+ </action>
+ <action type="Text1" target="editpanel/picnikprogress" xmbdesc="Text1(editpanel/picnikprogress)">
+  <xmbtext>Trasferimento foto a Kit creativo...</xmbtext>
+ </action>
+ <action type="Text2" target="editpanel/picnikprogress" xmbdesc="Text2(editpanel/picnikprogress)">
+  <xmbtext>Connessione a Kit creativo...</xmbtext>
+ </action>
+ <action type="Text3" target="editpanel/picnikprogress" xmbdesc="Text3(editpanel/picnikprogress)">
+  <xmbtext>Trasferimento foto da Kit creativo... Attendere.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label0" xmbdesc="Label(editpanel/colorwheel_label0)">
+  <xmbtext>Scegli colore</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label1" xmbdesc="Label(editpanel/colorwheel_label1)">
+  <xmbtext>Scegli colore</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_youtube" xmbdesc="Label(movieeditpanel/export_youtube)">
+  <xmbtext>Carica in YouTube</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_movie" xmbdesc="Label(movieeditpanel/export_movie)">
+  <xmbtext>Esporta clip</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/reset_trim" xmbdesc="Label(movieeditpanel/reset_trim)">
+  <xmbtext>Reimposta inizio e fine</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/capture_frame" xmbdesc="Label(movieeditpanel/capture_frame)">
+  <xmbtext>Crea istantanea</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_youtube" xmbdesc="Tooltip(movieeditpanel/export_youtube)">
+  <xmbtext>Carica il tuo filmato in YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_movie" xmbdesc="Tooltip(movieeditpanel/export_movie)">
+  <xmbtext>Salva un clip del filmato tra il punto iniziale e quello finale</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/reset_trim" xmbdesc="Tooltip(movieeditpanel/reset_trim)">
+  <xmbtext>Ripristina la lunghezza originale del filmato (rimuovi il punto iniziale e finale)</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/capture_frame" xmbdesc="Tooltip(movieeditpanel/capture_frame)">
+  <xmbtext>Acquisisci frame corrente</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>Stampa</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>Stampa le immagini della selezione temporanea</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>Email</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>Invia le immagini della selezione temporanea via email</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>Crea collage con le immagini selezionate</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>Filmato</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>Crea un filmato con le foto selezionate</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>Invia le foto della selezione temporanea a Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Carica immagini su Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Carica immagini su Blogger</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>Negozio</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>Acquista stampe e prodotti dal tuo fornitore online preferito </xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>Esporta</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>Copia le immagini della selezione temporanea in una cartella sul disco rigido</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>Altro…</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>Fai clic per visualizzare altre opzioni</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/makemovietab" xmbdesc="Label(panelroot/makemovietab)">
+  <xmbtext>Movie Maker</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/collagetab" xmbdesc="Label(panelroot/collagetab)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/acquiretab" xmbdesc="Label(panelroot/acquiretab)">
+  <xmbtext>Importa</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/capturemovietab" xmbdesc="Label(panelroot/capturemovietab)">
+  <xmbtext>Acquisisci</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/picasatab" xmbdesc="Label(panelroot/picasatab)">
+  <xmbtext>Libreria</xmbtext>
+ </action>
+ <action type="Label" target="publish/giftcdtext" xmbdesc="Label(publish/giftcdtext)">
+  <xmbtext>Gli elementi selezionati con un segno di spunta verranno inclusi nel tuo CD regalo. Per aggiungere ulteriori elementi, fai clic sul pulsante &quot;Aggiungi altro&quot; qui di seguito.</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_cdname" xmbdesc="Text(publish/label_cdname)">
+  <xmbtext>Nome CD</xmbtext>
+ </action>
+ <action type="Text" target="publish/namelimitext" xmbdesc="Text(publish/namelimitext)">
+  <xmbtext>Limite di 16 caratteri</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox1" xmbdesc="Text(publish/label_optionbox1)">
+  <xmbtext>Includi slideshow</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox2" xmbdesc="Text(publish/label_optionbox2)">
+  <xmbtext>Cancella supporto</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox3" xmbdesc="Text(publish/label_optionbox3)">
+  <xmbtext>Includi Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_go" xmbdesc="Label(publish/presentcd_go)">
+  <xmbtext>Masterizza disco</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_help" xmbdesc="Label(publish/presentcd_help)">
+  <xmbtext>Guida</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_eject" xmbdesc="Label(publish/presentcd_eject)">
+  <xmbtext>Espulsione</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_cancel" xmbdesc="Label(publish/presentcd_cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Aggiungi altro...</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Aggiungi altro...</xmbtext>
+ </action>
+ <action type="Text" target="publish/selectiontext" xmbdesc="Text(publish/selectiontext)">
+  <xmbtext>Selezione e impostazioni</xmbtext>
+ </action>
+ <action type="Text" target="publish/picsizetext" xmbdesc="Text(publish/picsizetext)">
+  <xmbtext>Dimensioni foto</xmbtext>
+ </action>
+ <action type="Text" target="publish/cdnametext" xmbdesc="Text(publish/cdnametext)">
+  <xmbtext>Nomina il CD regalo</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backupcdheader" xmbdesc="Text1(publish/backupcdheader)">
+  <xmbtext>Crea un CD di backup</xmbtext>
+ </action>
+ <action type="Text2" target="publish/backupcdheader" xmbdesc="Text2(publish/backupcdheader)">
+  <xmbtext>Crea un set oppure usane uno esistente</xmbtext>
+ </action>
+ <action type="Label" target="publish/backupcdheader2" xmbdesc="Label(publish/backupcdheader2)">
+  <xmbtext>Scegli cartelle e album di cui effettuare il backup</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backuptext" xmbdesc="Text1(publish/backuptext)">
+  <xmbtext>Un set di backup indica dove archiviare i file di cui viene eseguito il backup e mantiene un registro dei file di cui è già stato eseguito il backup, in modo da non doverlo eseguire più.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext2" xmbdesc="Label(publish/backuptext2)">
+  <xmbtext>Picasa sta mostrando i file di cui non hai precedentemente eseguito il backup.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext3" xmbdesc="Label(publish/backuptext3)">
+  <xmbtext>Controlla le cartelle di cui desideri effettuare il backup oppure scegli &#039;Seleziona tutto&#039; per sceglierle tutte.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_go" xmbdesc="Label(publish/backup_go)">
+  <xmbtext>Masterizza disco</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_help" xmbdesc="Label(publish/backup_help)">
+  <xmbtext>Guida</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_eject" xmbdesc="Label(publish/backup_eject)">
+  <xmbtext>Espulsione</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_cancel" xmbdesc="Label(publish/backup_cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Label" target="publish/newbackupset" xmbdesc="Label(publish/newbackupset)">
+  <xmbtext>Nuovo set</xmbtext>
+ </action>
+ <action type="Label" target="publish/deletebackupset" xmbdesc="Label(publish/deletebackupset)">
+  <xmbtext>Elimina set</xmbtext>
+ </action>
+ <action type="Label" target="publish/editbackupset" xmbdesc="Label(publish/editbackupset)">
+  <xmbtext>Modifica set</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_backupname" xmbdesc="Text(publish/label_backupname)">
+  <xmbtext>Set di backup</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectall" xmbdesc="Label(publish/selectall)">
+  <xmbtext>Seleziona tutto</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectnone" xmbdesc="Label(publish/selectnone)">
+  <xmbtext>Deseleziona tutto</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox1" xmbdesc="Label(publish/label_rpoptionbox1)">
+  <xmbtext>Carica</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox1" xmbdesc="Tooltip(publish/rpoptionbox1)">
+  <xmbtext>La cartella e/o gli album selezionati verranno caricati</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox2" xmbdesc="Label(publish/label_rpoptionbox2)">
+  <xmbtext>Cambia opzioni</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox2" xmbdesc="Tooltip(publish/rpoptionbox2)">
+  <xmbtext>Le cartelle e/o gli album selezionati verranno aggiornati online con le opzioni specificate nei menu a destra</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox3" xmbdesc="Label(publish/label_rpoptionbox3)">
+  <xmbtext>Rimuovi online</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Le cartelle e/o gli album selezionati verranno rimossi da Picasa Web Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Le cartelle e/o gli album selezionati verranno rimossi da Picasa Web Album</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_go" xmbdesc="Label(publish/replicate_go)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_go" xmbdesc="Tooltip(publish/replicate_go)">
+  <xmbtext>La tua azione scelta avrà inizio</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_cancel" xmbdesc="Label(publish/replicate_cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_cancel" xmbdesc="Tooltip(publish/replicate_cancel)">
+  <xmbtext>Torna alla libreria senza apportare nessuna modifica online</xmbtext>
+ </action>
+ <action type="Label" target="publish/upgradestorage" xmbdesc="Label(publish/upgradestorage)">
+  <xmbtext>Esegui l&#039;upgrade dell&#039;archiviazione</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/upgradestorage" xmbdesc="Tooltip(publish/upgradestorage)">
+  <xmbtext>Spazio di archiviazione aggiuntivo può consentirti di caricare più foto</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallactionstitle" xmbdesc="Text(publish/uploadallactionstitle)">
+  <xmbtext>Scegli azione per cartelle e album selezionati:</xmbtext>
+ </action>
+ <action type="Text1" target="publish/uploadallinfotext" xmbdesc="Text1(publish/uploadallinfotext)">
+  <xmbtext>Picasa mostra ora solo le cartelle e gli album contenenti foto che non sono state in precedenza caricate.</xmbtext>
+ </action>
+ <action type="Text2" target="publish/uploadallinfotext" xmbdesc="Text2(publish/uploadallinfotext)">
+  <xmbtext>Picasa mostra ora solo le cartelle e gli album contenenti foto già online che non corrispondono alle opzioni selezionate.</xmbtext>
+ </action>
+ <action type="Text3" target="publish/uploadallinfotext" xmbdesc="Text3(publish/uploadallinfotext)">
+  <xmbtext>Picasa mostra ora soltanto le cartelle e gli album contenenti foto già online.</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallstoragetitle" xmbdesc="Text(publish/uploadallstoragetitle)">
+  <xmbtext>Archiviazione:</xmbtext>
+ </action>
+ <action type="Text" target="publish/used_storage" xmbdesc="Text(publish/used_storage)">
+  <xmbtext>Spazio di archiviazione attualmente utilizzato</xmbtext>
+ </action>
+ <action type="Text" target="publish/full_storage" xmbdesc="Text(publish/full_storage)">
+  <xmbtext>Dopo il caricamento, utilizzerai tutto lo spazio di archiviazione.</xmbtext>
+ </action>
+ <action type="Text" target="publish/needed_storage" xmbdesc="Text(publish/needed_storage)">
+  <xmbtext>Per caricare tutto occorre altro spazio di archiviazione.</xmbtext>
+ </action>
+ <action type="Text" target="publish/final_storage" xmbdesc="Text(publish/final_storage)">
+  <xmbtext>Il tuo spazio di archiviazione dopo questo caricamento</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadalloptionstitle" xmbdesc="Text(publish/uploadalloptionstitle)">
+  <xmbtext>Opzioni caricamento:</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsize3" xmbdesc="Text(publish/uploadsize3)">
+  <xmbtext>Dimensioni:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>La dimensione della foto quando è caricata in Picasa Web Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>La dimensione della foto quando è caricata in Picasa Web Album</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadaccess3" xmbdesc="Text(publish/uploadaccess3)">
+  <xmbtext>Visibilità:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Imposta l&#039;accesso all&#039;album per Picasa Web Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Imposta l&#039;accesso all&#039;album per Picasa Web Album</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsync3" xmbdesc="Text(publish/uploadsync3)">
+  <xmbtext>Sinc:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsync" xmbdesc="Tooltip(publish/uploadallsync)">
+  <xmbtext>Cambia l&#039;impostazione di sincronizzazione per le cartelle e/o gli album selezionati</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/viewallbutton" xmbdesc="Label(searchoptions/viewallbutton)">
+  <xmbtext>Visualizza tutto</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchoptions/viewallbutton" xmbdesc="Tooltip(searchoptions/viewallbutton)">
+  <xmbtext>Esci da modalità ricerca</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/label_searchresult" xmbdesc="Label(searchoptions/label_searchresult)">
+  <xmbtext>Risultati della ricerca:</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/timecontainer_label" xmbdesc="Tooltip(searchcontainer/timecontainer_label)">
+  <xmbtext>Filtra per intervallo di date</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/searchclr" xmbdesc="Tooltip(searchcontainer/searchclr)">
+  <xmbtext>Cancella la ricerca</xmbtext>
+ </action>
+ <action type="Label" target="searchcontainer/filter_label" xmbdesc="Label(searchcontainer/filter_label)">
+  <xmbtext>Filtri</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/starsearch" xmbdesc="Tooltip(searchcontainer/starsearch)">
+  <xmbtext>Mostra solo foto speciali </xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/moviesearch" xmbdesc="Tooltip(searchcontainer/moviesearch)">
+  <xmbtext>Mostra solo filmati</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/webview" xmbdesc="Tooltip(searchcontainer/webview)">
+  <xmbtext>Mostra solo foto caricate su Web Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/facesearch" xmbdesc="Tooltip(searchcontainer/facesearch)">
+  <xmbtext>Mostra solo foto con volti</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/geotagsearch" xmbdesc="Tooltip(searchcontainer/geotagsearch)">
+  <xmbtext>Mostra solo foto con etichetta geografica</xmbtext>
+ </action>
+ <action type="Text1" target="thumbui/lightbox_bgtext" xmbdesc="Text1(thumbui/lightbox_bgtext)">
+  <xmbtext>Nessuna immagine trovata</xmbtext>
+ </action>
+ <action type="Text2" target="thumbui/lightbox_bgtext" xmbdesc="Text2(thumbui/lightbox_bgtext)">
+  <xmbtext>In questo set è stato eseguito il backup di tutti i file</xmbtext>
+ </action>
+ <action type="Text3" target="thumbui/lightbox_bgtext" xmbdesc="Text3(thumbui/lightbox_bgtext)">
+  <xmbtext>Nessuna immagine trovata per il CD</xmbtext>
+ </action>
+ <action type="Text4" target="thumbui/lightbox_bgtext" xmbdesc="Text4(thumbui/lightbox_bgtext)">
+  <xmbtext>Tutte le foto sono state caricate</xmbtext>
+ </action>
+ <action type="Text5" target="thumbui/lightbox_bgtext" xmbdesc="Text5(thumbui/lightbox_bgtext)">
+  <xmbtext>Tutte le foto attualmente online hanno queste impostazioni</xmbtext>
+ </action>
+ <action type="Text6" target="thumbui/lightbox_bgtext" xmbdesc="Text6(thumbui/lightbox_bgtext)">
+  <xmbtext>Impossibile rimuovere foto da Picasa Web Album</xmbtext>
+ </action>
+ <action type="Text7" target="thumbui/lightbox_bgtext" xmbdesc="Text7(thumbui/lightbox_bgtext)">
+  <xmbtext>Impossibile rimuovere foto da Google Foto</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/albumview" xmbdesc="Label(thumbui/albumview)">
+  <xmbtext>Torna alla libreria</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/loupehit" xmbdesc="Tooltip(thumbui/loupehit)">
+  <xmbtext>Fai clic e trascina le immagini per ingrandirle</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/albumview" xmbdesc="Tooltip(thumbui/albumview)">
+  <xmbtext>Torna a miniature organizzate</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/fullview" xmbdesc="Label(thumbui/fullview)">
+  <xmbtext>Modifica immagini</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/fullview" xmbdesc="Tooltip(thumbui/fullview)">
+  <xmbtext>Modifica le foto</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/importbutton" xmbdesc="Label(thumbui/importbutton)">
+  <xmbtext>Importa</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/importbutton" xmbdesc="Tooltip(thumbui/importbutton)">
+  <xmbtext>Acquisisci immagini da fotocamera, scanner o altri supporti</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/webcambutton" xmbdesc="Tooltip(thumbui/webcambutton)">
+  <xmbtext>Acquisisci foto o video da una webcam o da un altro dispositivo video</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/sbutton" xmbdesc="Label(thumbui/sbutton)">
+  <xmbtext>Slideshow</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/people_toggle" xmbdesc="Tooltip(thumbui/people_toggle)">
+  <xmbtext>Mostra/nascondi riquadro Persone</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/places_toggle" xmbdesc="Tooltip(thumbui/places_toggle)">
+  <xmbtext>Mostra/nascondi riquadro Luoghi</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/tags_toggle" xmbdesc="Tooltip(thumbui/tags_toggle)">
+  <xmbtext>Mostra/nascondi riquadro tag</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/properties_toggle" xmbdesc="Tooltip(thumbui/properties_toggle)">
+  <xmbtext>Mostra/nascondi riquadro Proprietà</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/sbutton" xmbdesc="Tooltip(thumbui/sbutton)">
+  <xmbtext>Visualizza uno slideshow delle immagini nella cartella o nell&#039;album selezionato</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/timelinebutton" xmbdesc="Label(thumbui/timelinebutton)">
+  <xmbtext>Cronologia</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/timelinebutton" xmbdesc="Tooltip(thumbui/timelinebutton)">
+  <xmbtext>Visualizzazione cronologica di tutte le immagini</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/cdmode" xmbdesc="Label(thumbui/cdmode)">
+  <xmbtext>CD regalo</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/cdmode" xmbdesc="Tooltip(thumbui/cdmode)">
+  <xmbtext>Crea un CD con uno slideshow incorporato per amici e parenti</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/backup" xmbdesc="Label(thumbui/backup)">
+  <xmbtext>Backup</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/backup" xmbdesc="Tooltip(thumbui/backup)">
+  <xmbtext>Archivia le immagini su CD o DVD</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/visitweb" xmbdesc="Label(thumbui/visitweb)">
+  <xmbtext>Visualizzazione Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/visitweb" xmbdesc="Tooltip(thumbui/visitweb)">
+  <xmbtext>SEGNAPOSTO</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchhold" xmbdesc="Tooltip(thumbui/scratchhold)">
+  <xmbtext>Conserva elementi selezionati</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchclear" xmbdesc="Tooltip(thumbui/scratchclear)">
+  <xmbtext>Cancella elementi dalla selezione</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/addtobuttcon" xmbdesc="Tooltip(thumbui/addtobuttcon)">
+  <xmbtext>Aggiungi gli elementi selezionati a un album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/startoggle" xmbdesc="Tooltip(thumbui/startoggle)">
+  <xmbtext>Aggiungi/Rimuovi da Speciali</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Ruota a sinistra</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Ruota a sinistra</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/scratchlabel" xmbdesc="Text(thumbui/scratchlabel)">
+  <xmbtext>Selezione</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/librarylabel" xmbdesc="Label(thumbui/librarylabel)">
+  <xmbtext>Libreria</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newfolder" xmbdesc="Tooltip(thumbui/newfolder)">
+  <xmbtext>Sposta i file selezionati in una nuova cartella</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderviewpopup" xmbdesc="Tooltip(thumbui/folderviewpopup)">
+  <xmbtext>Visualizza opzioni</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderview" xmbdesc="Tooltip(thumbui/folderview)">
+  <xmbtext>Imposta la visualizzazione per mostrare la struttura di cartelle ad albero</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/flatview" xmbdesc="Tooltip(thumbui/flatview)">
+  <xmbtext>Imposta la visualizzazione per mostrare la struttura di cartelle flat</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newalbum" xmbdesc="Tooltip(thumbui/newalbum)">
+  <xmbtext>Crea nuovo album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateright" xmbdesc="Tooltip(thumbui/rotateright)">
+  <xmbtext>Ruota in senso orario</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Ruota a sinistra</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/smallthumbs" xmbdesc="Tooltip(thumbui/smallthumbs)">
+  <xmbtext>Visualizza immagini con miniature piccole</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/largethumbs" xmbdesc="Tooltip(thumbui/largethumbs)">
+  <xmbtext>Visualizza immagini con miniature grandi</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/next" xmbdesc="Tooltip(thumbui/next)">
+  <xmbtext>Visualizza immagine successiva</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/prev" xmbdesc="Tooltip(thumbui/prev)">
+  <xmbtext>Visualizza immagine precedente</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/cd_label" xmbdesc="Text(thumbui/cd_label)">
+  <xmbtext>Crea un CD regalo</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/backup_label" xmbdesc="Text(thumbui/backup_label)">
+  <xmbtext>Esegui backup foto</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/replication_label" xmbdesc="Text(thumbui/replication_label)">
+  <xmbtext>Caricamento collettivo</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_text" xmbdesc="Label(thumbui/lightbox_esolo_text)">
+  <xmbtext>Nessun risultato trovato in questo album</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_button" xmbdesc="Label(thumbui/lightbox_esolo_button)">
+  <xmbtext>Cerca tutto</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/single_action_message" xmbdesc="Label(thumbui/single_action_message)">
+  <xmbtext>Seleziona elementi da aggiungere al vassoio clip del tuo progetto, quindi premi il pulsante &quot;Indietro&quot; per tornare al progetto</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_return" xmbdesc="Tooltip(thumbui/single_action_return)">
+  <xmbtext>Torna all&#039;elemento da modificare</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_close" xmbdesc="Tooltip(thumbui/single_action_close)">
+  <xmbtext>Annulla &quot;Scarica altro&quot;</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setin" xmbdesc="Tooltip(video_control_bar/setin)">
+  <xmbtext>Crea un nuovo punto iniziale</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setout" xmbdesc="Tooltip(video_control_bar/setout)">
+  <xmbtext>Crea un nuovo punto finale</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/moviemode1" xmbdesc="Tooltip(video_control_bar/moviemode1)">
+  <xmbtext>Riproduci su schermo intero</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/1to1" xmbdesc="Tooltip(video_control_bar2/1to1)">
+  <xmbtext>Mostra dimensione effettiva filmato (non espandere)</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/fullscreen" xmbdesc="Tooltip(video_control_bar2/fullscreen)">
+  <xmbtext>Riproduci su schermo intero</xmbtext>
+ </action>
+ <action type="Label" target="oneup/tllabel" xmbdesc="Label(oneup/tllabel)">
+  <xmbtext>Cronologia</xmbtext>
+ </action>
+ <action type="Label" target="oneup/bcklabel" xmbdesc="Label(oneup/bcklabel)">
+  <xmbtext>Esci</xmbtext>
+ </action>
+ <action type="Text" target="oneup/tpslabel" xmbdesc="Text(oneup/tpslabel)">
+  <xmbtext>Tempo di visualizzazione</xmbtext>
+ </action>
+</tooltips>

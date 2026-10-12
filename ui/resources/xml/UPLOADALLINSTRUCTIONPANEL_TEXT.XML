@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Close</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Welcome to Batch Upload</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Check the boxes next to the folders and albums you&#039;d like to work with. Then, pick what you&#039;d like to do. Picasa will filter the items where the operation wouldn&#039;t apply. For example, if an entire folder or album is already online, Picasa won&#039;t show it as an option to upload.</xmbtext>
+ </action>
+</tooltips>

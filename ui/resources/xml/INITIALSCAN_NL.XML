@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Er is een oudere versie van Picasa geïnstalleerd. Wil je je huidige afbeeldingsbibliotheek bijwerken of wilt u uw computer nogmaals doorzoeken op afbeeldingen?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Kies één van de volgende opties:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Mijn bestaande fotobibliotheek bijwerken</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Kies deze optie als u trefwoorden of aangepaste albums die u in Picasa 1 gebruikt, wilt behouden in Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Computer nogmaals doorzoeken op afbeeldingen</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Kies deze optie voor het vollediger doorzoeken van uw computer, waarbij ook uitgebreide afbeeldingsgegevens worden gescand. Uw bestaande bewerkingen en structuur worden behouden, maar uw zoekwoorden niet. Het zoeken kan enkele minuten duren.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Als u naar foto&#039;s zoekt, worden de bestanden nooit naar nieuwe locaties verplaatst of gekopieerd. U kunt met het hulpprogramma &#039;Mappenbeheer&#039; (beschikbaar in het menu &#039;Extra&#039;) kiezen welke mappen door Picasa worden weergegeven.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Doorgaan</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa is gereed om naar afbeeldingen te zoeken op uw computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Kies één van de volgende opties:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Foto&#039;s zoeken op mijn computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Selecteer deze optie als u afbeeldingen heeft opgeslagen in verschillende mappen op uw computer, vooral als u afbeeldingen heeft opgeslagen op meer dan één vaste schijf.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Alleen Documenten, Afbeeldingen, het bureaublad en iPhoto-bibliotheek scannen</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Selecteer deze optie als u uw afbeeldingen alleen opslaat in deze mappen.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Bij het zoeken naar foto&#039;s worden de bestanden nooit naar nieuwe locaties verplaatst of gekopieerd. Via het hulpprogramma &#039;Mappenbeheer&#039; (beschikbaar in het menu &#039;Extra&#039;) kunt u kiezen welke mappen in Picasa worden weergegeven.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Doorgaan</xmbtext>
+ </action>
+</tooltips>

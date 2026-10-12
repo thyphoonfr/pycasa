@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="collab/uploadsize_label" xmbdesc="Text(collab/uploadsize_label)">
+  <xmbtext>Taille d&#039;importation</xmbtext>
+ </action>
+ <action type="Text" target="collab/privacy_label" xmbdesc="Text(collab/privacy_label)">
+  <xmbtext>Confidentialité</xmbtext>
+ </action>
+ <action type="Text" target="collab/choose_contact_label" xmbdesc="Text(collab/choose_contact_label)">
+  <xmbtext>Sélectionner un contact :</xmbtext>
+ </action>
+ <action type="Text" target="collab/contact_album_list_label" xmbdesc="Text(collab/contact_album_list_label)">
+  <xmbtext>Albums du contact auxquels vous pouvez participer :</xmbtext>
+ </action>
+ <action type="Label" target="collab/ok" xmbdesc="Label(collab/ok)">
+  <xmbtext>Importer</xmbtext>
+ </action>
+ <action type="Label" target="collab/cancel" xmbdesc="Label(collab/cancel)">
+  <xmbtext>Annuler</xmbtext>
+ </action>
+ <action type="Label" target="collab/storagetext" xmbdesc="Label(collab/storagetext)">
+  <xmbtext>En savoir plus...</xmbtext>
+ </action>
+</tooltips>

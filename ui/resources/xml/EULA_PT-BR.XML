@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Leia os termos do contrato de licença antes de usar o Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Ao usar o Picasa, o usuário concorda com os Termos de Serviço e a Política de Privacidade do Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Termos de Serviço</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/pt-BR/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Política de Privacidade</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/pt-BR/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Enviar estatísticas de uso anônimas para o Google. É possível alterar essa configuração mais tarde.</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Concordo</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

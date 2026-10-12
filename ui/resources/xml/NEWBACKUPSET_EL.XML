@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="newbackupset/window1.title">
+  <xmbtext>Νέο σύνολο αντιγράφων ασφαλείας</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup2.title">
+  <xmbtext>Όνομα:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/typegroup.title">
+  <xmbtext>Τύπος αντιγράφου ασφαλείας:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio6.title">
+  <xmbtext>Αντίγραφο ασφαλείας CD ή DVD</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio7.title">
+  <xmbtext>Δημιουργία αντιγράφου ασφαλείας δίσκου σε δίσκο (disk-to-disk, για εξωτερικές μονάδες και μονάδες δικτύου)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/disk.title">
+  <xmbtext>Επιλέξτε...</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup12.title">
+  <xmbtext>Αρχεία προς δημιουργία αντιγράφων ασφαλείας:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio14.title">
+  <xmbtext>Όλοι οι τύποι αρχείων</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio15.title">
+  <xmbtext>Όλες οι φωτογραφίες (όχι ταινίες)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio16.title">
+  <xmbtext>Μόνο αρχεία JPEG με πληροφορίες φωτογραφικής μηχανής</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/ok.title">
+  <xmbtext>Δημιουργία</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/button19.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

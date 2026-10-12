@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_welcome/window.title">
+  <xmbtext>Säkerhetskopiering i Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/welcometext.title">
+  <xmbtext>Säkerhetskopiera foton och filmklipp från datorn automatiskt, inklusive hårddiskar och minneskort</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_text.title">
+  <xmbtext>Genom att använda Säkerhetskopiering i Google Foto godkänner du</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.title">
+  <xmbtext>Googles användarvillkor</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.url">
+  <xmbtext>https://www.google.com/policies/terms</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/sign_in.title">
+  <xmbtext>Fortsätt</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/switch_account.title">
+  <xmbtext>Byt konto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/get_started.title">
+  <xmbtext>Fortsätt</xmbtext>
+ </stringres>
+</resources>

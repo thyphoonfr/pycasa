@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="collagepanel/addclips" xmbdesc="Tooltip(collagepanel/addclips)">
+  <xmbtext>Kijelölt klipek felvétele a kollázsba</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/deleteclips" xmbdesc="Tooltip(collagepanel/deleteclips)">
+  <xmbtext>A kijelölt képek eltávolítása a tálcáról </xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/getmoreclips" xmbdesc="Label(collagepanel/getmoreclips)">
+  <xmbtext>Továbbiak...</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/getmoreclips" xmbdesc="Tooltip(collagepanel/getmoreclips)">
+  <xmbtext>További képek beolvasása a könyvtárból</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab1" xmbdesc="Label(collagepanel/tab1)">
+  <xmbtext>Beállítások</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab2" xmbdesc="Label(collagepanel/tab2)">
+  <xmbtext>Képek</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/shadow_checkbox_label" xmbdesc="Label(collagepanel/shadow_checkbox_label)">
+  <xmbtext>Árnyékok rajzolása</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/caption_checkbox_label" xmbdesc="Label(collagepanel/caption_checkbox_label)">
+  <xmbtext>Képfeliratok megjelenítése</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/caption_checkbox" xmbdesc="Tooltip(collagepanel/caption_checkbox)">
+  <xmbtext>Képfeliratok szövegként való megjelenítése &quot;Polaroid fényképezőgép&quot; szegélyű képeken</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_frame_center-label" xmbdesc="Label(collagepanel/set_frame_center-label)">
+  <xmbtext>Beállítás képkockaközéppontként</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/spacing_label" xmbdesc="Label(collagepanel/spacing_label)">
+  <xmbtext>Rács vastagsága</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/min_spacing_label" xmbdesc="Label(collagepanel/min_spacing_label)">
+  <xmbtext>Egyik sem</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/max_spacing_label" xmbdesc="Label(collagepanel/max_spacing_label)">
+  <xmbtext>Maximális</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_settings_title" xmbdesc="Label(collagepanel/bkg_settings_title)">
+  <xmbtext>Háttér beállításai</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/borders_label" xmbdesc="Label(collagepanel/borders_label)">
+  <xmbtext>Képszegélyek</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/format_title" xmbdesc="Label(collagepanel/format_title)">
+  <xmbtext>Oldalformátum</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_order-label" xmbdesc="Label(collagepanel/rand_order-label)">
+  <xmbtext>Képek összekeverése</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_placement-label" xmbdesc="Label(collagepanel/rand_placement-label)">
+  <xmbtext>Véletlenszerű kollázs</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/view_and_edit-label" xmbdesc="Label(collagepanel/view_and_edit-label)">
+  <xmbtext>Megjelenítés és szerkesztés</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/cancelbutton-label" xmbdesc="Label(collagepanel/cancelbutton-label)">
+  <xmbtext>Bezárás</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/resetbutton-label" xmbdesc="Label(collagepanel/resetbutton-label)">
+  <xmbtext>Alaphelyzet</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/makedesktop-label" xmbdesc="Label(collagepanel/makedesktop-label)">
+  <xmbtext>Asztali háttérkép</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/sharebutton-label" xmbdesc="Label(collagepanel/sharebutton-label)">
+  <xmbtext>Kollázs létrehozása</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/color_bg_label" xmbdesc="Label(collagepanel/color_bg_label)">
+  <xmbtext>Egyszínű</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bitmap_bg_label" xmbdesc="Label(collagepanel/bitmap_bg_label)">
+  <xmbtext>Kép használata</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_all" xmbdesc="Label(collagepanel/select_all)">
+  <xmbtext>Az összes kijelölése</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_none" xmbdesc="Label(collagepanel/select_none)">
+  <xmbtext>Az összes kijelölés megszüntetése</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/remove_node" xmbdesc="Label(collagepanel/remove_node)">
+  <xmbtext>Eltávolítás</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_background" xmbdesc="Label(collagepanel/set_background)">
+  <xmbtext>Beállítás háttérként</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_from_selection" xmbdesc="Label(collagepanel/bkg_from_selection)">
+  <xmbtext>A kijelölt elemek használata</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/portrait" xmbdesc="Tooltip(collagepanel/portrait)">
+  <xmbtext>Álló: A kollázs függőleges tájolása</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/landscape" xmbdesc="Tooltip(collagepanel/landscape)">
+  <xmbtext>Fekvő: a kollázs vízszintes tájolása</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/format_menu" xmbdesc="Tooltip(collagepanel/format_menu)">
+  <xmbtext>Kijelölheti a kollázs viszonylagos szélességét és magasságát</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/delete_custom_aspect" xmbdesc="Tooltip(collagepanel/delete_custom_aspect)">
+  <xmbtext>A jelenlegi méretarány törlése</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/cancelbutton" xmbdesc="Tooltip(collagepanel/cancelbutton)">
+  <xmbtext>A Kollázs lap bezárása</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/makedesktop" xmbdesc="Tooltip(collagepanel/makedesktop)">
+  <xmbtext>JPG formátumban mentheti a képet a Kollázsok albumba, majd beállíthatja az asztalra háttérképként</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/resetbutton" xmbdesc="Tooltip(collagepanel/resetbutton)">
+  <xmbtext>Az összes módosítás visszavonása</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/sharebutton" xmbdesc="Tooltip(collagepanel/sharebutton)">
+  <xmbtext>Mentés JPG formátumban a Kollázsok albumba (a Projektek gyűjteménybe).</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_order" xmbdesc="Tooltip(collagepanel/rand_order)">
+  <xmbtext>A képek sorrendjének véletlenszerűsítése </xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_placement" xmbdesc="Tooltip(collagepanel/rand_placement)">
+  <xmbtext>A kollázs elrendezésének összekeverése</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_all" xmbdesc="Tooltip(collagepanel/select_all)">
+  <xmbtext>Az összes kép kijelölése (Ctrl+A)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_none" xmbdesc="Tooltip(collagepanel/select_none)">
+  <xmbtext>Az összes kép kijelölésének megszüntetése (Ctrl+D)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/remove_node" xmbdesc="Tooltip(collagepanel/remove_node)">
+  <xmbtext>Kijelölt elemek eltávolítása a kollázsból (Del)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/set_background" xmbdesc="Tooltip(collagepanel/set_background)">
+  <xmbtext>A kijelölt kép használata háttérként</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_top" xmbdesc="Tooltip(collagepanel/move_top)">
+  <xmbtext>Kép elhelyezése a kupac tetején</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_up" xmbdesc="Tooltip(collagepanel/move_up)">
+  <xmbtext>Kép feljebb helyezése a kupacban</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_down" xmbdesc="Tooltip(collagepanel/move_down)">
+  <xmbtext>Kép lejjebb helyezése a kupacban</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_bottom" xmbdesc="Tooltip(collagepanel/move_bottom)">
+  <xmbtext>Kép elhelyezése a kupac alján</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_12" xmbdesc="Tooltip(collagepanel/snap_12)">
+  <xmbtext>Forgatás igazítása egyenesre</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_3" xmbdesc="Tooltip(collagepanel/snap_3)">
+  <xmbtext>Forgatás igazítása 90 fokra (jobbra)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_6" xmbdesc="Tooltip(collagepanel/snap_6)">
+  <xmbtext>Forgatás igazítása 180 fokra (jobbra)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_9" xmbdesc="Tooltip(collagepanel/snap_9)">
+  <xmbtext>Forgatás igazítása 270 fokra (jobbra)</xmbtext>
+ </action>
+</tooltips>

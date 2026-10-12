@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="modalprogress/escmessage" xmbdesc="Text(modalprogress/escmessage)">
+  <xmbtext>Tryck på Esc-tangenten för att avbryta</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printlayoutlabel" xmbdesc="Label(printpanel/printlayoutlabel)">
+  <xmbtext>Utskriftslayout</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/walletbutton" xmbdesc="Label(printpanel/walletbutton)">
+  <xmbtext>Plånboksformat</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/walletbutton" xmbdesc="Tooltip(printpanel/walletbutton)">
+  <xmbtext>Skriv ut foton i plånboksstorlek</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/3x5button" xmbdesc="Label(printpanel/3x5button)">
+  <xmbtext>3,5 x 5</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/3x5button" xmbdesc="Tooltip(printpanel/3x5button)">
+  <xmbtext>Skriv ut bilder med standardstorleken 3,5 x 5</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/4x6button" xmbdesc="Label(printpanel/4x6button)">
+  <xmbtext>4 x 6</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/4x6button" xmbdesc="Tooltip(printpanel/4x6button)">
+  <xmbtext>Skriv ut bilder med standardstorleken 4 x 6</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/5x7button" xmbdesc="Label(printpanel/5x7button)">
+  <xmbtext>5 x 7</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/5x7button" xmbdesc="Tooltip(printpanel/5x7button)">
+  <xmbtext>Skriv ut bilder med standardstorleken 5 x 7</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/8x10button" xmbdesc="Label(printpanel/8x10button)">
+  <xmbtext>8 x 10</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/8x10button" xmbdesc="Tooltip(printpanel/8x10button)">
+  <xmbtext>Skriv ut bilder med standardstorleken 8 x 10</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fullbutton" xmbdesc="Label(printpanel/fullbutton)">
+  <xmbtext>Helsida</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fullbutton" xmbdesc="Tooltip(printpanel/fullbutton)">
+  <xmbtext>Skriv ut bilder i samma storlek som papperet</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/croptogglelabel" xmbdesc="Label(printpanel/croptogglelabel)">
+  <xmbtext>Beskär till anpassad storlek</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/croptoggle" xmbdesc="Tooltip(printpanel/croptoggle)">
+  <xmbtext>Beskär fotot så att det matchar valt utskriftsmått</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fittogglelabel" xmbdesc="Label(printpanel/fittogglelabel)">
+  <xmbtext>Förminska</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fittoggle" xmbdesc="Tooltip(printpanel/fittoggle)">
+  <xmbtext>Bevara bildernas originalstorlek</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/captionoptionslabel" xmbdesc="Label(printpanel/captionoptionslabel)">
+  <xmbtext>Kantlinje- och textalternativ</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printerlabel" xmbdesc="Label(printpanel/printerlabel)">
+  <xmbtext>Skrivare</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/setuplabel" xmbdesc="Label(printpanel/setuplabel)">
+  <xmbtext>Skrivarinställningar</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/copieslabel" xmbdesc="Label(printpanel/copieslabel)">
+  <xmbtext>Kopior per bild</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/previewlabel" xmbdesc="Label(printpanel/previewlabel)">
+  <xmbtext>Förhandsvisa</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/prevbutton" xmbdesc="Tooltip(printpanel/prevbutton)">
+  <xmbtext>Visa föregående förhandsvisningssida</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/nextbutton" xmbdesc="Tooltip(printpanel/nextbutton)">
+  <xmbtext>Visa nästa förhandsvisningssida</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printsetuplabel" xmbdesc="Label(printpanel/printsetuplabel)">
+  <xmbtext>Skrivarinställningar</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/captionoptionsbutton" xmbdesc="Tooltip(printpanel/captionoptionsbutton)">
+  <xmbtext>Konfigurera kantlinjer och text för foton som ska skrivas ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/selectprinterbutton" xmbdesc="Tooltip(printpanel/selectprinterbutton)">
+  <xmbtext>Visar en lista över tillgängliga skrivare</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/psetupbutton" xmbdesc="Tooltip(printpanel/psetupbutton)">
+  <xmbtext>Öppna skrivarinställningar för vald skrivare</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/addprintsbutton" xmbdesc="Tooltip(printpanel/addprintsbutton)">
+  <xmbtext>Lägg till en kopia av varje bild som ska skrivas ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/subprintsbutton" xmbdesc="Tooltip(printpanel/subprintsbutton)">
+  <xmbtext>Dra ifrån en kopia av varje bild som ska skrivas ut</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/phelpbutton" xmbdesc="Label(printpanel/phelpbutton)">
+  <xmbtext>Hjälp</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/phelpbutton" xmbdesc="Tooltip(printpanel/phelpbutton)">
+  <xmbtext>Öppna hjälpcentret för att felsöka utskrifter</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/froogle" xmbdesc="Label(printpanel/froogle)">
+  <xmbtext>Sök i Froogle efter förbrukningsartiklar</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/froogle" xmbdesc="Tooltip(printpanel/froogle)">
+  <xmbtext>Sök efter objekt/tillbehör för skrivaren på Froogle</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton" xmbdesc="Label(printpanel/reviewnowbutton)">
+  <xmbtext>Granskning</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton" xmbdesc="Tooltip(printpanel/reviewnowbutton)">
+  <xmbtext>Se till att bilderna är klara för utskrift</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton2" xmbdesc="Label(printpanel/reviewnowbutton2)">
+  <xmbtext>Granskning</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton2" xmbdesc="Tooltip(printpanel/reviewnowbutton2)">
+  <xmbtext>Se till att bilderna är klara för utskrift</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton" xmbdesc="Label(printpanel/pnowbutton)">
+  <xmbtext>Skriv ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton" xmbdesc="Tooltip(printpanel/pnowbutton)">
+  <xmbtext>Skriv ut bilder nu med aktuella inställningar</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton2" xmbdesc="Label(printpanel/pnowbutton2)">
+  <xmbtext>Skriv ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton2" xmbdesc="Tooltip(printpanel/pnowbutton2)">
+  <xmbtext>Skriv ut bilder nu med aktuella inställningar</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pcancelbutton" xmbdesc="Label(printpanel/pcancelbutton)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pcancelbutton" xmbdesc="Tooltip(printpanel/pcancelbutton)">
+  <xmbtext>Avbryt utskriften och återgå till miniatyrvyn</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/tllabel" xmbdesc="Label(editoneup/tllabel)">
+  <xmbtext>Kronologiskt</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/bcklabel" xmbdesc="Label(editoneup/bcklabel)">
+  <xmbtext>Avsluta</xmbtext>
+ </action>
+ <action type="Text" target="editoneup/tpslabel" xmbdesc="Text(editoneup/tpslabel)">
+  <xmbtext>Visa tid</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/sbutton" xmbdesc="Label(editpanel/sbutton)">
+  <xmbtext>Spela upp</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/sbutton" xmbdesc="Tooltip(editpanel/sbutton)">
+  <xmbtext>Visa ett bildspel med de här fotona</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edithelpbutton" xmbdesc="Tooltip(editpanel/edithelpbutton)">
+  <xmbtext>Hjälp</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/weblink" xmbdesc="Tooltip(editpanel/weblink)">
+  <xmbtext>Fortsätt till webbplatsen som är kopplad till den här bilden</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editcollage" xmbdesc="Label(editpanel/editcollage)">
+  <xmbtext>Redigera collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editcollage" xmbdesc="Tooltip(editpanel/editcollage)">
+  <xmbtext>Redigera det collaga som den här bilden skapades från</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/fit" xmbdesc="Tooltip(editpanel/fit)">
+  <xmbtext>Anpassa bild till visningsområde</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/1to1" xmbdesc="Tooltip(editpanel/1to1)">
+  <xmbtext>Visa bild i verklig storlek</xmbtext>
+ </action>
+ <action type="Text" target="nerdview/nvhead" xmbdesc="Text(nerdview/nvhead)">
+  <xmbtext>Histogram och kamerainformation</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captionbutton" xmbdesc="Tooltip(editpanel/captionbutton)">
+  <xmbtext>Visa/dölj förklaring</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/toggle_left_drawer" xmbdesc="Tooltip(editpanel/toggle_left_drawer)">
+  <xmbtext>Visa/dölj redigeringskontroller</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captiontrash" xmbdesc="Tooltip(editpanel/captiontrash)">
+  <xmbtext>Radera denna beskrivning</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/refining_label" xmbdesc="Text(editpanel/refining_label)">
+  <xmbtext>Förfinar...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_ok" xmbdesc="Label(editpanel/tool_ok)">
+  <xmbtext>TILLÄMPA</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_cancel" xmbdesc="Label(editpanel/tool_cancel)">
+  <xmbtext>AVBRYT</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editslideshow" xmbdesc="Label(editpanel/editslideshow)">
+  <xmbtext>Redigera film</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editslideshow" xmbdesc="Tooltip(editpanel/editslideshow)">
+  <xmbtext>Redigera den här filmpresentationen</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/albumview" xmbdesc="Label(editpanel/albumview)">
+  <xmbtext>Tillbaka till bibliotek</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/albumview" xmbdesc="Tooltip(editpanel/albumview)">
+  <xmbtext>Tillbaka till sorterade miniatyrer</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/quickupload" xmbdesc="Tooltip(editpanel/quickupload)">
+  <xmbtext>Ladda upp till inlämningsfacket i Webbalbum</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/uploadchanges" xmbdesc="Tooltip(editpanel/uploadchanges)">
+  <xmbtext>Uppdatera onlinekopian med den här versionen</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label" xmbdesc="Label(editpanel/selection_label)">
+  <xmbtext>Vald</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label_zoom" xmbdesc="Label(editpanel/selection_label_zoom)">
+  <xmbtext>Vald</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_focus" xmbdesc="Tooltip(editpanel/swap_2up_focus)">
+  <xmbtext>Växla bild i fokus</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_layout" xmbdesc="Tooltip(editpanel/swap_2up_layout)">
+  <xmbtext>Växla mellan horisontell och vertikal layout</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/aa_2up_toggle" xmbdesc="Tooltip(editpanel/aa_2up_toggle)">
+  <xmbtext>Visa samma bild två gånger</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ab_2up_toggle" xmbdesc="Tooltip(editpanel/ab_2up_toggle)">
+  <xmbtext>Visa två olika bilder</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/only_1up_toggle" xmbdesc="Tooltip(editpanel/only_1up_toggle)">
+  <xmbtext>Visa endast en bild</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab1" xmbdesc="Tooltip(editpanel/tab1)">
+  <xmbtext>Vanliga korrigeringar</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab2" xmbdesc="Tooltip(editpanel/tab2)">
+  <xmbtext>Finjusterad ljussättning och färgkorrigeringar</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab3" xmbdesc="Tooltip(editpanel/tab3)">
+  <xmbtext>Rolig och praktisk bildbearbetning</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab4" xmbdesc="Tooltip(editpanel/tab4)">
+  <xmbtext>Rolig och praktisk bildbearbetning</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab5" xmbdesc="Tooltip(editpanel/tab5)">
+  <xmbtext>Rolig och praktisk bildbearbetning</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop" xmbdesc="Label(editpanel/crop)">
+  <xmbtext>Beskär</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop" xmbdesc="Tooltip(editpanel/crop)">
+  <xmbtext>Beskär bilden till ett annat format</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye" xmbdesc="Label(editpanel/redeye)">
+  <xmbtext>Röda ögon</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeye" xmbdesc="Tooltip(editpanel/redeye)">
+  <xmbtext>Reparera röda ögon-fel i bilden</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autolighting" xmbdesc="Label(editpanel/autolighting)">
+  <xmbtext>Automatisk kontrast</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autolighting" xmbdesc="Tooltip(editpanel/autolighting)">
+  <xmbtext>Korrigera exponering utan att påverka färg</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autocolor" xmbdesc="Label(editpanel/autocolor)">
+  <xmbtext>Automatisk färg</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autocolor" xmbdesc="Tooltip(editpanel/autocolor)">
+  <xmbtext>Ta bort färgskiftningar automatiskt</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch" xmbdesc="Label(editpanel/retouch)">
+  <xmbtext>Retuschera</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouch" xmbdesc="Tooltip(editpanel/retouch)">
+  <xmbtext>Ta bort fläckar, damm och repor</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/edittext" xmbdesc="Label(editpanel/edittext)">
+  <xmbtext>Text</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik" xmbdesc="Label(editpanel/picnik)">
+  <xmbtext>Redigera i Kreativa verktyg</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik" xmbdesc="Tooltip(editpanel/picnik)">
+  <xmbtext>Redigera ett foto online med Kreativa verktyg</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/showtextlabel" xmbdesc="Label(editpanel/showtextlabel)">
+  <xmbtext>Visa text</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edittext" xmbdesc="Tooltip(editpanel/edittext)">
+  <xmbtext>Lägg till/redigera text i ett foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/showtextcheckbox" xmbdesc="Tooltip(editpanel/showtextcheckbox)">
+  <xmbtext>Växla mellan att visa och dölja text i ett foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filllight_icon" xmbdesc="Tooltip(editpanel/filllight_icon)">
+  <xmbtext>Fyll belysning: Justera omgivningsljuset i bilden</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/horizonadjust" xmbdesc="Label(editpanel/horizonadjust)">
+  <xmbtext>Räta ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/horizonadjust" xmbdesc="Tooltip(editpanel/horizonadjust)">
+  <xmbtext>Korrigera ett skevt foto</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/enhance" xmbdesc="Label(editpanel/enhance)">
+  <xmbtext>Jag chansar</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/enhance" xmbdesc="Tooltip(editpanel/enhance)">
+  <xmbtext>Ljus- och färgkorrigering med ett klick</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/ok" xmbdesc="Label(editpanel/ok)">
+  <xmbtext>Verkställ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ok" xmbdesc="Tooltip(editpanel/ok)">
+  <xmbtext>Utför ändringar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cancel" xmbdesc="Label(editpanel/cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cancel" xmbdesc="Tooltip(editpanel/cancel)">
+  <xmbtext>Avbryt ändringar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_undo" xmbdesc="Label(editpanel/filter_undo)">
+  <xmbtext>Ångra</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_undo" xmbdesc="Tooltip(editpanel/filter_undo)">
+  <xmbtext>Ta bort den senaste korrigeringen eller redigeringen</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_redo" xmbdesc="Label(editpanel/filter_redo)">
+  <xmbtext>Gör om</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_redo" xmbdesc="Tooltip(editpanel/filter_redo)">
+  <xmbtext>Tillämpa en borttagen korrigering eller redigering på nytt</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop_label" xmbdesc="Label(editpanel/crop_label)">
+  <xmbtext>Beskär bild</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croptext" xmbdesc="Label(editpanel/croptext)">
+  <xmbtext>Välj en dimension nedan och klicka och dra sedan i bilden för att välja vilken del av bilden som ska beskäras.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croprotatecrop" xmbdesc="Label(editpanel/croprotatecrop)">
+  <xmbtext>Rotera</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croprotatecrop" xmbdesc="Tooltip(editpanel/croprotatecrop)">
+  <xmbtext>Växlar mellan stående och liggande orientering</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croppreview" xmbdesc="Label(editpanel/croppreview)">
+  <xmbtext>Förhandsvisa</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croppreview" xmbdesc="Tooltip(editpanel/croppreview)">
+  <xmbtext>Förhandsvisar markerad beskärning</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropdiscard" xmbdesc="Label(editpanel/cropdiscard)">
+  <xmbtext>Återställ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropdiscard" xmbdesc="Tooltip(editpanel/cropdiscard)">
+  <xmbtext>Tar bort tillämpade beskärningar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropapply" xmbdesc="Label(editpanel/cropapply)">
+  <xmbtext>Verkställ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropapply" xmbdesc="Tooltip(editpanel/cropapply)">
+  <xmbtext>Tillämpa beskärningsändringar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropcancel" xmbdesc="Label(editpanel/cropcancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropcancel" xmbdesc="Tooltip(editpanel/cropcancel)">
+  <xmbtext>Avslutar beskärningsverktyget</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop_delete_custom" xmbdesc="Tooltip(editpanel/crop_delete_custom)">
+  <xmbtext>Tar bort det aktuella höjd-/breddförhållandet</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye_label" xmbdesc="Label(editpanel/redeye_label)">
+  <xmbtext>Ta bort röda ögon</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyetext" xmbdesc="Label(editpanel/redeyetext)">
+  <xmbtext>Klicka, håll ned och dra musen runt varje öga separat för att markera det. En markeringsruta visas över området. Släpp musen när du är klar. Bilden visas med det röda ögat korrigerat.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeauto" xmbdesc="Label(editpanel/redeyeauto)">
+  <xmbtext>Automatiskt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeauto" xmbdesc="Tooltip(editpanel/redeyeauto)">
+  <xmbtext>Korrigera Röda ögon igen</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyepreview" xmbdesc="Label(editpanel/redeyepreview)">
+  <xmbtext>Förhandsvisa</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyepreview" xmbdesc="Tooltip(editpanel/redeyepreview)">
+  <xmbtext>Förhandsgranska ändringar utan konturer</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyecancel" xmbdesc="Label(editpanel/redeyecancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyecancel" xmbdesc="Tooltip(editpanel/redeyecancel)">
+  <xmbtext>Avsluta röda ögon-korrigering utan att tillämpa effekt</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeapply" xmbdesc="Label(editpanel/redeyeapply)">
+  <xmbtext>Verkställ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeapply" xmbdesc="Tooltip(editpanel/redeyeapply)">
+  <xmbtext>Tillämpa effekter och avsluta röda ögon-korrigering</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyediscard" xmbdesc="Label(editpanel/redeyediscard)">
+  <xmbtext>Återställ</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyediscard" xmbdesc="Tooltip(editpanel/redeyediscard)">
+  <xmbtext>Ångra röda ögon-ändringar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_label" xmbdesc="Label(editpanel/retouch_label)">
+  <xmbtext>Retuschera småfel</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchtext" xmbdesc="Label(editpanel/retouchtext)">
+  <xmbtext>Klicka för att välja det område som ska korrigeras. Flytta sedan musen för att visa en förhandsgranskning av området som ska ersättas. Klicka på bilden igen för att slutföra. Prova dig fram tills det blir som du vill ha det. Obs! Du kan panorera genom att trycka på ctrl och dra.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_brush_label" xmbdesc="Label(editpanel/retouch_brush_label)">
+  <xmbtext>Penselstorlek</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchreset" xmbdesc="Label(editpanel/retouchreset)">
+  <xmbtext>Återställ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchundo" xmbdesc="Label(editpanel/retouchundo)">
+  <xmbtext>Ångra korrigering</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchredo" xmbdesc="Label(editpanel/retouchredo)">
+  <xmbtext>Gör om korrigering</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchapply" xmbdesc="Label(editpanel/retouchapply)">
+  <xmbtext>Verkställ</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchcancel" xmbdesc="Label(editpanel/retouchcancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchreset" xmbdesc="Tooltip(editpanel/retouchreset)">
+  <xmbtext>Ta bort alla retuscheringsstycken</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchundo" xmbdesc="Tooltip(editpanel/retouchundo)">
+  <xmbtext>Ta bort det senaste retuscheringsstycket</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchredo" xmbdesc="Tooltip(editpanel/retouchredo)">
+  <xmbtext>Tillämpa ett borttaget retuscheringsstycke på nytt</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchapply" xmbdesc="Tooltip(editpanel/retouchapply)">
+  <xmbtext>Ändra och avsluta retuscheringsverktyget</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchcancel" xmbdesc="Tooltip(editpanel/retouchcancel)">
+  <xmbtext>Avsluta retuscheringsverktyget utan att redigera</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_lighting" xmbdesc="Tooltip(editpanel/magic_lighting)">
+  <xmbtext>Ljuskorrigering med ett klick</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_color" xmbdesc="Tooltip(editpanel/magic_color)">
+  <xmbtext>Färgkorrigering med ett klick</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/droppertoggle" xmbdesc="Tooltip(editpanel/droppertoggle)">
+  <xmbtext>Du kan välja ett neutralt grått eller vitt parti i bilden för att ta bort färgskiftningar</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/greybalancelabel" xmbdesc="Label(editpanel/greybalancelabel)">
+  <xmbtext>Neutral färgpipett</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filllightlabel" xmbdesc="Label(editpanel/filllightlabel)">
+  <xmbtext>Fyll belysning</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik_fx_label" xmbdesc="Label(editpanel/picnik_fx_label)">
+  <xmbtext>Effekter av</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik_fx" xmbdesc="Tooltip(editpanel/picnik_fx)">
+  <xmbtext>Prova fler effekter i Kreativa verktyg</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/in_progress_label" xmbdesc="Label(editpanel/in_progress_label)">
+  <xmbtext>Pågår...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/render_now" xmbdesc="Label(editpanel/render_now)">
+  <xmbtext>Skapa nu</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnikcancel" xmbdesc="Label(editpanel/picnikcancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/picnikprogressdone" xmbdesc="Text(editpanel/picnikprogressdone)">
+  <xmbtext>Klicka på &#039;Spara till Picasa&#039; när du är klar med redigeringen.</xmbtext>
+ </action>
+ <action type="Text1" target="editpanel/picnikprogress" xmbdesc="Text1(editpanel/picnikprogress)">
+  <xmbtext>Överför foto till Kreativa verktyg ...</xmbtext>
+ </action>
+ <action type="Text2" target="editpanel/picnikprogress" xmbdesc="Text2(editpanel/picnikprogress)">
+  <xmbtext>Ansluter till Kreativa verktyg ...</xmbtext>
+ </action>
+ <action type="Text3" target="editpanel/picnikprogress" xmbdesc="Text3(editpanel/picnikprogress)">
+  <xmbtext>Vänta. Överför foto från Kreativa verktyg ...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label0" xmbdesc="Label(editpanel/colorwheel_label0)">
+  <xmbtext>Välj färg</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label1" xmbdesc="Label(editpanel/colorwheel_label1)">
+  <xmbtext>Välj färg</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_youtube" xmbdesc="Label(movieeditpanel/export_youtube)">
+  <xmbtext>Ladda upp till YouTube</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_movie" xmbdesc="Label(movieeditpanel/export_movie)">
+  <xmbtext>Exportera klipp</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/reset_trim" xmbdesc="Label(movieeditpanel/reset_trim)">
+  <xmbtext>Återställ start och slut</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/capture_frame" xmbdesc="Label(movieeditpanel/capture_frame)">
+  <xmbtext>Ta en bild</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_youtube" xmbdesc="Tooltip(movieeditpanel/export_youtube)">
+  <xmbtext>Ladda upp din film till YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_movie" xmbdesc="Tooltip(movieeditpanel/export_movie)">
+  <xmbtext>Spara filmklippet mellan start- och slutpunkterna.</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/reset_trim" xmbdesc="Tooltip(movieeditpanel/reset_trim)">
+  <xmbtext>Återställ filmen till orginallängden (ta bort start- och slutpunkterna)</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/capture_frame" xmbdesc="Tooltip(movieeditpanel/capture_frame)">
+  <xmbtext>Kopiera aktuell ram</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>Skriv ut</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>Skriv ut bilder i bildfacket</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>E-post</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>Skicka bilder i bildfacket per e-post</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>Skapa ett bildcollage med ditt urval</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>Film</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>Skapa en filmpresentation med de markerade objekten</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>Skicka bilder i bildfacket till Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Ladda upp bilder på Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Ladda upp bilder på Blogger</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>Butik</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>Köp fotokopior och produkter från din favoritleverantör online </xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>Exportera</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>Kopiera bilder i bildfacket till en mapp på hårddisken</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>Mer …</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>Klicka för att visa fler alternativ</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/makemovietab" xmbdesc="Label(panelroot/makemovietab)">
+  <xmbtext>Movie Maker</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/collagetab" xmbdesc="Label(panelroot/collagetab)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/acquiretab" xmbdesc="Label(panelroot/acquiretab)">
+  <xmbtext>Importera</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/capturemovietab" xmbdesc="Label(panelroot/capturemovietab)">
+  <xmbtext>Fånga</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/picasatab" xmbdesc="Label(panelroot/picasatab)">
+  <xmbtext>Bibliotek</xmbtext>
+ </action>
+ <action type="Label" target="publish/giftcdtext" xmbdesc="Label(publish/giftcdtext)">
+  <xmbtext>De objekt som har markerats ovan kommer att inkluderas på din present-cd. Om du vill lägga till fler objekt klickar du på Lägg till mer nedan.</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_cdname" xmbdesc="Text(publish/label_cdname)">
+  <xmbtext>Namn på cd</xmbtext>
+ </action>
+ <action type="Text" target="publish/namelimitext" xmbdesc="Text(publish/namelimitext)">
+  <xmbtext>Max. 16 tecken</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox1" xmbdesc="Text(publish/label_optionbox1)">
+  <xmbtext>Inkludera bildspel</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox2" xmbdesc="Text(publish/label_optionbox2)">
+  <xmbtext>Radera media</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox3" xmbdesc="Text(publish/label_optionbox3)">
+  <xmbtext>Inkludera Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_go" xmbdesc="Label(publish/presentcd_go)">
+  <xmbtext>Bränn cd</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_help" xmbdesc="Label(publish/presentcd_help)">
+  <xmbtext>Hjälp</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_eject" xmbdesc="Label(publish/presentcd_eject)">
+  <xmbtext>Mata ut</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_cancel" xmbdesc="Label(publish/presentcd_cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Lägg till mer...</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Lägg till mer...</xmbtext>
+ </action>
+ <action type="Text" target="publish/selectiontext" xmbdesc="Text(publish/selectiontext)">
+  <xmbtext>Urval och inställningar</xmbtext>
+ </action>
+ <action type="Text" target="publish/picsizetext" xmbdesc="Text(publish/picsizetext)">
+  <xmbtext>Fotostorlek</xmbtext>
+ </action>
+ <action type="Text" target="publish/cdnametext" xmbdesc="Text(publish/cdnametext)">
+  <xmbtext>Ge present-cd:n ett namn</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backupcdheader" xmbdesc="Text1(publish/backupcdheader)">
+  <xmbtext>Skapa cd med säkerhetskopia</xmbtext>
+ </action>
+ <action type="Text2" target="publish/backupcdheader" xmbdesc="Text2(publish/backupcdheader)">
+  <xmbtext>Skapa en ny uppsättning eller använd en befintlig uppsättning</xmbtext>
+ </action>
+ <action type="Label" target="publish/backupcdheader2" xmbdesc="Label(publish/backupcdheader2)">
+  <xmbtext>Välj mappar och album att säkerhetskopiera</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backuptext" xmbdesc="Text1(publish/backuptext)">
+  <xmbtext>Objekt som säkerhetskopieras sparar information om var de säkerhetskopierade filerna sparas samt om vilka filer som redan har säkerhetskopierats så att du inte behöver säkerhetskopiera dem igen.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext2" xmbdesc="Label(publish/backuptext2)">
+  <xmbtext>Picasa visar nu de filer som inte har säkerhetskopierats tidigare.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext3" xmbdesc="Label(publish/backuptext3)">
+  <xmbtext>Kryssmarkera de mappar som du vill säkerhetskopiera eller välj Markera alla för att välja samtliga objekt.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_go" xmbdesc="Label(publish/backup_go)">
+  <xmbtext>Bränn cd</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_help" xmbdesc="Label(publish/backup_help)">
+  <xmbtext>Hjälp</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_eject" xmbdesc="Label(publish/backup_eject)">
+  <xmbtext>Mata ut</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_cancel" xmbdesc="Label(publish/backup_cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Label" target="publish/newbackupset" xmbdesc="Label(publish/newbackupset)">
+  <xmbtext>Ny uppsättning</xmbtext>
+ </action>
+ <action type="Label" target="publish/deletebackupset" xmbdesc="Label(publish/deletebackupset)">
+  <xmbtext>Radera uppsättning</xmbtext>
+ </action>
+ <action type="Label" target="publish/editbackupset" xmbdesc="Label(publish/editbackupset)">
+  <xmbtext>Redigera uppsättning</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_backupname" xmbdesc="Text(publish/label_backupname)">
+  <xmbtext>Objekt som säkerhetskopieras</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectall" xmbdesc="Label(publish/selectall)">
+  <xmbtext>Markera alla</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectnone" xmbdesc="Label(publish/selectnone)">
+  <xmbtext>Markera inga</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox1" xmbdesc="Label(publish/label_rpoptionbox1)">
+  <xmbtext>Ladda upp</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox1" xmbdesc="Tooltip(publish/rpoptionbox1)">
+  <xmbtext>Den valda mappen och/eller de valda albumen laddas upp</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox2" xmbdesc="Label(publish/label_rpoptionbox2)">
+  <xmbtext>Ändringsalternativ</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox2" xmbdesc="Tooltip(publish/rpoptionbox2)">
+  <xmbtext>Valda mappar och/eller album uppdateras online  med de alternativ som anges i menyerna till höger</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox3" xmbdesc="Label(publish/label_rpoptionbox3)">
+  <xmbtext>Ta bort online</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Valda mappar och/eller album tas inte bort från Picasa Webbalbum</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Valda mappar och/eller album tas inte bort från Picasa Webbalbum</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_go" xmbdesc="Label(publish/replicate_go)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_go" xmbdesc="Tooltip(publish/replicate_go)">
+  <xmbtext>Den åtgärd du valt utförs</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_cancel" xmbdesc="Label(publish/replicate_cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_cancel" xmbdesc="Tooltip(publish/replicate_cancel)">
+  <xmbtext>Återvänd till biblioteket utan att göra några ändringar online</xmbtext>
+ </action>
+ <action type="Label" target="publish/upgradestorage" xmbdesc="Label(publish/upgradestorage)">
+  <xmbtext>Uppgradera lagringsutrymme</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/upgradestorage" xmbdesc="Tooltip(publish/upgradestorage)">
+  <xmbtext>Med större lagringsutrymme kan du ladda upp fler foton</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallactionstitle" xmbdesc="Text(publish/uploadallactionstitle)">
+  <xmbtext>Välj åtgärd för markerade mappar och album:</xmbtext>
+ </action>
+ <action type="Text1" target="publish/uploadallinfotext" xmbdesc="Text1(publish/uploadallinfotext)">
+  <xmbtext>I Picasa visas nu enbart mappar och album som innehåller foton som du inte har laddat upp tidigare.</xmbtext>
+ </action>
+ <action type="Text2" target="publish/uploadallinfotext" xmbdesc="Text2(publish/uploadallinfotext)">
+  <xmbtext>I Picasa visas nu enbart mappar och album som innehåller foton som redan finns online och som inte motsvarar de alternativ du har valt.</xmbtext>
+ </action>
+ <action type="Text3" target="publish/uploadallinfotext" xmbdesc="Text3(publish/uploadallinfotext)">
+  <xmbtext>I Picasa visas nu enbart mappar och album som innehåller foton som redan är online.</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallstoragetitle" xmbdesc="Text(publish/uploadallstoragetitle)">
+  <xmbtext>Lagring:</xmbtext>
+ </action>
+ <action type="Text" target="publish/used_storage" xmbdesc="Text(publish/used_storage)">
+  <xmbtext>Lagringsutrymme som används för närvarande</xmbtext>
+ </action>
+ <action type="Text" target="publish/full_storage" xmbdesc="Text(publish/full_storage)">
+  <xmbtext>När den här uppladdningen har slutförts använder du allt ditt lagringsutrymme.</xmbtext>
+ </action>
+ <action type="Text" target="publish/needed_storage" xmbdesc="Text(publish/needed_storage)">
+  <xmbtext>Du behöver mer lagringsutrymme för att kunna ladda upp allt !</xmbtext>
+ </action>
+ <action type="Text" target="publish/final_storage" xmbdesc="Text(publish/final_storage)">
+  <xmbtext>Ditt lagringsutrymme efter denna uppladdning</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadalloptionstitle" xmbdesc="Text(publish/uploadalloptionstitle)">
+  <xmbtext>Uppladdningsalternativ:</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsize3" xmbdesc="Text(publish/uploadsize3)">
+  <xmbtext>Storlek:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Storleken på foton när det laddas upp till Picasa webbalbum</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Storleken på foton när det laddas upp till Picasa webbalbum</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadaccess3" xmbdesc="Text(publish/uploadaccess3)">
+  <xmbtext>Synlighet:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Ställ in åtkomst för albumet för Picasa webbalbum</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>Ställ in åtkomst för albumet för Picasa webbalbum</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsync3" xmbdesc="Text(publish/uploadsync3)">
+  <xmbtext>Synk:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsync" xmbdesc="Tooltip(publish/uploadallsync)">
+  <xmbtext>Ändra synkroniseringsinställningen för de valda mapparna och/eller albumen</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/viewallbutton" xmbdesc="Label(searchoptions/viewallbutton)">
+  <xmbtext>Tillbaka till Visa alla</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchoptions/viewallbutton" xmbdesc="Tooltip(searchoptions/viewallbutton)">
+  <xmbtext>Avsluta sökläget</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/label_searchresult" xmbdesc="Label(searchoptions/label_searchresult)">
+  <xmbtext>Sökresultat:</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/timecontainer_label" xmbdesc="Tooltip(searchcontainer/timecontainer_label)">
+  <xmbtext>Filtrera efter datumintervall</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/searchclr" xmbdesc="Tooltip(searchcontainer/searchclr)">
+  <xmbtext>Rensa sökningen</xmbtext>
+ </action>
+ <action type="Label" target="searchcontainer/filter_label" xmbdesc="Label(searchcontainer/filter_label)">
+  <xmbtext>Filter</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/starsearch" xmbdesc="Tooltip(searchcontainer/starsearch)">
+  <xmbtext>Visa endast stjärnmärkta foton </xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/moviesearch" xmbdesc="Tooltip(searchcontainer/moviesearch)">
+  <xmbtext>Visa enbart filmer</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/webview" xmbdesc="Tooltip(searchcontainer/webview)">
+  <xmbtext>Visa bara uppladdningar till webbalbum</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/facesearch" xmbdesc="Tooltip(searchcontainer/facesearch)">
+  <xmbtext>Visa bara foton med ansikten</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/geotagsearch" xmbdesc="Tooltip(searchcontainer/geotagsearch)">
+  <xmbtext>Visa bara foton med geotaggning</xmbtext>
+ </action>
+ <action type="Text1" target="thumbui/lightbox_bgtext" xmbdesc="Text1(thumbui/lightbox_bgtext)">
+  <xmbtext>Inga foton hittades</xmbtext>
+ </action>
+ <action type="Text2" target="thumbui/lightbox_bgtext" xmbdesc="Text2(thumbui/lightbox_bgtext)">
+  <xmbtext>Alla filer i den här uppsättningen har säkerhetskopierats</xmbtext>
+ </action>
+ <action type="Text3" target="thumbui/lightbox_bgtext" xmbdesc="Text3(thumbui/lightbox_bgtext)">
+  <xmbtext>Inga foton hittades för cd</xmbtext>
+ </action>
+ <action type="Text4" target="thumbui/lightbox_bgtext" xmbdesc="Text4(thumbui/lightbox_bgtext)">
+  <xmbtext>Alla foton har laddats upp</xmbtext>
+ </action>
+ <action type="Text5" target="thumbui/lightbox_bgtext" xmbdesc="Text5(thumbui/lightbox_bgtext)">
+  <xmbtext>Alla foton som finns online just nu har dessa inställningar</xmbtext>
+ </action>
+ <action type="Text6" target="thumbui/lightbox_bgtext" xmbdesc="Text6(thumbui/lightbox_bgtext)">
+  <xmbtext>Det går inte att ta bort foton från Picasa Webbalbum</xmbtext>
+ </action>
+ <action type="Text7" target="thumbui/lightbox_bgtext" xmbdesc="Text7(thumbui/lightbox_bgtext)">
+  <xmbtext>Det går inte att ta bort foton från Google Foto</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/albumview" xmbdesc="Label(thumbui/albumview)">
+  <xmbtext>Tillbaka till bibliotek</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/loupehit" xmbdesc="Tooltip(thumbui/loupehit)">
+  <xmbtext>Klicka och dra markören över foton för att förstora dem</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/albumview" xmbdesc="Tooltip(thumbui/albumview)">
+  <xmbtext>Tillbaka till sorterade miniatyrer</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/fullview" xmbdesc="Label(thumbui/fullview)">
+  <xmbtext>Redigera foton</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/fullview" xmbdesc="Tooltip(thumbui/fullview)">
+  <xmbtext>Redigera foton</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/importbutton" xmbdesc="Label(thumbui/importbutton)">
+  <xmbtext>Importera</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/importbutton" xmbdesc="Tooltip(thumbui/importbutton)">
+  <xmbtext>Hämta foton från en kamera, skanner eller annat medium</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/webcambutton" xmbdesc="Tooltip(thumbui/webcambutton)">
+  <xmbtext>Hämta foton eller videofilmer från webbkamera eller annan videoutrustning.</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/sbutton" xmbdesc="Label(thumbui/sbutton)">
+  <xmbtext>Bildspel</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/people_toggle" xmbdesc="Tooltip(thumbui/people_toggle)">
+  <xmbtext>Visa/dölj personpanelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/places_toggle" xmbdesc="Tooltip(thumbui/places_toggle)">
+  <xmbtext>Visa/dölj platspanelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/tags_toggle" xmbdesc="Tooltip(thumbui/tags_toggle)">
+  <xmbtext>Visa/dölj etikettpanelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/properties_toggle" xmbdesc="Tooltip(thumbui/properties_toggle)">
+  <xmbtext>Visa/dölj egenskapspanelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/sbutton" xmbdesc="Tooltip(thumbui/sbutton)">
+  <xmbtext>Visa ett bildspel med foton i vald mapp eller valt album</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/timelinebutton" xmbdesc="Label(thumbui/timelinebutton)">
+  <xmbtext>Kronologiskt</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/timelinebutton" xmbdesc="Tooltip(thumbui/timelinebutton)">
+  <xmbtext>Kronologisk visning av alla foton</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/cdmode" xmbdesc="Label(thumbui/cdmode)">
+  <xmbtext>Present-cd</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/cdmode" xmbdesc="Tooltip(thumbui/cdmode)">
+  <xmbtext>Skapa en cd med bildspel för släkt och vänner</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/backup" xmbdesc="Label(thumbui/backup)">
+  <xmbtext>Säkerhetskopiering</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/backup" xmbdesc="Tooltip(thumbui/backup)">
+  <xmbtext>Arkivera dina foton på en cd eller dvd</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/visitweb" xmbdesc="Label(thumbui/visitweb)">
+  <xmbtext>Webbvy</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/visitweb" xmbdesc="Tooltip(thumbui/visitweb)">
+  <xmbtext>PLATSHÅLLARE</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchhold" xmbdesc="Tooltip(thumbui/scratchhold)">
+  <xmbtext>Håll markerade objekt</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchclear" xmbdesc="Tooltip(thumbui/scratchclear)">
+  <xmbtext>Rensa objekt från urvalet</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/addtobuttcon" xmbdesc="Tooltip(thumbui/addtobuttcon)">
+  <xmbtext>Lägg till de valda objekten i ett album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/startoggle" xmbdesc="Tooltip(thumbui/startoggle)">
+  <xmbtext>Lägg till/ta bort stjärnmärkning</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Rotera vänster</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Rotera vänster</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/scratchlabel" xmbdesc="Text(thumbui/scratchlabel)">
+  <xmbtext>Urval</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/librarylabel" xmbdesc="Label(thumbui/librarylabel)">
+  <xmbtext>Bibliotek</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newfolder" xmbdesc="Tooltip(thumbui/newfolder)">
+  <xmbtext>Flytta de markerade filerna till en ny mapp</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderviewpopup" xmbdesc="Tooltip(thumbui/folderviewpopup)">
+  <xmbtext>Visa alternativ</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderview" xmbdesc="Tooltip(thumbui/folderview)">
+  <xmbtext>Välj mappträdstruktur</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/flatview" xmbdesc="Tooltip(thumbui/flatview)">
+  <xmbtext>Välj platt mappstruktur</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newalbum" xmbdesc="Tooltip(thumbui/newalbum)">
+  <xmbtext>Skapa ett nytt album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateright" xmbdesc="Tooltip(thumbui/rotateright)">
+  <xmbtext>Rotera medurs</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Rotera vänster</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/smallthumbs" xmbdesc="Tooltip(thumbui/smallthumbs)">
+  <xmbtext>Visa foton med små miniatyrer</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/largethumbs" xmbdesc="Tooltip(thumbui/largethumbs)">
+  <xmbtext>Visa foton med stora miniatyrer</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/next" xmbdesc="Tooltip(thumbui/next)">
+  <xmbtext>Visa nästa foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/prev" xmbdesc="Tooltip(thumbui/prev)">
+  <xmbtext>Visa föregående foto</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/cd_label" xmbdesc="Text(thumbui/cd_label)">
+  <xmbtext>Skapa en present-cd</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/backup_label" xmbdesc="Text(thumbui/backup_label)">
+  <xmbtext>Säkerhetskopiera dina foton</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/replication_label" xmbdesc="Text(thumbui/replication_label)">
+  <xmbtext>Batchuppladdningen</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_text" xmbdesc="Label(thumbui/lightbox_esolo_text)">
+  <xmbtext>Inga resultat hittades i det här albumet</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_button" xmbdesc="Label(thumbui/lightbox_esolo_button)">
+  <xmbtext>Sök alla</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/single_action_message" xmbdesc="Label(thumbui/single_action_message)">
+  <xmbtext>Välj de objekt som du vill lägga till i projektets bildfack och tryck sedan på Bakåt-knappen för att återvända till projektet.</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_return" xmbdesc="Tooltip(thumbui/single_action_return)">
+  <xmbtext>Tillbaka till objektet som redigerades</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_close" xmbdesc="Tooltip(thumbui/single_action_close)">
+  <xmbtext>Avbryt Hämta mer</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setin" xmbdesc="Tooltip(video_control_bar/setin)">
+  <xmbtext>Skapa en ny startpunkt</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setout" xmbdesc="Tooltip(video_control_bar/setout)">
+  <xmbtext>Skapa en ny slutpunkt</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/moviemode1" xmbdesc="Tooltip(video_control_bar/moviemode1)">
+  <xmbtext>Spela upp med helskärm</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/1to1" xmbdesc="Tooltip(video_control_bar2/1to1)">
+  <xmbtext>Visa verklig filmstorlek (ändra inte)</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/fullscreen" xmbdesc="Tooltip(video_control_bar2/fullscreen)">
+  <xmbtext>Spela upp med helskärm</xmbtext>
+ </action>
+ <action type="Label" target="oneup/tllabel" xmbdesc="Label(oneup/tllabel)">
+  <xmbtext>Kronologiskt</xmbtext>
+ </action>
+ <action type="Label" target="oneup/bcklabel" xmbdesc="Label(oneup/bcklabel)">
+  <xmbtext>Avsluta</xmbtext>
+ </action>
+ <action type="Text" target="oneup/tpslabel" xmbdesc="Text(oneup/tpslabel)">
+  <xmbtext>Visa tid</xmbtext>
+ </action>
+</tooltips>

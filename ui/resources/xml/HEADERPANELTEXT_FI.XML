@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="headerpanel/view_online" xmbdesc="Label(headerpanel/view_online)">
+  <xmbtext>Näytä verkossa</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/select_star" xmbdesc="Tooltip(headerpanel/select_star)">
+  <xmbtext>Valitse tähdellä merkityt valokuvat</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/sync_label" xmbdesc="Label(headerpanel/sync_label)">
+  <xmbtext>Synkronoi verkkoon</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync1" xmbdesc="Tooltip(headerpanel/websync1)">
+  <xmbtext>Lopeta muutosten synkronointi verkkoon</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync0" xmbdesc="Tooltip(headerpanel/websync0)">
+  <xmbtext>Lähetä ja synkronoi tulevat muutokset verkkoon</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/sync_options" xmbdesc="Tooltip(headerpanel/sync_options)">
+  <xmbtext>Verkkoasetukset</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_movie" xmbdesc="Tooltip(headerpanel/create_movie)">
+  <xmbtext>Luo elokuvaesitys</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_collage" xmbdesc="Tooltip(headerpanel/create_collage)">
+  <xmbtext>Luo kuvakollaasi</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/play" xmbdesc="Tooltip(headerpanel/play)">
+  <xmbtext>Näytä koko näytön diasarja</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/share" xmbdesc="Label(headerpanel/share)">
+  <xmbtext>Lähetä</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/share" xmbdesc="Tooltip(headerpanel/share)">
+  <xmbtext>Albumin lähettäminen Google Kuviin</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/save_edits" xmbdesc="Tooltip(headerpanel/save_edits)">
+  <xmbtext>Tallenna muokatut valokuvat levylle</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Tuo albumit verkkoalbumeista</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Alla valitut verkkoalbumeiden kuvat ladataan tietokoneeseen, kun klikkaat OK-painiketta. Ne järjestetään automaattisesti kansioihin albumien nimien mukaan.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Sinulla on 100 verkkoalbumia.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Tuo kaikki albumit</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Tuo valitut albumit:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nimi</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Päiväys</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(HUOM: vain kuvat, joita ei vielä ole tietokoneessasi, ladataan.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

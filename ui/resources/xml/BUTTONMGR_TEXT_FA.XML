@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>‏افزودن &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>‏&lt;&lt; حذف</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>انتقال به بالا</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>حرکت به سمت پایین</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>بازنشانی به مقادیر پیش‌فرض</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>انجام شد</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>تأیید</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>یافتن دکمه‌های آنلاین ...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>‏با کلیک کردن روی &quot;افزودن&quot; و&quot;حذف&quot;، بین دو لیست حرکت به جلو و عقب حرکت کنید. دکمه‌های موجود در لیست &quot;دکمه‌ها ی کنونی&quot;، به ترتیبی که در اینجا به آن‌ها می‌دهید، در پایین Picasa نشان داده می‌شوند. از &quot;انتقال به بالا&quot; و&quot;انتقال به پایین&quot; برای مرتب‌سازی دکمه‌ها استفاده کنید. (بالا به پایین در اینجا معادل چپ به راست در برنامه است)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>دکمه‌های موجود:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>دکمه‌های کنونی:</xmbtext>
+ </action>
+</tooltips>

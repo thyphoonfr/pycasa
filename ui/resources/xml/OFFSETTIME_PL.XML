@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Dostosuj datę zdjęcia</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Bieżąca data zdjęcia: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Nowa data zdjęcia: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Dostosuj daty wszystkich zdjęć według ilości</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Ustaw taką samą datę i godzinę dla wszystkich zdjęć</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

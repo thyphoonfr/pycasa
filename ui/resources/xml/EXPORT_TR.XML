@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Klasöre Aktar</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Dışa aktarma konumu:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Göz at...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Dışa aktarılan klasörün adı:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Sırayı korumak için dosya adlarına sayı ekle</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Görsel boyutu:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Orijinal boyutu kullan</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Şuna göre yeniden boyutlandır:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>piksel</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Resim kalitesi:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Otomatik</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maksimum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Özel</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Orijinal resim kalitesini korur</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Kalite ve boyut arasında iyi bir denge</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Çok büyük dosya boyutu, ince ayrıntıları korur</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>En küçük dosya boyutu, kalitede kayıp olur</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Filmleri şununla dışa aktar:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>İlk kare</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Filmin tamamı (yeniden boyutlandırma yok)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Filigran:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Filigran ekle</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Fotoğrafları adınız, bir web alan adı veya telif hakkı bildirimi ile damgalayın.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Dışa Aktar</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

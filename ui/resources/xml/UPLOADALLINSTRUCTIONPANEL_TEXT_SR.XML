@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Затвори</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Добро дошли у групно отпремање</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Потврдите избор у пољима за потврду поред директоријума и албума које желите да користите. Затим изаберите радњу коју желите да обавите. Picasa ће филтрирати ставке на које неће бити могуће применити ту операцију. На пример, ако је комплетан директоријум или албум већ на мрежи, Picasa неће омогућити његово отпремање.</xmbtext>
+ </action>
+</tooltips>

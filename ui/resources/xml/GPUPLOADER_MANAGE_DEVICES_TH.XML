@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_manage_devices/manage_devices.title">
+  <xmbtext>จัดการอุปกรณ์</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/device_list_description.title">
+  <xmbtext>คุณสามารถเลือกที่จะนำเข้าหรือไม่ดำเนินการใดๆ กับรูปภาพและวิดีโอจากอุปกรณ์ที่ปรากฏ คุณจะได้รับการแจ้งเตือนทุกครั้งสำหรับอุปกรณ์ที่ไม่ปรากฏในรายการใดเลย</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_devices_label.title">
+  <xmbtext>อุปกรณ์ที่ต่ออยู่</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/devicecolumn.title">
+  <xmbtext>อุปกรณ์</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>ประเภทอุปกรณ์</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/uniquecolumn.title">
+  <xmbtext>รหัสเฉพาะ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_actions_label.title">
+  <xmbtext>นำเข้า</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist.title">
+  <xmbtext>ทุกครั้ง</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist.title">
+  <xmbtext>ไม่เลย</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist_description.title">
+  <xmbtext>นำเข้าจากอุปกรณ์เหล่านี้ทุกครั้ง</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>ชื่อ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_black.title">
+  <xmbtext>&gt;&gt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_white.title">
+  <xmbtext>&lt;&lt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/remove.title">
+  <xmbtext>ลบ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist_description.title">
+  <xmbtext>ไม่นำเข้าจากอุปกรณ์เหล่านี้เลย</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>ชื่อ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/ok.title">
+  <xmbtext>เสร็จ</xmbtext>
+ </stringres>
+</resources>

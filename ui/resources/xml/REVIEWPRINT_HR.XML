@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>Pregled za ispis</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>Ukloni odabrano</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>Ukloni slike niske kvalitete</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>Pregled slike</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>Informacije</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>Inloggning</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>Ange det användarnamn och lösenord som du brukar använda när du loggar in på fotokopieringstjänsten.  Om du inte redan har ett konto hos denna leverantör klickar du på &quot;Skapa ett konto&quot; för att registrera dig.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>E-post:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>Skapa ett konto...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>Lösenord:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>Har du glömt ditt lösenord?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>Spara lösenord</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>Säker inloggning med SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>Bildstorlek:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>För att du ska få högsta kvalitet på dina fotokopior skickas dina bilder med högsta tillgängliga upplösning.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>Albumnamn:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>Logga in</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

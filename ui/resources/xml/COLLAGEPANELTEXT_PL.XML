@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="collagepanel/addclips" xmbdesc="Tooltip(collagepanel/addclips)">
+  <xmbtext>Dodaj zaznaczone elementy do kolażu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/deleteclips" xmbdesc="Tooltip(collagepanel/deleteclips)">
+  <xmbtext>Usuń zaznaczone elementy ze schowka </xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/getmoreclips" xmbdesc="Label(collagepanel/getmoreclips)">
+  <xmbtext>Pobierz więcej...</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/getmoreclips" xmbdesc="Tooltip(collagepanel/getmoreclips)">
+  <xmbtext>Pobierz więcej elementów z biblioteki</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab1" xmbdesc="Label(collagepanel/tab1)">
+  <xmbtext>Ustawienia</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab2" xmbdesc="Label(collagepanel/tab2)">
+  <xmbtext>Elementy</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/shadow_checkbox_label" xmbdesc="Label(collagepanel/shadow_checkbox_label)">
+  <xmbtext>Dodaj cienie</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/caption_checkbox_label" xmbdesc="Label(collagepanel/caption_checkbox_label)">
+  <xmbtext>Pokaż podpisy</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/caption_checkbox" xmbdesc="Tooltip(collagepanel/caption_checkbox)">
+  <xmbtext>Pokaż podpisy jako tekst na zdjęciach z obramowaniem „Polaroid”</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_frame_center-label" xmbdesc="Label(collagepanel/set_frame_center-label)">
+  <xmbtext>Ustaw jako środek ramki</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/spacing_label" xmbdesc="Label(collagepanel/spacing_label)">
+  <xmbtext>Odstępy w siatce</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/min_spacing_label" xmbdesc="Label(collagepanel/min_spacing_label)">
+  <xmbtext>Brak</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/max_spacing_label" xmbdesc="Label(collagepanel/max_spacing_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_settings_title" xmbdesc="Label(collagepanel/bkg_settings_title)">
+  <xmbtext>Opcje tła</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/borders_label" xmbdesc="Label(collagepanel/borders_label)">
+  <xmbtext>Obramowania zdjęć</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/format_title" xmbdesc="Label(collagepanel/format_title)">
+  <xmbtext>Format strony</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_order-label" xmbdesc="Label(collagepanel/rand_order-label)">
+  <xmbtext>Losowa kolejność zdjęć</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_placement-label" xmbdesc="Label(collagepanel/rand_placement-label)">
+  <xmbtext>Kolaż rozproszony</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/view_and_edit-label" xmbdesc="Label(collagepanel/view_and_edit-label)">
+  <xmbtext>Wyświetl i edytuj</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/cancelbutton-label" xmbdesc="Label(collagepanel/cancelbutton-label)">
+  <xmbtext>Zamknij</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/resetbutton-label" xmbdesc="Label(collagepanel/resetbutton-label)">
+  <xmbtext>Resetuj</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/makedesktop-label" xmbdesc="Label(collagepanel/makedesktop-label)">
+  <xmbtext>Tło pulpitu</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/sharebutton-label" xmbdesc="Label(collagepanel/sharebutton-label)">
+  <xmbtext>Utwórz kolaż</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/color_bg_label" xmbdesc="Label(collagepanel/color_bg_label)">
+  <xmbtext>Jednolity kolor</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bitmap_bg_label" xmbdesc="Label(collagepanel/bitmap_bg_label)">
+  <xmbtext>Użyj obrazu</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_all" xmbdesc="Label(collagepanel/select_all)">
+  <xmbtext>Zaznacz wszystko</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_none" xmbdesc="Label(collagepanel/select_none)">
+  <xmbtext>Brak zaznaczenia</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/remove_node" xmbdesc="Label(collagepanel/remove_node)">
+  <xmbtext>Usuń</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_background" xmbdesc="Label(collagepanel/set_background)">
+  <xmbtext>Ustaw jako tło</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_from_selection" xmbdesc="Label(collagepanel/bkg_from_selection)">
+  <xmbtext>Użyj zaznaczonych</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/portrait" xmbdesc="Tooltip(collagepanel/portrait)">
+  <xmbtext>Orientacja pionowa – umieść swój projekt w pionie</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/landscape" xmbdesc="Tooltip(collagepanel/landscape)">
+  <xmbtext>Orientacja pozioma – umieść swój projekt w poziomie</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/format_menu" xmbdesc="Tooltip(collagepanel/format_menu)">
+  <xmbtext>Wybierz względną szerokość i wysokość swojego projektu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/delete_custom_aspect" xmbdesc="Tooltip(collagepanel/delete_custom_aspect)">
+  <xmbtext>Usuń bieżący format zdjęcia</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/cancelbutton" xmbdesc="Tooltip(collagepanel/cancelbutton)">
+  <xmbtext>Zamknij kartę Kolaż</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/makedesktop" xmbdesc="Tooltip(collagepanel/makedesktop)">
+  <xmbtext>Zapisz jako obraz JPG w albumie Kolaże, a następnie ustaw ten obraz jako tło pulpitu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/resetbutton" xmbdesc="Tooltip(collagepanel/resetbutton)">
+  <xmbtext>Cofnij wszystkie zmiany</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/sharebutton" xmbdesc="Tooltip(collagepanel/sharebutton)">
+  <xmbtext>Zapisz jako obraz JPG w albumie Kolaże (w kolekcji Projekty).</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_order" xmbdesc="Tooltip(collagepanel/rand_order)">
+  <xmbtext>Losowa kolejność zdjęć </xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_placement" xmbdesc="Tooltip(collagepanel/rand_placement)">
+  <xmbtext>Zmieszaj układ kolażu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_all" xmbdesc="Tooltip(collagepanel/select_all)">
+  <xmbtext>Zaznacz wszystkie zdjęcia (Ctrl+A)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_none" xmbdesc="Tooltip(collagepanel/select_none)">
+  <xmbtext>Usuń zaznaczenie wszystkich zdjęć (Ctrl+D)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/remove_node" xmbdesc="Tooltip(collagepanel/remove_node)">
+  <xmbtext>Usuń zaznaczone elementy z kolażu (Del)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/set_background" xmbdesc="Tooltip(collagepanel/set_background)">
+  <xmbtext>Użyj zaznaczonego zdjęcia jako tła</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_top" xmbdesc="Tooltip(collagepanel/move_top)">
+  <xmbtext>Przenieś zdjęcie na wierzch stosu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_up" xmbdesc="Tooltip(collagepanel/move_up)">
+  <xmbtext>Przenieś zdjęcie w górę stosu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_down" xmbdesc="Tooltip(collagepanel/move_down)">
+  <xmbtext>Przenieś zdjęcie w dół stosu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_bottom" xmbdesc="Tooltip(collagepanel/move_bottom)">
+  <xmbtext>Przenieś zdjęcie na spód stosu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_12" xmbdesc="Tooltip(collagepanel/snap_12)">
+  <xmbtext>Wyrównaj obrót do pionu</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_3" xmbdesc="Tooltip(collagepanel/snap_3)">
+  <xmbtext>Wyrównaj obrót do 90° zgodnie z ruchem wskazówek zegara</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_6" xmbdesc="Tooltip(collagepanel/snap_6)">
+  <xmbtext>Wyrównaj obrót do 180° zgodnie z ruchem wskazówek zegara</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_9" xmbdesc="Tooltip(collagepanel/snap_9)">
+  <xmbtext>Wyrównaj obrót do 270° zgodnie z ruchem wskazówek zegara</xmbtext>
+ </action>
+</tooltips>

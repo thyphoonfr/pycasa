@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>Aggiungi &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; Rimuovi</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>Sposta su</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>Sposta giù</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>Ripristina predefiniti</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>Completato</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>Trova pulsanti online...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>Sposta i pulsanti tra i due elenchi facendo clic su &quot;Aggiungi&quot; e &quot;Rimuovi&quot;.  I pulsanti nell&#039;elenco &quot;Pulsanti attuali&quot; verranno visualizzati nella parte inferiore di Picasa nell&#039;ordine assegnato qui.  Usa &quot;Sposta su&quot; e &quot;Sposta giù&quot; per definire l&#039;ordine dei pulsanti.  (Dall&#039;alto in basso significa da sinistra a destra nell&#039;applicazione.)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>Pulsanti disponibili:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>Pulsanti attuali:</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="makemoviepanel/rewind" xmbdesc="Label(makemoviepanel/rewind)">
+  <xmbtext>Tillbaka till den valda bilden</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addclips" xmbdesc="Tooltip(makemoviepanel/addclips)">
+  <xmbtext>Hämta fler klipp från fotobiblioteket</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addtomovie" xmbdesc="Tooltip(makemoviepanel/addtomovie)">
+  <xmbtext>Lägg till markerade klipp i slutet av filmen</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/deleteclips" xmbdesc="Tooltip(makemoviepanel/deleteclips)">
+  <xmbtext>Ta bort de markerade bilderna från fältet</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/durationslider_label" xmbdesc="Label(makemoviepanel/durationslider_label)">
+  <xmbtext>Varaktighet</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/lengthslider_label" xmbdesc="Label(makemoviepanel/lengthslider_label)">
+  <xmbtext>Totalt antal foton</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/burstslider_label" xmbdesc="Label(makemoviepanel/burstslider_label)">
+  <xmbtext>Filtrera inte efter tid för taget</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transitionslider_label" xmbdesc="Label(makemoviepanel/transitionslider_label)">
+  <xmbtext>Överlappande</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/export_youtube" xmbdesc="Label(makemoviepanel/export_youtube)">
+  <xmbtext>YT</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/render" xmbdesc="Label(makemoviepanel/render)">
+  <xmbtext>Skapa film</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/cancel" xmbdesc="Label(makemoviepanel/cancel)">
+  <xmbtext>Stäng</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/recompute" xmbdesc="Label(makemoviepanel/recompute)">
+  <xmbtext>Använd</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab1" xmbdesc="Label(makemoviepanel/tab1)">
+  <xmbtext>Film</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/moviesize_label" xmbdesc="Label(makemoviepanel/moviesize_label)">
+  <xmbtext>Mått</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/show_captions_label" xmbdesc="Label(makemoviepanel/show_captions_label)">
+  <xmbtext>Visa bildtexter</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/crop_to_fit_label" xmbdesc="Label(makemoviepanel/crop_to_fit_label)">
+  <xmbtext>Beskär hel bildruta</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_low_res_faces_label" xmbdesc="Label(makemoviepanel/remove_low_res_faces_label)">
+  <xmbtext>Ta bort ansikten med låg upplösning</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/ordering_header_label" xmbdesc="Label(makemoviepanel/ordering_header_label)">
+  <xmbtext>Bildsortering:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/smart_order_label" xmbdesc="Label(makemoviepanel/smart_order_label)">
+  <xmbtext>Bästa övergångar</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/album_order_label" xmbdesc="Label(makemoviepanel/album_order_label)">
+  <xmbtext>Albumsortering</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/chronological_order_label" xmbdesc="Label(makemoviepanel/chronological_order_label)">
+  <xmbtext>Kronologisk</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/audio_label" xmbdesc="Label(makemoviepanel/audio_label)">
+  <xmbtext>Ljudspår:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/add_audio" xmbdesc="Label(makemoviepanel/add_audio)">
+  <xmbtext>Läser in...</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_audio" xmbdesc="Label(makemoviepanel/remove_audio)">
+  <xmbtext>Rensa</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/aoptions_label" xmbdesc="Label(makemoviepanel/aoptions_label)">
+  <xmbtext>Alternativ</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transtype_label" xmbdesc="Label(makemoviepanel/transtype_label)">
+  <xmbtext>Övergångsstil</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab2" xmbdesc="Label(makemoviepanel/tab2)">
+  <xmbtext>Bild</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Klipp</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Klipp</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/font_label" xmbdesc="Label(makemoviepanel/font_label)">
+  <xmbtext>Teckensnitt:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/size_label" xmbdesc="Label(makemoviepanel/size_label)">
+  <xmbtext>Storlek:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/style_label" xmbdesc="Label(makemoviepanel/style_label)">
+  <xmbtext>Format:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/templatetext" xmbdesc="Label(makemoviepanel/templatetext)">
+  <xmbtext>Mall:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/text_color_label" xmbdesc="Label(makemoviepanel/text_color_label)">
+  <xmbtext>Textfärg</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/back_color_label" xmbdesc="Label(makemoviepanel/back_color_label)">
+  <xmbtext>Bakgrundsfärg</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/addclips" xmbdesc="Label(makemoviepanel/addclips)">
+  <xmbtext>Hämta mer...</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/bold" xmbdesc="Tooltip(makemoviepanel/bold)">
+  <xmbtext>Fetstil</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/italic" xmbdesc="Tooltip(makemoviepanel/italic)">
+  <xmbtext>Kursiv</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/outline" xmbdesc="Tooltip(makemoviepanel/outline)">
+  <xmbtext>Automatiska konturer (som textremsor på film)</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/insert_slide" xmbdesc="Tooltip(makemoviepanel/insert_slide)">
+  <xmbtext>Lägg till ny textbildruta</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_slide" xmbdesc="Tooltip(makemoviepanel/remove_slide)">
+  <xmbtext>Ta bort den markerade bilden</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/add_audio" xmbdesc="Tooltip(makemoviepanel/add_audio)">
+  <xmbtext>Lägg till ett ljudspår i den här filmen</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_audio" xmbdesc="Tooltip(makemoviepanel/remove_audio)">
+  <xmbtext>Ta bort ljudspåret</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/render" xmbdesc="Tooltip(makemoviepanel/render)">
+  <xmbtext>Skapa en film och byt till redigeringsläge</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/export_youtube" xmbdesc="Tooltip(makemoviepanel/export_youtube)">
+  <xmbtext>Skapa en film som du sedan kan laddas upp till YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/cancel" xmbdesc="Tooltip(makemoviepanel/cancel)">
+  <xmbtext>Stäng panelen Movie Maker</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/recompute" xmbdesc="Tooltip(makemoviepanel/recompute)">
+  <xmbtext>Skapa en ny sekvens</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="genericlogin/window1.title">
+  <xmbtext>Вхід</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/emaillabel.title">
+  <xmbtext>Електронна пошта:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.title">
+  <xmbtext>Створити обліковий запис...</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/labelgroup7.title">
+  <xmbtext>Пароль:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.title">
+  <xmbtext>Забули пароль?</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/savepassword.title">
+  <xmbtext>Зберегти пароль</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/label14.title">
+  <xmbtext>З&#039;єднання захищене протоколом SSL</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/accept.title">
+  <xmbtext>Увійти</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/button17.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

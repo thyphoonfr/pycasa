@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Está instalada uma versão mais antiga do Picasa. Pretende atualizar a sua fototeca de imagens actual ou voltar a procurar imagens no computador?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Seleccione a partir das seguintes opções:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Actualizar a minha biblioteca de imagens existente</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Escolha esta opção se utilizar palavras-chave ou álbuns personalizados no Picasa 1 e os quiser manter no Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Pesquisar novamente imagens no meu computador</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Seleccione esta opção para pesquisar o seu computador de forma mais completa, incluindo informações detalhadas sobre as imagens. A pesquisa irá manter as edições e organização existentes, mas não irá manter palavras-chave. Esta pesquisa pode demorar vários minutos.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>A pesquisa de imagens nunca move nem copia ficheiros para novos locais. Pode escolher quais as pastas apresentadas pelo Picasa, através da ferramenta Gestão de pastas (disponível no menu Ferramentas)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continuar</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>O Picasa está pronto para pesquisar imagens no seu computador</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Seleccione a partir das seguintes opções:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Pesquisar fotografias em todo o computador</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Seleccione esta opção se tiver imagens guardadas em diversas pastas do computador, especialmente se tiver imagens guardadas em mais de um disco rígido.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Procurar apenas em Documentos, Imagens, Ambiente de trabalho e Fototeca do iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Escolha esta opção se guardar as suas imagens apenas nestas pastas.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>A pesquisa de imagens nunca move nem copia ficheiros para novos locais. Pode escolher as pastas apresentadas no Picasa através da ferramenta Gestão de pastas (disponível no menu Ferramentas)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continuar</xmbtext>
+ </action>
+</tooltips>

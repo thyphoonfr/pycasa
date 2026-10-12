@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="newbackupset/window1.title">
+  <xmbtext>Nov paket za varnostno kopiranje</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup2.title">
+  <xmbtext>Ime:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/typegroup.title">
+  <xmbtext>Vrsta varnostne kopije:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio6.title">
+  <xmbtext>varnostna kopija na CD-ju ali DVD-ju</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio7.title">
+  <xmbtext>Varnostna kopija z diska na disk (pri zunanjih in omrežnih pogonih)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/disk.title">
+  <xmbtext>Izberi ...</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup12.title">
+  <xmbtext>Datoteke za varnostno kopiranje:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio14.title">
+  <xmbtext>Vse vrste datotek</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio15.title">
+  <xmbtext>Vse slike (brez filmov)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio16.title">
+  <xmbtext>Le datoteke JPEG s podatki o fotoaparatu</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/ok.title">
+  <xmbtext>Ustvari</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/button19.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="keywords/addbutton" xmbdesc="Label(keywords/addbutton)">
+  <xmbtext>Добавяне</xmbtext>
+ </action>
+ <action type="Label" target="keywords/removebutton" xmbdesc="Label(keywords/removebutton)">
+  <xmbtext>Премахване</xmbtext>
+ </action>
+ <action type="Label" target="keywords/closebutton" xmbdesc="Label(keywords/closebutton)">
+  <xmbtext>Готово</xmbtext>
+ </action>
+ <action type="Label" target="keywords/addkeywords_label" xmbdesc="Label(keywords/addkeywords_label)">
+  <xmbtext>Добавяне на маркер:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/keywords_label" xmbdesc="Label(keywords/keywords_label)">
+  <xmbtext>Маркери:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/readonly_label" xmbdesc="Label(keywords/readonly_label)">
+  <xmbtext>Маркерите не могат да се променят, понеже един или повече елемента са само за четене.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>Alege sursele pentru backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Google Foto face backup automat pentru fotografiile și videoclipurile din sursele selectate în fototeca Fotografii.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>Adaugă...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>Dimensiunea fotografiei</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>Calitate înaltă (spațiu de stocare nelimitat gratuit)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>Calitate excepțională a imaginii la o dimensiune redusă a fișierelor</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>Original (limitat la spațiul de stocare aferent contului)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>Fotografiile la rezoluție completă sunt luate în considerare la calcularea cotei de stocare</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>Contribuie la îmbunătățirea serviciului Google Foto trimițând statistici anonime privind utilizarea.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>Cumpăraţi mai mult spațiu de stocare...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>Începeţi backupul</xmbtext>
+ </stringres>
+</resources>

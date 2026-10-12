@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Fotoattēlu datumu pielāgošana</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Pašreizējā fotoattēla datums: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Jauns fotoattēla datums: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Visu fotoattēlu datumu pielāgošana pēc daudzuma</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Vienāda datuma un laika iestatīšana visiem fotoattēliem</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

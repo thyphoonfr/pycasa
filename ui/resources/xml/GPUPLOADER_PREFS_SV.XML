@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_prefs/prefs_window.mac_title">
+  <xmbtext>Konfiguration – Säkerhetskopiering i Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/prefs_window.win_title">
+  <xmbtext>Inställningar – Säkerhetskopiering i Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/account_name.title">
+  <xmbtext>Hämtar kontonamn ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/log_off.title">
+  <xmbtext>Logga ut</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/source_lbl.title">
+  <xmbtext>Källor för säkerhetskopiering</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.win_title">
+  <xmbtext>Kameror och minneskort</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.mac_title">
+  <xmbtext>Kameror och minneskort</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/devices_btn.title">
+  <xmbtext>Enheter ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder_chk.title">
+  <xmbtext>Kopiera även foton/videoklipp från extern media till</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder.title">
+  <xmbtext>Bläddra ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/watched_folders_lbl.title">
+  <xmbtext>Skrivbordsmappar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/add_folder_btn.title">
+  <xmbtext>Lägg till ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_size_label.title">
+  <xmbtext>Fotostorlek</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size.title">
+  <xmbtext>Hög kvalitet (gratis obegränsat lagringsutrymme)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size_desc.title">
+  <xmbtext>Hög visuell kvalitet och reducerad filstorlek</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size.title">
+  <xmbtext>Original (begränsat till kontots lagringsutrymme)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size_desc.title">
+  <xmbtext>Full upplösning som räknas in i din kvot</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_raw.title">
+  <xmbtext>Ladda upp RAW-filer</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/send_to_google.title">
+  <xmbtext>Bidra till att förbättra foton genom att skicka anonym användningsstatistik.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/more_storage.title">
+  <xmbtext>Skaffa mer lagringsutrymme ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/cancelbutton.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="keywords/addbutton" xmbdesc="Label(keywords/addbutton)">
+  <xmbtext>追加</xmbtext>
+ </action>
+ <action type="Label" target="keywords/removebutton" xmbdesc="Label(keywords/removebutton)">
+  <xmbtext>削除</xmbtext>
+ </action>
+ <action type="Label" target="keywords/closebutton" xmbdesc="Label(keywords/closebutton)">
+  <xmbtext>終了</xmbtext>
+ </action>
+ <action type="Label" target="keywords/addkeywords_label" xmbdesc="Label(keywords/addkeywords_label)">
+  <xmbtext>タグを追加:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/keywords_label" xmbdesc="Label(keywords/keywords_label)">
+  <xmbtext>タグ:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/readonly_label" xmbdesc="Label(keywords/readonly_label)">
+  <xmbtext>1 つ以上のアイテムが読み取り専用であるため、タグを変更できません。</xmbtext>
+ </action>
+</tooltips>

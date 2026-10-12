@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Versión %1$s de Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Copyright 2015, Google Inc. Todos los derechos reservados.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Este software se basa parcialmente en el trabajo de Independent JPEG Group. Este programa está protegido por las leyes de derechos de autor de Estados Unidos e internacionales.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_file_errors/file_errors.title">
+  <xmbtext>Sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/error_label.title">
+  <xmbtext>Nije moguće izraditi sigurnosnu kopiju ovih datoteka:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/namecolumn.title">
+  <xmbtext>Naziv</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/accept.title">
+  <xmbtext>Pokušajte ponovno</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/cancel.title">
+  <xmbtext>Odbaci</xmbtext>
+ </stringres>
+</resources>

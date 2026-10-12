@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Exportar a carpeta</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Ubicación de la exportación</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Examinar...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Nombre de la carpeta exportada:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Añadir números a los nombres de archivo para conservar el orden</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Tamaño de imagen:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Utilizar tamaño original</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Modificar tamaño a:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>píxeles</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Calidad de la imagen:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automático</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Máximo</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Mínimo</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Personalizado</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Mantiene la calidad de imagen original</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Buen equilibrio de calidad y tamaño</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Tamaño de archivo muy grande, conserva los detalles</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Tamaño de archivo más pequeño, con pérdida de calidad</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Exportar vídeos con:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Primer marco</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Película completa (no modificar tamaño)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Marca de agua:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Añadir marca de agua</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Puedes inscribir tu nombre, dominio web o avisos de derechos de autor en las fotos.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Exportar</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

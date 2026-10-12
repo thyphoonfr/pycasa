@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="newbackupset/window1.title">
+  <xmbtext>Jauna dublējuma kopa</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup2.title">
+  <xmbtext>Nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/typegroup.title">
+  <xmbtext>Dublējuma veids:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio6.title">
+  <xmbtext>Kompaktdiska vai DVD diska dublējums</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio7.title">
+  <xmbtext>Dublējums no diska uz disku (ārējiem un tīkla diskdziņiem)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/disk.title">
+  <xmbtext>Izvēlēties...</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup12.title">
+  <xmbtext>Dublējamie faili:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio14.title">
+  <xmbtext>Visi failu veidi</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio15.title">
+  <xmbtext>Visi attēli (izņemot filmas)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio16.title">
+  <xmbtext>Tikai JPEG faili ar kameras informāciju</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/ok.title">
+  <xmbtext>Izveidošana</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/button19.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

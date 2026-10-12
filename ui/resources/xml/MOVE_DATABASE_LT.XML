@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Perkelti duomenų bazę</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Kad įsigaliotų pakeitimai, turėsite paleisti „Picasa“ iš naujo.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Atminkite: prieš naudodamiesi šia eksperimentine funkcija turėtumėte sukurti atsarginę duomenų bazės kopiją. NIEKADA neperkelkite duomenų bazės į tinklą, keičiamąjį ar išorinį diską, nes galite prarasti duomenis.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Dabartinė duomenų bazės vieta:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nauja duomenų bazės vieta:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Naršyti...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Numatytasis</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Perkelti kitą kartą paleidus iš naujo</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

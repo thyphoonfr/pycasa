@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Mou la base de dades</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Hauràs de reiniciar Picasa perquè els canvis tinguin efecte.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Nota: Fes una còpia de seguretat de la teva base de dades abans de provar aquesta funció experimental. MAI no moguis la base de dades a una unitat de xarxa, extraïble ni externa, o és possible que perdis dades.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Ubicació actual de la base de dades:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Ubicació nova de la base de dades:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Predeterminat</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Mou-la en reiniciar</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Уплътняване</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa компресира базата си от данни, за да спести място на диска. Това може да отнеме няколко минути.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Уплътнява се...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

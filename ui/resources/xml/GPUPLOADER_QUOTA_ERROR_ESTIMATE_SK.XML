@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Automatické zálohovanie Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Nedostatok ukladacieho priestoru</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Vybraté priečinky obsahujú viac miesta než váš ukladací priestor v službe Google Drive. Môžete si buď kúpiť ďalší ukladací priestor, alebo bezplatne a neobmedzene zálohovať fotky a videá v štandardnej veľkosti.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Ak ste si ukladací priestor kúpili iba pred chvíľou, zmeny sa môžu prejaviť s istým malým časovým odstupom.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Získať ďalší ukladací priestor...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Prepnúť na štandardnú veľkosť</xmbtext>
+ </stringres>
+</resources>

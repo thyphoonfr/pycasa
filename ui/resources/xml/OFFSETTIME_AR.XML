@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>ضبط تاريخ الصورة</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>التاريخ الحالي للصورة: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>تاريخ الصورة الجديد: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>ضبط كل تواريخ الصور بحسب الكمية</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>تعيين نفس التاريخ والوقت إلى كل الصور</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>موافق</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

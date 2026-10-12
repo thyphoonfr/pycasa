@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>چاپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>چاپ عکس‌های موجود در سینی عکس</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>ایمیل</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>ارسال عکس‌های موجود در سینی عکس با ایمیل</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>کلاژ</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>ایجاد یک &quot;کلاژ عکس&quot; با انتخاب خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>فیلم</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>ایجاد یک ارائه &quot;فیلم&quot; با انتخاب خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>‏ارسال عکس‌های موجود در سینی عکس به Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>بلاگر</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>آپلود عکس‌ها در بلاگر</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>آپلود عکس‌ها در بلاگر</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>فروشگاه</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>خرید کارهای چاپی و محصولات از ارائه‌دهنده آنلاین دلخواه خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>صادر کردن</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>تهیه کپی از عکس‌های موجود در سینی عکس در یک پوشه در دیسک سخت خود</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>بیشتر…</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>برای مشاهده گزینه‌های بیشتر کلیک کنید</xmbtext>
+ </action>
+</tooltips>

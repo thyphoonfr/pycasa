@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_share/to_text" xmbdesc="Label(compose_share/to_text)">
+  <xmbtext>A:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/group_text" xmbdesc="Label(compose_share/group_text)">
+  <xmbtext>Grupos:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/subject_text" xmbdesc="Label(compose_share/subject_text)">
+  <xmbtext>Asunto:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/changeuser" xmbdesc="Label(compose_share/changeuser)">
+  <xmbtext>Cambiar usuario</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/send" xmbdesc="Label(compose_share/send)">
+  <xmbtext>Enviar</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discard" xmbdesc="Label(compose_share/discard)">
+  <xmbtext>Descartar</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/sendb" xmbdesc="Label(compose_share/sendb)">
+  <xmbtext>Enviar</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discardb" xmbdesc="Label(compose_share/discardb)">
+  <xmbtext>Descartar</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/collab_label" xmbdesc="Label(compose_share/collab_label)">
+  <xmbtext>Permitir que estas personas participen en mi álbum</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/infotext" xmbdesc="Label(compose_share/infotext)">
+  <xmbtext>Ya puedes compartir. A continuación, elige los destinatarios de tu invitación.</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/visibility_label" xmbdesc="Label(compose_share/visibility_label)">
+  <xmbtext>Visibilidad del álbum:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/cancel" xmbdesc="Label(compose_share/cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+</tooltips>

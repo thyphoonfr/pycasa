@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_mail/to_text" xmbdesc="Label(compose_mail/to_text)">
+  <xmbtext>Címzett:</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/subject_text" xmbdesc="Label(compose_mail/subject_text)">
+  <xmbtext>Tárgy:</xmbtext>
+ </action>
+ <action type="Tooltip" target="compose_mail/discardimage" xmbdesc="Tooltip(compose_mail/discardimage)">
+  <xmbtext>Kijelölt elemek eltávolítása a mellékletből</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/changeuser" xmbdesc="Label(compose_mail/changeuser)">
+  <xmbtext>Felhasználóváltás</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/send" xmbdesc="Label(compose_mail/send)">
+  <xmbtext>Küldés</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discard" xmbdesc="Label(compose_mail/discard)">
+  <xmbtext>Elvetés</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/sendb" xmbdesc="Label(compose_mail/sendb)">
+  <xmbtext>Küldés</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discardb" xmbdesc="Label(compose_mail/discardb)">
+  <xmbtext>Elvetés</xmbtext>
+ </action>
+</tooltips>

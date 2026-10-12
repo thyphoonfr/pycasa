@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_file_errors/file_errors.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/error_label.title">
+  <xmbtext>Teh datotek ni bilo mogoče varnostno kopirati:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/namecolumn.title">
+  <xmbtext>Ime</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/accept.title">
+  <xmbtext>Poskusi ponovno</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/cancel.title">
+  <xmbtext>Opusti</xmbtext>
+ </stringres>
+</resources>

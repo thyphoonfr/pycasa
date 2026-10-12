@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadmgr/hide" xmbdesc="Label(uploadmgr/hide)">
+  <xmbtext>Gizle</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/cleanup" xmbdesc="Label(uploadmgr/cleanup)">
+  <xmbtext>Tamamlananları Temizle</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/pause" xmbdesc="Label(uploadmgr/pause)">
+  <xmbtext>Duraklat</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/resume" xmbdesc="Label(uploadmgr/resume)">
+  <xmbtext>Devam</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/nopending" xmbdesc="Text(uploadmgr/nopending)">
+  <xmbtext>Yükleme etkinliği yok</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/throttletext" xmbdesc="Text(uploadmgr/throttletext)">
+  <xmbtext>Bant genişliğini koru</xmbtext>
+ </action>
+</tooltips>

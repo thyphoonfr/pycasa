@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>자동 완성 오류</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>클립보드 텍스트에 있는 다음 연락처를 제대로 붙여넣지 못했습니다.</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>연락처</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>오류</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>상태</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>확인</xmbtext>
+ </stringres>
+</resources>

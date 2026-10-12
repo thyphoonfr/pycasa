@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadmgr/hide" xmbdesc="Label(uploadmgr/hide)">
+  <xmbtext>Ocultar</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/cleanup" xmbdesc="Label(uploadmgr/cleanup)">
+  <xmbtext>Limpeza concluída</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/pause" xmbdesc="Label(uploadmgr/pause)">
+  <xmbtext>Pausa</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/resume" xmbdesc="Label(uploadmgr/resume)">
+  <xmbtext>Retomar</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/nopending" xmbdesc="Text(uploadmgr/nopending)">
+  <xmbtext>Nenhuma actividade de carregamento</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/throttletext" xmbdesc="Text(uploadmgr/throttletext)">
+  <xmbtext>Manter largura de banda</xmbtext>
+ </action>
+</tooltips>

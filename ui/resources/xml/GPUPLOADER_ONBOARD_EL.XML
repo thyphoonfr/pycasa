@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>Επιλογή πηγών αντιγράφων ασφαλείας</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Το Google Photos δημιουργεί αυτόματα αντίγραφα ασφαλείας φωτογραφιών και βίντεο από επιλεγμένες πηγές στη βιβλιοθήκη σας στο Google Photos.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>Προσθήκη…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>Μέγεθος φωτογραφίας</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>Υψηλή ποιότητα (δωρεάν απεριόριστος αποθηκευτικός χώρος)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>Υψηλή οπτική ποιότητα σε μειωμένο μέγεθος αρχείου</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>Αρχικό μέγεθος (περιορίζεται στον αποθηκευτικό χώρο λογαριασμού)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>Πλήρης ανάλυση που υπολογίζεται στο όριο του αποθηκευτικού χώρου</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>Βοηθήστε μας να βελτιώσουμε την εφαρμογή Google Photos με την αποστολή ανώνυμων δεδομένων χρήσης.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>Αποκτήστε περισσότερο χώρο αποθήκευσης…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>Έναρξη δημιουργίας αντιγράφου ασφαλείας</xmbtext>
+ </stringres>
+</resources>

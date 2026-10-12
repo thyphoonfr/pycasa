@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Zamknij</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Więcej informacji...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Witamy w albumie osób bez nazw! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Podczas skanowania zdjęć Picasa automatycznie grupuje znalezione twarze, aby ułatwić przypisywanie nazw.\n\nWarto wiedzieć:\n\nAby zidentyfikować osobę, kliknij „Dodaj nazwę”, wpisz imię i nazwisko tej osoby, a następnie naciśnij Enter. Za każdym razem, gdy po raz pierwszy przypiszesz komuś nazwę, zostanie utworzony nowy album osób.\n\nWSKAZÓWKA: aby podczas przypisywania nazw móc korzystać ze wszystkich swoich kontaktów z konta Google, zaloguj się na to konto.\n\nAby zignorować daną osobę, kliknij przycisk „X” na miniaturze twarzy.\n\nSugestie: gdy przypiszesz nazwę jakiejś osobie, Picasa może zasugerować więcej pasujących twarzy. Kliknij album tej osoby, aby wyświetlić i potwierdzić (lub odrzucić) wszelkie sugestie.\n\n\n Aby dowiedzieć się więcej o tej funkcji, kliknij „Więcej informacji”.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Podczas skanowania zdjęć Picasa automatycznie grupuje znalezione twarze, aby ułatwić przypisywanie nazw.\n\nWarto wiedzieć:\n\nAby zidentyfikować osobę, kliknij „Dodaj nazwę”, wpisz imię i nazwisko tej osoby, a następnie naciśnij Enter. Za każdym razem, gdy po raz pierwszy przypiszesz komuś nazwę, zostanie utworzony nowy album osób.\n\nWSKAZÓWKA: aby podczas przypisywania nazw móc korzystać ze wszystkich swoich kontaktów z konta Google, zaloguj się na to konto.\n\nAby zignorować daną osobę, kliknij przycisk „X” na miniaturze twarzy.\n\nSugestie: gdy przypiszesz nazwę jakiejś osobie, Picasa może zasugerować więcej pasujących twarzy. Kliknij album tej osoby, aby wyświetlić i potwierdzić (lub odrzucić) wszelkie sugestie.\n\n\n Aby dowiedzieć się więcej o tej funkcji, kliknij „Więcej informacji”.</xmbtext>
+ </action>
+</tooltips>

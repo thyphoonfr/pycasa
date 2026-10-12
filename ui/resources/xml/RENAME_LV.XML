@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Failu pārdēvēšana</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Pārdēvēšanai ir atlasīts 1 fails.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Pārdēvēšanai ir atlasīts (-i) %s fails (-i).</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Lūdzu, ievadiet jaunu nosaukumu šiem failiem:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Iekļaut faila nosaukumā:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Datums</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Attēla izšķirtspēja</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Piemērs: </xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Pārdēvēšana</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

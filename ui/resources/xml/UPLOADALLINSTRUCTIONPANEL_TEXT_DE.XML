@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Schließen</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Willkommen beim Massen-Upload</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Aktivieren Sie die Kontrollkästchen neben den Ordnern und Alben, mit denen Sie arbeiten möchten. Wählen Sie dann die gewünschte Aktion aus. Picasa filtert die Elemente heraus, auf die die Aktion nicht angewendet werden kann. Ist zum Beispiel ein Ordner oder Album bereits online, wird die Option zum Upload nicht in Picasa angezeigt.</xmbtext>
+ </action>
+</tooltips>

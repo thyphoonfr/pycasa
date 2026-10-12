@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>Thêm &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt;Xóa</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>Chuyển lên</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>Di chuyển xuống</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>Đặt lại thành mặc định</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>Xong</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>Hủy</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>Tìm các nút trực tuyến...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>Di chuyển các nút qua lại giữa hai danh sách bằng cách nhấp vào &quot;Thêm&quot; và &quot;Xóa&quot;.  Các nút trong danh sách·&quot;Nút·Hiện·thời&quot; sẽ xuất hiện ở cuối trang Picasa theo thứ tự bạn đặt chúng ở đây.  Sử dụng &quot;Di chuyển Lên&quot; và &quot;Di chuyển Xuống&quot; để sắp xếp thứ tự các nút.  (Trong ứng dụng này, từ trên xuống dưới cũng giống như từ trái sang phải)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>Nút hiện có:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>Các nút Hiện tại:</xmbtext>
+ </action>
+</tooltips>

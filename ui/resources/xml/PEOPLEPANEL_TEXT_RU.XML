@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Добавить имя</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Выберите папку для показа лиц</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Игнорировать</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Добавить отметку</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Отмена</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>При сканировании фотографий Picasa автоматически группирует найденные лица, чтобы упростить добавление имен.\n\nПолезные советы\n\nЧтобы отметить человека, нажмите &quot;Добавить имя&quot;, введите его и нажмите клавишу ВВОД. Каждый раз при добавлении нового человека будет создаваться его альбом.\n\n(Подсказка. Войдите в аккаунт Google, чтобы получить доступ к своим контактам при добавлении имен.)\n\nЧтобы игнорировать человека, нажмите крестик на уменьшенном изображении его лица.\n\n После того как вы отметили какого-либо человека, Picasa может предложить несколько похожих на него лиц. Нажмите на альбом с фотографиями соответствующего человека, чтобы посмотреть и подтвердить либо отклонить предложение.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>При сканировании фотографий Picasa автоматически группирует найденные лица, чтобы упростить добавление имен.\n\nПолезные советы\n\nЧтобы отметить человека, нажмите &quot;Добавить имя&quot;, введите его и нажмите клавишу ВВОД. Каждый раз при добавлении нового человека будет создаваться его альбом.\n\n(Подсказка. Войдите в аккаунт Google, чтобы получить доступ к своим контактам при добавлении имен.)\n\nЧтобы игнорировать человека, нажмите крестик на уменьшенном изображении его лица.\n\n После того как вы отметили какого-либо человека, Picasa может предложить несколько похожих на него лиц. Нажмите на альбом с фотографиями соответствующего человека, чтобы посмотреть и подтвердить либо отклонить предложение.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Пока пользователи не найдены. Как только лица будут обнаружены и сгруппированы, они появятся в альбоме &quot;Без имени&quot;. Во время сканирования информация о ходе выполнения процесса отображается в альбоме &quot;Без имени&quot;.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Здесь будут показаны пользователи с именами, находящиеся на фотографиях с выбранным человеком.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Здесь вы увидите всех, кого удастся распознать на выбранных фотографиях.</xmbtext>
+ </action>
+</tooltips>

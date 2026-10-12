@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_download/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/device_name.title">
+  <xmbtext>Eseguire il backup delle foto da %1$s?</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/action_prompt.title">
+  <xmbtext>Salva foto e video di questo dispositivo in Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/never_btn.title">
+  <xmbtext>Mai</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/once_btn.title">
+  <xmbtext>Solo questa volta</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/always_btn.title">
+  <xmbtext>Sempre</xmbtext>
+ </stringres>
+</resources>

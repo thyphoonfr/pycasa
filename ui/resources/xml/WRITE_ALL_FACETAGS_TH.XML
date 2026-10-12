@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>เขียนแท็กใบหน้า</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>การเขียนใบหน้าหรือการเขียนทั้งหมดอาจใช้เวลานาน  หากมีการตั้งค่าบันทึกเป็นรายละเอียดหรือสูงกว่าบันทึกเครือข่ายจะมีข้อความเกี่ยวกับไฟล์สำหรับอ่านเท่านั้น  ซึ่งไม่สามารถทำการปรับปรุงได้ จึงขอแนะนำให้คุณออกจากระบบเมื่อใช้คุณลักษณะนี้</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>เลือกการเขียน</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>เขียนใบหน้า</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>เขียนทั้งหมด</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

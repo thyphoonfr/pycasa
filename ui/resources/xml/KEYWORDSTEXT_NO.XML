@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="keywords/addbutton" xmbdesc="Label(keywords/addbutton)">
+  <xmbtext>Legg til</xmbtext>
+ </action>
+ <action type="Label" target="keywords/removebutton" xmbdesc="Label(keywords/removebutton)">
+  <xmbtext>Fjern</xmbtext>
+ </action>
+ <action type="Label" target="keywords/closebutton" xmbdesc="Label(keywords/closebutton)">
+  <xmbtext>Ferdig</xmbtext>
+ </action>
+ <action type="Label" target="keywords/addkeywords_label" xmbdesc="Label(keywords/addkeywords_label)">
+  <xmbtext>Legg til etikett:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/keywords_label" xmbdesc="Label(keywords/keywords_label)">
+  <xmbtext>Etiketter:</xmbtext>
+ </action>
+ <action type="Label" target="keywords/readonly_label" xmbdesc="Label(keywords/readonly_label)">
+  <xmbtext>Etiketter kan ikke endres da ett eller flere elementer er skrivebeskyttet.</xmbtext>
+ </action>
+</tooltips>

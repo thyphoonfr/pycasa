@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>‏גיבוי של אלבומי Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>‏בצע גיבוי לתמונות Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>‏שמור את התמונות והסרטונים שלך באינטרנט באופן אוטומטי בעזרת הגיבוי של אלבומי Google. הפריטים שתשמור יהיו נגישים מכל אחד מהמכשירים שלך והכל יישאר פרטי עד שתבחר לשתף.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>‏קבל את הגיבוי של אלבומי Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>לא, תודה</xmbtext>
+ </stringres>
+</resources>

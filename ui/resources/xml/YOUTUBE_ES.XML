@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Subir a YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Título:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descripción:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoría de vídeo:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Cargando...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Etiquetas:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Son palabras clave que se utilizan para ayudar a los usuarios a encontrar tu vídeo. (espacio de separación)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Hacer público este vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Tu vídeo tiene un límite de 10 minutos y 1 GB.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>No subas programas de televisión, vídeos musicales, conciertos ni anuncios sin permiso, a menos que se trate de contenido que hayas creado tu en su totalidad. La página Avisos de copyright y las Normas de la Comunidad pueden ayudarte a determinar si tu vídeo infringe los derechos de autor de otra persona.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Si haces clic en &quot;Subir vídeo&quot;, significa que el vídeo en cuestión no infringe los Términos de uso de YouTube y que eres propietario de todos los derechos de autor del mismo o que cuentas con la autorización necesaria para subirlo.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Subir vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

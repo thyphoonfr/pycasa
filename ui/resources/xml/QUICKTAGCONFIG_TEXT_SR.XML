@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Брзе ознаке можете да користите да бисте применили ознаку једним кликом. Испод откуцајте ознаке којима желите да приступате једним кликом. Подразумевано, горње две брзе ознаке се користе за праћење недавно примењених ознака. Опозовите избор у доленаведеном пољу за потврду да бисте ручно поставили горње две ознаке.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Аутоматски попуните горенаведена празна поља најчешће коришћеним ознакама</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Резервиши горња два дугмета за недавно коришћене ознаке</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>Потврди</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Откажи</xmbtext>
+ </action>
+</tooltips>

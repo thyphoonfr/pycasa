@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Chiudi</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Benvenuto in caricamento collettivo</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Seleziona le caselle accanto alle cartelle e agli album con cui lavorare. Quindi, scegli cosa fare. Picasa filtrerà gli elementi ai quali non applicare l&#039;operazione. Ad esempio, se un&#039;intera cartella o album sono già online, Picasa non li mostrerà come elementi da caricare.</xmbtext>
+ </action>
+</tooltips>

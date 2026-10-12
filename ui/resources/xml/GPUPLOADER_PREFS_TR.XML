@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_prefs/prefs_window.mac_title">
+  <xmbtext>Tercihler - Google Fotoğraflar Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/prefs_window.win_title">
+  <xmbtext>Ayarlar - Google Fotoğraflar Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/account_name.title">
+  <xmbtext>Hesap adı alınıyor...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/log_off.title">
+  <xmbtext>Çıkış</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/source_lbl.title">
+  <xmbtext>Yedek kaynaklar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.win_title">
+  <xmbtext>Kameralar ve hafıza kartları</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.mac_title">
+  <xmbtext>Kameralar ve hafıza kartları</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/devices_btn.title">
+  <xmbtext>Cihazlar...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder_chk.title">
+  <xmbtext>Harici medyadaki fotoğrafları/videoları da buraya kopyalayın</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder.title">
+  <xmbtext>Göz at...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/watched_folders_lbl.title">
+  <xmbtext>Masaüstü klasörleri</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/add_folder_btn.title">
+  <xmbtext>Ekle...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_size_label.title">
+  <xmbtext>Fotoğraf boyutu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size.title">
+  <xmbtext>Yüksek kalite (ücretsiz sınırsız depolama alanı)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size_desc.title">
+  <xmbtext>Harika görsel kalite, azaltılmış dosya boyutu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size.title">
+  <xmbtext>Orijinal (hesap depolama alanıyla sınırlıdır)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size_desc.title">
+  <xmbtext>Kotanızda hesaba katılan tam çözünürlük</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_raw.title">
+  <xmbtext>RAW dosyaları yükleyin.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/send_to_google.title">
+  <xmbtext>Anonim kullanım istatistikleri göndererek Fotoğraflar&#039;ın geliştirilmesine yardımcı olun.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/more_storage.title">
+  <xmbtext>Daha fazla depolama alanı alın...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/okbutton.title">
+  <xmbtext>Tamam</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/cancelbutton.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

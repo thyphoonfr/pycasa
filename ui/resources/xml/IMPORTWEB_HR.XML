@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Uvezi albume iz web-albuma</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Slike u web-albumima označenim u nastavku preuzet će se na vaše računalo kada kliknete gumb U redu. Automatski će se organizirati u mape na temelju naziva albuma.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Imate 100 web-albuma na internetu.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Uvezi sve albume</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Uvezi odabrane albume:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Naziv</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Datum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NAPOMENA: Bit će preuzete samo fotografije koje nemate u svom računalu)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

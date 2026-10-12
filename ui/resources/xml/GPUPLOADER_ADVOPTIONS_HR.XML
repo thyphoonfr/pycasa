@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_advoptions/adv_setup_window.title">
+  <xmbtext>Napredne postavke</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder_chk.title">
+  <xmbtext>Kopiraj i fotografije/videozapise s fotoaparata i memorijskih kartica na</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/send_to_google.title">
+  <xmbtext>Pošaljite Googleu anonimnu statistiku o korištenju.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/okbutton.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/cancelbutton.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

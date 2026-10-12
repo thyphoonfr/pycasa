@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="unknownfaceheaderpanel/cluster" xmbdesc="Label(unknownfaceheaderpanel/cluster)">
+  <xmbtext>Agrupa per cara</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showall" xmbdesc="Label(unknownfaceheaderpanel/showall)">
+  <xmbtext>Amplia els grups</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showignored" xmbdesc="Label(unknownfaceheaderpanel/showignored)">
+  <xmbtext>Mostra les cares ignorades</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showunknown" xmbdesc="Label(unknownfaceheaderpanel/showunknown)">
+  <xmbtext>Torna a Sense nom</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/addname" xmbdesc="Label(unknownfaceheaderpanel/addname)">
+  <xmbtext>Afegeix un nom</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/addname" xmbdesc="Tooltip(unknownfaceheaderpanel/addname)">
+  <xmbtext>Assigna un nom a totes les cares seleccionades</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/ignore" xmbdesc="Label(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignora els seleccionats</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/ignore" xmbdesc="Tooltip(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignora totes les cares seleccionades</xmbtext>
+ </action>
+</tooltips>

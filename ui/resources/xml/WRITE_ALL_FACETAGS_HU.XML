@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Arccímkék írása</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Az Arcinformációk írása és Az összes írása művelet hosszabb ideig is tarthat. Ha a naplózás részletes vagy annál magasabb szintre van beállítva, a network.log nem módosítható írásvédett fájlokról is tartalmaz majd üzeneteket. A funkció használatának idejére célszerű kijelentkezni.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Kijelöltek írása</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Arcinformációk írása</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Az összes írása</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

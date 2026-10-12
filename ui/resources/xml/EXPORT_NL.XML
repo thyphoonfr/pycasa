@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Naar map exporteren...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Exportlocatie:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Bladeren...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Naam van geëxporteerde map:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Nummers toevoegen aan bestandsnamen om de volgorde te handhaven</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Afbeeldingsformaat:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Oorspronkelijk formaat gebruiken</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Formaat aanpassen aan:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixels</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Afbeeldingskwaliteit:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatisch</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normaal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Aangepast</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Originele beeldkwaliteit wordt behouden</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Goede balans tussen kwaliteit en formaat</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Zeer groot bestandsformaat, details worden behouden</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Kleinste bestandsgrootte, klein kwaliteitsverlies</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Films exporteren met:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Eerste frame</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Volledige film (formaat niet wijzigen)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Watermerk:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Watermerk toevoegen</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Voeg uw naam, een webdomein of een auteursrechtmelding aan uw foto&#039;s toe.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Exporteren</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

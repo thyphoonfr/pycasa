@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Zapri</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Pozdravljeni v prenosu serije</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Potrdite polja ob mapah in albumih, s katerimi želite delati. Nato izberite opravilo, ki ga želite izvesti. Picasa bo nato prikazala elemente, v katerih je mogoče izvesti ta opravila. Če je na primer v spletu že celotna mapa ali album, Picasa ne prikaže možnosti za nalaganje.</xmbtext>
+ </action>
+</tooltips>

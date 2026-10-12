@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_advoptions/adv_setup_window.title">
+  <xmbtext>Configuració avançada</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder_chk.title">
+  <xmbtext>Copia també les fotos i els vídeos de les càmeres i les targetes d&#039;emmagatzematge a</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder.title">
+  <xmbtext>Examina...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/send_to_google.title">
+  <xmbtext>Envia estadístiques d&#039;ús anònimes a Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/okbutton.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/cancelbutton.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

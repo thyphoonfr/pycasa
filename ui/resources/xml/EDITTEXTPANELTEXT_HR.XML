@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="edittextpanel/edittext_label" xmbdesc="Label(edittextpanel/edittext_label)">
+  <xmbtext>Uredi tekst</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/font_label" xmbdesc="Label(edittextpanel/font_label)">
+  <xmbtext>Font:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/size_label" xmbdesc="Label(edittextpanel/size_label)">
+  <xmbtext>Veličina:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/style_label" xmbdesc="Label(edittextpanel/style_label)">
+  <xmbtext>Stil:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextapply" xmbdesc="Label(edittextpanel/edittextapply)">
+  <xmbtext>Primijeni</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextcancel" xmbdesc="Label(edittextpanel/edittextcancel)">
+  <xmbtext>Odustani</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/usecaption" xmbdesc="Label(edittextpanel/usecaption)">
+  <xmbtext>Kopiraj naslov</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/usecaption" xmbdesc="Tooltip(edittextpanel/usecaption)">
+  <xmbtext>Dodaj tekst prema naslovu fotografije</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/clearall" xmbdesc="Label(edittextpanel/clearall)">
+  <xmbtext>Obriši sve</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/clearall" xmbdesc="Tooltip(edittextpanel/clearall)">
+  <xmbtext>Ukloni sve postojeće tekstove</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/transparency_label" xmbdesc="Label(edittextpanel/transparency_label)">
+  <xmbtext>Prozirnost</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/align_label" xmbdesc="Label(edittextpanel/align_label)">
+  <xmbtext>Poravnanje:</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/leftalign" xmbdesc="Tooltip(edittextpanel/leftalign)">
+  <xmbtext>Poravnaj tekst ulijevo</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/centeralign" xmbdesc="Tooltip(edittextpanel/centeralign)">
+  <xmbtext>Poravnaj tekst obostrano</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/rightalign" xmbdesc="Tooltip(edittextpanel/rightalign)">
+  <xmbtext>Poravnaj tekst udesno</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/no_fill" xmbdesc="Tooltip(edittextpanel/no_fill)">
+  <xmbtext>Ne prikazuj punu boju ispune (prikaži samo okvir)</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/bold" xmbdesc="Tooltip(edittextpanel/bold)">
+  <xmbtext>Podebljano</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/italic" xmbdesc="Tooltip(edittextpanel/italic)">
+  <xmbtext>Kurziv</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/underline" xmbdesc="Tooltip(edittextpanel/underline)">
+  <xmbtext>Podcrtaj</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextapply" xmbdesc="Tooltip(edittextpanel/edittextapply)">
+  <xmbtext>Primijeni izmjene teksta i napusti alat za tekst</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextcancel" xmbdesc="Tooltip(edittextpanel/edittextcancel)">
+  <xmbtext>Zatvorite alat za tekst bez primjene izmjena</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="modalprogress/escmessage" xmbdesc="Text(modalprogress/escmessage)">
+  <xmbtext>Pindutin ang ESC na pindutan sa keyboard upang i-abort</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printlayoutlabel" xmbdesc="Label(printpanel/printlayoutlabel)">
+  <xmbtext>Layout ng Pag-print </xmbtext>
+ </action>
+ <action type="Label" target="printpanel/walletbutton" xmbdesc="Label(printpanel/walletbutton)">
+  <xmbtext>Wallet</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/walletbutton" xmbdesc="Tooltip(printpanel/walletbutton)">
+  <xmbtext>Mag-print ng mga larawan na kasing-laki ng pitaka</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/3x5button" xmbdesc="Label(printpanel/3x5button)">
+  <xmbtext>3.5 x 5</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/3x5button" xmbdesc="Tooltip(printpanel/3x5button)">
+  <xmbtext>Mag-print ng mga larawan sa pamantayang sukat na 3.5x5</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/4x6button" xmbdesc="Label(printpanel/4x6button)">
+  <xmbtext>4 x 6</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/4x6button" xmbdesc="Tooltip(printpanel/4x6button)">
+  <xmbtext>Mag-print ng mga larawan sa pamantayang sukat na 4x6</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/5x7button" xmbdesc="Label(printpanel/5x7button)">
+  <xmbtext>5 x 7</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/5x7button" xmbdesc="Tooltip(printpanel/5x7button)">
+  <xmbtext>Mag-print ng mga larawan sa pamantayang sukat na 5x7</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/8x10button" xmbdesc="Label(printpanel/8x10button)">
+  <xmbtext>8 x 10</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/8x10button" xmbdesc="Tooltip(printpanel/8x10button)">
+  <xmbtext>I-print ng mga larawan sa pamantayang sukat na 8x10</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fullbutton" xmbdesc="Label(printpanel/fullbutton)">
+  <xmbtext>Buong Pahina</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fullbutton" xmbdesc="Tooltip(printpanel/fullbutton)">
+  <xmbtext>Mag-print ng mga larawan na kapareho ng sukat ang papel</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/croptogglelabel" xmbdesc="Label(printpanel/croptogglelabel)">
+  <xmbtext>I-crop para Kumasya</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/croptoggle" xmbdesc="Tooltip(printpanel/croptoggle)">
+  <xmbtext>I-crop ang mga larawan upang maitugma sa mga napiling sukat sa pagprint</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/fittogglelabel" xmbdesc="Label(printpanel/fittogglelabel)">
+  <xmbtext>Paliitin para Kumasya</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/fittoggle" xmbdesc="Tooltip(printpanel/fittoggle)">
+  <xmbtext>Panatilihin ang mga orihinal na dimensyon ng mga larawan</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/captionoptionslabel" xmbdesc="Label(printpanel/captionoptionslabel)">
+  <xmbtext>Mga Opsyon ng Border at Teksto</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printerlabel" xmbdesc="Label(printpanel/printerlabel)">
+  <xmbtext>Printer</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/setuplabel" xmbdesc="Label(printpanel/setuplabel)">
+  <xmbtext>Setup ng Printer</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/copieslabel" xmbdesc="Label(printpanel/copieslabel)">
+  <xmbtext>Mga Kopya bawat Larawan</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/previewlabel" xmbdesc="Label(printpanel/previewlabel)">
+  <xmbtext>Preview</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/prevbutton" xmbdesc="Tooltip(printpanel/prevbutton)">
+  <xmbtext>Tingnan ang nakaraang pahina ng preview</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/nextbutton" xmbdesc="Tooltip(printpanel/nextbutton)">
+  <xmbtext>Tingnan ang susunod na pahina ng preview</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/printsetuplabel" xmbdesc="Label(printpanel/printsetuplabel)">
+  <xmbtext>Mga Setting ng Printer</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/captionoptionsbutton" xmbdesc="Tooltip(printpanel/captionoptionsbutton)">
+  <xmbtext>I-configure ang mga border at teksto para sa mga Larawan na ipi-print</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/selectprinterbutton" xmbdesc="Tooltip(printpanel/selectprinterbutton)">
+  <xmbtext>Nagbibigay ng listahan ng mga magagamit na printer</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/psetupbutton" xmbdesc="Tooltip(printpanel/psetupbutton)">
+  <xmbtext>Buksan ang mga pagkontrol ng setup ng printer para sa piniling printer</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/addprintsbutton" xmbdesc="Tooltip(printpanel/addprintsbutton)">
+  <xmbtext>Magdagdag ng isa pang kopya ng bawat Larawan na ipi-print</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/subprintsbutton" xmbdesc="Tooltip(printpanel/subprintsbutton)">
+  <xmbtext>Magbawas ng isang kopya ng bawat Larawang ipi-print</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/phelpbutton" xmbdesc="Label(printpanel/phelpbutton)">
+  <xmbtext>Tulong</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/phelpbutton" xmbdesc="Tooltip(printpanel/phelpbutton)">
+  <xmbtext>Buksan ang help center para sa pag-troubleshoot ng Pagpi-print</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/froogle" xmbdesc="Label(printpanel/froogle)">
+  <xmbtext>Hanapan ang Froogle para sa mga Supply</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/froogle" xmbdesc="Tooltip(printpanel/froogle)">
+  <xmbtext>Maghanap ng mga item/accessories para sa iyong printer sa Froogle</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton" xmbdesc="Label(printpanel/reviewnowbutton)">
+  <xmbtext>Review</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton" xmbdesc="Tooltip(printpanel/reviewnowbutton)">
+  <xmbtext>Siguraduhin mo na ang iyong mga larawan ay handa nang i-print</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/reviewnowbutton2" xmbdesc="Label(printpanel/reviewnowbutton2)">
+  <xmbtext>Review</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/reviewnowbutton2" xmbdesc="Tooltip(printpanel/reviewnowbutton2)">
+  <xmbtext>Siguraduhin mo na ang iyong mga larawan ay handa nang i-print</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton" xmbdesc="Label(printpanel/pnowbutton)">
+  <xmbtext>I-print</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton" xmbdesc="Tooltip(printpanel/pnowbutton)">
+  <xmbtext>Mag-print na ngayon ng mga larawan gamit ang mga kasalukuyang mga setting</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pnowbutton2" xmbdesc="Label(printpanel/pnowbutton2)">
+  <xmbtext>I-print</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pnowbutton2" xmbdesc="Tooltip(printpanel/pnowbutton2)">
+  <xmbtext>Mag-print na ngayon ng mga larawan gamit ang mga kasalukuyang mga setting</xmbtext>
+ </action>
+ <action type="Label" target="printpanel/pcancelbutton" xmbdesc="Label(printpanel/pcancelbutton)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="printpanel/pcancelbutton" xmbdesc="Tooltip(printpanel/pcancelbutton)">
+  <xmbtext>Kanselahin ang proseso ng pagpi-print at bumalik sa thumbnail na pagtingin</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/tllabel" xmbdesc="Label(editoneup/tllabel)">
+  <xmbtext>Timeline</xmbtext>
+ </action>
+ <action type="Label" target="editoneup/bcklabel" xmbdesc="Label(editoneup/bcklabel)">
+  <xmbtext>Lumabas</xmbtext>
+ </action>
+ <action type="Text" target="editoneup/tpslabel" xmbdesc="Text(editoneup/tpslabel)">
+  <xmbtext>Ipakita ang Oras</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/sbutton" xmbdesc="Label(editpanel/sbutton)">
+  <xmbtext>I-play</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/sbutton" xmbdesc="Tooltip(editpanel/sbutton)">
+  <xmbtext>Panoorin ang isang slideshow ng mga larawang ito</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edithelpbutton" xmbdesc="Tooltip(editpanel/edithelpbutton)">
+  <xmbtext>Tulong</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/weblink" xmbdesc="Tooltip(editpanel/weblink)">
+  <xmbtext>Magpunta sa website na kaugnay ng Larawan na ito</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editcollage" xmbdesc="Label(editpanel/editcollage)">
+  <xmbtext>I-edit ang Collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editcollage" xmbdesc="Tooltip(editpanel/editcollage)">
+  <xmbtext>I-edit ang collage kung saan ang larawang ito ay nilikha</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/fit" xmbdesc="Tooltip(editpanel/fit)">
+  <xmbtext>Pagkasyahin ang Larawan sa loob ng lugar sa panonood</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/1to1" xmbdesc="Tooltip(editpanel/1to1)">
+  <xmbtext>Ipaklita ang Larawan sa aktwal na sukat</xmbtext>
+ </action>
+ <action type="Text" target="nerdview/nvhead" xmbdesc="Text(nerdview/nvhead)">
+  <xmbtext>Histogram &amp; Impormasyon ng Camera</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captionbutton" xmbdesc="Tooltip(editpanel/captionbutton)">
+  <xmbtext>Ipakita/Itago ang Caption</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/toggle_left_drawer" xmbdesc="Tooltip(editpanel/toggle_left_drawer)">
+  <xmbtext>Ipakita/Itago ang Mga Kontrol sa Pag-edit</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/captiontrash" xmbdesc="Tooltip(editpanel/captiontrash)">
+  <xmbtext>Tanggalin ang caption na ito</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/refining_label" xmbdesc="Text(editpanel/refining_label)">
+  <xmbtext>Pinipino...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_ok" xmbdesc="Label(editpanel/tool_ok)">
+  <xmbtext>I-APPLY</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/tool_cancel" xmbdesc="Label(editpanel/tool_cancel)">
+  <xmbtext>KANSELAHIN</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/editslideshow" xmbdesc="Label(editpanel/editslideshow)">
+  <xmbtext>I-edit ang Movie</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/editslideshow" xmbdesc="Tooltip(editpanel/editslideshow)">
+  <xmbtext>I-edit ang Movie presentation na ito</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/albumview" xmbdesc="Label(editpanel/albumview)">
+  <xmbtext>Bumalik sa Library</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/albumview" xmbdesc="Tooltip(editpanel/albumview)">
+  <xmbtext>Bumalik sa organisadong thumbnail</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/quickupload" xmbdesc="Tooltip(editpanel/quickupload)">
+  <xmbtext>Mag-upload sa iyong Web Albums Drop Box</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/uploadchanges" xmbdesc="Tooltip(editpanel/uploadchanges)">
+  <xmbtext>I-update ang online na kopya gamit ang bersyon na ito</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label" xmbdesc="Label(editpanel/selection_label)">
+  <xmbtext>Pinili</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/selection_label_zoom" xmbdesc="Label(editpanel/selection_label_zoom)">
+  <xmbtext>Pinili</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_focus" xmbdesc="Tooltip(editpanel/swap_2up_focus)">
+  <xmbtext>Pagpalitin kung aling larawan ang may focus</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/swap_2up_layout" xmbdesc="Tooltip(editpanel/swap_2up_layout)">
+  <xmbtext>Lumipat sa pagitan ng pahalang at vertical na layout</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/aa_2up_toggle" xmbdesc="Tooltip(editpanel/aa_2up_toggle)">
+  <xmbtext>Tingnan nang dalawang beses ang parehong larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ab_2up_toggle" xmbdesc="Tooltip(editpanel/ab_2up_toggle)">
+  <xmbtext>Tingnan ang dalawang magkaibang mga larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/only_1up_toggle" xmbdesc="Tooltip(editpanel/only_1up_toggle)">
+  <xmbtext>Tingnan lang ang isang larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab1" xmbdesc="Tooltip(editpanel/tab1)">
+  <xmbtext>Mga karaniwang kailangang pagsasaayos</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab2" xmbdesc="Tooltip(editpanel/tab2)">
+  <xmbtext>Mga pinong-tono na pagsasaayos ng ilaw at kulay</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab3" xmbdesc="Tooltip(editpanel/tab3)">
+  <xmbtext>Masaya at kapaki-pakinabang na pagsasaproseso ng larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab4" xmbdesc="Tooltip(editpanel/tab4)">
+  <xmbtext>Mas masaya at magagamit na pagproseso ng larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/tab5" xmbdesc="Tooltip(editpanel/tab5)">
+  <xmbtext>Mas masaya at magagamit na pagproseso ng larawan</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop" xmbdesc="Label(editpanel/crop)">
+  <xmbtext>I-crop</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop" xmbdesc="Tooltip(editpanel/crop)">
+  <xmbtext>I-crop ang Larawan na ito sa ibang format</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye" xmbdesc="Label(editpanel/redeye)">
+  <xmbtext>Redeye</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeye" xmbdesc="Tooltip(editpanel/redeye)">
+  <xmbtext>Ayusin ang mga depekto ng Red-eye sa Larawan</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autolighting" xmbdesc="Label(editpanel/autolighting)">
+  <xmbtext>Auto Contrast</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autolighting" xmbdesc="Tooltip(editpanel/autolighting)">
+  <xmbtext>Ayusin ang exposure nang hindi naapektuhan ang kulay</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/autocolor" xmbdesc="Label(editpanel/autocolor)">
+  <xmbtext>Awto na Kulay</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/autocolor" xmbdesc="Tooltip(editpanel/autocolor)">
+  <xmbtext>Awtomatikong alisin ang mga color cast</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch" xmbdesc="Label(editpanel/retouch)">
+  <xmbtext>I-retouch</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouch" xmbdesc="Tooltip(editpanel/retouch)">
+  <xmbtext>Ayusin ang mga mantsa, alikabok at mga gasgas</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/edittext" xmbdesc="Label(editpanel/edittext)">
+  <xmbtext>Teksto</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik" xmbdesc="Label(editpanel/picnik)">
+  <xmbtext>I-edit sa Creative Kit</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik" xmbdesc="Tooltip(editpanel/picnik)">
+  <xmbtext>I-edit online ang larawan gamit ang Creative Kit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/showtextlabel" xmbdesc="Label(editpanel/showtextlabel)">
+  <xmbtext>Ipakita ang Teksto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/edittext" xmbdesc="Tooltip(editpanel/edittext)">
+  <xmbtext>Magdagdag/Mag-edit ng Teksto sa larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/showtextcheckbox" xmbdesc="Tooltip(editpanel/showtextcheckbox)">
+  <xmbtext>I-toggle upang ipakita o itago ang teksto sa isang larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filllight_icon" xmbdesc="Tooltip(editpanel/filllight_icon)">
+  <xmbtext>Pampunong Ilaw: Ayusin ang ambient na ilaw sa Larawan</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/horizonadjust" xmbdesc="Label(editpanel/horizonadjust)">
+  <xmbtext>Ituwid</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/horizonadjust" xmbdesc="Tooltip(editpanel/horizonadjust)">
+  <xmbtext>Ayusin ang isang baluktot na Larawan</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/enhance" xmbdesc="Label(editpanel/enhance)">
+  <xmbtext>Sinusuwerte Ako</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/enhance" xmbdesc="Tooltip(editpanel/enhance)">
+  <xmbtext>Pag-aayos na one-click para sa pag-iilaw at kulay</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/ok" xmbdesc="Label(editpanel/ok)">
+  <xmbtext>Ipatupad</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/ok" xmbdesc="Tooltip(editpanel/ok)">
+  <xmbtext>Ilapat ang mga Pagbabago</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cancel" xmbdesc="Label(editpanel/cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cancel" xmbdesc="Tooltip(editpanel/cancel)">
+  <xmbtext>Kanselahin ang mga Pagbabago</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_undo" xmbdesc="Label(editpanel/filter_undo)">
+  <xmbtext>Undo</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_undo" xmbdesc="Tooltip(editpanel/filter_undo)">
+  <xmbtext>Alisin ang pinakahuling pag-ayos o pag-edit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filter_redo" xmbdesc="Label(editpanel/filter_redo)">
+  <xmbtext>Gawing Muli</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/filter_redo" xmbdesc="Tooltip(editpanel/filter_redo)">
+  <xmbtext>I-apply muli ang tinanggal na pag-ayos o pag-edit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/crop_label" xmbdesc="Label(editpanel/crop_label)">
+  <xmbtext>I-crop ang Larawan</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croptext" xmbdesc="Label(editpanel/croptext)">
+  <xmbtext>Pumili ng isang dimensyin sa ibaba at pagkatapos ay i-click at i-drag ang larawan upang piliin ang bahagi ng larawan na gusto mong i-crop.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croprotatecrop" xmbdesc="Label(editpanel/croprotatecrop)">
+  <xmbtext>Pihitin</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croprotatecrop" xmbdesc="Tooltip(editpanel/croprotatecrop)">
+  <xmbtext>Lilipat sa pagitan ng oryentasyon na portrait at landscape</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/croppreview" xmbdesc="Label(editpanel/croppreview)">
+  <xmbtext>Preview</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/croppreview" xmbdesc="Tooltip(editpanel/croppreview)">
+  <xmbtext>Pini-preview ang piniling pag-crop</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropdiscard" xmbdesc="Label(editpanel/cropdiscard)">
+  <xmbtext>I-reset</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropdiscard" xmbdesc="Tooltip(editpanel/cropdiscard)">
+  <xmbtext>Tinatapon ang anumang ipinatupad na pag-crop</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropapply" xmbdesc="Label(editpanel/cropapply)">
+  <xmbtext>Ipatupad</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropapply" xmbdesc="Tooltip(editpanel/cropapply)">
+  <xmbtext>Ipatupad ang mga edits ng pag-crop</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/cropcancel" xmbdesc="Label(editpanel/cropcancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/cropcancel" xmbdesc="Tooltip(editpanel/cropcancel)">
+  <xmbtext>Lumabas sa tool sa pag-crop</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/crop_delete_custom" xmbdesc="Tooltip(editpanel/crop_delete_custom)">
+  <xmbtext>Tinatanggal ang kasalukuyang ratio ng aspeto</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeye_label" xmbdesc="Label(editpanel/redeye_label)">
+  <xmbtext>Pag-aayos ng Redeye</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyetext" xmbdesc="Label(editpanel/redeyetext)">
+  <xmbtext>I-click, pindutin nang matagal, at i-drag ang mouse sa paligid ng bawat mata nang magkahiwalay upang piliin ito. May lilitaw na kahong pampili sa ibabaw ng lugar.  Bitawan ang pagkakapindot sa mouse upang kumpletuhin ang iyong napili. Ang Larawan ay ipapakita nang wala nang red-eye.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeauto" xmbdesc="Label(editpanel/redeyeauto)">
+  <xmbtext>Awto</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeauto" xmbdesc="Tooltip(editpanel/redeyeauto)">
+  <xmbtext>I-apply muli ang awto na pag-aayos ng redeye</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyepreview" xmbdesc="Label(editpanel/redeyepreview)">
+  <xmbtext>Preview</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyepreview" xmbdesc="Tooltip(editpanel/redeyepreview)">
+  <xmbtext>I-preview ang mga nabago na walang kuwadradong balangkas</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyecancel" xmbdesc="Label(editpanel/redeyecancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyecancel" xmbdesc="Tooltip(editpanel/redeyecancel)">
+  <xmbtext>Umalis sa pag-aayos ng Red-Eye nang walang ina-apply na effect</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyeapply" xmbdesc="Label(editpanel/redeyeapply)">
+  <xmbtext>Ipatupad</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyeapply" xmbdesc="Tooltip(editpanel/redeyeapply)">
+  <xmbtext>I-apply ang effect at umalis sa pag-aayos ng Red-Eye</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/redeyediscard" xmbdesc="Label(editpanel/redeyediscard)">
+  <xmbtext>I-reset</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/redeyediscard" xmbdesc="Tooltip(editpanel/redeyediscard)">
+  <xmbtext>I-undo ang mga pagbabago sa Red-Eye</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_label" xmbdesc="Label(editpanel/retouch_label)">
+  <xmbtext>I-retouch ang mga mantsa</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchtext" xmbdesc="Label(editpanel/retouchtext)">
+  <xmbtext>I-click upang piliin ang lugar na aayusin.  Pagkatapos ay galawin ang mouse upang makita ang preview ng lugar na pinalitan.  I-click muli ang larawan upang i-finalize.  Sabunin, banlawan, ulitin.  Tala:  maaari mong gamitin ang ctrl-drag upang mag-pan.</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouch_brush_label" xmbdesc="Label(editpanel/retouch_brush_label)">
+  <xmbtext>Laki ng Brush</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchreset" xmbdesc="Label(editpanel/retouchreset)">
+  <xmbtext>I-reset</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchundo" xmbdesc="Label(editpanel/retouchundo)">
+  <xmbtext>I-undo ang Patch</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchredo" xmbdesc="Label(editpanel/retouchredo)">
+  <xmbtext>Redo Patch</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchapply" xmbdesc="Label(editpanel/retouchapply)">
+  <xmbtext>Ipatupad</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/retouchcancel" xmbdesc="Label(editpanel/retouchcancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchreset" xmbdesc="Tooltip(editpanel/retouchreset)">
+  <xmbtext>Alisin lahat ng mga retouch patch</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchundo" xmbdesc="Tooltip(editpanel/retouchundo)">
+  <xmbtext>Alisin ang huling retouch patch</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchredo" xmbdesc="Tooltip(editpanel/retouchredo)">
+  <xmbtext>I-apply muli ang naalis na retouch patch</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchapply" xmbdesc="Tooltip(editpanel/retouchapply)">
+  <xmbtext>Ipatupad ang pag-ayos at lumabas mula sa Retouch na tool</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/retouchcancel" xmbdesc="Tooltip(editpanel/retouchcancel)">
+  <xmbtext>Mag-exit sa Retouch na tool nang hindi pinatutupad ang mga pag-edit</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_lighting" xmbdesc="Tooltip(editpanel/magic_lighting)">
+  <xmbtext>Pag-aayos na one-click para sa pag-iilaw</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/magic_color" xmbdesc="Tooltip(editpanel/magic_color)">
+  <xmbtext>Pag-aayos na one-click para sa kulay</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/droppertoggle" xmbdesc="Tooltip(editpanel/droppertoggle)">
+  <xmbtext>Nagbibigay-daan sa iyo upang pumili ng isang kulay-abo o kulay-puti na bahagi ng Larawan upang alisin ang pataw ng kulay</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/greybalancelabel" xmbdesc="Label(editpanel/greybalancelabel)">
+  <xmbtext>Tagapili ng Neutral na Kulay</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/filllightlabel" xmbdesc="Label(editpanel/filllightlabel)">
+  <xmbtext>Pampuno na Ilaw</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnik_fx_label" xmbdesc="Label(editpanel/picnik_fx_label)">
+  <xmbtext>Mga effect ni</xmbtext>
+ </action>
+ <action type="Tooltip" target="editpanel/picnik_fx" xmbdesc="Tooltip(editpanel/picnik_fx)">
+  <xmbtext>Subukan ang higit pang mga effects sa Creative Kit</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/in_progress_label" xmbdesc="Label(editpanel/in_progress_label)">
+  <xmbtext>Isinasagawa...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/render_now" xmbdesc="Label(editpanel/render_now)">
+  <xmbtext>Lumikha Ngayon</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/picnikcancel" xmbdesc="Label(editpanel/picnikcancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Text" target="editpanel/picnikprogressdone" xmbdesc="Text(editpanel/picnikprogressdone)">
+  <xmbtext>I-click ang &#039;I-save sa Picasa&#039; kapag tapos nang i-edit.</xmbtext>
+ </action>
+ <action type="Text1" target="editpanel/picnikprogress" xmbdesc="Text1(editpanel/picnikprogress)">
+  <xmbtext>Nililipat ang larawan sa Creative Kit...</xmbtext>
+ </action>
+ <action type="Text2" target="editpanel/picnikprogress" xmbdesc="Text2(editpanel/picnikprogress)">
+  <xmbtext>Kumokonekta sa Creative Kit...</xmbtext>
+ </action>
+ <action type="Text3" target="editpanel/picnikprogress" xmbdesc="Text3(editpanel/picnikprogress)">
+  <xmbtext>Pakihintay, nililipat ang larawan mula sa Creative Kit...</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label0" xmbdesc="Label(editpanel/colorwheel_label0)">
+  <xmbtext>Pumili ng Kulay</xmbtext>
+ </action>
+ <action type="Label" target="editpanel/colorwheel_label1" xmbdesc="Label(editpanel/colorwheel_label1)">
+  <xmbtext>Pumili ng Kulay</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_youtube" xmbdesc="Label(movieeditpanel/export_youtube)">
+  <xmbtext>I-upload sa YouTube</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/export_movie" xmbdesc="Label(movieeditpanel/export_movie)">
+  <xmbtext>I-export ang Clip</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/reset_trim" xmbdesc="Label(movieeditpanel/reset_trim)">
+  <xmbtext>I-set muli ang Simula at Wakas</xmbtext>
+ </action>
+ <action type="Label" target="movieeditpanel/capture_frame" xmbdesc="Label(movieeditpanel/capture_frame)">
+  <xmbtext>Kumuha ng Snapshot</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_youtube" xmbdesc="Tooltip(movieeditpanel/export_youtube)">
+  <xmbtext>Mag-upload ng movie sa YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/export_movie" xmbdesc="Tooltip(movieeditpanel/export_movie)">
+  <xmbtext>Mag-save ng clip ng movie sa pagitan ng punto ng simula at pagtatapos</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/reset_trim" xmbdesc="Tooltip(movieeditpanel/reset_trim)">
+  <xmbtext>Ibalik ang movie sa orihinal na haba nito (alisin ang mga punto ng simula at wakas)</xmbtext>
+ </action>
+ <action type="Tooltip" target="movieeditpanel/capture_frame" xmbdesc="Tooltip(movieeditpanel/capture_frame)">
+  <xmbtext>Kunan ang kasalukuyang frame</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/pbutton" xmbdesc="Label(outputlayout/pbutton)">
+  <xmbtext>I-print</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/pbutton" xmbdesc="Tooltip(outputlayout/pbutton)">
+  <xmbtext>I-print ang mga larawan sa Photo Tray</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/ebutton" xmbdesc="Label(outputlayout/ebutton)">
+  <xmbtext>E-mail</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/ebutton" xmbdesc="Tooltip(outputlayout/ebutton)">
+  <xmbtext>Magpadala ng mga larawan sa Photo Tray sa pamamagitan ng e-mail</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/collage" xmbdesc="Label(outputlayout/collage)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/collage" xmbdesc="Tooltip(outputlayout/collage)">
+  <xmbtext>Bumuo ng isang Collage ng Larawan gamit ang iyong napili</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/makemovie" xmbdesc="Label(outputlayout/makemovie)">
+  <xmbtext>Movie</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/makemovie" xmbdesc="Tooltip(outputlayout/makemovie)">
+  <xmbtext>Lumikha ng isang Movie presentation ng iyong napili</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/sharewith" xmbdesc="Label(outputlayout/sharewith)">
+  <xmbtext>Hello</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/sharewith" xmbdesc="Tooltip(outputlayout/sharewith)">
+  <xmbtext>Magpadala ng mga larawan sa Photo Tray papunta sa Hello</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/blogger" xmbdesc="Label(outputlayout/blogger)">
+  <xmbtext>Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Mag-upload ng mga larawan sa Blogger</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/blogger" xmbdesc="Tooltip(outputlayout/blogger)">
+  <xmbtext>Mag-upload ng mga larawan sa Blogger</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/orderbutton" xmbdesc="Label(outputlayout/orderbutton)">
+  <xmbtext>Shop</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/orderbutton" xmbdesc="Tooltip(outputlayout/orderbutton)">
+  <xmbtext>Bumili ng mga print at produkto mula sa iyong paboritong online provider </xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/folderbutton" xmbdesc="Label(outputlayout/folderbutton)">
+  <xmbtext>I-export</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/folderbutton" xmbdesc="Tooltip(outputlayout/folderbutton)">
+  <xmbtext>Kumopya ng mga larawan sa Photo Tray papunta sa isang folder sa iyong hard disk</xmbtext>
+ </action>
+ <action type="Label" target="outputlayout/morebutton" xmbdesc="Label(outputlayout/morebutton)">
+  <xmbtext>Dagdag pa...</xmbtext>
+ </action>
+ <action type="Tooltip" target="outputlayout/morebutton" xmbdesc="Tooltip(outputlayout/morebutton)">
+  <xmbtext>I-click upang makakita ng higit pang mga opsyon</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/makemovietab" xmbdesc="Label(panelroot/makemovietab)">
+  <xmbtext>Movie Maker</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/collagetab" xmbdesc="Label(panelroot/collagetab)">
+  <xmbtext>Collage</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/acquiretab" xmbdesc="Label(panelroot/acquiretab)">
+  <xmbtext>I-import</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/capturemovietab" xmbdesc="Label(panelroot/capturemovietab)">
+  <xmbtext>Nakunan</xmbtext>
+ </action>
+ <action type="Label" target="panelroot/picasatab" xmbdesc="Label(panelroot/picasatab)">
+  <xmbtext>Library</xmbtext>
+ </action>
+ <action type="Label" target="publish/giftcdtext" xmbdesc="Label(publish/giftcdtext)">
+  <xmbtext>Ang mga napiling item sa pamamagitan ng markang check sa itaas ay isasama sa iyong Regalong CD.   Upang magdagdag ng higit pa na mga item, i-click ang &quot;Magdagdag ng Higit Pa&quot; na pindutan sa ibaba.</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_cdname" xmbdesc="Text(publish/label_cdname)">
+  <xmbtext>Pangalan ng CD</xmbtext>
+ </action>
+ <action type="Text" target="publish/namelimitext" xmbdesc="Text(publish/namelimitext)">
+  <xmbtext>Limitahin sa 16 na Character</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox1" xmbdesc="Text(publish/label_optionbox1)">
+  <xmbtext>Isama ang Slideshow</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox2" xmbdesc="Text(publish/label_optionbox2)">
+  <xmbtext>Burahin ang Media</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_optionbox3" xmbdesc="Text(publish/label_optionbox3)">
+  <xmbtext>Isama ang Picasa</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_go" xmbdesc="Label(publish/presentcd_go)">
+  <xmbtext>I-burn ang Disk</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_help" xmbdesc="Label(publish/presentcd_help)">
+  <xmbtext>Tulong</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_eject" xmbdesc="Label(publish/presentcd_eject)">
+  <xmbtext>I-eject</xmbtext>
+ </action>
+ <action type="Label" target="publish/presentcd_cancel" xmbdesc="Label(publish/presentcd_cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Magdagdag nang Higit Pa...</xmbtext>
+ </action>
+ <action type="Label" target="publish/addmore" xmbdesc="Label(publish/addmore)">
+  <xmbtext>Magdagdag nang Higit Pa...</xmbtext>
+ </action>
+ <action type="Text" target="publish/selectiontext" xmbdesc="Text(publish/selectiontext)">
+  <xmbtext>Napili at Mga Setting</xmbtext>
+ </action>
+ <action type="Text" target="publish/picsizetext" xmbdesc="Text(publish/picsizetext)">
+  <xmbtext>Sukat ng larawan</xmbtext>
+ </action>
+ <action type="Text" target="publish/cdnametext" xmbdesc="Text(publish/cdnametext)">
+  <xmbtext>Pangalanan ang Regalong CD</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backupcdheader" xmbdesc="Text1(publish/backupcdheader)">
+  <xmbtext>Lumikha ng Backup na CD</xmbtext>
+ </action>
+ <action type="Text2" target="publish/backupcdheader" xmbdesc="Text2(publish/backupcdheader)">
+  <xmbtext>Lumikha ng Set o gumamit ng isang umiiral na</xmbtext>
+ </action>
+ <action type="Label" target="publish/backupcdheader2" xmbdesc="Label(publish/backupcdheader2)">
+  <xmbtext>Pumili ng mga folder &amp; mga album na iba-back up</xmbtext>
+ </action>
+ <action type="Text1" target="publish/backuptext" xmbdesc="Text1(publish/backuptext)">
+  <xmbtext>Tinatala ng Backup Set kung saan iniimbak ang mga na-backup na mga file at nagtatabi din ito ng tala kung aling mga file ang na-back-up na, kaya hindi mo na kailangan pa itong i-backup muli.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext2" xmbdesc="Label(publish/backuptext2)">
+  <xmbtext>Pinapakita ngayon ng Picasa ang mga file na hindi mo na-backup dati.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backuptext3" xmbdesc="Label(publish/backuptext3)">
+  <xmbtext>Lagyan ng check ang mga folder na gusto mong i-backup o piliin ang &#039;Piliin Lahat&#039; upang piliin ang lahat.</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_go" xmbdesc="Label(publish/backup_go)">
+  <xmbtext>I-burn ang Disk</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_help" xmbdesc="Label(publish/backup_help)">
+  <xmbtext>Tulong</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_eject" xmbdesc="Label(publish/backup_eject)">
+  <xmbtext>I-eject</xmbtext>
+ </action>
+ <action type="Label" target="publish/backup_cancel" xmbdesc="Label(publish/backup_cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Label" target="publish/newbackupset" xmbdesc="Label(publish/newbackupset)">
+  <xmbtext>Bagong Set</xmbtext>
+ </action>
+ <action type="Label" target="publish/deletebackupset" xmbdesc="Label(publish/deletebackupset)">
+  <xmbtext>Tanggalin ang Set</xmbtext>
+ </action>
+ <action type="Label" target="publish/editbackupset" xmbdesc="Label(publish/editbackupset)">
+  <xmbtext>I-edit ang Set</xmbtext>
+ </action>
+ <action type="Text" target="publish/label_backupname" xmbdesc="Text(publish/label_backupname)">
+  <xmbtext>Set ng Backup</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectall" xmbdesc="Label(publish/selectall)">
+  <xmbtext>Piliin Lahat</xmbtext>
+ </action>
+ <action type="Label" target="publish/selectnone" xmbdesc="Label(publish/selectnone)">
+  <xmbtext>Piliin ang Wala</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox1" xmbdesc="Label(publish/label_rpoptionbox1)">
+  <xmbtext>I-upload</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox1" xmbdesc="Tooltip(publish/rpoptionbox1)">
+  <xmbtext>Ang napiling folder at/o mga album ay ia-upload</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox2" xmbdesc="Label(publish/label_rpoptionbox2)">
+  <xmbtext>Baguhin ang mga opsyon</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox2" xmbdesc="Tooltip(publish/rpoptionbox2)">
+  <xmbtext>Ang mga napiling folder at/o mga album ay ia-update online gamit ang mga opsyon na natukoy sa mga menu sa kanan</xmbtext>
+ </action>
+ <action type="Label" target="publish/label_rpoptionbox3" xmbdesc="Label(publish/label_rpoptionbox3)">
+  <xmbtext>Alisin online</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Ang mga napiling folder at/o mga album ay aalisin mula sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/rpoptionbox3" xmbdesc="Tooltip(publish/rpoptionbox3)">
+  <xmbtext>Ang mga napiling folder at/o mga album ay aalisin mula sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_go" xmbdesc="Label(publish/replicate_go)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_go" xmbdesc="Tooltip(publish/replicate_go)">
+  <xmbtext>Magsisimula ang napili mong aksyon</xmbtext>
+ </action>
+ <action type="Label" target="publish/replicate_cancel" xmbdesc="Label(publish/replicate_cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/replicate_cancel" xmbdesc="Tooltip(publish/replicate_cancel)">
+  <xmbtext>Ibalik sa Library nang hindi gumagawa ng mga pagbabago online</xmbtext>
+ </action>
+ <action type="Label" target="publish/upgradestorage" xmbdesc="Label(publish/upgradestorage)">
+  <xmbtext>I-upgrade ang storage</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/upgradestorage" xmbdesc="Tooltip(publish/upgradestorage)">
+  <xmbtext>Ang karagdagang imbakan ay magpapahintulot sa iyo na mag-upload ng higit pang mga larawan</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallactionstitle" xmbdesc="Text(publish/uploadallactionstitle)">
+  <xmbtext>Piliin ang pagkilos para sa mga piling folder at mga album:</xmbtext>
+ </action>
+ <action type="Text1" target="publish/uploadallinfotext" xmbdesc="Text1(publish/uploadallinfotext)">
+  <xmbtext>Ang Picasa ay nagpapakita lang ng mga folder at mga album na naglalaman ng mga folder na hindi mo na-upload dati.</xmbtext>
+ </action>
+ <action type="Text2" target="publish/uploadallinfotext" xmbdesc="Text2(publish/uploadallinfotext)">
+  <xmbtext>Ang Picasa ay nagpapakita ngayon ng mga folder at mga album na naglalaman lang mga mga larawang online na na hindi tugma sa mga opsyon na napili mo.</xmbtext>
+ </action>
+ <action type="Text3" target="publish/uploadallinfotext" xmbdesc="Text3(publish/uploadallinfotext)">
+  <xmbtext>Ang Picasa ay nagpapakita ngayon ng mga folder lang at mga album na naglalaman ng mga larawan online.</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadallstoragetitle" xmbdesc="Text(publish/uploadallstoragetitle)">
+  <xmbtext>Storage:</xmbtext>
+ </action>
+ <action type="Text" target="publish/used_storage" xmbdesc="Text(publish/used_storage)">
+  <xmbtext>Kasalukuyang ginagamit na imbakan</xmbtext>
+ </action>
+ <action type="Text" target="publish/full_storage" xmbdesc="Text(publish/full_storage)">
+  <xmbtext>Makalipas ang upload na ito, gagamit ka ng lahat ng iyong imbakan. </xmbtext>
+ </action>
+ <action type="Text" target="publish/needed_storage" xmbdesc="Text(publish/needed_storage)">
+  <xmbtext>Kailangan mo ng higit pang imbakan para ma-upload ang lahat ng iyan!</xmbtext>
+ </action>
+ <action type="Text" target="publish/final_storage" xmbdesc="Text(publish/final_storage)">
+  <xmbtext>Ang imbakan mo makalipas ang upload na ito</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadalloptionstitle" xmbdesc="Text(publish/uploadalloptionstitle)">
+  <xmbtext>Mga Opsyon sa Pag-upload:</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsize3" xmbdesc="Text(publish/uploadsize3)">
+  <xmbtext>Sukat:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Ang sukat ng larawan kapag in-upload sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsize" xmbdesc="Tooltip(publish/uploadallsize)">
+  <xmbtext>Ang sukat ng larawan kapag in-upload sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadaccess3" xmbdesc="Text(publish/uploadaccess3)">
+  <xmbtext>Visibility:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>I-set ang access ng album para sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallaccess" xmbdesc="Tooltip(publish/uploadallaccess)">
+  <xmbtext>I-set ang access ng album para sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Text" target="publish/uploadsync3" xmbdesc="Text(publish/uploadsync3)">
+  <xmbtext>I-sync:</xmbtext>
+ </action>
+ <action type="Tooltip" target="publish/uploadallsync" xmbdesc="Tooltip(publish/uploadallsync)">
+  <xmbtext>Baguhin ang setting ng sync para sa mga napiling folder at/o mga album</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/viewallbutton" xmbdesc="Label(searchoptions/viewallbutton)">
+  <xmbtext>Bumalik sa Tingnan Lahat</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchoptions/viewallbutton" xmbdesc="Tooltip(searchoptions/viewallbutton)">
+  <xmbtext>Mag-exit sa Mode ng Paghahanap</xmbtext>
+ </action>
+ <action type="Label" target="searchoptions/label_searchresult" xmbdesc="Label(searchoptions/label_searchresult)">
+  <xmbtext>Resulta ng Paghahanap:</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/timecontainer_label" xmbdesc="Tooltip(searchcontainer/timecontainer_label)">
+  <xmbtext>I-filter base sa saklaw ng petsa</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/searchclr" xmbdesc="Tooltip(searchcontainer/searchclr)">
+  <xmbtext>Limasin ang iyong paghanap</xmbtext>
+ </action>
+ <action type="Label" target="searchcontainer/filter_label" xmbdesc="Label(searchcontainer/filter_label)">
+  <xmbtext>Mga Filter</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/starsearch" xmbdesc="Tooltip(searchcontainer/starsearch)">
+  <xmbtext>Ipakita lamang ang mga larawang may star </xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/moviesearch" xmbdesc="Tooltip(searchcontainer/moviesearch)">
+  <xmbtext>Ipakita ang mga movie lamang</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/webview" xmbdesc="Tooltip(searchcontainer/webview)">
+  <xmbtext>Ipakita ang mga na-upload sa web albums lamang</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/facesearch" xmbdesc="Tooltip(searchcontainer/facesearch)">
+  <xmbtext>Ipakita lamang ang mga larawan na may mga mukha</xmbtext>
+ </action>
+ <action type="Tooltip" target="searchcontainer/geotagsearch" xmbdesc="Tooltip(searchcontainer/geotagsearch)">
+  <xmbtext>Ipakita lamang ang mga larawan na may geotag</xmbtext>
+ </action>
+ <action type="Text1" target="thumbui/lightbox_bgtext" xmbdesc="Text1(thumbui/lightbox_bgtext)">
+  <xmbtext>Walang natagpuang mga larawan</xmbtext>
+ </action>
+ <action type="Text2" target="thumbui/lightbox_bgtext" xmbdesc="Text2(thumbui/lightbox_bgtext)">
+  <xmbtext>Lahat ng mga File ay naka-backup sa set na ito</xmbtext>
+ </action>
+ <action type="Text3" target="thumbui/lightbox_bgtext" xmbdesc="Text3(thumbui/lightbox_bgtext)">
+  <xmbtext>Walang natagpuang mga larawan para sa cd</xmbtext>
+ </action>
+ <action type="Text4" target="thumbui/lightbox_bgtext" xmbdesc="Text4(thumbui/lightbox_bgtext)">
+  <xmbtext>Lahat ng mga larawan ay na-upload</xmbtext>
+ </action>
+ <action type="Text5" target="thumbui/lightbox_bgtext" xmbdesc="Text5(thumbui/lightbox_bgtext)">
+  <xmbtext>Lahat ng mga larawan na kasalukuyang online ay may mga setting na ito</xmbtext>
+ </action>
+ <action type="Text6" target="thumbui/lightbox_bgtext" xmbdesc="Text6(thumbui/lightbox_bgtext)">
+  <xmbtext>Walang mga larawan ang maaalis mula sa Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Text7" target="thumbui/lightbox_bgtext" xmbdesc="Text7(thumbui/lightbox_bgtext)">
+  <xmbtext>Walang mga larawan ang maaaring alisin sa Google Photos</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/albumview" xmbdesc="Label(thumbui/albumview)">
+  <xmbtext>Bumalik Sa Library</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/loupehit" xmbdesc="Tooltip(thumbui/loupehit)">
+  <xmbtext>Mag-click at drag sa ibabaw ng mga larawan upang palakihin ito</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/albumview" xmbdesc="Tooltip(thumbui/albumview)">
+  <xmbtext>Bumalik sa organisadong thumbnail</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/fullview" xmbdesc="Label(thumbui/fullview)">
+  <xmbtext>I-edit ang mga larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/fullview" xmbdesc="Tooltip(thumbui/fullview)">
+  <xmbtext>I-edit ang iyong mga larawan</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/importbutton" xmbdesc="Label(thumbui/importbutton)">
+  <xmbtext>I-import</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/importbutton" xmbdesc="Tooltip(thumbui/importbutton)">
+  <xmbtext>Kumuha ng mga larawan mula sa isang camera, scanner o iba pang media</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/webcambutton" xmbdesc="Tooltip(thumbui/webcambutton)">
+  <xmbtext>Kumuha ng mga larawan o video mula sa webcam o ibang kagamitang pang video</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/sbutton" xmbdesc="Label(thumbui/sbutton)">
+  <xmbtext>Slideshow</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/people_toggle" xmbdesc="Tooltip(thumbui/people_toggle)">
+  <xmbtext>Ipakita/Itago ang Panel ng Mga Tao</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/places_toggle" xmbdesc="Tooltip(thumbui/places_toggle)">
+  <xmbtext>Ipakita/Itago ang Panel ng Mga Lugar</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/tags_toggle" xmbdesc="Tooltip(thumbui/tags_toggle)">
+  <xmbtext>Ipakita/Itago ang Panel ng Mga Tag</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/properties_toggle" xmbdesc="Tooltip(thumbui/properties_toggle)">
+  <xmbtext>Ipakita/Itago ang Panel ng Mga Katangian</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/sbutton" xmbdesc="Tooltip(thumbui/sbutton)">
+  <xmbtext>Manood ng isang slideshow ng mga larawan sa napiling Folder o Album</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/timelinebutton" xmbdesc="Label(thumbui/timelinebutton)">
+  <xmbtext>Timeline</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/timelinebutton" xmbdesc="Tooltip(thumbui/timelinebutton)">
+  <xmbtext>Timeline na pagtingin ng lahat ng iyong mga larawan</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/cdmode" xmbdesc="Label(thumbui/cdmode)">
+  <xmbtext>Regalong CD</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/cdmode" xmbdesc="Tooltip(thumbui/cdmode)">
+  <xmbtext>Lumikha ng CD na may built-in na slideshow para sa mga kaibigan at kapamilya</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/backup" xmbdesc="Label(thumbui/backup)">
+  <xmbtext>I-backup</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/backup" xmbdesc="Tooltip(thumbui/backup)">
+  <xmbtext>I-archive ang iyong mga larawan sa isang CD o DVD</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/visitweb" xmbdesc="Label(thumbui/visitweb)">
+  <xmbtext>Web View</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/visitweb" xmbdesc="Tooltip(thumbui/visitweb)">
+  <xmbtext>PLACEHOLDER</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchhold" xmbdesc="Tooltip(thumbui/scratchhold)">
+  <xmbtext>Hawakan ang mga napiling item</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/scratchclear" xmbdesc="Tooltip(thumbui/scratchclear)">
+  <xmbtext>Burahin ang mga item mula sa seleksyon</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/addtobuttcon" xmbdesc="Tooltip(thumbui/addtobuttcon)">
+  <xmbtext>Idagdag ang napiling mga item sa Album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/startoggle" xmbdesc="Tooltip(thumbui/startoggle)">
+  <xmbtext>Magdagdag/Mag-alis ng Star</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Pihitin Pakaliwa</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Pihitin Pakaliwa</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/scratchlabel" xmbdesc="Text(thumbui/scratchlabel)">
+  <xmbtext>Pagpipilian</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/librarylabel" xmbdesc="Label(thumbui/librarylabel)">
+  <xmbtext>Library</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newfolder" xmbdesc="Tooltip(thumbui/newfolder)">
+  <xmbtext>Ilipat ang mga napiling file sa isang bagong folder</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderviewpopup" xmbdesc="Tooltip(thumbui/folderviewpopup)">
+  <xmbtext>Tingnan ang mga pagpipilian</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/folderview" xmbdesc="Tooltip(thumbui/folderview)">
+  <xmbtext>Itakda ang pagtingin upang magpakita ng mala-punong istraktura ng folder</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/flatview" xmbdesc="Tooltip(thumbui/flatview)">
+  <xmbtext>Itakda ang view para magpakita ng patag na istraktura ng folder</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/newalbum" xmbdesc="Tooltip(thumbui/newalbum)">
+  <xmbtext>Lumikha ng bagong album</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateright" xmbdesc="Tooltip(thumbui/rotateright)">
+  <xmbtext>Pihitin pakanan</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/rotateleft" xmbdesc="Tooltip(thumbui/rotateleft)">
+  <xmbtext>Pihitin Pakaliwa</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/smallthumbs" xmbdesc="Tooltip(thumbui/smallthumbs)">
+  <xmbtext>Magpakita ng mga larawan gamit ang mga maliliit na thumbnail</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/largethumbs" xmbdesc="Tooltip(thumbui/largethumbs)">
+  <xmbtext>Magpakita ng mga larawan gamit ang mga malalaking thumbnail</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/next" xmbdesc="Tooltip(thumbui/next)">
+  <xmbtext>Tingnan ang susunod na Larawan</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/prev" xmbdesc="Tooltip(thumbui/prev)">
+  <xmbtext>Tingnan ang nakaraang Larawan</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/cd_label" xmbdesc="Text(thumbui/cd_label)">
+  <xmbtext>Lumikha ng isang Regalong CD</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/backup_label" xmbdesc="Text(thumbui/backup_label)">
+  <xmbtext>I-backup ang iyong mga larawan</xmbtext>
+ </action>
+ <action type="Text" target="thumbui/replication_label" xmbdesc="Text(thumbui/replication_label)">
+  <xmbtext>Batch na Pag-upload...</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_text" xmbdesc="Label(thumbui/lightbox_esolo_text)">
+  <xmbtext>Walang resultang nahanap sa album na ito</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/lightbox_esolo_button" xmbdesc="Label(thumbui/lightbox_esolo_button)">
+  <xmbtext>Hanapin Lahat</xmbtext>
+ </action>
+ <action type="Label" target="thumbui/single_action_message" xmbdesc="Label(thumbui/single_action_message)">
+  <xmbtext>Piliin ang mga item na idadagdag sa clips tray ng iyong proyekto, matapos ay pindutin ang  &quot;Bumalik&quot; na pindutan upang bumalik sa iyong proyekto</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_return" xmbdesc="Tooltip(thumbui/single_action_return)">
+  <xmbtext>Bumalik sa ine-edit mo</xmbtext>
+ </action>
+ <action type="Tooltip" target="thumbui/single_action_close" xmbdesc="Tooltip(thumbui/single_action_close)">
+  <xmbtext>Kanselahin ang &quot;Kumuha ng higit pa&quot;</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setin" xmbdesc="Tooltip(video_control_bar/setin)">
+  <xmbtext>Lumikha ng bagong punto sa pagsimula</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/setout" xmbdesc="Tooltip(video_control_bar/setout)">
+  <xmbtext>Lumikha ng bagong punto sa pagtatapos</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar/moviemode1" xmbdesc="Tooltip(video_control_bar/moviemode1)">
+  <xmbtext>I-play nang full screen</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/1to1" xmbdesc="Tooltip(video_control_bar2/1to1)">
+  <xmbtext>Ipakita ang tunay na laki ng movie (huwag palakihin)</xmbtext>
+ </action>
+ <action type="Tooltip" target="video_control_bar2/fullscreen" xmbdesc="Tooltip(video_control_bar2/fullscreen)">
+  <xmbtext>I-play nang full screen</xmbtext>
+ </action>
+ <action type="Label" target="oneup/tllabel" xmbdesc="Label(oneup/tllabel)">
+  <xmbtext>Timeline</xmbtext>
+ </action>
+ <action type="Label" target="oneup/bcklabel" xmbdesc="Label(oneup/bcklabel)">
+  <xmbtext>Lumabas</xmbtext>
+ </action>
+ <action type="Text" target="oneup/tpslabel" xmbdesc="Text(oneup/tpslabel)">
+  <xmbtext>Ipakita ang Oras</xmbtext>
+ </action>
+</tooltips>

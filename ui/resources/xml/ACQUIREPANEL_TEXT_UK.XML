@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="acquirepanel/import_from_label" xmbdesc="Text(acquirepanel/import_from_label)">
+  <xmbtext>Імпортувати з:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_to_label" xmbdesc="Text(acquirepanel/import_to_label)">
+  <xmbtext>Імпортувати до:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_delimiter_label" xmbdesc="Text(acquirepanel/import_delimiter_label)">
+  <xmbtext>/</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/subfolder_label" xmbdesc="Text(acquirepanel/subfolder_label)">
+  <xmbtext>Назва папки:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludedupesbutton" xmbdesc="Tooltip(acquirepanel/excludedupesbutton)">
+  <xmbtext>Виключити фотографії, які вже імпортовано до Picasa</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/excludedupes_label" xmbdesc="Text(acquirepanel/excludedupes_label)">
+  <xmbtext>Виключити дублікати</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/nothing" xmbdesc="Text(acquirepanel/nothing)">
+  <xmbtext>Немає доступних фотографій</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/previewlabel" xmbdesc="Text(acquirepanel/previewlabel)">
+  <xmbtext>Попередній перегляд</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/importtraylabel" xmbdesc="Text(acquirepanel/importtraylabel)">
+  <xmbtext>Лоток імпорту</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>Попередня фотографія</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>Наступна фотографія</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>Повернути вправо</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>Повернути вліво</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/anowbutton" xmbdesc="Label(acquirepanel/anowbutton)">
+  <xmbtext>Імпортувати все</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/anowbutton" xmbdesc="Tooltip(acquirepanel/anowbutton)">
+  <xmbtext>Імпортувати всі, крім виключених елементів</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/import_selected" xmbdesc="Label(acquirepanel/import_selected)">
+  <xmbtext>Імпортувати вибрані</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/import_selected" xmbdesc="Tooltip(acquirepanel/import_selected)">
+  <xmbtext>Імпортувати елементи, вибрані лише на цей момент</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/acancelbutton" xmbdesc="Label(acquirepanel/acancelbutton)">
+  <xmbtext>Скасувати</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/acancelbutton" xmbdesc="Tooltip(acquirepanel/acancelbutton)">
+  <xmbtext>Скасувати імпортування</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/upload_label" xmbdesc="Label(acquirepanel/upload_label)">
+  <xmbtext>Завантажити</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/share_with_label" xmbdesc="Label(acquirepanel/share_with_label)">
+  <xmbtext>Спільно використовувати з:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/startoggle" xmbdesc="Tooltip(acquirepanel/startoggle)">
+  <xmbtext>Додати/видалити зірочку</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludetoggle" xmbdesc="Tooltip(acquirepanel/excludetoggle)">
+  <xmbtext>Виключити/Включити</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/sync_options_button" xmbdesc="Tooltip(acquirepanel/sync_options_button)">
+  <xmbtext>Параметри в режимі онлайн</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/delete_label" xmbdesc="Label(acquirepanel/delete_label)">
+  <xmbtext>Після копіювання:</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/sync_options_button" xmbdesc="Label(acquirepanel/sync_options_button)">
+  <xmbtext>Параметри</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/selected_groups_label" xmbdesc="Label(acquirepanel/selected_groups_label)">
+  <xmbtext>Ніхто</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>Повернути вправо</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>Повернути вліво</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>Наступна фотографія</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>Попередня фотографія</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/add_groups_button" xmbdesc="Tooltip(acquirepanel/add_groups_button)">
+  <xmbtext>Додати користувачів для спільного доступу до альбомів</xmbtext>
+ </action>
+ <action type="Text1" target="acquirepanel/importtiptext" xmbdesc="Text1(acquirepanel/importtiptext)">
+  <xmbtext>Введіть нову назву папки або виберіть уже існуючу папку, щоб продовжити</xmbtext>
+ </action>
+ <action type="Text2" target="acquirepanel/importtiptext" xmbdesc="Text2(acquirepanel/importtiptext)">
+  <xmbtext>Натисніть &quot;Імпортувати все&quot; або &quot;Імпортувати вибране&quot;</xmbtext>
+ </action>
+ <action type="Text3" target="acquirepanel/importtiptext" xmbdesc="Text3(acquirepanel/importtiptext)">
+  <xmbtext>Імпортувати в окремі папки для кожної взятої дати</xmbtext>
+ </action>
+ <action type="Text4" target="acquirepanel/importtiptext" xmbdesc="Text4(acquirepanel/importtiptext)">
+  <xmbtext>Імпортувати в папку iз сьогоднішньою датою</xmbtext>
+ </action>
+</tooltips>

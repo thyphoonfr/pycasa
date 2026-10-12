@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="acquirepanel/import_from_label" xmbdesc="Text(acquirepanel/import_from_label)">
+  <xmbtext>وارد کردن از:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_to_label" xmbdesc="Text(acquirepanel/import_to_label)">
+  <xmbtext>وارد کردن در:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_delimiter_label" xmbdesc="Text(acquirepanel/import_delimiter_label)">
+  <xmbtext>/</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/subfolder_label" xmbdesc="Text(acquirepanel/subfolder_label)">
+  <xmbtext>عنوان پوشه:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludedupesbutton" xmbdesc="Tooltip(acquirepanel/excludedupesbutton)">
+  <xmbtext>‏مستثنی کردن عکس‌هایی که در حال حاضر در Picasa وارد شدند</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/excludedupes_label" xmbdesc="Text(acquirepanel/excludedupes_label)">
+  <xmbtext>کنار گذاشتن موارد تکراری</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/nothing" xmbdesc="Text(acquirepanel/nothing)">
+  <xmbtext>عکسی موجود نیست</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/previewlabel" xmbdesc="Text(acquirepanel/previewlabel)">
+  <xmbtext>پیش‌نمایش</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/importtraylabel" xmbdesc="Text(acquirepanel/importtraylabel)">
+  <xmbtext>سبد ورودی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>عکس قبلی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>عکس بعدی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>چرخش به راست</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>چرخش به چپ</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/anowbutton" xmbdesc="Label(acquirepanel/anowbutton)">
+  <xmbtext>وارد کردن همه</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/anowbutton" xmbdesc="Tooltip(acquirepanel/anowbutton)">
+  <xmbtext>وارد کردن همه به غیر از موارد کنار گذاشته شده</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/import_selected" xmbdesc="Label(acquirepanel/import_selected)">
+  <xmbtext>وارد کردن موارد انتخابی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/import_selected" xmbdesc="Tooltip(acquirepanel/import_selected)">
+  <xmbtext>فقط مواردی را که در حال حاضر انتخاب کرده‌اید، وارد نمایید</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/acancelbutton" xmbdesc="Label(acquirepanel/acancelbutton)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/acancelbutton" xmbdesc="Tooltip(acquirepanel/acancelbutton)">
+  <xmbtext>لغو وارد کردن</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/upload_label" xmbdesc="Label(acquirepanel/upload_label)">
+  <xmbtext>آپلود</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/share_with_label" xmbdesc="Label(acquirepanel/share_with_label)">
+  <xmbtext>اشتراک‌گذاری با:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/startoggle" xmbdesc="Tooltip(acquirepanel/startoggle)">
+  <xmbtext>افزودن/حذف ستاره</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludetoggle" xmbdesc="Tooltip(acquirepanel/excludetoggle)">
+  <xmbtext>مستثنی کردن/شامل شدن</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/sync_options_button" xmbdesc="Tooltip(acquirepanel/sync_options_button)">
+  <xmbtext>گزینه‌های آنلاین</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/delete_label" xmbdesc="Label(acquirepanel/delete_label)">
+  <xmbtext>بعد از تهیه رونوشت:</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/sync_options_button" xmbdesc="Label(acquirepanel/sync_options_button)">
+  <xmbtext>گزینه‌ها</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/selected_groups_label" xmbdesc="Label(acquirepanel/selected_groups_label)">
+  <xmbtext>هیچ‌کس</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>چرخش به راست</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>چرخش به چپ</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>عکس بعدی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>عکس قبلی</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/add_groups_button" xmbdesc="Tooltip(acquirepanel/add_groups_button)">
+  <xmbtext>افزودن افراد برای اشتراک‌گذاری آلبوم‌ها با آن‌ها</xmbtext>
+ </action>
+ <action type="Text1" target="acquirepanel/importtiptext" xmbdesc="Text1(acquirepanel/importtiptext)">
+  <xmbtext>عنوان پوشهٔ جدید را وارد کنید یا پوشه موجود را برای ادامه انتخاب نمایید</xmbtext>
+ </action>
+ <action type="Text2" target="acquirepanel/importtiptext" xmbdesc="Text2(acquirepanel/importtiptext)">
+  <xmbtext>کلیک روی وارد کردن همه یا وارد کردن موارد انتخابی</xmbtext>
+ </action>
+ <action type="Text3" target="acquirepanel/importtiptext" xmbdesc="Text3(acquirepanel/importtiptext)">
+  <xmbtext>وارد کردن در پوشه‌های جداگانه برای هر تاریخی که عکس گرفته شده است</xmbtext>
+ </action>
+ <action type="Text4" target="acquirepanel/importtiptext" xmbdesc="Text4(acquirepanel/importtiptext)">
+  <xmbtext>وارد کردن در پوشه دارای تاریخ امروز</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>Conectaţi-vă</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>Doresc să fie reţinute datele mele pe acest computer</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>Numele de utilizator:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>Parolă:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>Folosiţi numele de utilizator Hello pentru a trimite fotografii cu Picasa!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>Conectaţi-vă</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>Aţi uitat parola?</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>Conectaţi-vă la Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>Cu Picasa Web Albums, puteţi distribui albume foto online prietenilor şi familiei sau puteţi crea albume publice de distribuit întregii lumi. Este gratuit şi uşor de folosit.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>Contul dvs. Google este valid, dar nu v-aţi deschis un cont pentru Picasa Web Albums.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>Faceţi clic aici pentru a afla mai multe.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>Activaţi Picasa Web Albums...</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>Deschideţi-vă un cont Picasa Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>Încărcaţi-vă filmele în Google Video folosind Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>Pentru a începe încărcarea, conectaţi-vă mai jos.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>Faceţi clic aici pentru a afla mai multe detalii.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>Creaţi un cont</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>Trimiteţi fotografii din contul dvs. Google folosind Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>Procesul de trimitere a imaginilor nu implică utilizarea unui browser web</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>Trimiteţi până la 10 MO de fotografii</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>Doriţi Gmail? Obţineţi un cont gratuit cu un spaţiu de stocare de peste 6,5 GO (care creşte continuu)</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>Previzualizaţi fotografiile înainte de a le trimite</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>Numele de utilizator sau parola este incorectă. Încercaţi din nou.</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>Numele utilizatorului şi parola nu se potrivesc. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>Introduceţi parola corectă deasupra, apoi scrieţi caracterele pe care le vedeţi în fotografia de mai jos (sensibilitate la litere mari şi mici)</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>Doresc să fie reţinute datele mele pe acest computer</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>Conectaţi-vă</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>Ekle &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; Kaldır</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>Yukarı Taşı</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>Aşağı Taşı</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>Varsayılan Ayarlara Dön</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>Bitti</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>Tamam</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>İptal</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>Düğmeleri çevrimiçi bul...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>&quot;Ekle&quot; ve &quot;Kaldır&quot; düğmelerini tıklayarak düğmeleri iki liste arasında taşıyın. &quot;Mevcut Düğmeler&quot; listesindeki düğmeler, burada verdiğiniz sırada Picasa’nın altında görünecektir. Düğmelerin sırasını düzenlemek için &quot;Yukarı Taşı&quot; ve &quot;Aşağı Taşı&quot; düğmelerini kullanın. (Buradaki yukarıdan aşağıya, uygulamada soldan sağa yönüne eşdeğerdir)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>Kullanılabilir Düğmeler:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>Mevcut Düğmeler:</xmbtext>
+ </action>
+</tooltips>

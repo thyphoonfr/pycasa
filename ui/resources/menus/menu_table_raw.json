@@ -1,0 +1,837 @@
+[
+  {
+    "id": "eMenuFile::ID_FILE_EXIT",
+    "label": "E&xit",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_EPROCESS",
+    "label": "Order Prin&ts...",
+    "accel": "E"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_EMAIL",
+    "label": "&E-Mail...",
+    "accel": "P"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_PRINT",
+    "label": "&Print...",
+    "accel": "CMenuBar::Delete"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_DELETEFROMDISK",
+    "label": "&Delete from Disk...",
+    "accel": "CMenuBar::Enter"
+  },
+  {
+    "id": "eMenuFileWin::ID_FILE_LOCATEONDISK",
+    "label": "&Locate on Disk",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_EXPORTTOFOLDER",
+    "label": "Export Pi&cture to Folder...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_SAVEACOPY",
+    "label": "Save a Cop&y",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_SAVEAS",
+    "label": "Save &As...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_REVERT",
+    "label": "Rever&t",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_SAVE",
+    "label": "&Save",
+    "accel": "F2"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_RENAME",
+    "label": "&Rename...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_NEWFOLDER",
+    "label": "Mo&ve to New Folder...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_OPENINANEDITOR",
+    "label": "&Open File(s) in an Editor",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_GETMYSTUFF",
+    "label": "Import from Picasa Web Albums...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_FILE_IMPORTPICTURE",
+    "label": "&Import From...",
+    "accel": "O"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_OPEN",
+    "label": "Add &File to Picasa...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFile::ID_TOOLS_INCLUDEEXCLUDEFOLDERS",
+    "label": "Add Folder to Picasa...",
+    "accel": "N"
+  },
+  {
+    "id": "eMenuFile::ID_FILE_NEWLABEL",
+    "label": "&New Album...",
+    "accel": "&File"
+  },
+  {
+    "id": "eMenuFile",
+    "label": "",
+    "accel": "C&lear Selection"
+  },
+  {
+    "id": "eMenuEdit::ID_SELECT_INVERT",
+    "label": "&Invert Selection",
+    "accel": ""
+  },
+  {
+    "id": "eMenuEdit::ID_SELECTSTAR",
+    "label": "Select &Starred",
+    "accel": "A"
+  },
+  {
+    "id": "eMenuEdit::ID_ALBUM_SELECTALLPICTURES",
+    "label": "Select &All",
+    "accel": ""
+  },
+  {
+    "id": "eMenuEdit::ID_EDIT_PASTETEXT",
+    "label": "Paste Text",
+    "accel": ""
+  },
+  {
+    "id": "eMenuEdit::ID_EDIT_COPYTEXT",
+    "label": "Copy Text",
+    "accel": ""
+  },
+  {
+    "id": "eMenuEdit::ID_EDIT_PASTEALLEFFECTS",
+    "label": "Paste All E&ffects",
+    "accel": ""
+  },
+  {
+    "id": "eMenuEdit::ID_EDIT_COPYALLEFFECTS",
+    "label": "C&opy All Effects",
+    "accel": "V"
+  },
+  {
+    "id": "eMenuEdit::ID_PASTE",
+    "label": "&Paste",
+    "accel": "C"
+  },
+  {
+    "id": "eMenuEdit::ID_COPY",
+    "label": "&Copy",
+    "accel": "X"
+  },
+  {
+    "id": "eMenuEdit::ID_CUT",
+    "label": "Cu&t",
+    "accel": "&Edit"
+  },
+  {
+    "id": "eMenuEdit",
+    "label": "",
+    "accel": "&Black and White"
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SEPIA",
+    "label": "&Sepia",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_LINEAR",
+    "label": "Linear &Gamma (2.2)",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_MAC",
+    "label": "&Mac Gamma (1.6)",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_OV",
+    "label": "&Show overflow pixels",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_PROJECTOR",
+    "label": "&Projector Mode",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_LCD",
+    "label": "&LCD Whitepoint",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_RDESK",
+    "label": "&Remote Desktop",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_16",
+    "label": "&16-bit (dithered)",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_NORMAL",
+    "label": "&24-bit",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_AUTO",
+    "label": "&Automatic",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_CAPRES",
+    "label": "&Resolution",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_CAPTAG",
+    "label": "&Tags",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_CAPFULL",
+    "label": "&Caption",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_CAPFILE",
+    "label": "&Filename",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_CAPNONE",
+    "label": "&None",
+    "accel": ""
+  },
+  {
+    "id": "eMenuViewWin::ID_VIEW_MYCOMPUTER",
+    "label": "My &Computer",
+    "accel": ""
+  },
+  {
+    "id": "eMenuViewWin::ID_VIEW_MYPICTURES",
+    "label": "My &Pictures",
+    "accel": ""
+  },
+  {
+    "id": "eMenuViewWin::ID_VIEW_MYDOCS",
+    "label": "My Do&cuments",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_DESKTOP",
+    "label": "&Desktop",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_WATCHED",
+    "label": "&Simplified Tree View",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_THUMBNAILS",
+    "label": "Show &Thumbnails in Library",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::Shortcuts",
+    "label": "&Shortcuts",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEWREVERSE",
+    "label": "Re&verse sort",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEWBYNAME",
+    "label": "Sort by &Name",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEWBYSIZE",
+    "label": "Sort by &Size",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEWBYRECENT",
+    "label": "Sort by &Recent Changes",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEWBYDATE",
+    "label": "Sort by &Creation Date",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_ALL",
+    "label": "&Tree View",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_FOLDERS",
+    "label": "&Flat Folder View",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::FolderView",
+    "label": "&Folder View",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ThumbnailCaption",
+    "label": "Thumbnail &Caption",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::DisplayMode",
+    "label": "&Display Mode",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_COLOR_MANAGED",
+    "label": "Use Color Management",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SHOWHIDDEN",
+    "label": "&Hidden Pictures",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SMALL",
+    "label": "Small &Pictures",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SEARCHVIEW",
+    "label": "Search &Options",
+    "accel": "5"
+  },
+  {
+    "id": "eMenuView::ID_VIEW_TIMELINE",
+    "label": "Ti&meline",
+    "accel": "4"
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SLIDESHOW",
+    "label": "&Slideshow",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_EDIT",
+    "label": "Show Edit Controls",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_PLACES",
+    "label": "&Places",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_PEOPLE",
+    "label": "&People",
+    "accel": "T"
+  },
+  {
+    "id": "eMenuView::ID_VIEW_PROPERTIES",
+    "label": "Properties",
+    "accel": "3"
+  },
+  {
+    "id": "eMenuView::ID_VIEW_PICTURE",
+    "label": "&Edit View",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_LARGETHUMBNAILS",
+    "label": "&Normal Thumbnails",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_SMALLTHUMBNAILS",
+    "label": "S&mall Thumbnails",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_VIEW_LIGHTBOXVIEW",
+    "label": "&Library View",
+    "accel": "&View"
+  },
+  {
+    "id": "eMenuView",
+    "label": "",
+    "accel": "&Reverse order"
+  },
+  {
+    "id": "eMenuLabelFolder::ID_SIZESORT",
+    "label": "&Size",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_DATESORT",
+    "label": "&Date",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_NAMESORT",
+    "label": "&Name",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_ALBUM_DELETE",
+    "label": "&Delete...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_MOVEFOLDER",
+    "label": "&Move...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_MANAGE_ALBUM",
+    "label": "&Remove from Picasa...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuFileWin::ID_ALBUM_LOCATEONDISK",
+    "label": "",
+    "accel": "E&xport as HTML Page..."
+  },
+  {
+    "id": "eMenuLabelFolder::ID_FILE_PRINTCONTACTSHEET",
+    "label": "&Print Contact Sheet...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_UNHIDE",
+    "label": "&Unhide",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_HIDE",
+    "label": "&Hide",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::SortBy",
+    "label": "&Sort By",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_REFRESH_THUMB",
+    "label": "Refresh &Thumbnails",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_ALBUM_SLIDESHOW",
+    "label": "&View Slideshow",
+    "accel": ""
+  },
+  {
+    "id": "eMenuLabelFolder::ID_ALBUM_EDITCAPTIONS",
+    "label": "&Edit Description...",
+    "accel": "&Folder"
+  },
+  {
+    "id": "eMenuLabelFolder",
+    "label": "",
+    "accel": "Hide Text"
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_SHOW_TEXT",
+    "label": "Show Text",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_AUTO_REDEYE",
+    "label": "Auto Red Eye Correction",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_FILM_GRAIN",
+    "label": "&Film Grain",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_WARMIFY",
+    "label": "&Warmify",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_SHARPEN",
+    "label": "S&harpen",
+    "accel": ""
+  },
+  {
+    "id": "eMenuView::ID_PICTURE_SEPIA",
+    "label": "",
+    "accel": "I'm Feeling &Lucky"
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_AUTO_COLOR",
+    "label": "&Auto Color",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_AUTO_LIGHTING",
+    "label": "A&uto Contrast",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_ROTATECOUNTERCLOCKWISE",
+    "label": "Rotate &Counterclockwise",
+    "accel": "R"
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_ROTATECLOCKWISE",
+    "label": "R&otate Clockwise",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPictureWin::ID_PICTURE_PROPERTIES",
+    "label": "Propert&ies",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_RESET_FACES",
+    "label": "Reset &Faces",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_REVERT",
+    "label": "Undo &All Edits",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::BatchEdit",
+    "label": "&Batch Edit",
+    "accel": ""
+  },
+  {
+    "id": "eMenuPicture::ID_PICTURE_VIEW",
+    "label": "&View and Edit",
+    "accel": "&Picture"
+  },
+  {
+    "id": "eMenuPicture",
+    "label": "",
+    "accel": "From People Albums..."
+  },
+  {
+    "id": "eMenuCreateMovie::ID_FACES",
+    "label": "From Faces in Selection...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreateMovie::MOVIE",
+    "label": "From Selection...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreateWin::ID_TIVO",
+    "label": "&Export to TiVo(r) DVR...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_EXPORT_SENDTOBLOGGER",
+    "label": "Publish to &Blogger...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::Movies",
+    "label": "&Movie",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_BURNCD",
+    "label": "Create a &Gift CD...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_SCREENSAVER",
+    "label": "Add to &Screensaver...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_COLLAGEMAKER",
+    "label": "&Picture Collage...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_POSTER",
+    "label": "Make a &Poster...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuCreate::ID_WALLPAPER",
+    "label": "Set as &Desktop...",
+    "accel": "&Create"
+  },
+  {
+    "id": "eMenuCreate",
+    "label": "",
+    "accel": "Upload to &YouTube"
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_COLLAB",
+    "label": "Upload to a Collaborative Web Album",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_UPLOAD",
+    "label": "Upload to Google &Photos",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_EXPORT_EARTH",
+    "label": "Export to Google Earth File",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_PICTURE_GEOUNTAG",
+    "label": "Clear Geotags",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_VIEW_EARTH",
+    "label": "View in Google Earth...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_PICTURE_GEOTAG",
+    "label": "Geotag With Google Earth...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_PURPLE",
+    "label": "&Purple",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_BLUE",
+    "label": "&Blue",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_GREEN",
+    "label": "&Green",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_YELLOW",
+    "label": "&Yellow",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_ORANGE",
+    "label": "&Orange",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_S_RED",
+    "label": "&Red",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_WRITE_XMP_FACES",
+    "label": "Write faces to XMP...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_MOVE_DATABASE",
+    "label": "Choose database location...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_DELETE_EMPTY_ALBUMS",
+    "label": "Delete empty online albums...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_PASSPORT",
+    "label": "&Passport photo...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_SEARCHTOKEN",
+    "label": "Show &tag as album...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_SAVESEARCH",
+    "label": "Save &search results...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::Searchfor",
+    "label": "Search for...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_DUPES",
+    "label": "Show Duplicate Files",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_FTPWEB",
+    "label": "Publish via FTP...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_OPTIONS",
+    "label": "&Options...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_BUTTONMGR",
+    "label": "Configure Buttons...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::Experimental",
+    "label": "Experimental",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::Geotag",
+    "label": "&Geotag",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::Upload",
+    "label": "U&pload",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_DOWNLOAD_FACES",
+    "label": "Do&wnload Name Tags from Picasa Web Albums",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_ADJUST_TIMESTAMP",
+    "label": "Adjust &Date and Time...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_BATCH_UPLOAD",
+    "label": "Batch Upload...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_BACKUP",
+    "label": "&Back Up Pictures...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_CONFIG_SCREENSAVER",
+    "label": "Configure Screensaver...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_CONFIG_SLINGSHOT",
+    "label": "Configure Photo Viewer...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_CONTACTMGR",
+    "label": "People Manager...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_UPLOADMGR",
+    "label": "&Upload Manager...",
+    "accel": ""
+  },
+  {
+    "id": "eMenuTools::ID_TOOLS_INCLUDEEXCLUDEFOLDERS",
+    "label": "&Folder Manager...",
+    "accel": "&Tools"
+  },
+  {
+    "id": "eMenuTools",
+    "label": "",
+    "accel": "&About Picasa"
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_CHECK_FOR_UPDATES",
+    "label": "&Check for Updates",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_UNINSTALL",
+    "label": "&Uninstalling Picasa",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_TERMS",
+    "label": "Terms",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_PRIVACY",
+    "label": "Privacy Policy",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_RELEASENOTES",
+    "label": "Release &Notes",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_PICASA_README",
+    "label": "Online &ReadMe",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_PICASA_FORUMS",
+    "label": "Picasa &Forums",
+    "accel": ""
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_KEYBOARD_SHORTCUTS",
+    "label": "&Keyboard Shortcuts",
+    "accel": "F1"
+  },
+  {
+    "id": "eMenuHelp::ID_HELP_DEFAULT",
+    "label": "&Help Contents and Index",
+    "accel": "&Help"
+  },
+  {
+    "id": "eMenuHelp",
+    "label": "IDS_DEFAULT_ALBUM_NAME",
+    "accel": "IDS_NORENAME"
+  },
+  {
+    "id": "eMenuFile::ID_GETMYSTUFF_ES",
+    "label": "",
+    "accel": "thumbui/searchcontainer"
+  }
+]

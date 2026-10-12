@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="contactmgr/window1.title">
+  <xmbtext>Personas</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup4.title">
+  <xmbtext>Buscar:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/delete.title">
+  <xmbtext>Eliminar persona</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/create.title">
+  <xmbtext>Persona nueva</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online_contact.title">
+  <xmbtext>Contacto online</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup22.title">
+  <xmbtext>Nombre:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup24.title">
+  <xmbtext>Correo electrónico:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/sync.title">
+  <xmbtext>Sincroniza las etiquetas de cara con Álbumes web</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/album_id_group.title">
+  <xmbtext>ID de álbum:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/contact_id_group.title">
+  <xmbtext>ID de contacto:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_id_group.title">
+  <xmbtext>ID de enfoque:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/subject_id_group.title">
+  <xmbtext>ID de sujeto:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_obfuscated_gaia_id_group.title">
+  <xmbtext>ID de GAIA de enfoque ofuscado:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/mobile_obfuscated_gaia_id_group.title">
+  <xmbtext>ID de GAIA de móvil ofuscado:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/revert.title">
+  <xmbtext>Restablecer</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online.title">
+  <xmbtext>Administrar contactos online</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/refresh_contacts.title">
+  <xmbtext>Actualizar contactos</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/ok.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/cancel.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

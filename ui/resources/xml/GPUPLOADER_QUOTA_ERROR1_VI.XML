@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Còn 1 GB trong bộ nhớ Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Mua thêm bộ nhớ để tiếp tục sao lưu ảnh gốc của bạn ở độ phân giải đầy đủ. Hoặc chuyển sang chất lượng cao với dung lượng miễn phí không giới hạn: chất lượng hình ảnh tuyệt vời với kích thước tệp giảm.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Nhận trợ giúp để ra quyết định</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Mua thêm bộ nhớ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Chuyển sang chất lượng cao</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Подешавање датума фотографије</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Тренутни датум фотографије: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Нови датум фотографије: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Подешавање свих датума фотографија према количини</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Постављање истог датума и времена за све фотографије</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>Потврди</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

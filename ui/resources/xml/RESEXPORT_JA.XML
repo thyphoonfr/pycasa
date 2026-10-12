@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Win32Res>
+ <RT_DIALOG>
+  <res resid="#145">
+   <dtitle>
+    <xmbtext>Picasa について</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 435 293)</dlayout>
+   <item itemid="1056" itemtype="Static" layout="rect(0 0 20 20)"/>
+   <item itemid="-1" itemtype="Static" layout="rect(9 171 427 258)">
+    <xmbtext>文字列表の IDS_ABOUT から挿入されました</xmbtext>
+   </item>
+   <item itemid="-2" itemtype="Static" layout="rect(9 260 109 268)">
+    <xmbtext>サードパーティのライセンス</xmbtext>
+   </item>
+   <item itemid="1" itemtype="Button" layout="rect(193 272 243 286)">
+    <xmbtext>OK</xmbtext>
+   </item>
+   <item itemid="1086" itemtype="Edit" layout="rect(6 7 429 227)"/>
+  </res>
+  <res resid="#198">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 95)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 74 179 88)">
+    <xmbtext>キャンセル</xmbtext>
+   </item>
+   <item itemid="1164" itemtype="Static" layout="rect(31 7 179 49)">
+    <xmbtext>ディスク容量を確保するために Picasa のデータベースを圧縮しています。この作業には数分かかります。</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>ID=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(31 45 179 62)"/>
+  </res>
+  <res resid="#211">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 71)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 50 179 64)">
+    <xmbtext>キャンセル</xmbtext>
+   </item>
+   <item itemid="1163" itemtype="Static" layout="rect(31 7 179 32)">
+    <xmbtext>複製しています</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>ID=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(14 42 123 58)">
+    <xmbtext>更新しています...</xmbtext>
+   </item>
+  </res>
+  <res resid="#323">
+   <dtitle>
+    <xmbtext>使用状況に関する統計情報</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 276 116)</dlayout>
+   <item itemid="1" itemtype="Button" layout="rect(7 88 161 102)">
+    <xmbtext>はい、統計情報を送信する</xmbtext>
+   </item>
+   <item itemid="2" itemtype="Button" layout="rect(170 88 269 102)">
+    <xmbtext>いいえ</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(30 34 269 62)">
+    <xmbtext>Picasa をさらに改善するために、使用状況に関する匿名の統計情報を Google に自動的に送信することにご協力いただけますか？</xmbtext>
+   </item>
+   <item itemid="1316" itemtype="Static" layout="rect(163 69 269 77)">
+    <xmbtext>プライバシー...</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(37 13 193 21)">
+    <xmbtext>Picasa の改善に協力する</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 28 27)">
+    <xmbtext>ID=105</xmbtext>
+   </item>
+  </res>
+ </RT_DIALOG>
+</Win32Res>

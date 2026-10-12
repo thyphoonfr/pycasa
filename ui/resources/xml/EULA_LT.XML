@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Prieš naudodami „Picasa“ peržiūrėkite licencijos sąlygas</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Naudodami „Picasa“ sutinkate su „Google“ paslaugų teikimo sąlygomis ir privatumo politika.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Paslaugų teikimo sąlygos</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Privatumo politika</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Siųsti anoniminę naudojimo statistiką „Google“ (vėliau šį nustatymą visada galite pakeisti)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Sutinku</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Auto Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Wala nang storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Napili mo ang mga folder na nagtataglay ng mas maraming espasyo kaysa sa nalalabi mong storage sa Google Drive. Maaari kang bumili ng karagdagang storage, o mag-backup ng walang limitasyong bilang ng litrato at video na may karaniwang sukat nang libre.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Kung kabibili mo lang ng storage, maaaring abutin ng ilang minuto para umiral ang mga pagbabago.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Kumuha ng karagdagang storage...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Lumipat sa karaniwang laki</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Nimeä tiedostot uudelleen</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 tiedosto valittu uudelleennimettäväksi.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s tiedostoa valittu uudelleennimettäviksi.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Anna tiedostojen uusi nimi:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Lisää tiedostonimeen:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Päiväys</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Kuvan resoluutio</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Esimerkki:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Nimeä uudelleen</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Pikatagien avulla voit lisätä tagin yhdellä klikkauksella. Kirjoita alle tagit, jotka haluat lisätä pikamuokkauksella. Kahta ylintä pikatagia käytetään oletuksena äskettäin käytettyjen tagien seuraamiseen. Jos haluat määrittää kaksi ylintä tagia manuaalisesti, poista valinta valintaruudusta.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Täytä automaattisesti yllä olevat tyhjät kentät usein käytetyillä tageille</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Varaa kaksi ylintä painiketta äskettäin käytetyille tageille</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Peruuta</xmbtext>
+ </action>
+</tooltips>

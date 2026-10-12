@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Exportálás mappába</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Exportálási hely:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Tallózás...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Az exportált mappa neve:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Számok hozzáadása a fájlnevekhez a sorrend megőrzése érdekében</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Képméret:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Eredeti méret használata</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Átméretezés:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>képpont</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Képminőség:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatikus</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normál</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Egyéni</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Megőrzi az eredeti képminőséget</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>A minőség és méret megfelelő egyensúlya</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Nagyon nagy méretű fájl, az apró részleteket is megőrzi</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Legkisebb fájlméret, némi minőségvesztés</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Filmek exportálása:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Első képkocka</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Teljes film (nincs átméretezés)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vízjel:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Vízjel hozzáadása</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>A fotókra rábélyegezheti saját nevét, egy internetes domain nevét vagy egy szerzői jogi közleményt.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Exportálás</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

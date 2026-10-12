@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Можете да използвате бързите маркери, за да зададете маркер с едно кликване.  По-долу въведете маркерите, до които искате да имате достъп с едно кликване.  По подразбиране най-горните два маркера отговарят на последно приложените маркери.  Премахнете отметката от квадратчето по-долу, за да зададете ръчно най-горните два маркера.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Автоматично попълване на полетата по-горе с често използвани маркери</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Запазване на най-горните два бутона за последно използваните маркери</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Отказ</xmbtext>
+ </action>
+</tooltips>

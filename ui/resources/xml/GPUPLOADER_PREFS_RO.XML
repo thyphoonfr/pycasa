@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_prefs/prefs_window.mac_title">
+  <xmbtext>Preferințe - Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/prefs_window.win_title">
+  <xmbtext>Setări - Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/account_name.title">
+  <xmbtext>Se obține numele contului...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/log_off.title">
+  <xmbtext>Deconectați-vă</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/source_lbl.title">
+  <xmbtext>Surse pentru backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.win_title">
+  <xmbtext>Camere foto și carduri de stocare</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.mac_title">
+  <xmbtext>Camere foto și carduri de stocare</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/devices_btn.title">
+  <xmbtext>Dispozitive...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder_chk.title">
+  <xmbtext>Copiază și fotografii/videoclipuri de pe medii de stocare externe în</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder.title">
+  <xmbtext>Răsfoiți...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/watched_folders_lbl.title">
+  <xmbtext>Dosare pe desktop</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/add_folder_btn.title">
+  <xmbtext>Adaugă...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_size_label.title">
+  <xmbtext>Dimensiunea fotografiei</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size.title">
+  <xmbtext>Calitate înaltă (spațiu de stocare nelimitat gratuit)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size_desc.title">
+  <xmbtext>Calitate excepțională a imaginii la o dimensiune redusă a fișierelor</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size.title">
+  <xmbtext>Original (limitat la spațiul de stocare aferent contului)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size_desc.title">
+  <xmbtext>Fotografiile la rezoluție completă sunt luate în considerare la calcularea cotei de stocare</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_raw.title">
+  <xmbtext>Încarcă fișiere RAW.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/send_to_google.title">
+  <xmbtext>Contribuie la îmbunătățirea serviciului Google Foto trimițând statistici anonime privind utilizarea.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/more_storage.title">
+  <xmbtext>Cumpără mai mult spațiu de stocare...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/cancelbutton.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

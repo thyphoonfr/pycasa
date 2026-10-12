@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exportovať ako stránku HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Exportovať obrázky v:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Pôvodná veľkosť</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1 024 pixlov (pre veľké monitory)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixlov (pre veľké webové stránky)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixlov (pre webové stránky)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixlov (pre e-maily)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Exportovať filmy pomocou:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Prvá snímka</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Celý film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Názov webovej stránky:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Priečinok:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Prehľadávať...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Kliknutím na názov šablóny zobrazíte príklad. Po uskutočnení výberu kliknite na tlačidlo Exportovať.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Popis šablóny</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

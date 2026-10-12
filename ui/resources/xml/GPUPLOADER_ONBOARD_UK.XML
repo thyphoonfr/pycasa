@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>Вибрати джерела автозавантаження</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Google Фото автоматично завантажує фото й відео з вибраних джерел у вашу бібліотеку фотографій.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>Додати...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>Розмір фотографій</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>Висока якість (безкоштовний необмежений обсяг пам’яті)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>Відмінна якість зображення навіть у зменшеному розмірі</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>Оригінальний розмір (обмежено обсягом пам’яті облікового запису)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>Файли у високій роздільній здатності, які використовують квоту пам’яті</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>Допоможіть покращити Google Фото, надсилаючи анонімну статистику щодо використання сервісу.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>Отримати додатковий обсяг пам’яті…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>Почати автозавантаження</xmbtext>
+ </stringres>
+</resources>

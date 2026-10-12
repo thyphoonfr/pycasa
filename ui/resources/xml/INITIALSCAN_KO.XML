@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>지금 설치되어 있는 Picasa는 최신 버전이 아닙니다. 기존 사진 라이브러리를 업데이트하시겠습니까, 아니면 컴퓨터에서 사진을 다시 검색하시겠습니까?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>다음 옵션 중 하나를 선택하세요.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>기존 사진 라이브러리 업데이트</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Picasa 1에서 사용한 키워드나 사용자설정 앨범을 Picasa 3에서도 유지하려면 이 옵션을 선택하세요.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>내 컴퓨터에서 다시 사진 검색</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>추가 사진 정보가 포함되어 있는 컴퓨터를 보다 자세히 검색하려면 이 옵션을 선택하세요. 기존 수정사항 및 구성은 보존되지만 키워드는 보존되지 않습니다. 검색은 몇 분 정도 걸릴 수 있습니다.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>사진을 검색해도 파일이 새 위치로 이동되거나 복사되지 않습니다. 도구 메뉴에 있는 폴더 관리자 도구를 사용하여 Picasa에 표시되는 폴더를 선택할 수 있습니다.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>계속</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa에서 컴퓨터에 있는 사진을 검색할 준비가 되었습니다.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>다음 옵션 중 하나를 선택하세요.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>내 전체 컴퓨터에서 사진 검색</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>사진을 여러 폴더에 저장한 경우, 특히 두 개 이상의 하드 드라이브에 저장한 경우에 이 옵션을 선택하세요.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>문서, 그림, 바탕화면, iPhoto 라이브러리만 검색</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>이러한 폴더에만 사진을 저장하는 경우 이 옵션을 선택하세요.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>사진을 검색해도 파일이 새 위치로 이동되거나 복사되지 않습니다. 도구 메뉴에 있는 폴더 관리자 도구를 사용하여 Picasa에 표시되는 폴더를 선택할 수 있습니다.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>계속</xmbtext>
+ </action>
+</tooltips>

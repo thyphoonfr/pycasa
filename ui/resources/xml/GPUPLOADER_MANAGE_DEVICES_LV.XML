@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_manage_devices/manage_devices.title">
+  <xmbtext>Ierīču pārvaldība</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/device_list_description.title">
+  <xmbtext>Varat izvēlēties vienmēr importēt vai ignorēt fotoattēlus un videoklipus no sarakstā ietvertajām ierīcēm. Ierīcēm, kuras nav ietvertas nevienā sarakstā, vienmēr tiks parādīts vaicājums.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_devices_label.title">
+  <xmbtext>Pievienotās ierīces</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/devicecolumn.title">
+  <xmbtext>Ierīce</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Ierīces veids</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/uniquecolumn.title">
+  <xmbtext>Unikāla identifikācija</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_actions_label.title">
+  <xmbtext>Importēt</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist.title">
+  <xmbtext>Vienmēr</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist.title">
+  <xmbtext>Nekad</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist_description.title">
+  <xmbtext>Vienmēr importēt no šīm ierīcēm</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nosaukums</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_black.title">
+  <xmbtext>&gt;&gt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_white.title">
+  <xmbtext>&lt;&lt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/remove.title">
+  <xmbtext>Noņemt</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist_description.title">
+  <xmbtext>Nekad neimportēt no šīm ierīcēm</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nosaukums</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/ok.title">
+  <xmbtext>Gatavs</xmbtext>
+ </stringres>
+</resources>

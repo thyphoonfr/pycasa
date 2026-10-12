@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="upload/public_label" xmbdesc="Text(upload/public_label)">
+  <xmbtext>Publik di web</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_label" xmbdesc="Text(upload/private_label)">
+  <xmbtext>Siapa saja yang memiliki tautan</xmbtext>
+ </action>
+ <action type="Text" target="upload/public_description1" xmbdesc="Text(upload/public_description1)">
+  <xmbtext>Album ini dapat dilihat oleh semua pengguna di: %s</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_description1" xmbdesc="Text(upload/private_description1)">
+  <xmbtext>Berbagi dengan orang tertentu</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadinfo" xmbdesc="Text(upload/uploadinfo)">
+  <xmbtext>Memeriksa status online...</xmbtext>
+ </action>
+ <action type="Text" target="upload/webalbumstext" xmbdesc="Text(upload/webalbumstext)">
+  <xmbtext>Memperbarui daftar album web...</xmbtext>
+ </action>
+ <action type="Text" target="upload/upload_label" xmbdesc="Text(upload/upload_label)">
+  <xmbtext>Unggah ke album ini</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadsize_label" xmbdesc="Text(upload/uploadsize_label)">
+  <xmbtext>Ukuran untuk diunggah</xmbtext>
+ </action>
+ <action type="Text" target="upload/privacy_label" xmbdesc="Text(upload/privacy_label)">
+  <xmbtext>Privasi</xmbtext>
+ </action>
+ <action type="Text" target="upload/require_login_text" xmbdesc="Text(upload/require_login_text)">
+  <xmbtext>Pribadi</xmbtext>
+ </action>
+ <action type="Label" target="upload/newalbum2" xmbdesc="Label(upload/newalbum2)">
+  <xmbtext>Baru</xmbtext>
+ </action>
+ <action type="Text" target="upload/titlelabel" xmbdesc="Text(upload/titlelabel)">
+  <xmbtext>Judul Album</xmbtext>
+ </action>
+ <action type="Text" target="upload/desclabel" xmbdesc="Text(upload/desclabel)">
+  <xmbtext>Deskripsi</xmbtext>
+ </action>
+ <action type="Text" target="upload/choose_contact_label" xmbdesc="Text(upload/choose_contact_label)">
+  <xmbtext>Pilih kontak:</xmbtext>
+ </action>
+ <action type="Text" target="upload/contact_album_list_label" xmbdesc="Text(upload/contact_album_list_label)">
+  <xmbtext>Album kontak yang dapat Anda kontribusikan ke:</xmbtext>
+ </action>
+ <action type="Label" target="upload/upgrade" xmbdesc="Label(upload/upgrade)">
+  <xmbtext>Tingkatkan versi</xmbtext>
+ </action>
+ <action type="Label" target="upload/ok" xmbdesc="Label(upload/ok)">
+  <xmbtext>Unggah</xmbtext>
+ </action>
+ <action type="Label" target="upload/cancel" xmbdesc="Label(upload/cancel)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+ <action type="Label" target="upload/storagetext" xmbdesc="Label(upload/storagetext)">
+  <xmbtext>Pelajari selengkapnya...</xmbtext>
+ </action>
+ <action type="Text" target="upload/account_title" xmbdesc="Text(upload/account_title)">
+  <xmbtext>Akun Anda:</xmbtext>
+ </action>
+ <action type="Text" target="upload/upsell_text" xmbdesc="Text(upload/upsell_text)">
+  <xmbtext>Memori tambahan dapat membantu membuat cadangan foto dengan aman.</xmbtext>
+ </action>
+ <action type="Label" target="upload/collab_label" xmbdesc="Label(upload/collab_label)">
+  <xmbtext>Izinkan orang-orang ini berkontribusi pada album saya</xmbtext>
+ </action>
+ <action type="Label" target="upload/sharing_label" xmbdesc="Label(upload/sharing_label)">
+  <xmbtext>Berbagi Dengan:</xmbtext>
+ </action>
+</tooltips>

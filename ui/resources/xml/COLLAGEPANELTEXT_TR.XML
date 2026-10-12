@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="collagepanel/addclips" xmbdesc="Tooltip(collagepanel/addclips)">
+  <xmbtext>Seçili klipleri kolaja ekle</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/deleteclips" xmbdesc="Tooltip(collagepanel/deleteclips)">
+  <xmbtext>Seçili klipleri tabladan kaldır </xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/getmoreclips" xmbdesc="Label(collagepanel/getmoreclips)">
+  <xmbtext>Daha fazla al...</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/getmoreclips" xmbdesc="Tooltip(collagepanel/getmoreclips)">
+  <xmbtext>Kütüphane&#039;den daha fazla klip al</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab1" xmbdesc="Label(collagepanel/tab1)">
+  <xmbtext>Ayarlar</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab2" xmbdesc="Label(collagepanel/tab2)">
+  <xmbtext>Klipler</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/shadow_checkbox_label" xmbdesc="Label(collagepanel/shadow_checkbox_label)">
+  <xmbtext>Gölge Çiz</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/caption_checkbox_label" xmbdesc="Label(collagepanel/caption_checkbox_label)">
+  <xmbtext>Başlıkları Göster</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/caption_checkbox" xmbdesc="Tooltip(collagepanel/caption_checkbox)">
+  <xmbtext>Başlıkları resimler·üzerinde bir &quot;Polaroid Fotoğraf Makinası&quot; kenarlığıyla birlikte metin olarak göster</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_frame_center-label" xmbdesc="Label(collagepanel/set_frame_center-label)">
+  <xmbtext>Çerçevenin Ortası Olarak Ayarla</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/spacing_label" xmbdesc="Label(collagepanel/spacing_label)">
+  <xmbtext>Tablo Aralığı</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/min_spacing_label" xmbdesc="Label(collagepanel/min_spacing_label)">
+  <xmbtext>Hiçbiri</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/max_spacing_label" xmbdesc="Label(collagepanel/max_spacing_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_settings_title" xmbdesc="Label(collagepanel/bkg_settings_title)">
+  <xmbtext>Arka Plan Seçenekleri</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/borders_label" xmbdesc="Label(collagepanel/borders_label)">
+  <xmbtext>Resim Kenarlıkları</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/format_title" xmbdesc="Label(collagepanel/format_title)">
+  <xmbtext>Sayfa Biçimi</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_order-label" xmbdesc="Label(collagepanel/rand_order-label)">
+  <xmbtext>Resimleri Karıştır</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_placement-label" xmbdesc="Label(collagepanel/rand_placement-label)">
+  <xmbtext>Şifreli Kolaj</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/view_and_edit-label" xmbdesc="Label(collagepanel/view_and_edit-label)">
+  <xmbtext>Görüntüle ve Düzenle</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/cancelbutton-label" xmbdesc="Label(collagepanel/cancelbutton-label)">
+  <xmbtext>Kapat</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/resetbutton-label" xmbdesc="Label(collagepanel/resetbutton-label)">
+  <xmbtext>Sıfırla</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/makedesktop-label" xmbdesc="Label(collagepanel/makedesktop-label)">
+  <xmbtext>Masaüstü Arka Planı</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/sharebutton-label" xmbdesc="Label(collagepanel/sharebutton-label)">
+  <xmbtext>Kolaj Oluştur</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/color_bg_label" xmbdesc="Label(collagepanel/color_bg_label)">
+  <xmbtext>Düz·Renk</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bitmap_bg_label" xmbdesc="Label(collagepanel/bitmap_bg_label)">
+  <xmbtext>Resmi Kullan</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_all" xmbdesc="Label(collagepanel/select_all)">
+  <xmbtext>Tümünü Seç</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_none" xmbdesc="Label(collagepanel/select_none)">
+  <xmbtext>Hiçbirini Seçme</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/remove_node" xmbdesc="Label(collagepanel/remove_node)">
+  <xmbtext>Kaldır</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_background" xmbdesc="Label(collagepanel/set_background)">
+  <xmbtext>Arka Plan Olarak Ayarla</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_from_selection" xmbdesc="Label(collagepanel/bkg_from_selection)">
+  <xmbtext>Seçilenleri kullan</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/portrait" xmbdesc="Tooltip(collagepanel/portrait)">
+  <xmbtext>Dikey: Tasarımınızı dikey olarak ayarlayın</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/landscape" xmbdesc="Tooltip(collagepanel/landscape)">
+  <xmbtext>Yatay: Tasarımınızı yatay olarak düzenler</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/format_menu" xmbdesc="Tooltip(collagepanel/format_menu)">
+  <xmbtext>Tasarımınızın göreli genişlik ve yüksekliğini seçin</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/delete_custom_aspect" xmbdesc="Tooltip(collagepanel/delete_custom_aspect)">
+  <xmbtext>Geçerli en boy oranını sil</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/cancelbutton" xmbdesc="Tooltip(collagepanel/cancelbutton)">
+  <xmbtext>Kolaj sekmesini kapat</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/makedesktop" xmbdesc="Tooltip(collagepanel/makedesktop)">
+  <xmbtext>Kolajlar albümüne JPG resmi olarak kaydet, ardından masaüstü arka planı olarak ayarla</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/resetbutton" xmbdesc="Tooltip(collagepanel/resetbutton)">
+  <xmbtext>Tüm değişiklikleri geri al</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/sharebutton" xmbdesc="Tooltip(collagepanel/sharebutton)">
+  <xmbtext>Kolajlar albümüne (Projeler koleksiyonu içinde) JPG resmi olarak kaydet.</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_order" xmbdesc="Tooltip(collagepanel/rand_order)">
+  <xmbtext>Resimleri rasgele sırala </xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_placement" xmbdesc="Tooltip(collagepanel/rand_placement)">
+  <xmbtext>Kolaj düzenini karıştır</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_all" xmbdesc="Tooltip(collagepanel/select_all)">
+  <xmbtext>Tüm resimleri seç (Ctrl+A)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_none" xmbdesc="Tooltip(collagepanel/select_none)">
+  <xmbtext>Tüm resimlerin seçimini kaldır (Ctrl-D)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/remove_node" xmbdesc="Tooltip(collagepanel/remove_node)">
+  <xmbtext>Seçimi kolajdan kaldır (Del)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/set_background" xmbdesc="Tooltip(collagepanel/set_background)">
+  <xmbtext>Seçili resmi arka plan olarak kullan</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_top" xmbdesc="Tooltip(collagepanel/move_top)">
+  <xmbtext>Resmi yığının en sütüne taşı</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_up" xmbdesc="Tooltip(collagepanel/move_up)">
+  <xmbtext>Resimleri yığında yukarı taşı</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_down" xmbdesc="Tooltip(collagepanel/move_down)">
+  <xmbtext>Resmi yığın içinde alt tarafa taşı</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_bottom" xmbdesc="Tooltip(collagepanel/move_bottom)">
+  <xmbtext>Resmi yığının en altına taşı</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_12" xmbdesc="Tooltip(collagepanel/snap_12)">
+  <xmbtext>Döndürmeyi dik duracak şekilde ayarla</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_3" xmbdesc="Tooltip(collagepanel/snap_3)">
+  <xmbtext>Saat yönünde 90 derece döndür</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_6" xmbdesc="Tooltip(collagepanel/snap_6)">
+  <xmbtext>Saat yönünde 180 derece döndür</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_9" xmbdesc="Tooltip(collagepanel/snap_9)">
+  <xmbtext>Saat yönünde 270 derece döndür</xmbtext>
+ </action>
+</tooltips>

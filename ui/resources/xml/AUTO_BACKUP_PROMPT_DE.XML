@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Sicherungskopien für Picasa-Fotos anlegen</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Sichern Sie Ihre Fotos und Videos automatisch online mit Google Photos Backup. Sie können von allen Ihren Geräten auf die Inhalte zugreifen. Solange Sie sie nicht geteilt haben, sind sie dort nur für Sie sichtbar.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google Photos Backup installieren</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nein danke</xmbtext>
+ </stringres>
+</resources>

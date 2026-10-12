@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Zapsat jmenovky</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Zápis jmenovek nebo všech položek může trvat dlouhou dobu. Pokud je protokolování nastaveno na možnost Podrobné nebo vyšší, bude soubor network.log obsahovat zprávy o souborech jen pro čtení, které nebylo možné aktualizovat. Při používání této funkce doporučujeme se odhlásit.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Zapsat vybrané</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Zapsat tváře</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Zapsat vše</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

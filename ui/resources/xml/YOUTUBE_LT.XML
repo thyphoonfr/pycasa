@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Įkelti į „YouTube“</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Pavadinimas:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Aprašymas:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Vaizdo įrašo kategorija:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Įkeliama...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Žymos:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Šie raktiniai žodžiai naudojami, kad padėtų žmonėms rasti savo vaizdo įrašus (atskirta tarpu).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Padaryti šį vaizdo įrašą viešą</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Jūsų vaizdo įrašas apribotas iki 10 minučių ir 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Negavę leidimo nekelkite TV laidų, muzikinių vaizdo įrašų, koncertų ar reklamų, nebent visą jų turinį sukūrėte jūs. Autorių teisių patarimų puslapyje ir bendruomenės gairėse galite pažiūrėti, ar jūsų vaizdo įrašas nepažeidžia kieno nors autoriaus teisių.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Spustelėdami „Įkelti vaizdo įrašą“ patvirtinate, kad šis vaizdo įrašas nepažeidžia „YouTube“ naudojimo sąlygų, o vaizdo įrašo autorių teisės priklauso jums arba turite teisėtą leidimą jį įkelti.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Įkelti vaizdo įrašą</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Zálohování Fotek Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Zálohování Fotek Google, verze %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Copyright 2015, Google Inc. Všechna práva vyhrazena.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Tento software je částečně založen na práci skupiny Independent JPEG Group. Tento program je chráněn autorským právem USA a mezinárodním autorským právem.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

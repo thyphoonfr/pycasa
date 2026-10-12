@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="foldermgr/folder_list_label" xmbdesc="Label(foldermgr/folder_list_label)">
+  <xmbtext>Klasör Listesi</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/instructions_text" xmbdesc="Label(foldermgr/instructions_text)">
+  <xmbtext>Her bir klasör için, Picasa&#039;nın içindeki resimleri bulması veya bulmaması yönünde seçim yapabilirsiniz. Ayrıca, yeni resimler için izlemek üzere klasör seçebilirsiniz.</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/status_label" xmbdesc="Label(foldermgr/status_label)">
+  <xmbtext>Mevcut klasör için:</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/scan_once_label" xmbdesc="Label(foldermgr/scan_once_label)">
+  <xmbtext>Bir Kere Tara</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/remove_label" xmbdesc="Label(foldermgr/remove_label)">
+  <xmbtext>Picasa&#039;dan Kaldır</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watch_label" xmbdesc="Label(foldermgr/watch_label)">
+  <xmbtext>Her Zaman Tara</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watched_label" xmbdesc="Label(foldermgr/watched_label)">
+  <xmbtext>İzlenen Klasörler</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/ok-label" xmbdesc="Label(foldermgr/ok-label)">
+  <xmbtext>Tamam</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/cancel-label" xmbdesc="Label(foldermgr/cancel-label)">
+  <xmbtext>İptal</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/help-label" xmbdesc="Label(foldermgr/help-label)">
+  <xmbtext>Yardım</xmbtext>
+ </action>
+</tooltips>

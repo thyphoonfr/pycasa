@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Închideţi</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Bun venit la funcţia de încărcare a loturilor de fotografii!</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Bifaţi casetele corespunzătoare dosarelor şi albumelor cu care doriţi să lucraţi. Apoi alegeţi ce doriţi să faceţi. Picasa va filtra elementele pentru care operaţia dorită nu se va putea efectua. De exemplu, dacă este deja online un dosar sau un album întreg, Picasa nu va afişa opţiunea de încărcare a acestuia.</xmbtext>
+ </action>
+</tooltips>

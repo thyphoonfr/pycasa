@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>로그인</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>취소</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>내 계정 정보 기억</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>사용자 이름:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>비밀번호:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>Hello 사용자 이름을 사용하여 Picasa로 사진을 보내세요.</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>로그인</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>취소</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>비밀번호 찾기</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>웹앨범</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>웹앨범에 로그인</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>웹앨범을 사용하면 친구나 가족과 온라인 사진 앨범을 공유하거나 공개 앨범을 만들어서 전세계 사람들과 공유할 수 있습니다. 웹앨범은 사용이 간편한 무료 서비스입니다.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>Google 계정은 유효하지만 아직 웹앨범 계정에 가입하지 않았습니다.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>자세히 보려면 여기를 클릭하세요.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>웹앨범 활성화...</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>웹앨범에 가입</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>Picasa로 Google 비디오에 동영상 업로드</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>업로드를 시작하려면 아래에서 로그인하세요.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>자세히 알아보려면 여기를 클릭하세요.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>계정 만들기</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>Picasa를 사용하여 Google 계정으로 사진 보내기</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>사진을 보내는 과정은 모두 웹브라우저 없이 진행됩니다.</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>최대 10MB 사진 보내기</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>아직 Gmail이 없으십니까? 6.5GB 이상의 저장용량을 제공하는 무료 계정을 만드세요.</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>보내기 전에 미리보기</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>사용자 이름이나 비밀번호가 올바르지 않습니다. 다시 시도하세요.</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>사용자 이름과 비밀번호가 일치하지 않습니다. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>위에 올바른 비밀번호를 입력하고 아래 그림에 표시되는 문자를 입력하세요(대소문자 구분).</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>내 계정 정보 기억</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>로그인</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>취소</xmbtext>
+ </action>
+</tooltips>

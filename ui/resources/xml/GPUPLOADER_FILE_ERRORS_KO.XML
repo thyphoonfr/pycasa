@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_file_errors/file_errors.title">
+  <xmbtext>Google 포토 백업</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/error_label.title">
+  <xmbtext>백업할 수 없는 파일:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/namecolumn.title">
+  <xmbtext>이름</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/accept.title">
+  <xmbtext>다시 시도</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/cancel.title">
+  <xmbtext>닫기</xmbtext>
+ </stringres>
+</resources>

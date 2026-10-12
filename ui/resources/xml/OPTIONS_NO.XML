@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Innstillinger</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Alternativer</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Generelt</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Brukergrensesnitt:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Bruk spesialeffekter</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Vis verktøytips</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Vis hjelpekoder</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Enkeltklikk for å avslutte redigeringsvisning</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Filer:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Gjenkjenn kopier under importering</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Slett bufferfiler</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Slett fra disk uten bekreftelse</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Fjern fra album uten bekreftelse</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Hjelp oss med å forbedre Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Send anonym bruksstatistikk til Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Personvern</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Automatiske oppdateringer:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Oppdater automatisk</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Spør før nedlasting av oppdateringer</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Ikke se etter oppdateringer</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Språk:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Systemstandard (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Start følgende når et kamera kobles til:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>ikke noe program</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Velg program i ImageCapture</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Lagre importerte bilder i:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Bla gjennom</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>E-post</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>E-postprogram:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Jeg vil velge hver gang jeg sender bilder</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Bruk standard e-postprogram på datamaskinen</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Bruk Google-kontoen</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Størrelse når det er flere bilder:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 piksler</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s piksler</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Størrelse på enkeltbilder:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Samme som flere (1024 piksler)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Samme som flere (%s piksler)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Opprinnelig størrelse</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Send filmer som:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Det første bildet</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Hele filmen</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Utdataformat:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Send innebygde bilder og bildetekster (kun Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Filtyper</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Vis JPEG-filer og:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW-formater</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Formater som håndteres</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=no&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmer (AVI, MPG, ASF, WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Quicktime-filmer (MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW-formater</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Formater som håndteres</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=no&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmer (MOV, MPG, M4V, 3GP, AVI o.l.)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Lysbildefremvisning</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Gjenta lysbildefremvisning</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Spill av musikkspor under lysbildefremvisning</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Velg en mappe med musikkfiler:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Bla gjennom</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Utskrift</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Tilgjengelige utskriftsstørrelser:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Forhåndsvisninger:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Bruk forhåndsvisning med høy kvalitet (tregere)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Skriverkvalitet:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Kompatibel (halvoppløsning)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Høy kvalitet (fulloppløsning)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Kvalitet for utskriftens·pikseltetthet:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Generelt (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Ekstra skarp (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Nettverk</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Proxy-brukernavn:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Proxy-passord:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Oppdag nettverksinnstillinger automatisk</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Loggnivå for nettverk:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Deaktiver logging</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Logg bare feil</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Minimal logginformasjon</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Detaljert logginformasjon</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Logg all nettverksinformasjon</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Logg:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Nettalbum</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Standard opplastingsstørrelse:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Når du skal synkronisere store filer, bør du laste opp forhåndsvisninger først</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(anbefalt)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>JPEG-kvalitet:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Behold den opprinnelige bildekvaliteten (bruker mer plass)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Synkroniserer:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Synkroniser bare bilder merket med stjerne</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Ikke be meg om å bekrefte all synkronisering (bruk innstillingene ovenfor)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Navnemerker:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Inkluder i bildeopplastinger</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Vannmerker:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Legg til vannmerke for alle bildeopplastinger:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Stemple bildene med navnet ditt, et domenenavn eller en merknad om opphavsrett.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Navnemerker</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Aktiver ansiktsgjenkjennelse</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Aktiver forslag:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Forslagsgrense:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Gruppegrense:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Lagre navnemerkinger i dette bildet</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Last opp album med folk til Google Kontakter</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

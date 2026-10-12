@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>Вход</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>Отказ</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>Запомни ме на този компютър</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>Потребителско име:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>Парола:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>Използвайте потребителското си име в Hello, за да изпращате снимки с Picasa!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>Вход</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>Отказ</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>Забравили сте паролата си?</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>Уеб Албуми</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>Вход в Уеб Албуми</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>С Уеб Албуми можете да споделяте онлайн фотоалбуми със своите близки и приятели, както и да създавате обществени албуми, които да споделяте с целия свят.  Лесно е и безплатно.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>Профилът ви в Google е валиден, но още не сте си регистрирали профил в Уеб Албуми.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>Кликнете тук, за да научите повече.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>Активиране на Уеб Албуми...</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>Регистрирайте се в Уеб Албуми</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>Качете филмите си в Google Video чрез Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>За да започнете да качвате, влезте в профила си.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>Кликнете тук, за да научите повече.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>Създаване на профил</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>Изпращайте снимки от профила си в Google чрез Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>Не ви е необходим уеб браузър, за да изпращате снимки</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>Изпращайте снимки с общ размер до 10 МБ</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>Искате да имате адрес в Gmail? Регистрирайте си безплатно профил с хранилище с над 6,5 ГБ (и нараства)</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>Визуализирайте снимките си, преди да ги изпратите</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>Потребителското име или паролата са неправилни. Моля, опитайте пак.</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>Потребителското име и паролата са неправилни. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>Въведете правилната парола по-горе и след това въведете знаците които виждате на изображението по-долу (регистърът на буквите е от значение)</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>Запомни ме на този компютър</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>Вход</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>Отказ</xmbtext>
+ </action>
+</tooltips>

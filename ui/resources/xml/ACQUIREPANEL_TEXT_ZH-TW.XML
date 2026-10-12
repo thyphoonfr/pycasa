@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="acquirepanel/import_from_label" xmbdesc="Text(acquirepanel/import_from_label)">
+  <xmbtext>匯入來源：</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_to_label" xmbdesc="Text(acquirepanel/import_to_label)">
+  <xmbtext>匯入到：</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_delimiter_label" xmbdesc="Text(acquirepanel/import_delimiter_label)">
+  <xmbtext>/</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/subfolder_label" xmbdesc="Text(acquirepanel/subfolder_label)">
+  <xmbtext>資料夾標題：</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludedupesbutton" xmbdesc="Tooltip(acquirepanel/excludedupesbutton)">
+  <xmbtext>排除已匯入 Picasa 的相片</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/excludedupes_label" xmbdesc="Text(acquirepanel/excludedupes_label)">
+  <xmbtext>排除重複</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/nothing" xmbdesc="Text(acquirepanel/nothing)">
+  <xmbtext>沒有可用的相片</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/previewlabel" xmbdesc="Text(acquirepanel/previewlabel)">
+  <xmbtext>預覽</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/importtraylabel" xmbdesc="Text(acquirepanel/importtraylabel)">
+  <xmbtext>匯入寄存區</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>上一張相片</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>下一張相片</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>向右旋轉</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>向左旋轉</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/anowbutton" xmbdesc="Label(acquirepanel/anowbutton)">
+  <xmbtext>全部匯入</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/anowbutton" xmbdesc="Tooltip(acquirepanel/anowbutton)">
+  <xmbtext>全部匯入，除了排除的項目</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/import_selected" xmbdesc="Label(acquirepanel/import_selected)">
+  <xmbtext>匯入所選</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/import_selected" xmbdesc="Tooltip(acquirepanel/import_selected)">
+  <xmbtext>僅匯入您目前所選的項目</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/acancelbutton" xmbdesc="Label(acquirepanel/acancelbutton)">
+  <xmbtext>取消</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/acancelbutton" xmbdesc="Tooltip(acquirepanel/acancelbutton)">
+  <xmbtext>取消匯入</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/upload_label" xmbdesc="Label(acquirepanel/upload_label)">
+  <xmbtext>上傳</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/share_with_label" xmbdesc="Label(acquirepanel/share_with_label)">
+  <xmbtext>分享對象：</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/startoggle" xmbdesc="Tooltip(acquirepanel/startoggle)">
+  <xmbtext>新增/移除星號</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludetoggle" xmbdesc="Tooltip(acquirepanel/excludetoggle)">
+  <xmbtext>排除/納入</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/sync_options_button" xmbdesc="Tooltip(acquirepanel/sync_options_button)">
+  <xmbtext>線上選項</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/delete_label" xmbdesc="Label(acquirepanel/delete_label)">
+  <xmbtext>複製後：</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/sync_options_button" xmbdesc="Label(acquirepanel/sync_options_button)">
+  <xmbtext>選項</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/selected_groups_label" xmbdesc="Label(acquirepanel/selected_groups_label)">
+  <xmbtext>沒有人</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>向右旋轉</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>向左旋轉</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>下一張相片</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>上一張相片</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/add_groups_button" xmbdesc="Tooltip(acquirepanel/add_groups_button)">
+  <xmbtext>新增您想要分享相簿內容的使用者</xmbtext>
+ </action>
+ <action type="Text1" target="acquirepanel/importtiptext" xmbdesc="Text1(acquirepanel/importtiptext)">
+  <xmbtext>請輸入新資料夾名稱或選擇既有的資料夾以繼續</xmbtext>
+ </action>
+ <action type="Text2" target="acquirepanel/importtiptext" xmbdesc="Text2(acquirepanel/importtiptext)">
+  <xmbtext>按一下 [匯入全部] 或 [匯入所選項目]</xmbtext>
+ </action>
+ <action type="Text3" target="acquirepanel/importtiptext" xmbdesc="Text3(acquirepanel/importtiptext)">
+  <xmbtext>將相片依照其拍攝日期匯入個別資料夾</xmbtext>
+ </action>
+ <action type="Text4" target="acquirepanel/importtiptext" xmbdesc="Text4(acquirepanel/importtiptext)">
+  <xmbtext>匯入資料夾並加註今天的日期</xmbtext>
+ </action>
+</tooltips>

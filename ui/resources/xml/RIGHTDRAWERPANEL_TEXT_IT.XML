@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="rightdrawerpanel/title_text" xmbdesc="Label(rightdrawerpanel/title_text)">
+  <xmbtext>Metadati</xmbtext>
+ </action>
+ <action type="Tooltip" target="rightdrawerpanel/close" xmbdesc="Tooltip(rightdrawerpanel/close)">
+  <xmbtext>Chiudi questo riquadro laterale</xmbtext>
+ </action>
+ <action type="Tooltip" target="rightdrawerpanel/size_toggle" xmbdesc="Tooltip(rightdrawerpanel/size_toggle)">
+  <xmbtext>Alterna tra riquadro laterale grande e piccolo</xmbtext>
+ </action>
+</tooltips>

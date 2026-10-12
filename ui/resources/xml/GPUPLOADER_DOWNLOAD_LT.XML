@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_download/window.title">
+  <xmbtext>„Google“ nuotraukų atsarginis kopijavimas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/device_name.title">
+  <xmbtext>Kurti atsargines nuotraukų kopijas iš %1$s?</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/action_prompt.title">
+  <xmbtext>Išsaugoti šiame įrenginyje esančias nuotraukas ir vaizdo įrašus „Google“ nuotraukose</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/never_btn.title">
+  <xmbtext>Niekada</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/once_btn.title">
+  <xmbtext>Tik kartą</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/always_btn.title">
+  <xmbtext>Visada</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Премештање базе података</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Биће потребно да поново покренете Picasa-у како би промене имале ефекта.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Напомена: Требало би да направите резервну копију базе података пре него што испробате ову експерименталну функцију. НИКАДА немојте да премештате базу података на мрежу, одвојиви или спољни уређај зато што на тај начин можете да изгубите податке.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Тренутна локација базе података:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Нова локација базе података:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Прегледај...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Подразумевано</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Премести након следећег поновног покретања</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

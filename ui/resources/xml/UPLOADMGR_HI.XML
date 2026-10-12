@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadmgr/hide" xmbdesc="Label(uploadmgr/hide)">
+  <xmbtext>छुपाएं</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/cleanup" xmbdesc="Label(uploadmgr/cleanup)">
+  <xmbtext>पूर्ण किया गया साफ़ करें</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/pause" xmbdesc="Label(uploadmgr/pause)">
+  <xmbtext>रुकें</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/resume" xmbdesc="Label(uploadmgr/resume)">
+  <xmbtext>फिर से शुरू करें</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/nopending" xmbdesc="Text(uploadmgr/nopending)">
+  <xmbtext>कोई अपलोड गतिविधि नहीं</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/throttletext" xmbdesc="Text(uploadmgr/throttletext)">
+  <xmbtext>बैंडविड्थ बचाएं</xmbtext>
+ </action>
+</tooltips>

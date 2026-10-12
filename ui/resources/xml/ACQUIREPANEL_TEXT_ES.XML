@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="acquirepanel/import_from_label" xmbdesc="Text(acquirepanel/import_from_label)">
+  <xmbtext>Importar de:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_to_label" xmbdesc="Text(acquirepanel/import_to_label)">
+  <xmbtext>Importar a:</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/import_delimiter_label" xmbdesc="Text(acquirepanel/import_delimiter_label)">
+  <xmbtext>/</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/subfolder_label" xmbdesc="Text(acquirepanel/subfolder_label)">
+  <xmbtext>Título de la carpeta:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludedupesbutton" xmbdesc="Tooltip(acquirepanel/excludedupesbutton)">
+  <xmbtext>Excluye las fotos que ya se han importado a Picasa</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/excludedupes_label" xmbdesc="Text(acquirepanel/excludedupes_label)">
+  <xmbtext>Excluir duplicados</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/nothing" xmbdesc="Text(acquirepanel/nothing)">
+  <xmbtext>No hay ninguna foto disponible.</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/previewlabel" xmbdesc="Text(acquirepanel/previewlabel)">
+  <xmbtext>Vista previa</xmbtext>
+ </action>
+ <action type="Text" target="acquirepanel/importtraylabel" xmbdesc="Text(acquirepanel/importtraylabel)">
+  <xmbtext>Bandeja de importación</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>Foto anterior</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>Foto siguiente</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>Girar a la derecha</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>Girar a la izquierda</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/anowbutton" xmbdesc="Label(acquirepanel/anowbutton)">
+  <xmbtext>Importar todo</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/anowbutton" xmbdesc="Tooltip(acquirepanel/anowbutton)">
+  <xmbtext>Lo importa todo, excepto los elementos excluidos</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/import_selected" xmbdesc="Label(acquirepanel/import_selected)">
+  <xmbtext>Importar seleccionadas</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/import_selected" xmbdesc="Tooltip(acquirepanel/import_selected)">
+  <xmbtext>Importa solo los elementos que tienes seleccionados actualmente</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/acancelbutton" xmbdesc="Label(acquirepanel/acancelbutton)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/acancelbutton" xmbdesc="Tooltip(acquirepanel/acancelbutton)">
+  <xmbtext>Cancela importación</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/upload_label" xmbdesc="Label(acquirepanel/upload_label)">
+  <xmbtext>Subir</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/share_with_label" xmbdesc="Label(acquirepanel/share_with_label)">
+  <xmbtext>Compartir con:</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/startoggle" xmbdesc="Tooltip(acquirepanel/startoggle)">
+  <xmbtext>Destacar foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/excludetoggle" xmbdesc="Tooltip(acquirepanel/excludetoggle)">
+  <xmbtext>Excluye/incluye</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/sync_options_button" xmbdesc="Tooltip(acquirepanel/sync_options_button)">
+  <xmbtext>Opciones online</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/delete_label" xmbdesc="Label(acquirepanel/delete_label)">
+  <xmbtext>Después de la copia:</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/sync_options_button" xmbdesc="Label(acquirepanel/sync_options_button)">
+  <xmbtext>Opciones</xmbtext>
+ </action>
+ <action type="Label" target="acquirepanel/selected_groups_label" xmbdesc="Label(acquirepanel/selected_groups_label)">
+  <xmbtext>Nadie</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate1button" xmbdesc="Tooltip(acquirepanel/rotate1button)">
+  <xmbtext>Girar a la derecha</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/rotate2button" xmbdesc="Tooltip(acquirepanel/rotate2button)">
+  <xmbtext>Girar a la izquierda</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/nextbutton" xmbdesc="Tooltip(acquirepanel/nextbutton)">
+  <xmbtext>Foto siguiente</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/previousbutton" xmbdesc="Tooltip(acquirepanel/previousbutton)">
+  <xmbtext>Foto anterior</xmbtext>
+ </action>
+ <action type="Tooltip" target="acquirepanel/add_groups_button" xmbdesc="Tooltip(acquirepanel/add_groups_button)">
+  <xmbtext>Añade personas con las que compartir los álbumes</xmbtext>
+ </action>
+ <action type="Text1" target="acquirepanel/importtiptext" xmbdesc="Text1(acquirepanel/importtiptext)">
+  <xmbtext>Introduce un nuevo título de carpeta o elige una existente para continuar.</xmbtext>
+ </action>
+ <action type="Text2" target="acquirepanel/importtiptext" xmbdesc="Text2(acquirepanel/importtiptext)">
+  <xmbtext>Haz clic en &quot;Importar todo&quot; o en &quot;Importar seleccionadas&quot;.</xmbtext>
+ </action>
+ <action type="Text3" target="acquirepanel/importtiptext" xmbdesc="Text3(acquirepanel/importtiptext)">
+  <xmbtext>Importa en una carpeta distinta para cada fecha</xmbtext>
+ </action>
+ <action type="Text4" target="acquirepanel/importtiptext" xmbdesc="Text4(acquirepanel/importtiptext)">
+  <xmbtext>Importar a la carpeta con la fecha de hoy</xmbtext>
+ </action>
+</tooltips>

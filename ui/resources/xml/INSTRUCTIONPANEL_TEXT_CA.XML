@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Tanca</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Més informació...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Benvingut a l&#039;àlbum de les persones sense nom. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>A mesura que s&#039;analitzen les fotos a Picasa, les cares que es detecten s&#039;agrupen de manera automàtica per facilitar l&#039;assignació de noms\n\nInformació important:\n\nPer identificar una persona, fes clic a Afegeix un nom. Seguidament, escriu el nom de la persona i prem Retorn. Es crearà un àlbum Persones nou cada vegada que identifiquis una persona per primera vegada.\n\n(CONSELL: inicia la sessió amb el compte de Google per accedir a tots els contactes mentre assignes noms.)\n\nPer no identificar una persona, fes clic al botó X de la miniatura de cara.\n\nSuggeriments: després d&#039;identificar una persona per nom, Picasa pot suggerir més cares que coincideixin amb aquesta persona. Fes clic a l&#039;àlbum d&#039;una persona per veure i confirmar (o rebutjar) qualsevol suggeriment.\n\n\nFes clic a Més informació per obtenir més informació sobre aquesta funció.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>A mesura que s&#039;analitzen les fotos a Picasa, les cares que es detecten s&#039;agrupen de manera automàtica per facilitar l&#039;assignació de noms\n\nInformació important:\n\nPer identificar una persona, fes clic a Afegeix un nom. Seguidament, escriu el nom de la persona i prem Retorn. Es crearà un àlbum Persones nou cada vegada que identifiquis una persona per primera vegada.\n\n(CONSELL: inicia la sessió amb el compte de Google per accedir a tots els contactes mentre assignes noms.)\n\nPer no identificar una persona, fes clic al botó X de la miniatura de cara.\n\nSuggeriments: després d&#039;identificar una persona per nom, Picasa pot suggerir més cares que coincideixin amb aquesta persona. Fes clic a l&#039;àlbum d&#039;una persona per veure i confirmar (o rebutjar) qualsevol suggeriment.\n\n\nFes clic a Més informació per obtenir més informació sobre aquesta funció.</xmbtext>
+ </action>
+</tooltips>

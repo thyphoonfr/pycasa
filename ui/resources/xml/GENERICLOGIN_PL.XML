@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="genericlogin/window1.title">
+  <xmbtext>Logowanie</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/emaillabel.title">
+  <xmbtext>E-mail:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.title">
+  <xmbtext>Utwórz konto...</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/labelgroup7.title">
+  <xmbtext>Hasło:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.title">
+  <xmbtext>Nie pamiętasz hasła?</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/savepassword.title">
+  <xmbtext>Zapisz hasło</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/label14.title">
+  <xmbtext>Logowanie zabezpieczone protokołem SSL</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/accept.title">
+  <xmbtext>Logowanie</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/button17.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

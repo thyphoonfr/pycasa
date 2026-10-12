@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Funkciu Rýchle značky môžete použiť, ak chcete priradiť značku jediným kliknutím. Nižšie zadajte značky, ku ktorým chcete mať prístup jediným kliknutím. Podľa predvoleného nastavenia sa prvé dve rýchle značky používajú na sledovanie naposledy použitých značiek. Zrušte začiarknutie políčka nižšie, ak chcete prvé dve značky nastaviť manuálne.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Prázdne polia vyššie automaticky vyplniť bežne používanými značkami</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Rezervovať prvé dve tlačidlá pre naposledy použité značky</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_manage_devices/manage_devices.title">
+  <xmbtext>Hallinnoi laitteita</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/device_list_description.title">
+  <xmbtext>Voit valita, tuodaanko vai ohitetaanko lueteltujen laitteiden kuvat ja videot. Sinulta kysytään aina, jos laite ei ole kummassakaan luettelossa.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_devices_label.title">
+  <xmbtext>Liitetyt laitteet</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/devicecolumn.title">
+  <xmbtext>Laite</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Laitteen tyyppi</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/uniquecolumn.title">
+  <xmbtext>Yksilöllinen tunniste</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/attached_actions_label.title">
+  <xmbtext>Tuo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist.title">
+  <xmbtext>Aina</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist.title">
+  <xmbtext>Ei koskaan</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/whitelist_description.title">
+  <xmbtext>Tuo aina näistä laitteista.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nimi</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_black.title">
+  <xmbtext>&gt;&gt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/move_to_white.title">
+  <xmbtext>&lt;&lt;</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/remove.title">
+  <xmbtext>Poista</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/blacklist_description.title">
+  <xmbtext>Älä koskaan tuo näistä laitteista.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/namecolumn.title">
+  <xmbtext>Nimi</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_manage_devices/ok.title">
+  <xmbtext>Valmis</xmbtext>
+ </stringres>
+</resources>

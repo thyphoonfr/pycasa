@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="poster/window1.title">
+  <xmbtext>पोस्टर सेटिंग</xmbtext>
+ </stringres>
+ <stringres id="poster/label2.title">
+  <xmbtext>युक्ति: अगर आप ट्रिम करना नहीं चाहते हैं, तो अपने चित्र को पेपर के आकार के जैसे ही काटें.</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup3.title">
+  <xmbtext>पोस्टर आकार:</xmbtext>
+ </stringres>
+ <stringres id="poster/item5.title">
+  <xmbtext>200%</xmbtext>
+ </stringres>
+ <stringres id="poster/item6.title">
+  <xmbtext>300%</xmbtext>
+ </stringres>
+ <stringres id="poster/item7.title">
+  <xmbtext>400%</xmbtext>
+ </stringres>
+ <stringres id="poster/item8.title">
+  <xmbtext>500%</xmbtext>
+ </stringres>
+ <stringres id="poster/item9.title">
+  <xmbtext>600%</xmbtext>
+ </stringres>
+ <stringres id="poster/item10.title">
+  <xmbtext>700%</xmbtext>
+ </stringres>
+ <stringres id="poster/item11.title">
+  <xmbtext>800%</xmbtext>
+ </stringres>
+ <stringres id="poster/item12.title">
+  <xmbtext>900%</xmbtext>
+ </stringres>
+ <stringres id="poster/item13.title">
+  <xmbtext>1000%</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup14.title">
+  <xmbtext>पेपर का आकार:</xmbtext>
+ </stringres>
+ <stringres id="poster/overlap.title">
+  <xmbtext>टाइल ओवरलैप करें</xmbtext>
+ </stringres>
+ <stringres id="poster/button18.title">
+  <xmbtext>ठीक</xmbtext>
+ </stringres>
+ <stringres id="poster/button19.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

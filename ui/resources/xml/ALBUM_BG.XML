@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Име:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Дата:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Автоматично датиране</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Музика:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Използване на музика при слайдшоу и филмова презентация:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Преглед...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Място на заснемане (по избор):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Описание (по избор):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

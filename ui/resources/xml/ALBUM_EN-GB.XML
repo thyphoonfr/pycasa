@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Name:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Date:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Automatic date</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Music:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Use music for Slideshow and Movie presentation:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Browse...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Place taken (optional):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Description (optional):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="genericlogin/window1.title">
+  <xmbtext>เข้าสู่ระบบ</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/emaillabel.title">
+  <xmbtext>อีเมล:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.title">
+  <xmbtext>สร้างบัญชี...</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/labelgroup7.title">
+  <xmbtext>รหัสผ่าน:</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.title">
+  <xmbtext>ลืมรหัสผ่านของคุณใช่ไหม</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/savepassword.title">
+  <xmbtext>บันทึกรหัสผ่าน</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/label14.title">
+  <xmbtext>ล็อกอินปลอดภัยด้วย SSL</xmbtext>
+ </stringres>
+ <stringres id="genericlogin/accept.title">
+  <xmbtext>ลงชื่อเข้าใช้ </xmbtext>
+ </stringres>
+ <stringres id="genericlogin/button17.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

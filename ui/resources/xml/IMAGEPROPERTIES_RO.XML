@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="imageproperties/labelgroup2.title">
+  <xmbtext>Numele fişierului:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/name.title">
+  <xmbtext>photo.jpg</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup4.title">
+  <xmbtext>Locaţie:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup6.title">
+  <xmbtext>Dimensiune:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/size.title">
+  <xmbtext>120k</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/label9.title">
+  <xmbtext>Data:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/date.title">
+  <xmbtext>WWW 00, 0000 00:00 WW</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column12.title">
+  <xmbtext>Proprietate</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column13.title">
+  <xmbtext>Valoare</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/prev.title">
+  <xmbtext>Anteriorul</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/navlabel.title">
+  <xmbtext>x din x (de) fişiere</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/next.title">
+  <xmbtext>Următorul</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/button19.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

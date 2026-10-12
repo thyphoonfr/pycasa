@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="choose_mail/selecttext" xmbdesc="Label(choose_mail/selecttext)">
+  <xmbtext>نحوه ایمیل عکس‌های خود را انتخاب کنید.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1" xmbdesc="Label(choose_mail/mail1)">
+  <xmbtext>سرویس‌گیرنده نامه</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1a" xmbdesc="Label(choose_mail/mail1a)">
+  <xmbtext>از برنامه ایمیل پیش‌فرض من استفاده شود.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2" xmbdesc="Label(choose_mail/mail2)">
+  <xmbtext>Google Mail</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2a" xmbdesc="Label(choose_mail/mail2a)">
+  <xmbtext>‏از Gmail یا حساب Google من استفاده شود.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/gmailsignup1" xmbdesc="Label(choose_mail/gmailsignup1)">
+  <xmbtext>‏حساب Gmail ندارید؟ یک حساب رایگان دریافت کنید.</xmbtext>
+ </action>
+ <action type="WebTarget" target="choose_mail/gmailsignup1" xmbdesc="WebTarget(choose_mail/gmailsignup1)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/remember" xmbdesc="Label(choose_mail/remember)">
+  <xmbtext>این تنظیم به خاطر سپرده شود، این گفتگو دیگر نشان داده نشود.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/help" xmbdesc="Label(choose_mail/help)">
+  <xmbtext>راهنمایی</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mailcancel" xmbdesc="Label(choose_mail/mailcancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+</tooltips>

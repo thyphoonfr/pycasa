@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>Tarkista tulostusta varten</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>Poista valitut</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>Poista heikkolaatuiset kuvat</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>Kuvan esikatselu</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>Tiedot</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

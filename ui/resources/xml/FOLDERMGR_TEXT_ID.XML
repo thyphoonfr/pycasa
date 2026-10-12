@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="foldermgr/folder_list_label" xmbdesc="Label(foldermgr/folder_list_label)">
+  <xmbtext>Daftar Folder</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/instructions_text" xmbdesc="Label(foldermgr/instructions_text)">
+  <xmbtext>Untuk setiap folder, Anda bisa memilih untuk meminta Picasa mencari foto di dalamnya atau tidak.  Anda juga dapat memilih folder yang gambar barunya harus diawasi.</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/status_label" xmbdesc="Label(foldermgr/status_label)">
+  <xmbtext>Untuk folder saat ini:</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/scan_once_label" xmbdesc="Label(foldermgr/scan_once_label)">
+  <xmbtext>Pindai Sekali</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/remove_label" xmbdesc="Label(foldermgr/remove_label)">
+  <xmbtext>Hapus dari Picasa</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watch_label" xmbdesc="Label(foldermgr/watch_label)">
+  <xmbtext>Pindai Selalu</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watched_label" xmbdesc="Label(foldermgr/watched_label)">
+  <xmbtext>Folder yang Diawasi</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/ok-label" xmbdesc="Label(foldermgr/ok-label)">
+  <xmbtext>Oke</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/cancel-label" xmbdesc="Label(foldermgr/cancel-label)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/help-label" xmbdesc="Label(foldermgr/help-label)">
+  <xmbtext>Bantuan</xmbtext>
+ </action>
+</tooltips>

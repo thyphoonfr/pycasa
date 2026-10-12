@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>‏יצא כדף HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>יצא תמונות ב:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>גודל מקורי</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 פיקסלים (צגים גדולים)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 פיקסלים (דפי אינטרנט גדולים)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 פיקסלים (דפי אינטרנט)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 פיקסלים (לשליחה בדוא&quot;ל)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>יצא סרטים באמצעות:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>מסגרת ראשונה</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>סרט מלא</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>כותרת דף אינטרנט:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>תיקייה:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>עיון...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>לחץ על &#039;שם תבנית&#039; כדי להציג דוגמה. לאחר הבחירה, לחץ על &#039;יצא&#039;.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>תיאור תבנית</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>יצא</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

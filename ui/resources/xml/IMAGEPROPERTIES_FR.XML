@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="imageproperties/labelgroup2.title">
+  <xmbtext>Nom du fichier :</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/name.title">
+  <xmbtext>photo.jpg</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup4.title">
+  <xmbtext>Emplacement :</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup6.title">
+  <xmbtext>Taille :</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/size.title">
+  <xmbtext>120 Ko</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/label9.title">
+  <xmbtext>Date :</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/date.title">
+  <xmbtext>WWW 00, 0000 00:00 WW</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column12.title">
+  <xmbtext>Propriété</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column13.title">
+  <xmbtext>Valeur</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/prev.title">
+  <xmbtext>Préc.</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/navlabel.title">
+  <xmbtext>x sur x fichiers</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/next.title">
+  <xmbtext>Suivant</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/button19.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

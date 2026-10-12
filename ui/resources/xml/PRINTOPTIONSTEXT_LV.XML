@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="printoptions/apply" xmbdesc="Label(printoptions/apply)">
+  <xmbtext>Lietot</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/apply" xmbdesc="Tooltip(printoptions/apply)">
+  <xmbtext>Lietojiet fotoattēliem atlasītās opcijas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/ok" xmbdesc="Label(printoptions/ok)">
+  <xmbtext>Labi</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/ok" xmbdesc="Tooltip(printoptions/ok)">
+  <xmbtext>Lietojiet fotoattēliem atlasītās opcijas un aizveriet šo dialoglodziņu</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/cancel" xmbdesc="Label(printoptions/cancel)">
+  <xmbtext>Atcelt</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/cancel" xmbdesc="Tooltip(printoptions/cancel)">
+  <xmbtext>Aizveriet šo dialoglodziņu, nesaglabājot izmaiņas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_label" xmbdesc="Label(printoptions/border_label)">
+  <xmbtext>Apmale</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_size_label" xmbdesc="Label(printoptions/border_size_label)">
+  <xmbtext>Apmales platums</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_none_label" xmbdesc="Label(printoptions/border_none_label)">
+  <xmbtext>Nav</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_max_label" xmbdesc="Label(printoptions/border_max_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_color_label" xmbdesc="Label(printoptions/border_color_label)">
+  <xmbtext>Apmales krāsa</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_label" xmbdesc="Label(printoptions/caption_label)">
+  <xmbtext>Uzraksti</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usenotext_label" xmbdesc="Label(printoptions/usenotext_label)">
+  <xmbtext>Nav teksta</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usecaption_label" xmbdesc="Label(printoptions/usecaption_label)">
+  <xmbtext>Uzraksts</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usefilename_label" xmbdesc="Label(printoptions/usefilename_label)">
+  <xmbtext>Faila nosaukums</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/useexif_label" xmbdesc="Label(printoptions/useexif_label)">
+  <xmbtext>Exif informācija</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_color_label" xmbdesc="Label(printoptions/caption_color_label)">
+  <xmbtext>Teksta krāsa</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_font_label" xmbdesc="Label(printoptions/caption_font_label)">
+  <xmbtext>Fonts</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_size_label" xmbdesc="Label(printoptions/caption_size_label)">
+  <xmbtext>Lielums</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/wrap_checkbox_label" xmbdesc="Label(printoptions/wrap_checkbox_label)">
+  <xmbtext>Aplauzt tekstu</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textbelowimage_label" xmbdesc="Label(printoptions/textbelowimage_label)">
+  <xmbtext>Tālāk redzamais attēls</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonimage_label" xmbdesc="Label(printoptions/textonimage_label)">
+  <xmbtext>Attēlā</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonborder_label" xmbdesc="Label(printoptions/textonborder_label)">
+  <xmbtext>Uz apmales</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/bottomonly_checkbox_label" xmbdesc="Label(printoptions/bottomonly_checkbox_label)">
+  <xmbtext>Tikai apakšā</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/evenwidth_checkbox_label" xmbdesc="Label(printoptions/evenwidth_checkbox_label)">
+  <xmbtext>Vienāda platuma apmale</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/disabled_label" xmbdesc="Label(printoptions/disabled_label)">
+  <xmbtext>Diemžēl attēlu rādītāja drukāšanas laikā šīs opcijas nevar izmantot.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>A compactar</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>O Picasa está a compactar a base de dados para poupar espaço no disco. Esta acção pode demorar vários minutos.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>A compactar...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

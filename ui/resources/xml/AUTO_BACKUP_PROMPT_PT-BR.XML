@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Backup do Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Faça backup de suas fotos do Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Salve suas fotos e seus vídeos na nuvem automaticamente com o Backup do Google Fotos. Seus itens podem ser acessados de qualquer um dos seus dispositivos e todos permanecem particulares até que você decida compartilhá-los.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Acessar o Backup do Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Não, obrigado</xmbtext>
+ </stringres>
+</resources>

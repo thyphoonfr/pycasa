@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>I-import ang Mga Album mula sa Web Albums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Ang mga larawan sa web albums na naka-check sa ibaba ay mai-da-download sa iyong computer sa sandaling nag-click ka sa button ng OK. Awtomatiko silang isasaayos sa mga folder batay sa mga pangalan ng album.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Mayroon kang 100 mga web album online.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>I-import lahat ng mga album</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>I-import ang mga napiling album:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Pangalan</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Petsa</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(TANDAAN: Ang mga larawan lamang na wala pa sa iyong computer ang maida-download)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

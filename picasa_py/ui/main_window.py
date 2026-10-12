@@ -1,0 +1,223 @@
+"""
+Main Application Window for PyCasa (faithful reproduction of ytWindow).
+
+Ref: picasa3.exe @ 0x00983940 (ytWindow WndProc)
+Ref: picasa3.exe @ 0x0070494B (Magic signature 0x47506332 'GPc2')
+Ref: AGENTS.md §4 bis (Disposition et fonctionnement identiques)
+"""
+
+from __future__ import annotations
+from typing import Optional, List, Dict, Any
+from pathlib import Path
+from PySide6.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
+    QStatusBar, QMessageBox, QFileDialog
+)
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QIcon
+
+from picasa_py.ui.style import PicasaStyle
+from picasa_py.ui.resources import PicasaResourceManager
+from picasa_py.ui.menu import PicasaMenuBuilder
+from picasa_py.ui.top_bar import PicasaTopBar
+from picasa_py.ui.library_tree import PicasaLibraryTree
+from picasa_py.ui.thumbnail_view import PicasaThumbnailView
+from picasa_py.ui.photo_tray import PicasaPhotoTray
+from picasa_py.ui.right_drawer import PicasaRightDrawer
+from picasa_py.db.database import PicasaDatabase
+
+
+# Ref: picasa3.exe @ 0x00983940 (ytWindow)
+class PicasaMainWindow(QMainWindow):
+    """
+    Fenêtre principale de l'application reproduisant ytWindow de Picasa 3.
+    """
+    WINDOW_MAGIC = 0x47506332  # 'GPc2'
+
+    def __init__(self, db_path: Optional[str] = None, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.style = PicasaStyle.load()
+        self.res_mgr = PicasaResourceManager.get()
+
+        self.setWindowTitle("Picasa 3")
+        self.setWindowIcon(self.res_mgr.get_icon(105))
+        self.resize(1200, 780)
+
+        # Central container
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # 1. Barre d'outils supérieure
+        self.top_bar = PicasaTopBar(self.style, self)
+        main_layout.addWidget(self.top_bar)
+
+        # 2. Zone centrale (Splitter 3 volets: Bibliothèque | Grille | Tiroir)
+        self.splitter = QSplitter(Qt.Orientation.Horizontal, self)
+        self.splitter.setHandleWidth(4)
+        self.splitter.setStyleSheet("""
+            QSplitter::handle {
+                background-color: #D6D6D6;
+            }
+        """)
+
+        # Volet gauche (Arborescence)
+        self.library_tree = PicasaLibraryTree(self.style, self)
+        self.library_tree.setMinimumWidth(180)
+        self.splitter.addWidget(self.library_tree)
+
+        # Volet central (Grille de vignettes)
+        self.thumb_view = PicasaThumbnailView(self.style, self)
+        self.splitter.addWidget(self.thumb_view)
+
+        # Volet droit (Tiroir de métadonnées)
+        self.right_drawer = PicasaRightDrawer(self.style, self)
+        self.splitter.addWidget(self.right_drawer)
+
+        # Proportions initiales: 220px gauche, reste centre, 260px droite
+        self.splitter.setSizes([220, 720, 260])
+        main_layout.addWidget(self.splitter, 1)
+
+        # 3. Bac à photos inférieur (Photo Tray)
+        self.photo_tray = PicasaPhotoTray(self.style, self)
+        main_layout.addWidget(self.photo_tray)
+
+        # 4. Barre d'état
+        self.status_bar = QStatusBar(self)
+        self.status_bar.setStyleSheet("background-color: #E6E6E6; color: #555555; font-size: 11px;")
+        self.setStatusBar(self.status_bar)
+        self.status_bar.showMessage("Prêt")
+
+        # 5. Construction des menus
+        self.menu_builder = PicasaMenuBuilder(self)
+        self.menu_builder.build_menu_bar()
+
+        # 6. Connexion des signaux
+        self._connect_signals()
+
+        # 7. Chargement de la base de données
+        self.db: Optional[PicasaDatabase] = None
+        self._init_database(db_path)
+
+    def _connect_signals(self) -> None:
+        # Sélection de dossier dans l'arborescence
+        self.library_tree.folder_selected.connect(self._on_folder_selected)
+
+        # Sélection d'éléments dans la grille
+        self.thumb_view.selection_changed.connect(self._on_selection_changed)
+
+        # Curseur de zoom du plateau
+        self.photo_tray.zoom_changed.connect(self.thumb_view.set_thumb_size)
+
+        # Recherche et filtres
+        self.top_bar.search_query_changed.connect(self._on_search_query)
+
+        # Actions du plateau
+        self.photo_tray.action_clear.connect(self.action_clear_selection)
+        self.photo_tray.action_export.connect(self.action_export)
+
+    def _init_database(self, db_path: Optional[str] = None) -> None:
+        try:
+            if db_path:
+                self.db = PicasaDatabase.open(db_path)
+            else:
+                self.db = PicasaDatabase.open_default()
+
+            self.library_tree.populate_from_database(self.db)
+            self.thumb_view.set_database(self.db)
+            count = len(self.db.index)
+            self.status_bar.showMessage(f"Base de données chargée : {count} photos indexées")
+        except Exception as e:
+            self.status_bar.showMessage(f"Mode sans base active : {e}")
+
+    def _on_folder_selected(self, key: str, target_type: str, display_name: str) -> None:
+        if target_type == "folder":
+            self.thumb_view.filter_by_folder(key)
+            self.status_bar.showMessage(f"Dossier sélectionné : {display_name}")
+        else:
+            self.thumb_view.filter_by_folder(None)
+            self.status_bar.showMessage(f"Sélection : {display_name}")
+
+    def _on_selection_changed(self, indices: List[int]) -> None:
+        count = len(indices)
+        self.photo_tray.set_selected_count(count)
+
+        if count == 1 and self.db is not None:
+            idx = indices[0]
+            entry = self.db.index[idx]
+            p = Path(entry.path)
+            info = {
+                "filename": p.name,
+                "date": "—",
+                "size": f"{entry.file_size // 1024} Ko" if entry.file_size else "—",
+                "resolution": "—",
+                "camera": "—"
+            }
+            self.right_drawer.display_item_info(info)
+        elif count == 0:
+            self.right_drawer.display_item_info(None)
+        else:
+            info = {
+                "filename": f"{count} fichiers sélectionnés",
+                "date": "—",
+                "size": "—",
+                "resolution": "—",
+                "camera": "—"
+            }
+            self.right_drawer.display_item_info(info)
+
+    def _on_search_query(self, query: str) -> None:
+        if not self.db or not self.db.search_index:
+            return
+        query = query.strip()
+        if not query:
+            self.thumb_view.filter_by_folder(None)
+            return
+
+        doc_ids = self.db.search(query)
+        self.thumb_view.filtered_indices = [
+            i for i in doc_ids if i < len(self.thumb_view.items)
+        ]
+        self.thumb_view.section_title = f'Recherche : "{query}"'
+        self.thumb_view.section_subtitle = f"{len(self.thumb_view.filtered_indices)} résultats"
+        self.thumb_view.selected_indices.clear()
+        self.thumb_view._recompute_layout()
+        self.thumb_view.update()
+
+    # --- Actions des Menus ---
+
+    def action_add_file(self) -> None:
+        fn, _ = QFileDialog.getOpenFileName(self, "Ajouter un fichier à Picasa", "", "Images (*.jpg *.jpeg *.png *.bmp)")
+        if fn:
+            self.status_bar.showMessage(f"Fichier sélectionné : {fn}")
+
+    def action_select_all(self) -> None:
+        self.thumb_view.selected_indices = set(self.thumb_view.filtered_indices)
+        self.thumb_view.selection_changed.emit(list(self.thumb_view.selected_indices))
+        self.thumb_view.update()
+
+    def action_clear_selection(self) -> None:
+        self.thumb_view.selected_indices.clear()
+        self.thumb_view.selection_changed.emit([])
+        self.thumb_view.update()
+
+    def action_slideshow(self) -> None:
+        QMessageBox.information(self, "Diaporama", "Lancement du diaporama plein écran.")
+
+    def action_options(self) -> None:
+        QMessageBox.information(self, "Options", "Préférences de Picasa (options.fen).")
+
+    def action_export(self) -> None:
+        sel_count = len(self.thumb_view.selected_indices)
+        if sel_count == 0:
+            QMessageBox.information(self, "Export", "Veuillez sélectionner au moins une image.")
+            return
+        dest_dir = QFileDialog.getExistingDirectory(self, "Sélectionner le dossier de destination pour l'export")
+        if dest_dir:
+            self.status_bar.showMessage(f"Export de {sel_count} images vers {dest_dir}")
+
+    def action_about(self) -> None:
+        about_text = self.res_mgr.get_string(298, "Picasa 3 Re-implementation in Python")
+        QMessageBox.about(self, "À propos de Picasa", f"Picasa 3 (Python Edition)\n\n{about_text}")

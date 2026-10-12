@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_download/window.title">
+  <xmbtext>Cópia de segurança do Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/device_name.title">
+  <xmbtext>Criar cópias de segurança das fotografias de %1$s?</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/action_prompt.title">
+  <xmbtext>Guardar fotografias e vídeos deste dispositivo no Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/never_btn.title">
+  <xmbtext>Nunca</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/once_btn.title">
+  <xmbtext>Apenas uma vez</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_download/always_btn.title">
+  <xmbtext>Sempre</xmbtext>
+ </stringres>
+</resources>

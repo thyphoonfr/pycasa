@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_advoptions/adv_setup_window.title">
+  <xmbtext>Advanced Settings</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder_chk.title">
+  <xmbtext>Also copy photos/videos from cameras and storage cards to</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder.title">
+  <xmbtext>Browse...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/send_to_google.title">
+  <xmbtext>Send anonymous usage statistics to Google.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/cancelbutton.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

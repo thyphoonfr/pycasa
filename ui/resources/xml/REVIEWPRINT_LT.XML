@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>Peržiūra prieš spausdinimą</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>Pašalinti pasirinktą</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>Šalinti žemos kokybės nuotraukas</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>Vaizdo peržiūra</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>Informacija</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

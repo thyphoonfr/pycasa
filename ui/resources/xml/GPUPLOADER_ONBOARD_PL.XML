@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Kopia zapasowa Zdjęć Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>Wybierz źródła kopii zapasowej</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Zdjęcia Google automatycznie tworzą w bibliotece kopie zapasowe fotografii z wybranych źródeł.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>Dodaj...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>Rozmiar zdjęcia</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>Wysoka jakość (bezpłatne nieograniczone miejsce)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>Świetna jakość i mniejszy rozmiar pliku</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>Oryginalne (ograniczone do miejsca na koncie)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>Pełna rozdzielczość (pliki zajmują miejsce na Dysku)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>Pomóż ulepszać Zdjęcia, wysyłając anonimowe statystyki użytkowania.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>Zwiększ ilość miejsca...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>Rozpocznij tworzenie kopii zapasowej</xmbtext>
+ </stringres>
+</resources>

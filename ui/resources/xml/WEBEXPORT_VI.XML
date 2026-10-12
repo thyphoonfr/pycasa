@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Xuất dưới dạng Trang HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Xuất ảnh tại:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Kích thước Ban đầu</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixel (cho màn hình lớn)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixel (cho trang Web lớn)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixel (cho trang Web)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixel (dành cho email)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Xuất phim bằng cách sử dụng:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Khung đầu tiên</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Phim đầy đủ</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Tiêu đề trang web:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Thư mục:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Duyệt...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Nhấp vào một Tên Mẫu để xem ví dụ.  Khi bạn đã chọn xong, nhấp vào Xuất.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Mô tả mẫu</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Xuất</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

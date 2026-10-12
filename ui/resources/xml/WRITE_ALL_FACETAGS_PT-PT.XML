@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Escrever Etiquetas de Cara</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Escrever etiquetas ou escrever tudo pode demorar demasiado tempo. Se o registo estiver definido como detalhado ou mais elevado, o network.log irá conter mensagens sobre ficheiros só de leitura que não foi possível atualizar. Recomendamos terminar a sessão enquanto estiver a utilizar esta funcionalidade.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Escrever nos Selecionados</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Escrever dados de Caras</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Escrever Tudo</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="imageproperties/labelgroup2.title">
+  <xmbtext>Faila nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/name.title">
+  <xmbtext>fotoattels.jpg</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup4.title">
+  <xmbtext>Atrašanās vieta:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup6.title">
+  <xmbtext>Lielums:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/size.title">
+  <xmbtext>120k</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/label9.title">
+  <xmbtext>Datums:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/date.title">
+  <xmbtext>WWW 00, 0000 00:00 WW</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column12.title">
+  <xmbtext>Rekvizīts</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column13.title">
+  <xmbtext>Vērtība</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/prev.title">
+  <xmbtext>Apskate</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/navlabel.title">
+  <xmbtext>x. no x failiem</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/next.title">
+  <xmbtext>Nākamais</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/button19.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+</resources>

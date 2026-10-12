@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>导出到文件夹</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>导出位置：</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>浏览...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>导出的文件夹的名称：</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>在文件名中添加数字以保留顺序</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>图片大小：</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>使用原始大小</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>将大小调整为：</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>像素</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>图片质量：</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>自动</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>正常</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>最大</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>最小</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>自定义</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>保持原始图片质量</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>适当平衡质量和大小</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>特大文件 - 保留精细细节</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>文件大小为最小，质量有所降低</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>导出视频方式：</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>第一幅</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>完整视频（没有调整尺寸）</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>水印：</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>添加水印</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>在照片上标记您的姓名、网域或版权声明。</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>导出</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

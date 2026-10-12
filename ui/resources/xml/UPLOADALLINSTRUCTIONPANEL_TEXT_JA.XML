@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>閉じる</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>一括アップロードをご利用いただきありがとうございます</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>目的のフォルダやアルバムの横にあるチェックボックスをオンにし、操作を選択します。適用されない操作項目は表示されません。たとえば、フォルダやアルバム全体がオンラインにアップロード済みの場合、アップロード オプションは表示されません。</xmbtext>
+ </action>
+</tooltips>

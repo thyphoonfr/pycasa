@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Picasa&#039;nın eski bir sürümü yüklü. Var olan resim kütüphanenizi güncellemek mi, yoksa bilgisayarınızda resimler için yeniden bir arama mı gerçekleştirmek istiyorsunuz?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Lütfen aşağıdaki seçeneklerden birini seçin:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Var olan resim kütüphanemi güncelle</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Picasa 1 içinde anahtar kelimeler veya özel albümler kullanıyorsanız ve bunları Picasa 3&#039;te de korumak istiyorsanız bu seçeneği seçin.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Bilgisayarımdaki resimleri tekrar ara</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Bilgisayarınızın daha kapsamlı bir şekilde taranması için genişletilmiş resim bilgileri içeren bu seçeneği belirleyin. Bu, var olan düzeltmelerinizi veya düzenlemenizi korur ancak anahtar kelimeleri korumaz. Bu arama birkaç dakika sürebilir.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Resimlerin taranması dosyaların yeni konumlara taşınmasına veya kopyalanmasına neden olmaz. Picasa tarafından görüntülenen klasörleri Dosya Yöneticisi aracını (Araçlar menüsünde) kullanarak seçebilirsiniz.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Devam</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa, bilgisayarınızda bulunan resimler için arama gerçekleştirmeye hazır</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Lütfen aşağıdaki seçeneklerden birini seçin:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Tüm bilgisayarımdaki resimleri ara</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Resimlerinizi bilgisayarınızda değişik klasörlerde, özellikle birden fazla sabit sürücüde saklıyorsanız bu seçeneği tercih edin.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Yalnızca Belgelerim, Resimlerim, Masaüstü ve iPhoto Kitaplığı&#039;nda ara</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Bu seçeneği sadece, resimlerinizi bu klasörlerde saklıyorsanız seçin.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Resim arama, dosyaların yeni konumlara taşınmasına veya kopyalanmasına neden olmaz. Picasa tarafından görüntülenen klasörleri Dosya Yöneticisi aracını (Araçlar menüsünde) kullanarak seçebilirsiniz.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Devam</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Eksportēšana HTML lapas formātā</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Eksportēt attēlus uz:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Sākotnējie izmēri</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pikseļi (lieliem monitoriem)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pikseļi (lielām tīmekļa lapām)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pikseļi (tīmekļa lapām)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pikseļi (e-pastam)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Eksportēt filmas, izmantojot:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Pirmais kadrs</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Visa filma</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Tīmekļa lapas nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Mape:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Lai skatītu piemēru, noklikšķiniet uz veidnes nosaukuma. Kad esat atlasījis, noklikšķiniet uz Eksportēt.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Veidnes apraksts</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Eksportēt</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

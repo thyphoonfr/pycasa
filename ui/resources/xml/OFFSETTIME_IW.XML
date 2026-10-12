@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>התאם תאריך תמונה</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>התאריך הנוכחי של התמונה: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>התאריך החדש של התמונה: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>התאם את תאריכי כל התמונות לפי הכמות</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>הגדר תאריך ושעה זהים לכל התצלומים</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

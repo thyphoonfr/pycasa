@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_mail/to_text" xmbdesc="Label(compose_mail/to_text)">
+  <xmbtext>A:</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/subject_text" xmbdesc="Label(compose_mail/subject_text)">
+  <xmbtext>Asunto:</xmbtext>
+ </action>
+ <action type="Tooltip" target="compose_mail/discardimage" xmbdesc="Tooltip(compose_mail/discardimage)">
+  <xmbtext>Eliminar la imagen seleccionada del archivo adjunto</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/changeuser" xmbdesc="Label(compose_mail/changeuser)">
+  <xmbtext>Cambiar usuario</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/send" xmbdesc="Label(compose_mail/send)">
+  <xmbtext>Enviar</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discard" xmbdesc="Label(compose_mail/discard)">
+  <xmbtext>Descartar</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/sendb" xmbdesc="Label(compose_mail/sendb)">
+  <xmbtext>Enviar</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discardb" xmbdesc="Label(compose_mail/discardb)">
+  <xmbtext>Descartar</xmbtext>
+ </action>
+</tooltips>

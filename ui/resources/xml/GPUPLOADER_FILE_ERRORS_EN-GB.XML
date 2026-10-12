@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_file_errors/file_errors.title">
+  <xmbtext>Google Photos backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/error_label.title">
+  <xmbtext>Couldn&#039;t back up these files:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/namecolumn.title">
+  <xmbtext>Name</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/accept.title">
+  <xmbtext>Try again</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/cancel.title">
+  <xmbtext>Dismiss</xmbtext>
+ </stringres>
+</resources>

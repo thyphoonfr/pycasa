@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="printoptions/apply" xmbdesc="Label(printoptions/apply)">
+  <xmbtext>Primijeni</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/apply" xmbdesc="Tooltip(printoptions/apply)">
+  <xmbtext>Primijeni odabrane mogućnosti na Fotografije</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/ok" xmbdesc="Label(printoptions/ok)">
+  <xmbtext>U redu</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/ok" xmbdesc="Tooltip(printoptions/ok)">
+  <xmbtext>Primijeni odabrane opcije na fotografije i zatvori ovaj dijaloški okvir</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/cancel" xmbdesc="Label(printoptions/cancel)">
+  <xmbtext>Odustani</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/cancel" xmbdesc="Tooltip(printoptions/cancel)">
+  <xmbtext>Zatvori dijaloški okvir bez spremanja promjena</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_label" xmbdesc="Label(printoptions/border_label)">
+  <xmbtext>Obrub</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_size_label" xmbdesc="Label(printoptions/border_size_label)">
+  <xmbtext>Širina obruba</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_none_label" xmbdesc="Label(printoptions/border_none_label)">
+  <xmbtext>Ništa</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_max_label" xmbdesc="Label(printoptions/border_max_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_color_label" xmbdesc="Label(printoptions/border_color_label)">
+  <xmbtext>Boja obruba</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_label" xmbdesc="Label(printoptions/caption_label)">
+  <xmbtext>Naslovi</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usenotext_label" xmbdesc="Label(printoptions/usenotext_label)">
+  <xmbtext>Bez teksta</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usecaption_label" xmbdesc="Label(printoptions/usecaption_label)">
+  <xmbtext>Naslov</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usefilename_label" xmbdesc="Label(printoptions/usefilename_label)">
+  <xmbtext>Naziv datoteke</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/useexif_label" xmbdesc="Label(printoptions/useexif_label)">
+  <xmbtext>Exif informacije</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_color_label" xmbdesc="Label(printoptions/caption_color_label)">
+  <xmbtext>Boja teksta</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_font_label" xmbdesc="Label(printoptions/caption_font_label)">
+  <xmbtext>Font</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_size_label" xmbdesc="Label(printoptions/caption_size_label)">
+  <xmbtext>Veličina</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/wrap_checkbox_label" xmbdesc="Label(printoptions/wrap_checkbox_label)">
+  <xmbtext>Prelomi tekst</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textbelowimage_label" xmbdesc="Label(printoptions/textbelowimage_label)">
+  <xmbtext>Ispod slike</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonimage_label" xmbdesc="Label(printoptions/textonimage_label)">
+  <xmbtext>Na slici</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonborder_label" xmbdesc="Label(printoptions/textonborder_label)">
+  <xmbtext>Na obrubu</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/bottomonly_checkbox_label" xmbdesc="Label(printoptions/bottomonly_checkbox_label)">
+  <xmbtext>Samo dno</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/evenwidth_checkbox_label" xmbdesc="Label(printoptions/evenwidth_checkbox_label)">
+  <xmbtext>Obrub jednake širine</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/disabled_label" xmbdesc="Label(printoptions/disabled_label)">
+  <xmbtext>Te mogućnosti, nažalost, nije moguće koristiti prilikom ispisa listova s kontaktima.</xmbtext>
+ </action>
+</tooltips>

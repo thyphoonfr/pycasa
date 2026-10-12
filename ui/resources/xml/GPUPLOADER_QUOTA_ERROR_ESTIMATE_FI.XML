@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Automaattinen varmuuskopiointi Google+ -palvelussa</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Tallennustila loppunut</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Olet valinnut kansioita, jotka vaativat enemmän tilaa kuin Google Drive -tallennustilaa on jäljellä. Voit ostaa lisää tallennustilaa tai varmuuskopioida rajoittamattoman määrän valokuvia ja videoita vakiokoossa ilmaiseksi.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Jos olet juuri ostanut tallennustilaa, muutosten tuleminen voimaan voi kestää hetken.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Hanki lisää tallennustilaa…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Vaihda vakiokokoon</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>อัปโหลดไปยัง YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>ชื่อ:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>คำอธิบาย:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>หมวดหมู่วิดีโอ:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>กำลังโหลด ...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>แท็ก:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>คำเหล่านี้เป็นคำหลักที่ทำให้ผู้ใช้รายอื่นสามารถพบวิดีโอของคุณได้ (คั่นด้วยการเว้นวรรค)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>กำหนดให้วิดีโอนี้เป็นแบบสาธารณะ </xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>วิดีโอของคุณต้องไม่ยาวเกิน 10 นาที และไม่ใหญ่เกิน 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>อย่าอัปโหลดรายการทีวี มิวสิควิดีโอ คอนเสิร์ต หรือโฆษณาใดๆ โดยมิได้รับอนุญาต เว้นเสียแต่ว่าคุณจะเป็นผู้สร้างเนื้อหานั้นๆ ขึ้นมาเองทั้งหมด หากสงสัยว่าวิดีโอของคุณละเมิดลิขสิทธิ์ของผู้อื่นหรือไม่ โปรดดูหน้าเคล็ดลับเรื่องลิขสิทธิ์และหลักเกณฑ์ของชุมชน</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>เมื่อคลิกที่ &quot;อัปโหลดวิดีโอ&quot; จะถือว่าคุณได้รับรองว่าวิดีโอนี้ไม่ละเมิดข้อกำหนดในการให้บริการของ YouTube และคุณเป็นเจ้าของลิขสิทธิ์ทั้งหมดของวิดีโอนี้ หรือได้รับอนุญาตให้สามารถอัปโหลดได้</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>อัปโหลดวิดีโอ</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

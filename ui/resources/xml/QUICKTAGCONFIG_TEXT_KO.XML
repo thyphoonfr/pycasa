@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>빠른 태그를 사용하면 한 번의 클릭으로 태그를 적용할 수 있습니다. 아래에 한 번의 클릭으로 액세스할 태그를 입력하세요. 기본적으로 맨 위 2개의 빠른 태그는 최근에 적용된 태그를 추적하는 데 사용됩니다. 수동으로 상위 2개 태그를 설정하려면 아래 확인란 선택을 취소하세요.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>일반적으로 사용되는 태그로 위의 빈 상자 자동 채우기</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>최근에 사용한 태그에 대해 상위 2개 버튼 예약</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>확인</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>취소</xmbtext>
+ </action>
+</tooltips>

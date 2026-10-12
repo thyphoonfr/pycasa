@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Správa</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Už sa nepýtať</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Áno</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Nie</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

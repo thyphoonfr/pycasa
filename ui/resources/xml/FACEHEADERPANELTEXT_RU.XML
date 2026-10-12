@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="faceheaderpanel/set_thumbnail" xmbdesc="Tooltip(faceheaderpanel/set_thumbnail)">
+  <xmbtext>Установить уменьшенное изображение для альбома</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_movie" xmbdesc="Tooltip(faceheaderpanel/create_movie)">
+  <xmbtext>Создать фильм-презентацию</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_face_movie" xmbdesc="Tooltip(faceheaderpanel/create_face_movie)">
+  <xmbtext>Создать фильм с лицами</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_collage" xmbdesc="Tooltip(faceheaderpanel/create_collage)">
+  <xmbtext>Создать коллаж из фотографий</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/play" xmbdesc="Tooltip(faceheaderpanel/play)">
+  <xmbtext>Воспроизвести слайд-шоу в полноэкранном режиме</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/pwa_button" xmbdesc="Tooltip(faceheaderpanel/pwa_button)">
+  <xmbtext>Открыть страницу веб-альбома Picasa</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/sug_filter" xmbdesc="Tooltip(faceheaderpanel/sug_filter)">
+  <xmbtext>Показывать только предложения (если включено)</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsug" xmbdesc="Label(faceheaderpanel/confirmsug)">
+  <xmbtext>Подтвердить все</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsel" xmbdesc="Label(faceheaderpanel/confirmsel)">
+  <xmbtext>Подтвердить</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/removesel" xmbdesc="Label(faceheaderpanel/removesel)">
+  <xmbtext>Удалить</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/moresug" xmbdesc="Label(faceheaderpanel/moresug)">
+  <xmbtext>Найти дополнительные предложения</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/removesel" xmbdesc="Tooltip(faceheaderpanel/removesel)">
+  <xmbtext>Удалить выбранные предложения</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsug" xmbdesc="Tooltip(faceheaderpanel/confirmsug)">
+  <xmbtext>Подтвердить все предложения</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsel" xmbdesc="Tooltip(faceheaderpanel/confirmsel)">
+  <xmbtext>Подтвердить выбранные предложения</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/face_zoom" xmbdesc="Tooltip(faceheaderpanel/face_zoom)">
+  <xmbtext>Просмотр лица крупным планом</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/picture_zoom" xmbdesc="Tooltip(faceheaderpanel/picture_zoom)">
+  <xmbtext>Уменьшить для просмотра всей фотографии</xmbtext>
+ </action>
+ <action type="Text" target="faceheaderpanel/sug_label" xmbdesc="Text(faceheaderpanel/sug_label)">
+  <xmbtext>Предложения:</xmbtext>
+ </action>
+</tooltips>

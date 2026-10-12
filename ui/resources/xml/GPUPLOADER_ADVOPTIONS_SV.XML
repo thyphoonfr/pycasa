@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_advoptions/adv_setup_window.title">
+  <xmbtext>Avancerade inställningar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder_chk.title">
+  <xmbtext>Kopiera även foton/videoklipp från kameror och minneskort till</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/local_folder.title">
+  <xmbtext>Bläddra ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/send_to_google.title">
+  <xmbtext>Skicka anonym användarstatistik till Google.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_advoptions/cancelbutton.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

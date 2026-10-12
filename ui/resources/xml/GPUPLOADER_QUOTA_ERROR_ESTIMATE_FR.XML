@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Sauvegarde automatique Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Espace de stockage saturé</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Vous avez sélectionné des dossiers dont la taille du contenu est supérieure à votre espace de stockage Drive restant. Vous pouvez soit acheter plus d&#039;espace, soit sauvegarder gratuitement toutes les photos et les vidéos que vous souhaitez à la taille standard.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Si vous venez d&#039;acheter de l&#039;espace de stockage, il vous faudra peut-être patienter quelques minutes avant que cette modification prenne effet.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Acheter davantage d&#039;espace de stockage...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Convertir les photos en taille standard</xmbtext>
+ </stringres>
+</resources>

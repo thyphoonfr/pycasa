@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>إغلاق</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>مرحبًا في التحميل المجمّع</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>حدد المربعات بجوار المجلدات والألبومات التي تريد التعامل معها. ثم اختر ما تريد عمله. ستصفي بيكاسا العناصر التي لن تنطبق عليها العملية. على سبيل المثال، إذا كان أحد المجلدات أو ألبومات موجودًا بالكامل على الإنترنت من قبل، فلن تُظهره بيكاسا كخيار للتحميل.</xmbtext>
+ </action>
+</tooltips>

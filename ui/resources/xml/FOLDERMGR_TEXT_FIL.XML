@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="foldermgr/folder_list_label" xmbdesc="Label(foldermgr/folder_list_label)">
+  <xmbtext>Listahan ng Folder</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/instructions_text" xmbdesc="Label(foldermgr/instructions_text)">
+  <xmbtext>Para sa bawat folder, maaari mong piliin kung pahihintulutan o hindi ang Picasa na makita sa loob nito ang mga larawan. Maaari ka ring pumili ng mga folder upang mag-abang para sa mga bagong larawan.</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/status_label" xmbdesc="Label(foldermgr/status_label)">
+  <xmbtext>Para sa kasalukuyang folder:</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/scan_once_label" xmbdesc="Label(foldermgr/scan_once_label)">
+  <xmbtext>I-scan Minsan</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/remove_label" xmbdesc="Label(foldermgr/remove_label)">
+  <xmbtext>Alisin mula sa Picasa</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watch_label" xmbdesc="Label(foldermgr/watch_label)">
+  <xmbtext>Palaging I-scan</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watched_label" xmbdesc="Label(foldermgr/watched_label)">
+  <xmbtext>Mga Inaabangang Folder</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/ok-label" xmbdesc="Label(foldermgr/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/cancel-label" xmbdesc="Label(foldermgr/cancel-label)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/help-label" xmbdesc="Label(foldermgr/help-label)">
+  <xmbtext>Tulong</xmbtext>
+ </action>
+</tooltips>

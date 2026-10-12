@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="contactmgr/window1.title">
+  <xmbtext>Personer</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup4.title">
+  <xmbtext>Søk:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/delete.title">
+  <xmbtext>Slett person</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/create.title">
+  <xmbtext>Ny person</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online_contact.title">
+  <xmbtext>Kontakter på Internett</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup22.title">
+  <xmbtext>Navn:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup24.title">
+  <xmbtext>E-post(er):</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/sync.title">
+  <xmbtext>Synkroniser ansiktsmerker med Nettalbum</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/album_id_group.title">
+  <xmbtext>Album-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/contact_id_group.title">
+  <xmbtext>Kontakt-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_id_group.title">
+  <xmbtext>Fokus-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/subject_id_group.title">
+  <xmbtext>Emne-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_obfuscated_gaia_id_group.title">
+  <xmbtext>Maskert GAIA fokus-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/mobile_obfuscated_gaia_id_group.title">
+  <xmbtext>Maskert GAIA mobil-ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/revert.title">
+  <xmbtext>Tilbakestill</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online.title">
+  <xmbtext>Administrer nettkontakter</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/refresh_contacts.title">
+  <xmbtext>Last kontakter inn på nytt</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/cancel.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_welcome/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/welcometext.title">
+  <xmbtext>Sauvegardez automatiquement vos photos et vidéos depuis votre ordinateur, y compris celles qui se trouvent sur votre disque dur ou une carte mémoire</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_text.title">
+  <xmbtext>En utilisant Google Photos Backup, vous acceptez les</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.title">
+  <xmbtext>Conditions d&#039;utilisation de Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.url">
+  <xmbtext>https://www.google.com/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/sign_in.title">
+  <xmbtext>Continuer</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/switch_account.title">
+  <xmbtext>Changer de compte</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/get_started.title">
+  <xmbtext>Continuer</xmbtext>
+ </stringres>
+</resources>

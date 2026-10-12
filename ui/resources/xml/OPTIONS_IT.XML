@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Preferenze</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Opzioni</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Generale</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Interfaccia utente:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Usa effetti speciali</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Mostra suggerimenti</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Mostra tag guida</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Fai un solo clic per chiudere l&#039;area di editing</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>File:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Rileva duplicati durante l&#039;importazione</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Cancella file cache</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Elimina dal disco senza conferma</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Rimuovi da album senza conferma</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Aiutaci a migliorare Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Invia a Google statistiche anonime sull&#039;uso.</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Privacy...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.it/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Aggiornamenti automatici:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Aggiorna automaticamente</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Chiedi prima di scaricare gli aggiornamenti</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Non controllare aggiornamenti</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Lingua:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Predefinito dal sistema (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Quando la fotocamera è connessa, avvia:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>nessuna applicazione</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Selezione dell&#039;applicazione di ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Salva immagini importate in:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Sfoglia...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>Email</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Programma email:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Voglio scegliere a ogni invio di immagini</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Usa il programma email predefinito del mio computer.</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Usa account Google personale</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Dimensione per più immagini:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 pixel</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s pixel</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Dimensione per immagini singole:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Uguale a multiplo di (1024 pixel)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Uguale a multiplo di (%s pixel)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Dimensione originale</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Invia filmati come:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Primo fotogramma</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Film intero</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Formato output:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Invia didascalie e foto in linea (solo Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Tipi di file</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Visualizza file JPEG e:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Formati RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Formati supportati</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=it&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmati (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Filmati Quicktime (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Formati RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Formati supportati</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=it&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmati (.mov, .mpg, .m4v, .3gp, .avi, ...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Slideshow</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Ripeti slideshow</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Riproduci brani musicali durante slideshow</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Seleziona una cartella di brani musicali:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Sfoglia...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Stampa</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Formati di stampa disponibili:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Anteprime:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Usa anteprime di alta qualità (esecuzione più lenta)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Qualità stampante:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Compatibile (metà risoluzione)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Alta qualità (risoluzione completa)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Stampa con qualità Resampler:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Generale (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Extra nitido (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Rete</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Nome utente proxy:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Password proxy:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Rileva automaticamente le impostazioni di rete</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Livello log di rete:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Disattiva registrazione nel log</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Registra nel log solo errori</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Informazioni di log minime</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Informazioni di log dettagliate</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Registra nel log tutte le informazioni di rete</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Log:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Album web</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Dimensione caricamento predefinita:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Quando sincronizzi file di grandi dimensioni, carica prima le anteprime</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(consigliato)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>Qualità JPEG:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Preserva la qualità dell&#039;immagine originale (utilizza più spazio di archiviazione)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Sincronizzazione:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Sincronizza solo foto speciali</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Non chiedere conferma di ogni sincronizzazione (usa le impostazioni precedenti)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Etichette nome:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Includi con i caricamenti di foto</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Watermark:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Aggiungi watermark per tutti i caricamenti delle foto:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Indica il nome, un dominio web e una nota di copyright sulle foto.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Etichette nome</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Attiva rilevamento volti</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Attiva suggerimenti:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Soglia consigliata:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Soglia cluster:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Memorizza i tag nelle foto</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Carica miniature album persone in contatti di Google</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

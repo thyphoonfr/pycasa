@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Premještanje baze podataka</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Morat ćete ponovno pokrenuti program Picasa da bi se promjene primijenile.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Napomena: Prije isprobavanja te eksperimentalne značajke preporučujemo da izradite sigurnosnu kopiju baze podataka. Bazu podataka NIKAD ne premještajte na mrežni, izmjenjivi ili vanjski pogon jer možete izgubiti podatke.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Trenutačna lokacija baze podataka:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nova lokacija baze podataka:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Zadano</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Premjesti pri sljedećem ponovnom pokretanju</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

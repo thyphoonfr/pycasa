@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>Logg på</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>Husk meg på denne datamaskinen</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>Brukernavn:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>Passord:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>Bruk ditt brukernavn i Hello når du sender bilder med Picasa!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>Logg på</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>Har du glemt passordet?</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>Nettalbum</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>Logg på Nettalbum</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>Med Nettalbum kan du dele bildealbum på Internett med venner og familie, eller opprette offentlige album som du kan dele med hele verden. Det er gratis og enkelt å bruke.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>Google-kontoen din er gyldig, men du har ikke registrert deg for en Nettalbum-konto.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>Klikk her for å lese mer.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>Aktiver Nettalbum</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>Registrer deg for Nettalbum</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>Last opp filmene dine til Google Video ved hjelp av Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>Logg på nedenfor for å begynne opplasting.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>Klikk her for å finne ut mer.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>Opprett en konto</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>Send bilder med Google-kontoen din ved hjelp av Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>Bildene sendes uten å bruke nettleser</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>Send opptil 10 MB bilder</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>Ønsker du Gmail? Få en gratis konto med over 6,5 GB lagringsplass (det øker stadig )</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>Forhåndsvis bildene før du sender dem</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>Feil brukernavn eller passord. Prøv på nytt.</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>Brukernavn og passord stemmer ikke. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>Skriv inn riktig passord ovenfor og deretter tegnene du ser i bildet nedenfor (skiller mellom store og små bokstaver).</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>Husk meg på denne datamaskinen</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>Logg på</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+</tooltips>

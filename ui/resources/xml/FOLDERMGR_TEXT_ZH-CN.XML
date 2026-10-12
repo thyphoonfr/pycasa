@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="foldermgr/folder_list_label" xmbdesc="Label(foldermgr/folder_list_label)">
+  <xmbtext>文件夹列表</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/instructions_text" xmbdesc="Label(foldermgr/instructions_text)">
+  <xmbtext>对于每个文件夹，您都可以选择是否让 Picasa 查找其中的图片。您也可以挑选文件夹，以观看新图片。</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/status_label" xmbdesc="Label(foldermgr/status_label)">
+  <xmbtext>对于当前文件夹：</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/scan_once_label" xmbdesc="Label(foldermgr/scan_once_label)">
+  <xmbtext>扫描一次</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/remove_label" xmbdesc="Label(foldermgr/remove_label)">
+  <xmbtext>从 Picasa 中删除</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watch_label" xmbdesc="Label(foldermgr/watch_label)">
+  <xmbtext>总是扫描</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watched_label" xmbdesc="Label(foldermgr/watched_label)">
+  <xmbtext>监控文件夹</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/ok-label" xmbdesc="Label(foldermgr/ok-label)">
+  <xmbtext>确定</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/cancel-label" xmbdesc="Label(foldermgr/cancel-label)">
+  <xmbtext>取消</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/help-label" xmbdesc="Label(foldermgr/help-label)">
+  <xmbtext>帮助</xmbtext>
+ </action>
+</tooltips>

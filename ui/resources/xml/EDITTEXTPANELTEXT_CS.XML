@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="edittextpanel/edittext_label" xmbdesc="Label(edittextpanel/edittext_label)">
+  <xmbtext>Textové úpravy</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/font_label" xmbdesc="Label(edittextpanel/font_label)">
+  <xmbtext>Písmo:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/size_label" xmbdesc="Label(edittextpanel/size_label)">
+  <xmbtext>Velikost:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/style_label" xmbdesc="Label(edittextpanel/style_label)">
+  <xmbtext>Styl:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextapply" xmbdesc="Label(edittextpanel/edittextapply)">
+  <xmbtext>Použít</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextcancel" xmbdesc="Label(edittextpanel/edittextcancel)">
+  <xmbtext>Zrušit</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/usecaption" xmbdesc="Label(edittextpanel/usecaption)">
+  <xmbtext>Kopírovat popisek</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/usecaption" xmbdesc="Tooltip(edittextpanel/usecaption)">
+  <xmbtext>Přidat text podle popisku fotky</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/clearall" xmbdesc="Label(edittextpanel/clearall)">
+  <xmbtext>Vymazat vše</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/clearall" xmbdesc="Tooltip(edittextpanel/clearall)">
+  <xmbtext>Odebrat veškerý stávající text</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/transparency_label" xmbdesc="Label(edittextpanel/transparency_label)">
+  <xmbtext>Průhlednost</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/align_label" xmbdesc="Label(edittextpanel/align_label)">
+  <xmbtext>Zarovnání:</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/leftalign" xmbdesc="Tooltip(edittextpanel/leftalign)">
+  <xmbtext>Zarovnat text vlevo</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/centeralign" xmbdesc="Tooltip(edittextpanel/centeralign)">
+  <xmbtext>Zarovnat text na střed</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/rightalign" xmbdesc="Tooltip(edittextpanel/rightalign)">
+  <xmbtext>Zarovnat text vpravo</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/no_fill" xmbdesc="Tooltip(edittextpanel/no_fill)">
+  <xmbtext>Nezobrazovat plnou barvu výplně (zobrazit pouze obrys)</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/bold" xmbdesc="Tooltip(edittextpanel/bold)">
+  <xmbtext>Tučné</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/italic" xmbdesc="Tooltip(edittextpanel/italic)">
+  <xmbtext>Kurzíva</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/underline" xmbdesc="Tooltip(edittextpanel/underline)">
+  <xmbtext>Podtržení</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextapply" xmbdesc="Tooltip(edittextpanel/edittextapply)">
+  <xmbtext>Použít změny textu a ukončit nástroj Text</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextcancel" xmbdesc="Tooltip(edittextpanel/edittextcancel)">
+  <xmbtext>Zavřít nástroj Text bez použití změn</xmbtext>
+ </action>
+</tooltips>

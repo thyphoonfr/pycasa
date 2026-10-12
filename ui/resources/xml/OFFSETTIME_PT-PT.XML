@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Alterar data da fotografia</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Data da fotografia actual: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Nova data da fotografia: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Alterar as datas de todas as fotografias em</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Definir todas as fotografias para a mesma data e hora</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

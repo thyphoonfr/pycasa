@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Izradite sigurnosnu kopiju svojih fotografija s usluge Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Automatski spremajte fotografije i videozapise na mrežu uz sigurnosno kopiranje u Google fotografije. Sadržajima ćete moći jednostavno pristupiti sa svih uređaja i bit će privatni za vas dok ih ne odlučite podijeliti.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Nabavite sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Ne, hvala</xmbtext>
+ </stringres>
+</resources>

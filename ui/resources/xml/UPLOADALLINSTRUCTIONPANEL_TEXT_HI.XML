@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>बंद करें</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>बैच अपलोड में आपका स्वागत है</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>उन फ़ोल्डर और एल्बम के आगे स्थित बॉक्स को चेक करें, जिनपर आप कार्य करना चाहते हैं. फिर, चुनें कि आप क्या करना चाहते हैं. जहां कार्रवाई लागू नहीं होती है, उन आइटम को Picasa फ़िल्टर कर देगा. उदाहरण के लिए, अगर एक संपूर्ण फ़ोल्डर या एल्बम पहले से ही ऑनलाइन मौजूद है, तो Picasa इसे अपलोड करने के विकल्प के रूप में नहीं दिखाएगा.</xmbtext>
+ </action>
+</tooltips>

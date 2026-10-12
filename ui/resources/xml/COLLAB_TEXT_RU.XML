@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="collab/uploadsize_label" xmbdesc="Text(collab/uploadsize_label)">
+  <xmbtext>Размер добавляемых файлов</xmbtext>
+ </action>
+ <action type="Text" target="collab/privacy_label" xmbdesc="Text(collab/privacy_label)">
+  <xmbtext>Конфиденциальность</xmbtext>
+ </action>
+ <action type="Text" target="collab/choose_contact_label" xmbdesc="Text(collab/choose_contact_label)">
+  <xmbtext>Введите имя пользователя:</xmbtext>
+ </action>
+ <action type="Text" target="collab/contact_album_list_label" xmbdesc="Text(collab/contact_album_list_label)">
+  <xmbtext>Альбомы, в которые вы можете добавлять файлы:</xmbtext>
+ </action>
+ <action type="Label" target="collab/ok" xmbdesc="Label(collab/ok)">
+  <xmbtext>Добавить</xmbtext>
+ </action>
+ <action type="Label" target="collab/cancel" xmbdesc="Label(collab/cancel)">
+  <xmbtext>Отмена</xmbtext>
+ </action>
+ <action type="Label" target="collab/storagetext" xmbdesc="Label(collab/storagetext)">
+  <xmbtext>Подробнее...</xmbtext>
+ </action>
+</tooltips>

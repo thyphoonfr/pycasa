@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Сабијање</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa сажима базу података да би сачувала простор на диску. Ово може потрајати неколико минута.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Сабијање...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

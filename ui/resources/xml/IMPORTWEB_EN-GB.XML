@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Import Albums from Web Albums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Pictures in the web albums ticked below will download to your computer once you click the OK button. They will automatically be organised into folders based on the album names.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>You have 100 web albums online.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Import all albums</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Import selected albums:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Name</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Date</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOTE: Only pictures that are not already on your computer will be downloaded)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

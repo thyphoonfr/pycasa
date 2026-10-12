@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>ใส่แท็กภูมิศาสตร์ให้กับรูปภาพด้วยการไปที่ตำแหน่งที่คุณถ่ายรูปนั้น วางตำแหน่งของกากบาท จากนั้นกดปุ่ม&#039;แท็กภูมิศาสตร์&#039;</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>แท็กสถานที่</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>แท็กที่ตั้ง</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>เสร็จเรียบร้อย</xmbtext>
+ </action>
+</tooltips>

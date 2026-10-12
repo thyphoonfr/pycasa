@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>Преглед за штампање</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>Уклони обележено</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>Уклони слике слабог квалитета</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>Преглед слика</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>Инфо</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>Потврди</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>Inclua geo-tags numa foto navegando até o local onde você tirou a foto. Posicione a mira e clique no botão &#039;Geo-tag&#039;.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>Geotag</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>Geo-tag em todas</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>Concluído</xmbtext>
+ </action>
+</tooltips>

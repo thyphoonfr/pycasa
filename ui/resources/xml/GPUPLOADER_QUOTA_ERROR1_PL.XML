@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Kopia zapasowa Zdjęć Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>1 GB wolnego miejsca na Dysku Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Kup więcej miejsca, aby nadal tworzyć kopie zapasowe zdjęć w pełnej rozdzielczości. Możesz też przełączyć na kopie wysokiej jakości z nieograniczonym miejscem – świetna jakość przy mniejszym rozmiarze plików.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Poproś o pomoc w podjęciu decyzji</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Kup więcej miejsca</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Przełącz na wysoką jakość</xmbtext>
+ </stringres>
+</resources>

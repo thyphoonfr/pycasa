@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_prefs/prefs_window.mac_title">
+  <xmbtext>Preferencias - Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/prefs_window.win_title">
+  <xmbtext>Configuración - Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/account_name.title">
+  <xmbtext>Obteniendo el nombre de la cuenta...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/log_off.title">
+  <xmbtext>Cerrar sesión</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/source_lbl.title">
+  <xmbtext>Fuentes de copia de seguridad</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.win_title">
+  <xmbtext>Cámaras y tarjetas de almacenamiento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/auto_import.mac_title">
+  <xmbtext>Cámaras y tarjetas de almacenamiento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/devices_btn.title">
+  <xmbtext>Dispositivos...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder_chk.title">
+  <xmbtext>Copiar también fotos o vídeos de medios externos en</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/local_folder.title">
+  <xmbtext>Examinar...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/watched_folders_lbl.title">
+  <xmbtext>Carpetas del escritorio</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/add_folder_btn.title">
+  <xmbtext>Añadir...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_size_label.title">
+  <xmbtext>Tamaño de la foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size.title">
+  <xmbtext>Alta calidad (almacenamiento ilimitado gratuito)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/free_size_desc.title">
+  <xmbtext>Gran calidad visual con un tamaño reducido de archivo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size.title">
+  <xmbtext>Original (limitado al almacenamiento de la cuenta)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/full_size_desc.title">
+  <xmbtext>Resolución completa que se resta de tu espacio</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/upload_raw.title">
+  <xmbtext>Subir archivos RAW</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/send_to_google.title">
+  <xmbtext>Ayuda a mejorar Fotos mediante el envío de estadísticas de uso anónimas.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/more_storage.title">
+  <xmbtext>Obtener más espacio de almacenamiento...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/okbutton.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_prefs/cancelbutton.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

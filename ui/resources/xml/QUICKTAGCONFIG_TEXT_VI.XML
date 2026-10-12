@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Bạn có thể sử dụng Thẻ Nhanh để áp dụng thẻ chỉ với một cú nhấp chuột.  Nhập các thẻ bên dưới mà bạn muốn truy cập bằng một cú nhấp chuột. Theo mặc định, hai Thẻ Nhanh trên cùng được sử dụng để theo dõi các thẻ được áp dụng gần đây.  Bỏ chọn hộp kiểm bên dưới để đặt hai thẻ lên trên cùng theo cách thủ công.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Tự động điền các ô trống bên trên với các thẻ thường được sử dụng</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Giữ lại hai nút trên cùng cho các thẻ được sử dụng gần đây</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Hủy</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>الاسم:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>التاريخ:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>التاريخ التلقائي</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>الموسيقى:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>استخدام الموسيقى لعرض الشرائح والعرض التقديمي للفيلم:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>تصفَّح...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>مكان الالتقاط (اختياري):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>الوصف (اختياري):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>موافق</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

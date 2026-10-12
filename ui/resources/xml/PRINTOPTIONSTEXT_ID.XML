@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="printoptions/apply" xmbdesc="Label(printoptions/apply)">
+  <xmbtext>Terapkan</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/apply" xmbdesc="Tooltip(printoptions/apply)">
+  <xmbtext>Terapkan pilihan yang diambil ke Foto</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/ok" xmbdesc="Label(printoptions/ok)">
+  <xmbtext>Oke</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/ok" xmbdesc="Tooltip(printoptions/ok)">
+  <xmbtext>Terapkan pilihan yang diambil ke Foto dan tutup dialog ini</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/cancel" xmbdesc="Label(printoptions/cancel)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/cancel" xmbdesc="Tooltip(printoptions/cancel)">
+  <xmbtext>Tutup dialog ini tanpa menyimpan perubahan</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_label" xmbdesc="Label(printoptions/border_label)">
+  <xmbtext>Pembatas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_size_label" xmbdesc="Label(printoptions/border_size_label)">
+  <xmbtext>Lebar pembatas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_none_label" xmbdesc="Label(printoptions/border_none_label)">
+  <xmbtext>Tidak ada</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_max_label" xmbdesc="Label(printoptions/border_max_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_color_label" xmbdesc="Label(printoptions/border_color_label)">
+  <xmbtext>Warna pembatas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_label" xmbdesc="Label(printoptions/caption_label)">
+  <xmbtext>Teks</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usenotext_label" xmbdesc="Label(printoptions/usenotext_label)">
+  <xmbtext>Tidak ada teks</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usecaption_label" xmbdesc="Label(printoptions/usecaption_label)">
+  <xmbtext>Teks</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usefilename_label" xmbdesc="Label(printoptions/usefilename_label)">
+  <xmbtext>Nama file</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/useexif_label" xmbdesc="Label(printoptions/useexif_label)">
+  <xmbtext>Informasi exif</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_color_label" xmbdesc="Label(printoptions/caption_color_label)">
+  <xmbtext>Warna Teks</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_font_label" xmbdesc="Label(printoptions/caption_font_label)">
+  <xmbtext>Font</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_size_label" xmbdesc="Label(printoptions/caption_size_label)">
+  <xmbtext>Ukuran</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/wrap_checkbox_label" xmbdesc="Label(printoptions/wrap_checkbox_label)">
+  <xmbtext>Rapikan teks</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textbelowimage_label" xmbdesc="Label(printoptions/textbelowimage_label)">
+  <xmbtext>Di bawah gambar</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonimage_label" xmbdesc="Label(printoptions/textonimage_label)">
+  <xmbtext>Pada gambar</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonborder_label" xmbdesc="Label(printoptions/textonborder_label)">
+  <xmbtext>Pada pembatas</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/bottomonly_checkbox_label" xmbdesc="Label(printoptions/bottomonly_checkbox_label)">
+  <xmbtext>Hanya bagian bawah</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/evenwidth_checkbox_label" xmbdesc="Label(printoptions/evenwidth_checkbox_label)">
+  <xmbtext>Pembatas berlebar rata</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/disabled_label" xmbdesc="Label(printoptions/disabled_label)">
+  <xmbtext>Maaf, tapi pilihan ini tidak dapat digunakan saat mencetak lembar kontak.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Přesunout databázi</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Změny se projeví až po restartování aplikace Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Upozornění: Před vyzkoušením této experimentální funkce zálohujte databázi. NIKDY nepřesouvejte databázi na síť, na vyměnitelný nebo externí disk, mohli byste přijít o data.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Aktuální umístění databáze:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nové umístění databáze:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Procházet...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Výchozí</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Přesunout při příštím restartu</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

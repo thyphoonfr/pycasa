@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="customaspectratio/window1.title">
+  <xmbtext>Afegeix una relació d&#039;aspecte personalitzat</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup3.title">
+  <xmbtext>Dimensions:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label6.title">
+  <xmbtext>  x  </xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup8.title">
+  <xmbtext>Nom:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup10.title">
+  <xmbtext>Exemple:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label11.title">
+  <xmbtext>   4 x 6   Impressió petita</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/ok.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/cancel.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="printoptions/apply" xmbdesc="Label(printoptions/apply)">
+  <xmbtext>Применить</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/apply" xmbdesc="Tooltip(printoptions/apply)">
+  <xmbtext>Применить выбранные параметры к фотографиям</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/ok" xmbdesc="Label(printoptions/ok)">
+  <xmbtext>ОК</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/ok" xmbdesc="Tooltip(printoptions/ok)">
+  <xmbtext>Применить выбранные параметры к фотографиям и закрыть диалоговое окно</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/cancel" xmbdesc="Label(printoptions/cancel)">
+  <xmbtext>Отмена</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/cancel" xmbdesc="Tooltip(printoptions/cancel)">
+  <xmbtext>Закрыть диалоговое окно без сохранения изменений</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_label" xmbdesc="Label(printoptions/border_label)">
+  <xmbtext>Рамка</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_size_label" xmbdesc="Label(printoptions/border_size_label)">
+  <xmbtext>Ширина рамки</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_none_label" xmbdesc="Label(printoptions/border_none_label)">
+  <xmbtext>Нет</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_max_label" xmbdesc="Label(printoptions/border_max_label)">
+  <xmbtext>Макс.</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_color_label" xmbdesc="Label(printoptions/border_color_label)">
+  <xmbtext>Цвет рамки</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_label" xmbdesc="Label(printoptions/caption_label)">
+  <xmbtext>Подписи</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usenotext_label" xmbdesc="Label(printoptions/usenotext_label)">
+  <xmbtext>Без текста</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usecaption_label" xmbdesc="Label(printoptions/usecaption_label)">
+  <xmbtext>Подпись</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usefilename_label" xmbdesc="Label(printoptions/usefilename_label)">
+  <xmbtext>Название файла</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/useexif_label" xmbdesc="Label(printoptions/useexif_label)">
+  <xmbtext>Метаданные EXIF</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_color_label" xmbdesc="Label(printoptions/caption_color_label)">
+  <xmbtext>Цвет текста</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_font_label" xmbdesc="Label(printoptions/caption_font_label)">
+  <xmbtext>Шрифт</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_size_label" xmbdesc="Label(printoptions/caption_size_label)">
+  <xmbtext>Размер</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/wrap_checkbox_label" xmbdesc="Label(printoptions/wrap_checkbox_label)">
+  <xmbtext>Переносить текст</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textbelowimage_label" xmbdesc="Label(printoptions/textbelowimage_label)">
+  <xmbtext>Под картинкой</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonimage_label" xmbdesc="Label(printoptions/textonimage_label)">
+  <xmbtext>На картинке</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonborder_label" xmbdesc="Label(printoptions/textonborder_label)">
+  <xmbtext>На рамке</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/bottomonly_checkbox_label" xmbdesc="Label(printoptions/bottomonly_checkbox_label)">
+  <xmbtext>Только нижняя часть</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/evenwidth_checkbox_label" xmbdesc="Label(printoptions/evenwidth_checkbox_label)">
+  <xmbtext>Выровнять ширину рамки</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/disabled_label" xmbdesc="Label(printoptions/disabled_label)">
+  <xmbtext>К сожалению, эти функции недоступны при печати галерей.</xmbtext>
+ </action>
+</tooltips>

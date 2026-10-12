@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_welcome/window.title">
+  <xmbtext>Google 포토 백업</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/welcometext.title">
+  <xmbtext>하드 드라이브나 메모리 카드 등 컴퓨터에 있는 사진과 동영상을 자동으로 백업합니다.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_text.title">
+  <xmbtext>Google 포토 백업을 사용하면 다음에 동의하게 됩니다.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.title">
+  <xmbtext>Google 서비스 약관</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/tos_link.url">
+  <xmbtext>https://www.google.com/policies/terms</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/sign_in.title">
+  <xmbtext>계속</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/switch_account.title">
+  <xmbtext>계정 전환</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_welcome/get_started.title">
+  <xmbtext>계속</xmbtext>
+ </stringres>
+</resources>

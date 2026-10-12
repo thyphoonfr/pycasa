@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Tải lên YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Tiêu đề:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Mô tả:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Loại video:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Đang tải...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Thẻ:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Đây là những từ khóa được sử dụng để giúp mọi người tìm video của bạn. (được phân cách bằng dấu cách)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Đặt video này ở chế độ công cộng</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Video của bạn bị giới hạn tối đa 10 phút và 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Không tải lên các chương trình truyền hình, video ca nhạc, chương trình hoà nhạc hoặc nội dung có tính thương mại mà không được phép trừ khi các nội dung đó hoàn toàn do bạn tạo ra. Trang Mẹo Bản quyền và Nguyên tắc Cộng đồng có thể giúp bạn xác định xem video của mình có vi phạm bản quyền của người khác hay không.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Bằng cách nhấp vào &quot;Tải lên video,&quot; bạn tuyên bố rằng video này không vi phạm Điều khoản sử dụng của YouTube và bạn sở hữu tất cả bản quyền đối với video này hoặc có quyền tải video này lên.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Tải lên video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>שנה שמות קבצים</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>נבחר קובץ אחד לשינוי שם.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>נבחרו %s קבצים לשינוי שם.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>הזן שם חדש לקבצים אלה:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>כלול בשם קובץ:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>תאריך</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>רזולוציית תמונה</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>דוגמה:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>שנה שם</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

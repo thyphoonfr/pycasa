@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importuoti albumus iš žiniatinklio albumų</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Žemiau pažymėtos nuotraukos žiniatinklio albumuose bus atsiųstos į jūsų kompiuterį paspaudus mygtuką „Gerai“. Jos bus automatiškai išdėstytos į aplankus pagal albumo pavadinimus.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Internete turite 100 žiniatinklio albumų.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importuoti visus albumus</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importuoti pasirinktus albumus:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Vardas</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(PASTABA: bus atsiunčiamos tik tos nuotraukos, kurių dar nėra jūsų kompiuteryje)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

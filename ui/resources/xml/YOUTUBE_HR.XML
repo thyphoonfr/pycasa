@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Učitaj na YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Naslov:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Opis:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Kategorija videozapisa:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Učitavanje...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Oznake:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Te će ključne riječi drugima pojednostavniti pronalaženje vašeg videozapisa. (odvojeno razmakom)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Učini videozapis javnim</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Vaš je videozapis ograničen na 10 minuta i 1 GB.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Ne prenosite TV emisije, glazbene videospotove, koncerte ili reklame bez dopuštenja osim ako ne sadrže isključivo sadržaj koji ste sami izradili. Stranica sa savjetima o autorskim pravima i smjernicama zajednice može vam pomoći da utvrdite krši li vaš videozapis nečije autorsko pravo.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Klikom na &quot;Prijenos videozapisa,&quot; potvrđujete da videozapis ne krši Uvjete upotrebe web-mjesta YouTube te da posjedujete sva autorska prava na taj videozapis ili da imate ovlaštenje za njegov prijenos.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Prijenos videozapisa</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

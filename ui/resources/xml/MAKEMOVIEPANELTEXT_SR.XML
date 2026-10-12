@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="makemoviepanel/rewind" xmbdesc="Label(makemoviepanel/rewind)">
+  <xmbtext>Назад на изабрани слајд</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addclips" xmbdesc="Tooltip(makemoviepanel/addclips)">
+  <xmbtext>Преузмите још клипова из фото-библиотеке</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addtomovie" xmbdesc="Tooltip(makemoviepanel/addtomovie)">
+  <xmbtext>Додајте изабране клипове на крај филма</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/deleteclips" xmbdesc="Tooltip(makemoviepanel/deleteclips)">
+  <xmbtext>Уклоните изабране клипове из припреме</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/durationslider_label" xmbdesc="Label(makemoviepanel/durationslider_label)">
+  <xmbtext>Трајање слике</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/lengthslider_label" xmbdesc="Label(makemoviepanel/lengthslider_label)">
+  <xmbtext>Укупно фотографија</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/burstslider_label" xmbdesc="Label(makemoviepanel/burstslider_label)">
+  <xmbtext>Немој да филтрираш по времену снимања</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transitionslider_label" xmbdesc="Label(makemoviepanel/transitionslider_label)">
+  <xmbtext>Преклапање</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/export_youtube" xmbdesc="Label(makemoviepanel/export_youtube)">
+  <xmbtext>YT</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/render" xmbdesc="Label(makemoviepanel/render)">
+  <xmbtext>Направи филм</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/cancel" xmbdesc="Label(makemoviepanel/cancel)">
+  <xmbtext>Затвори</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/recompute" xmbdesc="Label(makemoviepanel/recompute)">
+  <xmbtext>Примени</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab1" xmbdesc="Label(makemoviepanel/tab1)">
+  <xmbtext>Филм</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/moviesize_label" xmbdesc="Label(makemoviepanel/moviesize_label)">
+  <xmbtext>Димензије</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/show_captions_label" xmbdesc="Label(makemoviepanel/show_captions_label)">
+  <xmbtext>Прикажи натписе</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/crop_to_fit_label" xmbdesc="Label(makemoviepanel/crop_to_fit_label)">
+  <xmbtext>Опсецање пуног оквира фотографије</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_low_res_faces_label" xmbdesc="Label(makemoviepanel/remove_low_res_faces_label)">
+  <xmbtext>Уклони лица ниске резолуције</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/ordering_header_label" xmbdesc="Label(makemoviepanel/ordering_header_label)">
+  <xmbtext>Редослед слајдова:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/smart_order_label" xmbdesc="Label(makemoviepanel/smart_order_label)">
+  <xmbtext>Најбољи прелази</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/album_order_label" xmbdesc="Label(makemoviepanel/album_order_label)">
+  <xmbtext>Редослед албума</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/chronological_order_label" xmbdesc="Label(makemoviepanel/chronological_order_label)">
+  <xmbtext>Хронолошки</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/audio_label" xmbdesc="Label(makemoviepanel/audio_label)">
+  <xmbtext>Аудио нумера:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/add_audio" xmbdesc="Label(makemoviepanel/add_audio)">
+  <xmbtext>Учитај...</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_audio" xmbdesc="Label(makemoviepanel/remove_audio)">
+  <xmbtext>Oбриши</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/aoptions_label" xmbdesc="Label(makemoviepanel/aoptions_label)">
+  <xmbtext>Опције</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transtype_label" xmbdesc="Label(makemoviepanel/transtype_label)">
+  <xmbtext>Стил прелаза</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab2" xmbdesc="Label(makemoviepanel/tab2)">
+  <xmbtext>Слика (слајд)</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Клипови</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Клипови</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/font_label" xmbdesc="Label(makemoviepanel/font_label)">
+  <xmbtext>Фонт:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/size_label" xmbdesc="Label(makemoviepanel/size_label)">
+  <xmbtext>Величина:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/style_label" xmbdesc="Label(makemoviepanel/style_label)">
+  <xmbtext>Стил:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/templatetext" xmbdesc="Label(makemoviepanel/templatetext)">
+  <xmbtext>Шаблон:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/text_color_label" xmbdesc="Label(makemoviepanel/text_color_label)">
+  <xmbtext>Боја текста</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/back_color_label" xmbdesc="Label(makemoviepanel/back_color_label)">
+  <xmbtext>Боја позадине</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/addclips" xmbdesc="Label(makemoviepanel/addclips)">
+  <xmbtext>Преузми још...</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/bold" xmbdesc="Tooltip(makemoviepanel/bold)">
+  <xmbtext>Подебљано</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/italic" xmbdesc="Tooltip(makemoviepanel/italic)">
+  <xmbtext>Курзив</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/outline" xmbdesc="Tooltip(makemoviepanel/outline)">
+  <xmbtext>Аутоматска контура (као титлови филма)</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/insert_slide" xmbdesc="Tooltip(makemoviepanel/insert_slide)">
+  <xmbtext>Додајте нову текстуалну слику</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_slide" xmbdesc="Tooltip(makemoviepanel/remove_slide)">
+  <xmbtext>Уклоните изабрану слику</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/add_audio" xmbdesc="Tooltip(makemoviepanel/add_audio)">
+  <xmbtext>Додајте аудио нумеру овом филму</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_audio" xmbdesc="Tooltip(makemoviepanel/remove_audio)">
+  <xmbtext>Уклоните аудио нумеру</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/render" xmbdesc="Tooltip(makemoviepanel/render)">
+  <xmbtext>Направите филм, а затим идите у режим Измене</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/export_youtube" xmbdesc="Tooltip(makemoviepanel/export_youtube)">
+  <xmbtext>Направите филм, а затим га отпремите на YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/cancel" xmbdesc="Tooltip(makemoviepanel/cancel)">
+  <xmbtext>Затворите окно програма Movie Maker</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/recompute" xmbdesc="Tooltip(makemoviepanel/recompute)">
+  <xmbtext>Генериши нову секвенцу</xmbtext>
+ </action>
+</tooltips>

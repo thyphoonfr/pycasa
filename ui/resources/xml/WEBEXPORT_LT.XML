@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Eksportuoti kaip HTML puslapį</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Eksportuoti nuotraukas į:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Originalus dydis</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 taškai (dideliems monitoriams)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 taškų (dideliems tinklalapiams)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 taškų (tinklalapiams)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 taškų (el. laiškams)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Eksportuoti filmus naudojant:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Pirmas kadras</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Visas filmas</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Tinklalapio pavadinimas:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Aplankas:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Naršyti…</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Jei norite pamatyti pavyzdį, paspauskite šablono pavadinimą. Pasirinkę spustelėkite „Eksportuoti“.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Šablono aprašymas</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Eksportuoti</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

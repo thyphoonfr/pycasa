@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Datums:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Norādīt automātiski</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Mūzika:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Slaidrādei un filmas prezentācijai lietot šo mūziku:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Uzņemšanas vieta (nav obligāti):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Apraksts (nav obligāti):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

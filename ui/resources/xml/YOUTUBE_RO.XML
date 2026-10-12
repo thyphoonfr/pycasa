@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Încărcaţi în YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Titlu:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descriere:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoria videoclipului:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Se încarcă...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Etichete:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Acestea sunt cuvinte cheie folosite pentru a ajuta alte persoane să vă găsească videoclipul. (separate prin spaţiu)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Faceţi public acest videoclip</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videoclipul dvs. este limitat la 10 minute şi 1 GO</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Nu încărcaţi emisiuni de televiziune, videoclipuri muzicale, concerte muzicale sau reclame fără permisiune, cu excepţia situaţiei în care acestea cuprind conţinut creat în totalitate de dvs. Pagina de Sfaturi privind drepturile de autor şi Instrucţiunile pentru comunitate vă pot ajuta să stabiliţi dacă videoclipul dvs. încalcă drepturile de autor ale altei persoane.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Făcând clic pe „Încărcaţi videoclipul”, declaraţi că acest videoclip respectă Termenii şi condiţiile YouTube şi că deţineţi toate drepturile de autor pentru acest videoclip sau că aveţi permisiunea de a-l încărca.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Încărcaţi videoclipul</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

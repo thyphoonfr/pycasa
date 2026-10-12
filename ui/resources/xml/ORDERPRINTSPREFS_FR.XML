@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>Connexion</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>Entrez le nom d&#039;utilisateur et le mot de passe que vous utilisez normalement pour vous connecter à ce service de tirage de photos. Si vous ne possédez aucun compte auprès de ce service, cliquez sur &quot;Créer un compte&quot; pour vous inscrire.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>E-mail :</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>Créer un compte...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>Mot de passe :</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>Mot de passe oublié ?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>Enregistrer le mot de passe</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>Connexion sécurisée par SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>Taille de la photo :</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>Pour garantir des tirages de qualité optimale, vos photos seront envoyées dans la plus haute résolution disponible.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>Nom de l&#039;album :</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>Se connecter</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

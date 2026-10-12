@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>صادر کردن در پوشه</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>محل صادر کردن:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>مرور...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>نام پوشه صادر شده:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>افزودن شماره به نام‌های فایل برای حفظ ترتیب</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>اندازه تصویر:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>استفاده از اندازه اصلی</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>تغییر اندازه به:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>پیکسل</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>کیفیت تصویر:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>خودکار</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>عادی</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>حداکثر</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>حداقل</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>سفارشی</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>حفظ کیفیت تصویر اولیه</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>تعادل مناسب اندازه و کیفیت</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>اندازه فایل خیلی بزرگ، جزئیات دقیق را حفظ می‌کند</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>کوچکترین اندازه فایل، مقداری ازکیفیت از دست می‌رود</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>صادر کردن فیلم‌ها با استفاده از:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>قاب اول</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>فیلم کامل (بدون تغییر اندازه)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>ته‌نقش</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>افزودن ته‌نقش</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>عکس‌های خود را با نام خود، یک دامنه وب یا یک اعلامیه حق نسخه‌برداری مهر کنید.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>صادر کردن</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

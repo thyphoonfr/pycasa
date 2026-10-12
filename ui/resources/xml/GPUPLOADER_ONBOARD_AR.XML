@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>اختيار مصادر الاحتفاظ بنسخة احتياطية</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>‏تحتفظ صور Google تلقائيًا بنسخة احتياطية من الصور ومقاطع الفيديو من المصادر المختارة إلى مكتبة صورك.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>إضافة...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>حجم الصورة</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>جودة عالية (مساحة تخزين غير محدودة مجانية)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>جودة مرئية رائعة مع تقليل حجم الملف</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>أصلي (مقتصر على مساحة تخزين الحساب)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>الدقة الكاملة التي تؤثر سلبًا على حصتك</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>المساعدة في تحسين الصور من خلال إرسال إحصاءات الاستخدام دون الكشف عن الهوية</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>الحصول على مزيد من السعة التخزينية...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>بدء النسخ الاحتياطي</xmbtext>
+ </stringres>
+</resources>

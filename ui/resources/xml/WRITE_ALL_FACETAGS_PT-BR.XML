@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Gravar tags de rosto</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>A gravação de tags ou de tudo pode demorar. Se o registro estiver configurado como detalhado ou superior, o network.log conterá mensagens sobre arquivos somente leitura que não puderem ser atualizados. É recomendável fazer logout ao usar esse recurso.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Gravação selecionada</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Gravar rostos</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Gravar tudo</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

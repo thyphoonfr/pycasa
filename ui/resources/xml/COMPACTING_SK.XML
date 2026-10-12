@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Kompresia</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Program Picasa zhutňuje databázu s cieľom šetriť miesto na disku. Môže to trvať niekoľko minút.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Kompresia...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

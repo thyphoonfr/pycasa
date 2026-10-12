@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>إعادة تسمية الملفات</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>ملف واحد محدد لإعادة تسميته</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>عدد الملفات المحددة لإعادة تسميتها: %s</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>الرجاء إدخال اسم جديد لهذه الملفات:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>تضمين في اسم الملف:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>التاريخ</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>دقة الصورة</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>مثال:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>إعادة تسمية</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

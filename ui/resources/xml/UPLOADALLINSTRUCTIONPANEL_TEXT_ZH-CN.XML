@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>关闭</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>欢迎使用批量上传</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>选中您要操作的文件夹和相册旁边的框。然后，选择您要执行的操作。Picasa 将过滤该操作不适用的项。例如，如果整个文件夹或相册已经是在线状态，Picasa 就不会在上传操作中显示该文件夹或相册。</xmbtext>
+ </action>
+</tooltips>

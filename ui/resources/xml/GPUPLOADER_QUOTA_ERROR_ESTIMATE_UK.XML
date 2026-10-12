@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Автозавантаження Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Обсяг пам’яті вичерпано</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Ви вибрали папки, обсяг яких більше, ніж наразі вільно на Диску Google. Можна придбати додатковий обсяг пам’яті або безкоштовно створити необмежену кількість резервних копій фотографій і відео стандартного розміру.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Якщо ви щойно придбали додатковий обсяг пам’яті, зміни можуть набути чинності за кілька хвилин.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Отримати додатковий обсяг пам’яті…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Перейти до стандартного розміру</xmbtext>
+ </stringres>
+</resources>

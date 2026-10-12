@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>V storitvi Google Drive imate še 1 GB prostora za shranjevanje</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Če želite še naprej varnostno kopirati izvirne fotografije v polni ločljivosti, dokupite prostor za shranjevanje. Lahko tudi preklopite na visoko kakovost – v tem primeru imate na voljo brezplačen neomejen prostor za shranjevanje in odlično vizualno kakovost pri manjši velikosti datoteke.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Pomoč pri odločanju</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Nakup prostora</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Preklopi na visoko kakovost</xmbtext>
+ </stringres>
+</resources>

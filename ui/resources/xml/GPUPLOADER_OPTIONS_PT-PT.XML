@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_options/window.mac_title">
+  <xmbtext>Preferências da Cópia de Segurança Automática</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/window.win_title">
+  <xmbtext>Opções da Cópia de Segurança Automática</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/auto_start.title">
+  <xmbtext>Iniciar Automaticamente</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/networklabel.title">
+  <xmbtext>Definições de Rede:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/proxygroup.title">
+  <xmbtext>Nome de utilizador do proxy:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/passwordgroup.title">
+  <xmbtext>Palavra-passe do proxy:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/autoproxy.title">
+  <xmbtext>Detetar automaticamente as definições de rede</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loglevelgroup.title">
+  <xmbtext>Nível de registo da rede:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/disable_item.title">
+  <xmbtext>Desativar Registo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/errors_item.title">
+  <xmbtext>Registar apenas erros</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/min_item.title">
+  <xmbtext>Informação de registo mínima</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/detailed_item.title">
+  <xmbtext>Informação de registo detalhada</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/all_item.title">
+  <xmbtext>Registar todas as informações de rede</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loggroup.title">
+  <xmbtext>Registar:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/cancelbutton.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

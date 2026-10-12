@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exporteren als HTML-pagina</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Afbeeldingen exporteren naar:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Oorspronkelijk formaat</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixels (voor grote monitors)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixels (voor grote webpagina&#039;s)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixels (voor webpagina&#039;s)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixels (voor e-mail)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Films exporteren met:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Eerste frame</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Volledige film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Titel webpagina:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Map:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Bladeren...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Klik op een sjabloonnaam om een voorbeeld weer te geven. Klik op &#039;Exporteren&#039; nadat u een selectie heeft gemaakt.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Beschrijving sjabloon</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Exporteren</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

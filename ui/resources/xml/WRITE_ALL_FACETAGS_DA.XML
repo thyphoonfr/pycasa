@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Skriv ansigtstags</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Skrivning af ansigter eller skrivning af alt kan tage lang tid. Hvis logning er indstillet til detaljeret eller højere, vil netværksloggen indeholde beskeder om skrivebeskyttede filer, der ikke kunne opdateres. Det anbefales, at du logger ud, mens du bruger denne funktion.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Skriv valgte</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Skriv ansigter</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Skriv alle</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

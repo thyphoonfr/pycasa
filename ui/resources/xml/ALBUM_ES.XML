@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nombre:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Fecha:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Fecha automática</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Música:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Usar música para la presentación de vídeos y diapositivas</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Examinar...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Tomada en (opcional):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Descripción (opcional):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

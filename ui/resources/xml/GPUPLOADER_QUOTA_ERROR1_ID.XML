@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Cadangan Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Penyimpanan Google Drive tersisa 1 GB</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Dapatkan lebih banyak ruang penyimpanan untuk terus mencadangkan foto asli Anda dalam resolusi penuh. Atau, beralihlah ke kualitas tinggi untuk mendapatkan penyimpanan tanpa batas yang gratis: kualitas visual yang bagus dengan ukuran file yang lebih kecil.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Dapatkan bantuan untuk memilih</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Dapatkan lebih banyak penyimpanan</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Beralih ke kualitas tinggi</xmbtext>
+ </stringres>
+</resources>

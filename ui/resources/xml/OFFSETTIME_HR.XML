@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Prilagodi datum fotografije</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Trenutni datum fotografije: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Novi datum fotografije: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Prilagodi sve datume fotografija prema količini</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Postavi sve fotografije na isti datum i vrijeme</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

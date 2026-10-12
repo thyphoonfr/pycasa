@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Instalirana je starija verzija Picase. Želite li ažurirati postojeću biblioteku fotografija ili ponovno potražiti fotografije na računalu?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Odaberite neku od sljedećih opcija:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Ažuriraj postojeću biblioteku slika</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Odaberite tu mogućnost ako koristite ključne riječi ili prilagođene albume u verziji Picasa 1, a želite ih zadržati u verziji Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Ponovno potraži slike na računalu</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Odaberite tu opciju za potpunije pretraživanje računala, što obuhvaća proširene informacije o slikama. Na taj će se način sačuvati postojeća uređivanja i organizacija, ali neće se sačuvati ključne riječi. To pretraživanje može potrajati nekoliko minuta.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Traženje slika nikada ne premješta niti kopira datoteke na nove lokacije. Mape koje će Picasa prikazivati možete odabrati pomoću alata Upravitelj mapama (dostupnog s izbornika Alati)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Nastavak</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa je spremna za traženje fotografija na vašem računalu</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Odaberite neku od sljedećih opcija:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Potraži slike na cijelom računalu</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Odaberite tu opciju ako su slike spremljene u različitim mapama na računalu, a osobito ako su slike spremljene na većem broju diskova.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Pretraži samo mape Dokumenti, Slike, radnu površinu i biblioteku programa iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Odaberite tu opciju ako slike spremate samo u te mape.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Traženje slika nikada ne premješta datoteke niti ih kopira na nove lokacije. Mape koje će Picasa prikazivati možete odabrati pomoću alata Upravitelj mapama (dostupnog s izbornika Alati)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Nastavak</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>تسجيل الدخول</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>إلغاء</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>تذكّرني على هذا الكمبيوتر</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>اسم المستخدم:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>كلمة المرور:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>استخدم اسم مستخدم الترحيب لإرسال الصور باستخدام بيكاسا!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>تسجيل الدخول</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>إلغاء</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>هل نسيت كلمة المرور؟</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>ألبومات الويب</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>تسجيل الدخول إلى ألبومات الويب</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>يمكنك باستخدام ألبومات الويب مشاركة ألبومات الصور عبر الإنترنت مع الأصدقاء والأسرة أو إنشاء ألبومات عامة لمشاركتها مع العالم.  إنه مجاني وسهل الاستخدام.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>‏حسابك على Google صالح، إلا أنك لم تسجل الدخول للحصول على حساب ألبومات الويب.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>انقر هنا للتعرف على مزيد من المعلومات.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>تنشيط ألبومات الويب...</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>الاشتراك في ألبومات الويب</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>‏تحميل أفلامك على فيديو Google باستخدام بيكاسا</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>للبدء في التحميل، سجّل الدخول أدناه.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>انقر هنا للعثور على المزيد.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>إنشاء حساب</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>‏إرسال الصور من حسابك Google على باستخدام بيكاسا</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>يتم إجراء عملية إرسال الصور بالكامل بدون متصفح ويب</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>إرسال حتى 10 ميغابايت من الصور</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>‏هل ترغب في الحصول على Gmail؟ احصل على حساب مجاني يحتوي على مساحة تخزين تزيد عن 6.5 غيغابايت (وأكثر)</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>معاينة صورك قبل إرسالها</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>اسم المستخدم أو كلمة المرور غير صحيحة - الرجاء إعادة المحاولة</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>لا يتوافق اسم المستخدم وكلمة المرور. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>أدخل كلمة المرور الصحيحة السابقة، ثم اكتب الأحرف التي تشاهدها في الصورة التالية (حساسة لحالة الأحرف)</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>تذكّرني على هذا الكمبيوتر</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>تسجيل الدخول</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>إلغاء</xmbtext>
+ </action>
+</tooltips>

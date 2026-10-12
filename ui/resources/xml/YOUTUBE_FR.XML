@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Transférer vers YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Titre :</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Description :</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Catégorie de la vidéo :</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Chargement...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tags :</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Mots clés pouvant aider les internautes à trouver votre vidéo (séparés par un espace)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Rendre cette vidéo publique</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Votre vidéo ne peut dépasser 10 minutes et 1 Go.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Ne transférez pas de contenu comportant des extraits d&#039;émissions de télévision, de vidéos musicales, de concerts ou de publicités sans autorisation, à part si vous êtes vous-même l&#039;auteur de ces contenus. La page Conseils sur les droits d&#039;auteur ou le Règlement de la communauté vous aideront à déterminer si votre vidéo enfreint les droits d&#039;auteur d&#039;un tiers.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>En cliquant sur &quot;Transférer&quot;, vous déclarez que cette vidéo n&#039;enfreint pas les Conditions d&#039;utilisation relatives à YouTube et que vous possédez tous les droits d&#039;auteur afférents ou l&#039;autorisation de la transférer.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Transférer</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

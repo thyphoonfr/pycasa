@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Імпортувати альбоми з веб-альбомів</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Фотографії у веб-альбомах, позначених нижче, завантажаться на комп’ютер, щойно ви натиснете кнопку OK. Їх буде автоматично впорядковано в папках залежно від назв альбомів.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>У вас 100 веб-альбомів онлайн.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Імпортувати всі альбоми</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Імпортувати вибрані альбоми:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Назва</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Дата</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(ПРИМІТКА. Буде завантажено лише ті зображення, яких немає на Вашому комп’ютері)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

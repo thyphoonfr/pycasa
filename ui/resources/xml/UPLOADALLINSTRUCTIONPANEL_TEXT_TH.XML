@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>ปิด</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>ยินดีต้อนรับสู่การอัปโหลดกลุ่มรูป</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>ทำเครื่องหมายในช่องถัดจากโฟลเดอร์และอัลบั้มที่คุณต้องการใช้งาน จากนั้นเลือกสิ่งที่คุณต้องการดำเนินการ Picasa จะกรองรายการที่ไม่สามารถดำเนินการนั้นได้ออก ตัวอย่างเช่น ถ้าทั้งโฟลเดอร์หรืออัลบั้มใดมีสถานะออนไลน์อยู่แล้ว Picasa จะไม่แสดงโฟลเดอร์หรืออัลบั้มนั้นเป็นตัวเลือกในการอัปโหลด </xmbtext>
+ </action>
+</tooltips>

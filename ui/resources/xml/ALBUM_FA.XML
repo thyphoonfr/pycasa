@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>نام:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>تاریخ:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>تاریخ خودکار</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>موسیقی:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>استفاده از موسیقی برای نمایش اسلاید و ارائه فیلم:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>مرور…</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>محل گرفتن عکس (اختیاری):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>توضیح (اختیاری):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

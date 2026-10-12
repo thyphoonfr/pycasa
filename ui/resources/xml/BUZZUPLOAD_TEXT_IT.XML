@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="buzzupload/uploadinfo" xmbdesc="Text(buzzupload/uploadinfo)">
+  <xmbtext>Verifica stato online in corso...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/webalbumstext" xmbdesc="Text(buzzupload/webalbumstext)">
+  <xmbtext>Aggiornamento dell&#039;album web in corso...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/upload_label" xmbdesc="Text(buzzupload/upload_label)">
+  <xmbtext>Carica in questo album:</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/uploadsize_label" xmbdesc="Text(buzzupload/uploadsize_label)">
+  <xmbtext>Dimensioni da caricare</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/newalbum2" xmbdesc="Label(buzzupload/newalbum2)">
+  <xmbtext>Nuovo</xmbtext>
+ </action>
+ <action type="Tooltip" target="buzzupload/newalbum2" xmbdesc="Tooltip(buzzupload/newalbum2)">
+  <xmbtext>Cambia il nome del nuovo album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/ok" xmbdesc="Label(buzzupload/ok)">
+  <xmbtext>Carica</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/cancel" xmbdesc="Label(buzzupload/cancel)">
+  <xmbtext>Annulla</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/desclabel" xmbdesc="Text(buzzupload/desclabel)">
+  <xmbtext>Descrizione</xmbtext>
+ </action>
+ <action type="Text1" target="buzzupload/comments_label" xmbdesc="Text1(buzzupload/comments_label)">
+  <xmbtext>Messaggio email</xmbtext>
+ </action>
+ <action type="Text2" target="buzzupload/comments_label" xmbdesc="Text2(buzzupload/comments_label)">
+  <xmbtext>[Facoltativo] Stai condividendo su Google+? Aggiungi un messaggio</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/options_label" xmbdesc="Label(buzzupload/options_label)">
+  <xmbtext>Dimensioni immagine</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/visibility_label" xmbdesc="Label(buzzupload/visibility_label)">
+  <xmbtext>Visibilità album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/collab_label" xmbdesc="Label(buzzupload/collab_label)">
+  <xmbtext>Consenti a queste persone di aggiungere foto al mio album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/also_send_email_label" xmbdesc="Label(buzzupload/also_send_email_label)">
+  <xmbtext>Invia notifiche email</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Lees de licentievoorwaarden voordat je Picasa gebruikt</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Door Picasa te gebruiken, ga je akkoord met de Servicevoorwaarden en het Privacybeleid van Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Servicevoorwaarden</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/nl/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Privacybeleid</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/nl/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Anonieme gebruiksstatistieken naar Google verzenden (je kunt deze instelling later wijzigen)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Akkoord</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

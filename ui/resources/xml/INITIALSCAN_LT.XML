@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Įdiegta senesnė „Picasa“ versija. Ar norite atnaujinti esamą nuotraukų biblioteką, ar dar kartą kompiuteryje ieškoti nuotraukų?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Pasirinkite variantą:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Atnaujinti esamų nuotraukų biblioteką</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Pasirinkite šią parinktį, jei naudojate raktažodžius arba pritaikytus albumus „Picasa 1“ programoje ir norite išsaugoti juos „Picasa 3“ programoje.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Dar kartą ieškoti nuotraukų mano kompiuteryje</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Pasirinkite šią parinktį, jei norite atlikti išsamią paiešką kompiuteryje, kuriame yra išplėstos nuotraukų informacijos. Ji išlaikys esamus pakeitimus ir tvarką, tačiau neišsaugos raktažodžių. Ši paieška gali trukti kelias minutes.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Nuskaitytos nuotraukos nėra perkeliamos ar kopijuojamos į naujas vietas. Jūs galite rinktis, kuriuos aplankus rodys „Picasa“ su aplankų tvarkytuvės įrankiu (renkamasi iš meniu „Įrankiai“)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Tęsti</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>„Picasa“ parengta ieškoti nuotraukų jūsų kompiuteryje</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Pasirinkite variantą:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Ieškoti nuotraukų visame kompiuteryje</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Naudokite šią parinktį, jei nuotraukas laikote įvairiuose aplankuose savo kompiuteryje, ypač jei nuotraukas laikote daugiau nei viename standžiajame diske.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Ieškoti tik „Dokumentuose“, „Nuotraukose“, darbalaukyje ir „iPhoto Library“</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Pasirinkite šią parinktį tik tuo atveju, jei savo nuotraukas laikote šiuose aplankuose.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Ieškant nuotraukų failai nėra perkeliami ar kopijuojami į naujas vietas. Naudodami aplankų tvarkytuvės įrankį (renkamasi iš meniu „Įrankiai“) galite rinktis, kuriuos aplankus rodys „Picasa“</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Tęsti</xmbtext>
+ </action>
+</tooltips>

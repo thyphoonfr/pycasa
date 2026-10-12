@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="edittextpanel/edittext_label" xmbdesc="Label(edittextpanel/edittext_label)">
+  <xmbtext>Szöveg szerkesztése</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/font_label" xmbdesc="Label(edittextpanel/font_label)">
+  <xmbtext>Betűtípus:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/size_label" xmbdesc="Label(edittextpanel/size_label)">
+  <xmbtext>Méret:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/style_label" xmbdesc="Label(edittextpanel/style_label)">
+  <xmbtext>Stílus:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextapply" xmbdesc="Label(edittextpanel/edittextapply)">
+  <xmbtext>Alkalmaz</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextcancel" xmbdesc="Label(edittextpanel/edittextcancel)">
+  <xmbtext>Mégse</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/usecaption" xmbdesc="Label(edittextpanel/usecaption)">
+  <xmbtext>Képfelirat másolása</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/usecaption" xmbdesc="Tooltip(edittextpanel/usecaption)">
+  <xmbtext>Szöveg hozzáadása a képfelirat alapján</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/clearall" xmbdesc="Label(edittextpanel/clearall)">
+  <xmbtext>Az összes törlése</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/clearall" xmbdesc="Tooltip(edittextpanel/clearall)">
+  <xmbtext>Az összes meglévő szöveg eltávolítása</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/transparency_label" xmbdesc="Label(edittextpanel/transparency_label)">
+  <xmbtext>Átlátszóság</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/align_label" xmbdesc="Label(edittextpanel/align_label)">
+  <xmbtext>Igazítás:</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/leftalign" xmbdesc="Tooltip(edittextpanel/leftalign)">
+  <xmbtext>Szöveg balra igazítása</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/centeralign" xmbdesc="Tooltip(edittextpanel/centeralign)">
+  <xmbtext>Szöveg középre igazítása</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/rightalign" xmbdesc="Tooltip(edittextpanel/rightalign)">
+  <xmbtext>Szöveg jobbra igazítása</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/no_fill" xmbdesc="Tooltip(edittextpanel/no_fill)">
+  <xmbtext>Ne jelenjen meg a kitöltőszín (csak a körvonal)</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/bold" xmbdesc="Tooltip(edittextpanel/bold)">
+  <xmbtext>Félkövér</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/italic" xmbdesc="Tooltip(edittextpanel/italic)">
+  <xmbtext>Dőlt</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/underline" xmbdesc="Tooltip(edittextpanel/underline)">
+  <xmbtext>Aláhúzás</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextapply" xmbdesc="Tooltip(edittextpanel/edittextapply)">
+  <xmbtext>A szövegmódosítások alkalmazása, majd kilépés a szövegeszközből</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextcancel" xmbdesc="Tooltip(edittextpanel/edittextcancel)">
+  <xmbtext>Kilépés a szövegeszközből a módosítások alkalmazása nélkül</xmbtext>
+ </action>
+</tooltips>

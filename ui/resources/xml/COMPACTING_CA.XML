@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>S’està compactant</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa està compactant la base de dades per estalviar espai al disc. Aquest procés pot trigar uns quants minuts.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>S’està compactant...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

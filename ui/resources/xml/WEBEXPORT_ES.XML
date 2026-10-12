@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exportar como página HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Exportar imágenes a:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Tamaño original</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 píxeles (monitores grandes)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 píxeles (páginas web grandes)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 píxeles (páginas web)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 píxeles (correo electrónico)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Exportar vídeos con:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Primer marco</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Película completa</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Título de la página web:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Carpeta:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Examinar...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Haz clic en el nombre de una plantilla para ver un ejemplo. Cuando hayas realizado tu selección, haz clic en Exportar.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Descripción de la plantilla</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Exportar</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

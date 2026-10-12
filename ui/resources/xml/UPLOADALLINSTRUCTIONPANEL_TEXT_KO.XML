@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>닫기</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>일괄 업로드를 시작합니다. </xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>작업할 앨범 및 폴더 옆에 있는 확인란을 선택합니다. 그런 다음 수행할 작업을 선택합니다. Picasa에서 작업이 적용되지 않을 항목을 필터링합니다. 예를 들어 전체 폴더 또는 앨범이 이미 온라인 상태인 경우 Picasa에서 해당 항목을 업로드할 옵션으로 표시하지 않습니다.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>透過瀏覽您拍攝相片的地點，為相片加上地理標記。定位交叉線，然後按下 [地理標記] 按鈕。</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>地理標記</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>全都加上地理標記</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>完成</xmbtext>
+ </action>
+</tooltips>

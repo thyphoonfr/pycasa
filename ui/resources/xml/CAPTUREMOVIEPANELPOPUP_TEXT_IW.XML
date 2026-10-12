@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="capturemoviepanelpopup/done" xmbdesc="Label(capturemoviepanelpopup/done)">
+  <xmbtext>בוצע</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/capture" xmbdesc="Label(capturemoviepanelpopup/capture)">
+  <xmbtext>הקלט</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/stop" xmbdesc="Label(capturemoviepanelpopup/stop)">
+  <xmbtext>עצור</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/live_video" xmbdesc="Label(capturemoviepanelpopup/live_video)">
+  <xmbtext>מצלמה</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/camchange" xmbdesc="Label(capturemoviepanelpopup/camchange)">
+  <xmbtext>הגדרות</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/capture" xmbdesc="Tooltip(capturemoviepanelpopup/capture)">
+  <xmbtext>התחל להקליט מהמצלמה</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/stop" xmbdesc="Tooltip(capturemoviepanelpopup/stop)">
+  <xmbtext>הפסק להקליט מהמצלמה</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/live_video" xmbdesc="Tooltip(capturemoviepanelpopup/live_video)">
+  <xmbtext>הקלט וידאו חי באמצעות המצלמה</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/camchange" xmbdesc="Tooltip(capturemoviepanelpopup/camchange)">
+  <xmbtext>שנה הגדרות מצלמה</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_cancel" xmbdesc="Label(capturemoviepanelpopup/settings_cancel)">
+  <xmbtext>ביטול</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_apply" xmbdesc="Label(capturemoviepanelpopup/settings_apply)">
+  <xmbtext>החל</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/video_label" xmbdesc="Label(capturemoviepanelpopup/video_label)">
+  <xmbtext>וידאו</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/size_label" xmbdesc="Label(capturemoviepanelpopup/size_label)">
+  <xmbtext>גודל</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/audio_label" xmbdesc="Label(capturemoviepanelpopup/audio_label)">
+  <xmbtext>אודיו</xmbtext>
+ </action>
+</tooltips>

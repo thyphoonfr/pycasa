@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="newbackupset/window1.title">
+  <xmbtext>Bagong Backup na Set</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup2.title">
+  <xmbtext>Pangalan:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/typegroup.title">
+  <xmbtext>Uri ng Backup:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio6.title">
+  <xmbtext>CD o DVD na backup</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio7.title">
+  <xmbtext>Disk-to-disk na backup (para sa mga external at network drive)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/disk.title">
+  <xmbtext>Pumili...</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup12.title">
+  <xmbtext>Mga iba-backup na file:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio14.title">
+  <xmbtext>Lahat ng mga uri ng file</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio15.title">
+  <xmbtext>Lahat ng mga larawan (hindi kasali ang mga movie)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio16.title">
+  <xmbtext>Tanging ang mga JPEG na may impormasyon ng camera</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/ok.title">
+  <xmbtext>Lumikha</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/button19.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

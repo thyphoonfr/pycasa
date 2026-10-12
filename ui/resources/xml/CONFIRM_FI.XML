@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Viesti</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Älä kysy uudelleen</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Kyllä</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Ei</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>È installata una versione precedente di Picasa. Aggiornare la libreria di immagini esistente o cercare le immagini sul computer?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Scegli una delle seguenti opzioni:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Aggiorna la libreria di immagini personale esistente</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Scegli questa opzione se utilizzi le parole chiave o personalizzi gli album in Picasa 1 e desideri conservarli in Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Esegui nuovamente la ricerca di immagini nel mio computer</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Scegli questa opzione per una ricerca più completa nel computer che includa maggiori informazioni sull&#039;immagine. Verranno conservate le modifiche e l&#039;organizzazione corrente, ma non le parole chiave. La scansione può durare parecchi minuti.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>La ricerca di immagini non sposta o copia mai i file in nuovi percorsi. Puoi scegliere le cartelle visualizzate da Picasa mediante lo strumento Gestione cartelle (disponibile nel menu Strumenti).</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continua</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa è pronto per eseguire la scansione delle immagini sul computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Scegli una delle seguenti opzioni:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Cerca immagini in tutto il computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Scegli questa opzione se le tue immagini sono memorizzate in varie cartelle del tuo computer, in particolare se le immagini sono memorizzate su più di una unità.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Esegui la ricerca solo in Documenti, Immagini, Desktop e iPhoto Library</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Scegli questa opzione se in queste cartelle memorizzi solo immagini.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>La ricerca di immagini non sposta o copia mai i file in nuovi percorsi. Puoi scegliere quali cartelle vengono visualizzate in Picasa mediante lo strumento Gestione cartelle (disponibile nel menu Strumenti).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continua</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>Sincronizar álbum en la Web</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>¿Quieres subir este álbum a Álbumes web y mantenerlo sincronizado?</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>Configuración actual:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>Tamaño:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>el tamaño predeterminado va aquí</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>Visibilidad:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>Sin listar</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>Sincronizar solo las fotos destacadas</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>No preguntarme de nuevo (usar siempre la configuración actual)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>Cambiar configuración...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>Sincronizar</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

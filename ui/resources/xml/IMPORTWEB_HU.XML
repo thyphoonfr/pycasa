@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Albumok importálása a Webalbumokból</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Az alábbi webalbumokban bejelölt képeket letöltheti a számítógépre. A képek automatikusan mappákba rendeződnek az albumnevek alapján.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>100 webalbuma van az interneten.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Az összes album importálása</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Kijelölt albumok importálása:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Név</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Dátum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(MEGJEGYZÉS: Csak azok a képek töltődnek le, amelyek még nincsenek a számítógépen.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

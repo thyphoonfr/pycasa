@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>ส่งออกเป็นหน้า HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>ส่งออกภาพที่:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>ขนาดเดิม</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 พิกเซล (สำหรับจอแสดงผลขนาดใหญ่)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 พิกเซล (สำหรับหน้าเว็บขนาดใหญ่)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 พิกเซล (สำหรับหน้าเว็บ)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 พิกเซล (สำหรับอีเมล)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>ส่งภาพยนตร์ออกโดยใช้:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>ภาพแรก</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>หนังเต็มจอ</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>ชื่อหน้าเว็บ:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>โฟลเดอร์: </xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>เรียกดู...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>คลิกชื่อแม่แบบเพื่อดูตัวอย่าง เมื่อคุณเลือกแล้ว ให้คลิก ส่งออก</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>คำอธิบายแม่แบบ</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>ส่งออก</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="printoptions/apply" xmbdesc="Label(printoptions/apply)">
+  <xmbtext>Застосувати</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/apply" xmbdesc="Tooltip(printoptions/apply)">
+  <xmbtext>Застосувати вибрані параметри до фотографій</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/ok" xmbdesc="Label(printoptions/ok)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/ok" xmbdesc="Tooltip(printoptions/ok)">
+  <xmbtext>Застосуйте вибрані параметри до фотографій та закрийте діалогове вікно</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/cancel" xmbdesc="Label(printoptions/cancel)">
+  <xmbtext>Скасувати</xmbtext>
+ </action>
+ <action type="Tooltip" target="printoptions/cancel" xmbdesc="Tooltip(printoptions/cancel)">
+  <xmbtext>Закрити діалогове вікно, не зберігаючи зміни</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_label" xmbdesc="Label(printoptions/border_label)">
+  <xmbtext>Рамка</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_size_label" xmbdesc="Label(printoptions/border_size_label)">
+  <xmbtext>Ширина межі</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_none_label" xmbdesc="Label(printoptions/border_none_label)">
+  <xmbtext>Немає</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_max_label" xmbdesc="Label(printoptions/border_max_label)">
+  <xmbtext>Максимум</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/border_color_label" xmbdesc="Label(printoptions/border_color_label)">
+  <xmbtext>Колір рамки</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_label" xmbdesc="Label(printoptions/caption_label)">
+  <xmbtext>Підписи</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usenotext_label" xmbdesc="Label(printoptions/usenotext_label)">
+  <xmbtext>Без тексту</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usecaption_label" xmbdesc="Label(printoptions/usecaption_label)">
+  <xmbtext>Підпис</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/usefilename_label" xmbdesc="Label(printoptions/usefilename_label)">
+  <xmbtext>Ім’я файлу</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/useexif_label" xmbdesc="Label(printoptions/useexif_label)">
+  <xmbtext>Інформація Exif</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_color_label" xmbdesc="Label(printoptions/caption_color_label)">
+  <xmbtext>Колір тексту</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_font_label" xmbdesc="Label(printoptions/caption_font_label)">
+  <xmbtext>Шрифт</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/caption_size_label" xmbdesc="Label(printoptions/caption_size_label)">
+  <xmbtext>Розмір</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/wrap_checkbox_label" xmbdesc="Label(printoptions/wrap_checkbox_label)">
+  <xmbtext>Загорнути текст</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textbelowimage_label" xmbdesc="Label(printoptions/textbelowimage_label)">
+  <xmbtext>Зображення нижче</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonimage_label" xmbdesc="Label(printoptions/textonimage_label)">
+  <xmbtext>На зображенні</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/textonborder_label" xmbdesc="Label(printoptions/textonborder_label)">
+  <xmbtext>На полі</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/bottomonly_checkbox_label" xmbdesc="Label(printoptions/bottomonly_checkbox_label)">
+  <xmbtext>Лише нижня частина</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/evenwidth_checkbox_label" xmbdesc="Label(printoptions/evenwidth_checkbox_label)">
+  <xmbtext>Ширша лінія рамки</xmbtext>
+ </action>
+ <action type="Label" target="printoptions/disabled_label" xmbdesc="Label(printoptions/disabled_label)">
+  <xmbtext>Вибачте, ці параметри не можна використовувати для друку відомостей контактів.</xmbtext>
+ </action>
+</tooltips>

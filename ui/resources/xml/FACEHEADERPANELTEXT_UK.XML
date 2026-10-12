@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="faceheaderpanel/set_thumbnail" xmbdesc="Tooltip(faceheaderpanel/set_thumbnail)">
+  <xmbtext>Установити як ескіз альбому</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_movie" xmbdesc="Tooltip(faceheaderpanel/create_movie)">
+  <xmbtext>Створити презентацію відеофайлу</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_face_movie" xmbdesc="Tooltip(faceheaderpanel/create_face_movie)">
+  <xmbtext>Створити фільм з обличчям</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_collage" xmbdesc="Tooltip(faceheaderpanel/create_collage)">
+  <xmbtext>Створити фотоколаж</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/play" xmbdesc="Tooltip(faceheaderpanel/play)">
+  <xmbtext>Відтворити слайд-шоу розміром на весь екран</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/pwa_button" xmbdesc="Tooltip(faceheaderpanel/pwa_button)">
+  <xmbtext>Відкрити веб-сторінку PWA</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/sug_filter" xmbdesc="Tooltip(faceheaderpanel/sug_filter)">
+  <xmbtext>Показати лише пропозиції (після підключення)</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsug" xmbdesc="Label(faceheaderpanel/confirmsug)">
+  <xmbtext>Підтвердити всі</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsel" xmbdesc="Label(faceheaderpanel/confirmsel)">
+  <xmbtext>Підтвердити</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/removesel" xmbdesc="Label(faceheaderpanel/removesel)">
+  <xmbtext>Видалити</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/moresug" xmbdesc="Label(faceheaderpanel/moresug)">
+  <xmbtext>Пошук пропозицій</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/removesel" xmbdesc="Tooltip(faceheaderpanel/removesel)">
+  <xmbtext>Видалити вибрані пропозиції</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsug" xmbdesc="Tooltip(faceheaderpanel/confirmsug)">
+  <xmbtext>Підтвердити всі пропозиції</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsel" xmbdesc="Tooltip(faceheaderpanel/confirmsel)">
+  <xmbtext>Підтвердити вибрані пропозиції</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/face_zoom" xmbdesc="Tooltip(faceheaderpanel/face_zoom)">
+  <xmbtext>Масштабувати до обличчя</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/picture_zoom" xmbdesc="Tooltip(faceheaderpanel/picture_zoom)">
+  <xmbtext>Переглянути в режимі оригінального розміру</xmbtext>
+ </action>
+ <action type="Text" target="faceheaderpanel/sug_label" xmbdesc="Text(faceheaderpanel/sug_label)">
+  <xmbtext>Пропозиції:</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Komprimierung</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa komprimiert seine Datenbank, um Speicherplatz zu sparen. Dies kann mehrere Minuten dauern.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Komprimierung...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Abbrechen</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadmgr/hide" xmbdesc="Label(uploadmgr/hide)">
+  <xmbtext>숨기기</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/cleanup" xmbdesc="Label(uploadmgr/cleanup)">
+  <xmbtext>완료 항목 지우기</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/pause" xmbdesc="Label(uploadmgr/pause)">
+  <xmbtext>일시중지</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/resume" xmbdesc="Label(uploadmgr/resume)">
+  <xmbtext>계속</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/nopending" xmbdesc="Text(uploadmgr/nopending)">
+  <xmbtext>업로드 활동 없음</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/throttletext" xmbdesc="Text(uploadmgr/throttletext)">
+  <xmbtext>대역폭 절약</xmbtext>
+ </action>
+</tooltips>

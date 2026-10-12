@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="headerpanel/view_online" xmbdesc="Label(headerpanel/view_online)">
+  <xmbtext>Prikaži v spletu</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/select_star" xmbdesc="Tooltip(headerpanel/select_star)">
+  <xmbtext>Izberite fotografije, označene z zvezdico</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/sync_label" xmbdesc="Label(headerpanel/sync_label)">
+  <xmbtext>Sinhronizacija s spletom</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync1" xmbdesc="Tooltip(headerpanel/websync1)">
+  <xmbtext>Ustavi sinhronizacijo sprememb s spletom</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync0" xmbdesc="Tooltip(headerpanel/websync0)">
+  <xmbtext>Naloži in sinhroniziraj prihodnje spremembe s spletom</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/sync_options" xmbdesc="Tooltip(headerpanel/sync_options)">
+  <xmbtext>Spletne možnosti</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_movie" xmbdesc="Tooltip(headerpanel/create_movie)">
+  <xmbtext>Ustvari predstavitev filma</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_collage" xmbdesc="Tooltip(headerpanel/create_collage)">
+  <xmbtext>Ustvari kolaž fotografij</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/play" xmbdesc="Tooltip(headerpanel/play)">
+  <xmbtext>Predvajaj celozaslonsko diaprojekcijo</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/share" xmbdesc="Label(headerpanel/share)">
+  <xmbtext>Naloži</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/share" xmbdesc="Tooltip(headerpanel/share)">
+  <xmbtext>Naloži album v Google Foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/save_edits" xmbdesc="Tooltip(headerpanel/save_edits)">
+  <xmbtext>Shrani urejene fotografije na disk.</xmbtext>
+ </action>
+</tooltips>

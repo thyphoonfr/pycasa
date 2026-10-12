@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>ทำให้ข้อมูลอัลบั้มตรงกัุบเว็บ</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>อัปโหลดอัลบั้มนี้ไปยัง Web Albums และทำให้มีข้อมูลตรงกันหรือไม่</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>การตั้งค่าปัจจุบัน:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>ขนาด:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>ขนาดเริ่มต้นอยู่ที่นี่</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>การแสดงผล:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>ไม่แสดง</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>ทำให้ข้อมูลตรงกันเฉพาะรูปภาพที่ติดดาว</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>ไม่ต้องถามอีก (ใช้การตั้งค่าปัจจุบันเสมอ)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>เปลี่ยนการตั้งค่า...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>ซิงค์</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

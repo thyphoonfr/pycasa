@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>Login</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>Digite o nome de usuário e a senha que você usa para efetuar login nesse serviço de impressão de fotos. Caso ainda não tenha uma conta com esse provedor, clique em &quot;Criar uma conta&quot; para se inscrever.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>E-mail:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>Criar uma conta...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com.br</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>Senha:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>Esqueceu a sua senha?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com.br</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>Salvar senha</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>Login protegido por SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>Tamanho da imagem:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>Para garantir a máxima qualidade de impressão, as suas imagens serão enviadas com a maior resolução disponível.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>Nome do álbum:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>Fazer login</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

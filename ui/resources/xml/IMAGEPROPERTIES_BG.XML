@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="imageproperties/labelgroup2.title">
+  <xmbtext>Име на файла:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/name.title">
+  <xmbtext>photo.jpg</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup4.title">
+  <xmbtext>Местоположение:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup6.title">
+  <xmbtext>Размер:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/size.title">
+  <xmbtext>120 КБ</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/label9.title">
+  <xmbtext>Дата:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/date.title">
+  <xmbtext>WWW 00, 0000 00:00 WW</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column12.title">
+  <xmbtext>Свойство</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column13.title">
+  <xmbtext>Стойност</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/prev.title">
+  <xmbtext>Пред.</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/navlabel.title">
+  <xmbtext>x от x файла</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/next.title">
+  <xmbtext>Следв.</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/button19.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

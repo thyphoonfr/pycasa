@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="contactmgr/window1.title">
+  <xmbtext>Osebe</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup4.title">
+  <xmbtext>Iskanje:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/delete.title">
+  <xmbtext>Izbriši osebo</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/create.title">
+  <xmbtext>Nova oseba</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online_contact.title">
+  <xmbtext>Spletni stik </xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup22.title">
+  <xmbtext>Ime:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup24.title">
+  <xmbtext>E-poštni naslovi:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/sync.title">
+  <xmbtext>Sinhronizacija oznak obrazov s spletnimi albumi</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/album_id_group.title">
+  <xmbtext>ID albuma:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/contact_id_group.title">
+  <xmbtext>ID stika:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_id_group.title">
+  <xmbtext>ID fokusa:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/subject_id_group.title">
+  <xmbtext>ID zadeve:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_obfuscated_gaia_id_group.title">
+  <xmbtext>Zakriti ID fokusa storitve GAIA:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/mobile_obfuscated_gaia_id_group.title">
+  <xmbtext>Zakriti ID storitve GAIA za mobilne naprave:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/revert.title">
+  <xmbtext>Povrni v prejšnjo obliko</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online.title">
+  <xmbtext>Upravljanje stikov v spletu</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/refresh_contacts.title">
+  <xmbtext>Osveži stike</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/ok.title">
+  <xmbtext>V redu</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/cancel.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

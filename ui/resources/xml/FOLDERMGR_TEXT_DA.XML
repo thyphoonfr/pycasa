@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="foldermgr/folder_list_label" xmbdesc="Label(foldermgr/folder_list_label)">
+  <xmbtext>Mappeoversigt</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/instructions_text" xmbdesc="Label(foldermgr/instructions_text)">
+  <xmbtext>For hver mappe kan du vælge, om Picasa skal finde billeder i den eller ej. Du kan også vælge mapper, som du vil overvåge mht. nye billeder.</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/status_label" xmbdesc="Label(foldermgr/status_label)">
+  <xmbtext>For den aktuelle mappe:</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/scan_once_label" xmbdesc="Label(foldermgr/scan_once_label)">
+  <xmbtext>Scan én gang</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/remove_label" xmbdesc="Label(foldermgr/remove_label)">
+  <xmbtext>Fjern fra Picasa</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watch_label" xmbdesc="Label(foldermgr/watch_label)">
+  <xmbtext>Scan altid</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/watched_label" xmbdesc="Label(foldermgr/watched_label)">
+  <xmbtext>Mapper, som Picasa holder øje med</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/ok-label" xmbdesc="Label(foldermgr/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/cancel-label" xmbdesc="Label(foldermgr/cancel-label)">
+  <xmbtext>Annuller</xmbtext>
+ </action>
+ <action type="Label" target="foldermgr/help-label" xmbdesc="Label(foldermgr/help-label)">
+  <xmbtext>Hjælp</xmbtext>
+ </action>
+</tooltips>

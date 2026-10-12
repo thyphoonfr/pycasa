@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Move Database</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>You will need to restart Picasa for the changes to take effect.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Please Note: You should back-up your database before trying out this experimental feature. NEVER move the database to a network, removable or external drive, or you may lose data.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Current Database location:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>New Database location:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Browse...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Default</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Move on next restart</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

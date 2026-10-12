@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_options/window.mac_title">
+  <xmbtext>自動バックアップの設定</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/window.win_title">
+  <xmbtext>自動バックアップのオプション</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/auto_start.title">
+  <xmbtext>自動的に開始</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/networklabel.title">
+  <xmbtext>ネットワークの設定:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/proxygroup.title">
+  <xmbtext>プロキシのユーザー名:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/passwordgroup.title">
+  <xmbtext>プロキシのパスワード:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/autoproxy.title">
+  <xmbtext>ネットワーク設定を自動的に検出</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loglevelgroup.title">
+  <xmbtext>ネットワーク ログ レベル:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/disable_item.title">
+  <xmbtext>ログを無効にする</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/errors_item.title">
+  <xmbtext>エラーのみを記録</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/min_item.title">
+  <xmbtext>最小限のログ情報</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/detailed_item.title">
+  <xmbtext>詳細なログ情報</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/all_item.title">
+  <xmbtext>すべてのネットワーク情報を記録</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loggroup.title">
+  <xmbtext>ログ:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/cancelbutton.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

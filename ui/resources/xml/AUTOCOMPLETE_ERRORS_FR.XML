@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>Erreurs lors de la saisie semi-automatique</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>Les contacts suivants placés dans le Presse-papiers n&#039;ont pas pu être correctement collés.</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>Contact</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>Erreur</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>État</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Google Photos Backup Version %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Copyright 2015, Google, Inc. Alle Rechte vorbehalten.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Diese Software basiert in Teilen auf der Arbeit der Independent JPEG Group. Dieses Programm ist durch die US-amerikanischen und internationalen Urheberrechte geschützt.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_share/to_text" xmbdesc="Label(compose_share/to_text)">
+  <xmbtext>Komu:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/group_text" xmbdesc="Label(compose_share/group_text)">
+  <xmbtext>Skupiny:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/subject_text" xmbdesc="Label(compose_share/subject_text)">
+  <xmbtext>Objekt:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/changeuser" xmbdesc="Label(compose_share/changeuser)">
+  <xmbtext>Změnit uživatele</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/send" xmbdesc="Label(compose_share/send)">
+  <xmbtext>Odeslat</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discard" xmbdesc="Label(compose_share/discard)">
+  <xmbtext>Zahodit</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/sendb" xmbdesc="Label(compose_share/sendb)">
+  <xmbtext>Odeslat</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discardb" xmbdesc="Label(compose_share/discardb)">
+  <xmbtext>Zahodit</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/collab_label" xmbdesc="Label(compose_share/collab_label)">
+  <xmbtext>Tyto osoby mohou přispívat do mého alba</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/infotext" xmbdesc="Label(compose_share/infotext)">
+  <xmbtext>Připraveno ke sdílení. Níže zvolte příjemce vaší pozvánky.</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/visibility_label" xmbdesc="Label(compose_share/visibility_label)">
+  <xmbtext>Viditelnost alba:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/cancel" xmbdesc="Label(compose_share/cancel)">
+  <xmbtext>Zrušit</xmbtext>
+ </action>
+</tooltips>

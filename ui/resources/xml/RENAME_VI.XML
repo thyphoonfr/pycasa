@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Đổi tên tệp</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 tệp đã được chọn để đổi tên.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s tệp đã được chọn để đổi tên.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Hãy nhập tên mới cho các tệp này:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Bao gồm trong tên tệp:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Ngày</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Độ phân giải ảnh</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Ví dụ: </xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Đổi tên</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

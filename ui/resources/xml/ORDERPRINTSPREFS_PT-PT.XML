@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>Iniciar sessão</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>Introduza o nome de utilizador e a palavra-passe que normalmente utiliza para iniciar sessão neste serviço de impressão de fotografias. Se ainda não tiver uma conta neste fornecedor, clique em &quot;Criar uma conta&quot; para se inscrever.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>E-mail:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>Criar uma conta...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>Palavra-passe:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>Esqueceu-se da palavra-passe?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>Guardar palavra-passe</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>Início de sessão protegido por SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>Tamanho da imagem:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>Para assegurar impressões da mais alta qualidade, as imagens serão enviadas com a resolução máxima disponível.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>Nome do álbum:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>Iniciar sessão</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

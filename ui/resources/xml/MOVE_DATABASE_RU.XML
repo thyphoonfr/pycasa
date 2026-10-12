@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Перенести базу данных</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Чтобы изменения вступили в силу, потребуется перезапуск приложения Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Примечание. Прежде чем опробовать эту экспериментальную функцию, создайте резервную копию базы данных. НИКОГДА не переносите базу на сетевой, съемный или внешний диск во избежание потери данных.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Текущее местоположение базы данных:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Новое местоположение базы данных:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Обзор...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>По умолчанию</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Переместить при следующем перезапуске</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Adı:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Tarih:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Otomatik tarih</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Müzik:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Slayt gösterisi ve Film sunumu için müzik kullan:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Göz at...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Çekildiği yer (isteğe bağlı):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Açıklama (isteğe bağlı):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>Tamam</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

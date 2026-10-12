@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Fechar</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Bem-vindo ao carregamento em lote</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Assinale as caixas junto às pastas e álbuns com que pretende trabalhar. Em seguida, escolha o que pretende fazer. O Picasa irá filtrar os itens aos quais a operação não se aplica. Por exemplo, se uma pasta ou álbum inteiros já se encontrarem on-line, o Picasa não o apresentará nas opções de carregamento.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>Napake samodokončanja</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>Spodnjih stikov, ki so bili najdeni v besedilu odložišča, ni bilo mogoče pravilno prilepiti</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>Stik</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>Napaka</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>Stanje</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>V redu</xmbtext>
+ </stringres>
+</resources>

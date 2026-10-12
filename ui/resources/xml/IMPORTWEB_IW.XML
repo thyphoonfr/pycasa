@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>‏יבוא אלבומים מאלבומי Google...</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>התמונות באלבומי האינטרנט המסומנים יורדו למחשב שלך לאחר שתלחץ על לחצן &#039;אישור&#039;. התמונות יאורגנו באופן אוטומטי בתיקיות לפי שמות האלבומים.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>יש לך 100 אלבומי אינטרנט מקוונים.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>יבא את כל האלבומים</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>יבא אלבומים נבחרים:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>שם</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>תאריך</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(הערה: היישום יוריד רק תצלומים שעדיין לא נמצאים במחשב)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

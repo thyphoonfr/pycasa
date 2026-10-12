@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>O programe Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Všetky ostatné názvy produktov a služieb, značky alebo ochranné známky sú majetkom príslušných vlastníkov.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Tento softvér je čiastočne založený na práci nezávislej skupiny JPEG. Tento program je chránený zákonom o autorských právach v USA a ďalších krajinách.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Licencie tretích strán...</xmbtext>
+ </stringres>
+</resources>

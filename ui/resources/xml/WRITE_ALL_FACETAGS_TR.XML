@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Yüz Etiketlerini Yaz</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Yüzleri yazma veya tümünü yazma işlemi uzun sürebilir. Günlük kaydı ayrıntılı düzeyine veya daha yüksek bir düzeye ayarlandıysa, network.log dosyası güncellenememiş salt okunur dosyalarla ilgili mesajları içerecektir. Bu özellik kullanılırken programdan çıkılması önerilir.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Seçilenleri Yaz</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Yüzleri Yaz</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Tümünü Yaz</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Tanca</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Benvingut a la càrrega massiva</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Activa les caselles al costat de les carpetes i dels àlbums amb els quals t&#039;agradaria treballar. A continuació, selecciona el que t&#039;agradaria fer. Picasa filtrarà els elements als quals no s&#039;apliqui l&#039;operació. Per exemple, si una carpeta o un àlbum sencers ja estan en línia, Picasa no els mostrarà com a opció per a la càrrega.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Εξαγωγή ως σελίδα HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Εξαγωγή φωτογραφιών σε:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Αρχικό μέγεθος</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 εικονοστοιχεία (για οθόνες μεγάλου μεγέθους)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 εικονοστοιχεία (για μεγάλες ιστοσελίδες)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 εικονοστοιχεία (για ιστοσελίδες)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 εικονοστοιχεία (για αποστολή μέσω ηλεκτρονικού ταχυδρομείου)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Εξαγωγή ταινιών με:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Πρώτο καρέ</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Ολόκληρη η ταινία</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Τίτλος ιστοσελίδας:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Φάκελος:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Αναζήτηση...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Πατήστε ένα όνομα προτύπου για να δείτε ένα παράδειγμα.  Αφού επιλέξετε αυτό που θέλετε, πατήστε &quot;Εξαγωγή&quot;.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Περιγραφή προτύπου</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Εξαγωγή</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

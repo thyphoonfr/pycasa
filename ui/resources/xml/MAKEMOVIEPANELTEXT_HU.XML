@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="makemoviepanel/rewind" xmbdesc="Label(makemoviepanel/rewind)">
+  <xmbtext>Vissza a kijelölt diához</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addclips" xmbdesc="Tooltip(makemoviepanel/addclips)">
+  <xmbtext>További klipek beolvasása a fotótárból</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addtomovie" xmbdesc="Tooltip(makemoviepanel/addtomovie)">
+  <xmbtext>A kijelölt klip(ek) hozzáadása a mozgófilm végéhez</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/deleteclips" xmbdesc="Tooltip(makemoviepanel/deleteclips)">
+  <xmbtext>A kijelölt klip(ek) eltávolítása a tálcáról</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/durationslider_label" xmbdesc="Label(makemoviepanel/durationslider_label)">
+  <xmbtext>Dia időtartama</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/lengthslider_label" xmbdesc="Label(makemoviepanel/lengthslider_label)">
+  <xmbtext>Összes fénykép</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/burstslider_label" xmbdesc="Label(makemoviepanel/burstslider_label)">
+  <xmbtext>Ne legyen szűrés a készítés ideje alapján</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transitionslider_label" xmbdesc="Label(makemoviepanel/transitionslider_label)">
+  <xmbtext>Átfedés</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/export_youtube" xmbdesc="Label(makemoviepanel/export_youtube)">
+  <xmbtext>YouTube</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/render" xmbdesc="Label(makemoviepanel/render)">
+  <xmbtext>Mozgófilm létrehozása</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/cancel" xmbdesc="Label(makemoviepanel/cancel)">
+  <xmbtext>Bezárás</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/recompute" xmbdesc="Label(makemoviepanel/recompute)">
+  <xmbtext>Alkalmaz</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab1" xmbdesc="Label(makemoviepanel/tab1)">
+  <xmbtext>Mozgófilm</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/moviesize_label" xmbdesc="Label(makemoviepanel/moviesize_label)">
+  <xmbtext>Méretek</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/show_captions_label" xmbdesc="Label(makemoviepanel/show_captions_label)">
+  <xmbtext>Képfeliratok megjelenítése</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/crop_to_fit_label" xmbdesc="Label(makemoviepanel/crop_to_fit_label)">
+  <xmbtext>Teljes képkockás fotó körbevágása</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_low_res_faces_label" xmbdesc="Label(makemoviepanel/remove_low_res_faces_label)">
+  <xmbtext>Kis felbontású arcok eltávolítása</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/ordering_header_label" xmbdesc="Label(makemoviepanel/ordering_header_label)">
+  <xmbtext>Diák rendezése:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/smart_order_label" xmbdesc="Label(makemoviepanel/smart_order_label)">
+  <xmbtext>A legjobb átmenetek</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/album_order_label" xmbdesc="Label(makemoviepanel/album_order_label)">
+  <xmbtext>Album szerint</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/chronological_order_label" xmbdesc="Label(makemoviepanel/chronological_order_label)">
+  <xmbtext>Időrend</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/audio_label" xmbdesc="Label(makemoviepanel/audio_label)">
+  <xmbtext>Hangsáv:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/add_audio" xmbdesc="Label(makemoviepanel/add_audio)">
+  <xmbtext>Betöltés...</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_audio" xmbdesc="Label(makemoviepanel/remove_audio)">
+  <xmbtext>Törlés</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/aoptions_label" xmbdesc="Label(makemoviepanel/aoptions_label)">
+  <xmbtext>Opciók</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transtype_label" xmbdesc="Label(makemoviepanel/transtype_label)">
+  <xmbtext>Képváltási stílus</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab2" xmbdesc="Label(makemoviepanel/tab2)">
+  <xmbtext>Dia</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Klipek</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Klipek</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/font_label" xmbdesc="Label(makemoviepanel/font_label)">
+  <xmbtext>Betűtípus:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/size_label" xmbdesc="Label(makemoviepanel/size_label)">
+  <xmbtext>Méret:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/style_label" xmbdesc="Label(makemoviepanel/style_label)">
+  <xmbtext>Stílus:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/templatetext" xmbdesc="Label(makemoviepanel/templatetext)">
+  <xmbtext>Sablon:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/text_color_label" xmbdesc="Label(makemoviepanel/text_color_label)">
+  <xmbtext>Szöveg színe</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/back_color_label" xmbdesc="Label(makemoviepanel/back_color_label)">
+  <xmbtext>Háttér színe</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/addclips" xmbdesc="Label(makemoviepanel/addclips)">
+  <xmbtext>Továbbiak...</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/bold" xmbdesc="Tooltip(makemoviepanel/bold)">
+  <xmbtext>Félkövér</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/italic" xmbdesc="Tooltip(makemoviepanel/italic)">
+  <xmbtext>Dőlt</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/outline" xmbdesc="Tooltip(makemoviepanel/outline)">
+  <xmbtext>Automatikus körvonal (mint a filmfeliratok esetében)</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/insert_slide" xmbdesc="Tooltip(makemoviepanel/insert_slide)">
+  <xmbtext>Új szöveges dia hozzáadása</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_slide" xmbdesc="Tooltip(makemoviepanel/remove_slide)">
+  <xmbtext>A kijelölt dia eltávolítása</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/add_audio" xmbdesc="Tooltip(makemoviepanel/add_audio)">
+  <xmbtext>Hangsáv hozzáadása a mozgófilmhez</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_audio" xmbdesc="Tooltip(makemoviepanel/remove_audio)">
+  <xmbtext>Hangsáv eltávolítása</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/render" xmbdesc="Tooltip(makemoviepanel/render)">
+  <xmbtext>Mozgófilm létrehozása, majd belépés szerkesztési üzemmódba</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/export_youtube" xmbdesc="Tooltip(makemoviepanel/export_youtube)">
+  <xmbtext>Mozgófilm létrehozása, majd feltöltése a YouTube webhelyre</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/cancel" xmbdesc="Tooltip(makemoviepanel/cancel)">
+  <xmbtext>A Mozgófilmkészítés párbeszédpanel bezárása</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/recompute" xmbdesc="Tooltip(makemoviepanel/recompute)">
+  <xmbtext>Új sorozat létrehozása</xmbtext>
+ </action>
+</tooltips>

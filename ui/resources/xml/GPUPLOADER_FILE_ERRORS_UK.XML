@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_file_errors/file_errors.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/error_label.title">
+  <xmbtext>Неможливо створити резервні копії цих файлів:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/namecolumn.title">
+  <xmbtext>Назва</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/accept.title">
+  <xmbtext>Повторіть спробу</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_file_errors/cancel.title">
+  <xmbtext>Закрити</xmbtext>
+ </stringres>
+</resources>

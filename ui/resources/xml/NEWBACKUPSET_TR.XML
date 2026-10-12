@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="newbackupset/window1.title">
+  <xmbtext>Yeni Yedekleme Kümesi</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup2.title">
+  <xmbtext>Adı:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/typegroup.title">
+  <xmbtext>Yedekleme türü:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio6.title">
+  <xmbtext>CD veya DVD&#039;ye yedekleme</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio7.title">
+  <xmbtext>Diskten diske yedekleme (harici sürücüler ve ağ sürücüleri içindir)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/disk.title">
+  <xmbtext>Seç…</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/labelgroup12.title">
+  <xmbtext>Yedeklenecek dosyalar:</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio14.title">
+  <xmbtext>Tüm dosya türleri</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio15.title">
+  <xmbtext>Tüm resimler (filmleri hariç tut)</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/radio16.title">
+  <xmbtext>Sadece kamera bilgileri içeren JPEG&#039;ler</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/ok.title">
+  <xmbtext>Oluştur</xmbtext>
+ </stringres>
+ <stringres id="newbackupset/button19.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

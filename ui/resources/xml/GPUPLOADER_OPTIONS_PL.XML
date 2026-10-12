@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_options/window.mac_title">
+  <xmbtext>Ustawienia Automatycznej kopii zapasowej</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/window.win_title">
+  <xmbtext>Opcje Automatycznej kopii zapasowej</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/auto_start.title">
+  <xmbtext>Uruchom automatycznie</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/networklabel.title">
+  <xmbtext>Ustawienia sieci:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/proxygroup.title">
+  <xmbtext>Nazwa użytkownika serwera proxy:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/passwordgroup.title">
+  <xmbtext>Hasło serwera proxy:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/autoproxy.title">
+  <xmbtext>Automatycznie wykryj ustawienia sieci</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loglevelgroup.title">
+  <xmbtext>Poziom rejestrowania sieciowego:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/disable_item.title">
+  <xmbtext>Wyłącz rejestrowanie</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/errors_item.title">
+  <xmbtext>Rejestruj tylko błędy</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/min_item.title">
+  <xmbtext>Minimalna ilość informacji w dzienniku</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/detailed_item.title">
+  <xmbtext>Szczegółowe informacje w dzienniku</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/all_item.title">
+  <xmbtext>Rejestruj wszystkie informacje sieciowe</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/loggroup.title">
+  <xmbtext>Dziennik:</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_options/cancelbutton.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

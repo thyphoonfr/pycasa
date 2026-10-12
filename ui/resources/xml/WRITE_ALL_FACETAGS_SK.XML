@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Zápis značiek tvárí</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Zapísanie tvárí alebo zapísanie všetkých značiek môže dlho trvať. Ak je nastavené podrobné alebo dôkladnejšie zapisovanie do denníka, súbor network.log bude obsahovať hlásenia o súboroch iba na čítanie, ktoré nebolo možné aktualizovať. Pri použití tejto funkcie sa odporúča odhlásiť sa.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Zapísať vybraté</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Zapísať tváre</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Zapísať všetky</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

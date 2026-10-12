@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Név hozzáadása</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Válasszon ki egy mappát az arcok megjelenítéséhez</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Mellőzés</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Személy kézi hozzáadása</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Mégse</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>A Picasa a fotókeresés közben az egyszerű elnevezés érdekében automatikusan csoportosítja az arcokat.\n\nFontos tudnivalók:\n\nA személyek nevének megadásához kattintson a Név hozzáadása elemre, írja be a személy nevét, majd nyomja le az Enter billentyűt. Minden alkalommal, amikor először nevez el valakit, a rendszer egy, az adott személyhez tartozó albumot hoz létre.\n\n(TIPP: Ha az elnevezés közben az összes névjegyét el szeretné érni, jelentkezzen be Google-fiókjával.)\n\nHa figyelmen kívül szeretne hagyni valakit, kattintson az arc indexképén látható X gombra.\n\nJavaslatok: Az elnevezést követően előfordulhat, hogy a Picasa további képjavaslatokat tesz. Ha meg szeretné tekinteni, illetve el szeretné fogadni (vagy elutasítaná) a javaslatokat, nyissa meg az adott személyhez tartozó albumot.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>A Picasa a fotókeresés közben az egyszerű elnevezés érdekében automatikusan csoportosítja az arcokat.\n\nFontos tudnivalók:\n\nA személyek nevének megadásához kattintson a Név hozzáadása elemre, írja be a személy nevét, majd nyomja le az Enter billentyűt. Minden alkalommal, amikor először nevez el valakit, a rendszer egy, az adott személyhez tartozó albumot hoz létre.\n\n(TIPP: Ha az elnevezés közben az összes névjegyét el szeretné érni, jelentkezzen be Google-fiókjával.)\n\nHa figyelmen kívül szeretne hagyni valakit, kattintson az arc indexképén látható X gombra.\n\nJavaslatok: Az elnevezést követően előfordulhat, hogy a Picasa további képjavaslatokat tesz. Ha meg szeretné tekinteni, illetve el szeretné fogadni (vagy elutasítaná) a javaslatokat, nyissa meg az adott személyhez tartozó albumot.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>A program még nem talált személyeket. A megtalált és csoportosított arcok a Név nélküliek albumban fognak megjelenni. A keresés ideje alatt a Név nélküliek album elemeiben folyamatinformáció jelenik meg.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Itt látható majd az aktuálisan kijelölt személlyel együtt megjelenő, megnevezett szereplők listája.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Itt jelenik meg a kijelölt fotókon szereplő személyek listája.</xmbtext>
+ </action>
+</tooltips>

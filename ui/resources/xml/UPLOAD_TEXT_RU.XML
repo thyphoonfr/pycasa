@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="upload/public_label" xmbdesc="Text(upload/public_label)">
+  <xmbtext>Для всех в Интернете</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_label" xmbdesc="Text(upload/private_label)">
+  <xmbtext>Любой пользователь, обладающий ссылкой</xmbtext>
+ </action>
+ <action type="Text" target="upload/public_description1" xmbdesc="Text(upload/public_description1)">
+  <xmbtext>Этот альбом смогут просматривать все пользователи по адресу %s</xmbtext>
+ </action>
+ <action type="Text" target="upload/private_description1" xmbdesc="Text(upload/private_description1)">
+  <xmbtext>Открыть доступ избранным пользователям</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadinfo" xmbdesc="Text(upload/uploadinfo)">
+  <xmbtext>Проверка статуса подключения к Интернету...</xmbtext>
+ </action>
+ <action type="Text" target="upload/webalbumstext" xmbdesc="Text(upload/webalbumstext)">
+  <xmbtext>Обновление списка веб-альбомов...</xmbtext>
+ </action>
+ <action type="Text" target="upload/upload_label" xmbdesc="Text(upload/upload_label)">
+  <xmbtext>Добавить в этот альбом:</xmbtext>
+ </action>
+ <action type="Text" target="upload/uploadsize_label" xmbdesc="Text(upload/uploadsize_label)">
+  <xmbtext>Размер добавляемых файлов</xmbtext>
+ </action>
+ <action type="Text" target="upload/privacy_label" xmbdesc="Text(upload/privacy_label)">
+  <xmbtext>Конфиденциальность</xmbtext>
+ </action>
+ <action type="Text" target="upload/require_login_text" xmbdesc="Text(upload/require_login_text)">
+  <xmbtext>Частный</xmbtext>
+ </action>
+ <action type="Label" target="upload/newalbum2" xmbdesc="Label(upload/newalbum2)">
+  <xmbtext>Новый</xmbtext>
+ </action>
+ <action type="Text" target="upload/titlelabel" xmbdesc="Text(upload/titlelabel)">
+  <xmbtext>Название альбома</xmbtext>
+ </action>
+ <action type="Text" target="upload/desclabel" xmbdesc="Text(upload/desclabel)">
+  <xmbtext>Описание</xmbtext>
+ </action>
+ <action type="Text" target="upload/choose_contact_label" xmbdesc="Text(upload/choose_contact_label)">
+  <xmbtext>Введите имя пользователя:</xmbtext>
+ </action>
+ <action type="Text" target="upload/contact_album_list_label" xmbdesc="Text(upload/contact_album_list_label)">
+  <xmbtext>Альбомы контактов, в которые можно добавлять изображения:</xmbtext>
+ </action>
+ <action type="Label" target="upload/upgrade" xmbdesc="Label(upload/upgrade)">
+  <xmbtext>Обновить</xmbtext>
+ </action>
+ <action type="Label" target="upload/ok" xmbdesc="Label(upload/ok)">
+  <xmbtext>Добавить</xmbtext>
+ </action>
+ <action type="Label" target="upload/cancel" xmbdesc="Label(upload/cancel)">
+  <xmbtext>Отмена</xmbtext>
+ </action>
+ <action type="Label" target="upload/storagetext" xmbdesc="Label(upload/storagetext)">
+  <xmbtext>Подробнее...</xmbtext>
+ </action>
+ <action type="Text" target="upload/account_title" xmbdesc="Text(upload/account_title)">
+  <xmbtext>Ваш аккаунт:</xmbtext>
+ </action>
+ <action type="Text" target="upload/upsell_text" xmbdesc="Text(upload/upsell_text)">
+  <xmbtext>Дополнительное место для хранения позволит безопасно создавать резервные копии фотографий.</xmbtext>
+ </action>
+ <action type="Label" target="upload/collab_label" xmbdesc="Label(upload/collab_label)">
+  <xmbtext>Разрешить этим пользователям добавлять фотографии в альбом</xmbtext>
+ </action>
+ <action type="Label" target="upload/sharing_label" xmbdesc="Label(upload/sharing_label)">
+  <xmbtext>Открыть доступ для:</xmbtext>
+ </action>
+</tooltips>

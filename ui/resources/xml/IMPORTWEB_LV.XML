@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Albumu importēšana no tīmekļa albumiem</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Kad noklikšķināsit uz pogas Labi, tālāk atzīmēto tīmekļa albumu attēli tiks lejupielādēti datorā. Tie tiks automātiski sakārtoti mapēs atbilstoši albumu nosaukumiem.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Jums tiešsaistē ir 100 tīmekļa albumu.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Visu albumu importēšana</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importēt atlasītos albumus:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nosaukums</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Datums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(PIEZĪME. Tiks lejupielādēti tikai tie attēli, kas neatrodas datorā)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="faceheaderpanel/set_thumbnail" xmbdesc="Tooltip(faceheaderpanel/set_thumbnail)">
+  <xmbtext>Nustatyti kaip žmonių albumo miniatiūrą</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_movie" xmbdesc="Tooltip(faceheaderpanel/create_movie)">
+  <xmbtext>Kurti filmo pateiktį</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_face_movie" xmbdesc="Tooltip(faceheaderpanel/create_face_movie)">
+  <xmbtext>Kurti veidų filmą</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_collage" xmbdesc="Tooltip(faceheaderpanel/create_collage)">
+  <xmbtext>Kurti nuotraukų koliažą</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/play" xmbdesc="Tooltip(faceheaderpanel/play)">
+  <xmbtext>Paleisti skaidrių demonstravimą visame ekrane</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/pwa_button" xmbdesc="Tooltip(faceheaderpanel/pwa_button)">
+  <xmbtext>Atidaryti PWA tinklalapį</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/sug_filter" xmbdesc="Tooltip(faceheaderpanel/sug_filter)">
+  <xmbtext>Rodyti tik pasiūlymus (kai įjungtas perjungimas)</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsug" xmbdesc="Label(faceheaderpanel/confirmsug)">
+  <xmbtext>Patvirtinti viską</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsel" xmbdesc="Label(faceheaderpanel/confirmsel)">
+  <xmbtext>Patvirtinti</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/removesel" xmbdesc="Label(faceheaderpanel/removesel)">
+  <xmbtext>Pašalinti</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/moresug" xmbdesc="Label(faceheaderpanel/moresug)">
+  <xmbtext>Rasti daugiau pasiūlymų</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/removesel" xmbdesc="Tooltip(faceheaderpanel/removesel)">
+  <xmbtext>Pašalinti pasirinktus pasiūlymus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsug" xmbdesc="Tooltip(faceheaderpanel/confirmsug)">
+  <xmbtext>Patvirtinti visus pasiūlymus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsel" xmbdesc="Tooltip(faceheaderpanel/confirmsel)">
+  <xmbtext>Patvirtinti pasirinktus pasiūlymus</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/face_zoom" xmbdesc="Tooltip(faceheaderpanel/face_zoom)">
+  <xmbtext>Peržiūrėti padidintus iki veidų</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/picture_zoom" xmbdesc="Tooltip(faceheaderpanel/picture_zoom)">
+  <xmbtext>Peržiūrėti sumažintą iki visos nuotraukos</xmbtext>
+ </action>
+ <action type="Text" target="faceheaderpanel/sug_label" xmbdesc="Text(faceheaderpanel/sug_label)">
+  <xmbtext>Pasiūlymai:</xmbtext>
+ </action>
+</tooltips>

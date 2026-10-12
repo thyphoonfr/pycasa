@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>आप सिंगल क्लिक से कोई टैग लागू करने के लिए त्वरित टैग का उपयोग कर सकते हैं.  नीचे उन टैग में लिखें जिनके लिए आप एक-क्लिक पहुंच चाहते हैं.  सामान्य रूप से, हाल ही में लागू किए गए टैग को ट्रैक करने के लिए शीर्ष के दो त्वरित टैग उपयोग किए जाते हैं.  मैन्युअल रूप से शीर्ष के दो टैग सेट करने के लिए नीचे दिए गए चेकबॉक्स को अनचेक करें.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>ऊपर दिए गए खाली बॉक्स को सामान्य रूप से उपयोग किए जाने वाले टैग के साथ स्वतः भरें</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>हाल में उपयोग किए गए टैग के लिए शीर्ष के दो बटन आरक्षित करें</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>ठीक</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>अभी नहीं</xmbtext>
+ </action>
+</tooltips>

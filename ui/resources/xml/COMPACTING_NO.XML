@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Komprimere</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa komprimerer databasen for å spare diskplass. Dette kan ta noen minutter.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Komprimerer ...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

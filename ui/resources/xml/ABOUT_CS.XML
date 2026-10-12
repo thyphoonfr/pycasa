@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>O aplikaci Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Všechny ostatní produkty, názvy služeb, obchodní značky nebo ochranné známky jsou majetkem příslušných vlastníků.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Tento software je částečně založen na práci skupiny Independent JPEG Group. Tento program je chráněn autorským právem USA a mezinárodním autorským právem.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Licence třetích stran...</xmbtext>
+ </stringres>
+</resources>

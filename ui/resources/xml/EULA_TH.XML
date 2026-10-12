@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>โปรดอ่านเงื่อนไขของใบอนุญาตก่อนที่จะใช้ Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>เมื่อใช้ Picasa จะถือว่าคุณยอมรับข้อกำหนดในการให้บริการและนโยบายส่วนบุคคลของ Google</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>ข้อกำหนดในการให้บริการ</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>นโยบายส่วนบุคคล</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>ส่งสถิติการใช้งานที่ไม่ระบุชื่อให้กับ Google (คุณสามารถเปลี่ยนการตั้งค่านี้ในภายหลัง)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>ฉันยอมรับ</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

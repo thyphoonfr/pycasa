@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>นำเข้าอัลบั้มจาก Web Albums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>รูปภาพในอัลบั้มทางเว็บที่เลือกไว้ด้านล่างจะได้รับการดาวน์โหลดเข้าสู่คอมพิวเตอร์ของคุณเมื่อคุณคลิกที่ปุ่ม ตกลง รูปภาพเหล่านี้จะได้รับการจัดระเบียบเป็นโฟลเดอร์ตามชื่ออัลบั้ม</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>คุณมีอัลบั้มทางเว็บที่ออนไลน์ 100 อัลบั้ม</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>นำเข้าอัลบั้มทั้งหมด</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>นำเข้าอัลบั้มที่เลือก:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>ชื่อ</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>วันที่</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(หมายเหตุ: ระบบจะดาวน์โหลดเฉพาะรูปภาพที่ไม่อยู่้ในคอมพิวเตอร์ของคุณอยู่แล้วเท่านั้น)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

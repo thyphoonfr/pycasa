@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>Προσθήκη &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; Κατάργηση</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>Μετακίνηση προς τα επάνω</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>Μετακίνηση προς τα κάτω</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>Επαναφορά προεπιλογών</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>Τέλος</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>Εύρεση κουμπιών στο διαδίκτυο...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>Μετακινήστε τα κουμπιά πίσω και εμπρός ανάμεσα σε δύο λίστες κάνοντας κλικ στις επιλογές &quot;Προσθήκη&quot; και &quot;Κατάργηση&quot;.  Τα κουμπιά στη λίστα &quot;Τρέχοντα Κουμπιά&quot; θα εμφανιστούν στο κάτω μέρος του Picasa στη σειρά που έχετε ορίσει εδώ.  Χρησιμοποιήστε τις επιλογές &quot;Κίνηση Επάνω&quot; και &quot;Κίνηση Κάτω&quot;, για να ρυθμίστε τη σειρά των κουμπιών.  (Η σειρά από επάνω προς τα κάτω εδώ ισοδυναμεί με τη σειρά από τα αριστερά στα δεξιά στην εφαρμογή)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>Διαθέσιμα κουμπιά:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>Τρέχοντα κουμπιά:</xmbtext>
+ </action>
+</tooltips>

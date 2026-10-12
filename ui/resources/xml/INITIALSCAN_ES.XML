@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>La versión de Picasa instalada no es la más reciente. ¿Quieres actualizar la biblioteca de imágenes existente o volver a buscar imágenes en el equipo?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Elige entre las siguientes opciones:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Actualizar mi biblioteca de imágenes existente</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Elige esta opción si utilizas palabras clave o álbumes personalizados en Picasa 1 y si deseas mantenerlos en Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Volver a buscar imágenes en el equipo</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Selecciona esta opción para que Picasa realice una exploración más completa del equipo, incluyendo información ampliada de las imágenes. Las modificaciones y la organización de los elementos se conservarán, pero no las palabras clave. Este proceso puede tardar varios minutos.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>La búsqueda de imágenes no mueve ni copia archivos en ubicaciones nuevas. Puedes elegir las carpetas que quieres que Picasa muestre mediante la herramienta Administrador de carpetas (disponible en el menú Herramientas).</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continuar</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa está listo para buscar imágenes en el equipo.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Elige entre las siguientes opciones:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Buscar imágenes en todo el equipo</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Elige esta opción si tienes imágenes almacenadas en varias carpetas del equipo, sobre todo si tienes imágenes en más de un disco duro.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Buscar solo en Documentos, Imágenes, el escritorio y la biblioteca de iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Elige esta opción si solo guardas tus imágenes en estas carpetas.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>La búsqueda de imágenes no mueve ni copia archivos en ubicaciones nuevas. Puedes elegir las carpetas que quieres que Picasa muestre mediante la herramienta Administrador de carpetas (disponible en el menú Herramientas).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continuar</xmbtext>
+ </action>
+</tooltips>

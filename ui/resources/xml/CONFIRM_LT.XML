@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Pranešimas</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Daugiau neklausti</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Taip</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Ne</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

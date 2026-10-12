@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Pomocí rychlých tagů můžete přiřadit tag jediným kliknutím. Níže zadejte tagy, ke kterým chcete mít přístup jedním kliknutím. Ve výchozím nastavení jsou dva horní rychlé tagy použity ke sledování nedávno použitých tagů. Pokud chcete horní dva tagy nastavit ručně, zrušte zaškrtnutí políčka níže.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Automaticky vyplnit prázdná pole nahoře pomocí běžně používaných tagů</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Vyhradit dvě horní tlačítka pro nedávno použité tagy</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Zrušit</xmbtext>
+ </action>
+</tooltips>

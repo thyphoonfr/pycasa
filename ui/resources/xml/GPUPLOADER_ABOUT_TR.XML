@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Google Fotoğraflar Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Google Fotoğraflar Yedekleme sürüm %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Telif Hakkı 2015, Google Inc. Tüm hakları saklıdır.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Bu yazılım kısmen, Independent JPEG Group&#039;un çalışmasını temel almaktadır. Bu program ABD ve uluslararası telif hakkı yasalarıyla korunmaktadır.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>Tamam</xmbtext>
+ </stringres>
+</resources>

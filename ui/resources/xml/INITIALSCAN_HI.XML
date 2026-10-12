@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Picasa का एक पुराना वर्शन स्थापित है.  क्या आप अपनी मौजूदा चित्र लाइब्रेरी अपडेट करना चाहेंगे, या चित्रों के लिए अपने कंप्यूटर की दोबारा जांच करना चाहेंगे?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>कृपया निम्न विकल्पों से चुनें:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>मेरी मौजूदा चित्र लाइब्रेरी अपडेट करें</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>अगर आप Picasa 1 में कीवर्ड या कस्टम एल्बम का उपयोग करते हैं, और इन्हें Picasa 3 में संरक्षित करना चाहते हैं तो यह विकल्प चुनें.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>चित्रों के लिए मेरे कंप्यूटर पर फिर से खोजें</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>अपने कंप्यूटर के अधिक पूर्ण खोज के लिए यह विकल्प चुनें, जिसमें विस्तृत चित्र जानकारी शामिल होती है.  यह आपके मौजूदा संपादनों और संगठन को तो संरक्षित रखेगा, लेकिन यह कीवर्ड को संरक्षित नहीं रखेगा.  इस खोज में कुछ मिनट लग सकते हैं.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>चित्रों को खोजना फ़ाइलों को कभी भी नए स्थानों पर नहीं ले जाता है या उनकी प्रतिलिपि नहीं बनाता है. आप फ़ोल्डर प्रबंधक टूल (टूल मेनू से उपलब्ध) का उपयोग करके, यह चुन सकते हैं कि Picasa द्वारा कौन-से फ़ोल्डर प्रदर्शित किए जाएं</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>जारी रखें</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa आपके कंप्यूटर पर चित्र खोजने के लिए तैयार है</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>कृपया निम्न विकल्पों से चुनें:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>चित्रों के लिए मेरा पूरा कंप्यूटर खोजें</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>अगर आपने अपने कंप्यूटर में चित्रों को विभिन्न फ़ोल्डर में संगृहीत किया है, विशेष रूप से अगर आपने चित्रों को एक से अधिक हार्ड ड्राइव पर संगृहीत किया है, तो इस विकल्प को चुनें.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>केवल दस्तावेज़, चित्र, डेस्कटॉप, और iPhoto लाइब्रेरी खोजें</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>अगर आप केवल इन फ़ोल्डर में अपने चित्र संगृहीत करते हैं, तो यह विकल्प चुनें.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>चित्रों को खोजना फ़ाइलों को कभी भी नए स्थानों पर नहीं ले जाता है या उनकी प्रतिलिपि नहीं बनाता है. आप फ़ोल्डर प्रबंधक टूल (टूल मेनू से उपलब्ध) का उपयोग करके, यह चुन सकते हैं कि Picasa में कौन-से फ़ोल्डर प्रदर्शित किए जाएं</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>जारी रखें</xmbtext>
+ </action>
+</tooltips>

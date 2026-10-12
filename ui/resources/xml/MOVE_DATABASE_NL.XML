@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Database verplaatsen</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>U moet Picasa opnieuw opstarten om de wijzigingen door te voeren.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Opmerking: U moet een back-up maken van uw database voordat u deze experimentele functie uitprobeert. Verplaats uw database NOOIT naar een netwerk of een verwisselbare of externe schijf, zodat er geen gegevens verloren kunnen gaan.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Huidige locatie van de database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nieuwe locatie van de database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Bladeren...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Standaard</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Verplaatsen bij volgende keer opnieuw starten</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

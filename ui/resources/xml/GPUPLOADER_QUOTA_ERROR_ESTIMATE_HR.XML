@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Automatska izrada sigurnosnih kopija usluge Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Nema mjesta za pohranu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Odabrali ste mape koje zauzimaju više prostora od preostalog prostora za pohranu na usluzi Google disk. Možete kupiti dodatni prostor za pohranu ili besplatno izrađivati sigurnosne kopije neograničenog broja fotografija i videozapisa standardne veličine.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Ako ste upravo kupili prostor za pohranu, može proći nekoliko minuta dok promjene ne stupe na snagu.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Kupnja dodatnog prostora za pohranu...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Prebaci se na standardnu veličinu</xmbtext>
+ </stringres>
+</resources>

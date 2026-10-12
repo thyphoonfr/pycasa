@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Adatbázis áthelyezése</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>A módosítások érvénybe léptetéséhez újra kell indítania a Picasa szolgáltatást.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Megjegyzés: E kísérleti funkció kipróbálása előtt ajánlatos biztonsági másolatot készíteni az adatbázisról. SOHA ne helyezze át az adatbázist hálózatra, illetve cserélhető vagy külső meghajtóra, mert úgy adatokat veszíthet.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Adatbázis aktuális helye:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Adatbázis új helye:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Tallózás...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Alapbeállítás</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Áthelyezés a következő újraindításkor</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

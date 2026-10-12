@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Scrieţi etichetele de chipuri</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Scrierea etichetelor de chipuri sau scrierea tuturor etichetelor poate dura mai mult timp.  Dacă înregistrarea este setată ca detaliată sau avansată, fişierul network.log va conţine mesaje despre fişierele doar în citire care s-ar putea să nu fie actualizate.  Se recomandă deconectarea în timpul utilizării acestei funcţii.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Scrieţi etichetele selectate</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Scrieţi etichetele de chipuri</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Scrieţi-le pe toate</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

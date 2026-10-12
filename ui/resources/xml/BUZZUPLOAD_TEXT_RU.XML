@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="buzzupload/uploadinfo" xmbdesc="Text(buzzupload/uploadinfo)">
+  <xmbtext>Проверка подключения к Интернету...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/webalbumstext" xmbdesc="Text(buzzupload/webalbumstext)">
+  <xmbtext>Обновление списка веб-альбомов...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/upload_label" xmbdesc="Text(buzzupload/upload_label)">
+  <xmbtext>Добавить в этот альбом:</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/uploadsize_label" xmbdesc="Text(buzzupload/uploadsize_label)">
+  <xmbtext>Размер добавляемых файлов</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/newalbum2" xmbdesc="Label(buzzupload/newalbum2)">
+  <xmbtext>Новый</xmbtext>
+ </action>
+ <action type="Tooltip" target="buzzupload/newalbum2" xmbdesc="Tooltip(buzzupload/newalbum2)">
+  <xmbtext>Изменить название нового альбома</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/ok" xmbdesc="Label(buzzupload/ok)">
+  <xmbtext>Загрузить</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/cancel" xmbdesc="Label(buzzupload/cancel)">
+  <xmbtext>Отмена</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/desclabel" xmbdesc="Text(buzzupload/desclabel)">
+  <xmbtext>Описание</xmbtext>
+ </action>
+ <action type="Text1" target="buzzupload/comments_label" xmbdesc="Text1(buzzupload/comments_label)">
+  <xmbtext>Сообщение электронной почты</xmbtext>
+ </action>
+ <action type="Text2" target="buzzupload/comments_label" xmbdesc="Text2(buzzupload/comments_label)">
+  <xmbtext>[Необязательно] Делитесь фотографиями в Google+? Введите текст…</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/options_label" xmbdesc="Label(buzzupload/options_label)">
+  <xmbtext>Размер файлов</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/visibility_label" xmbdesc="Label(buzzupload/visibility_label)">
+  <xmbtext>Видимость альбома</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/collab_label" xmbdesc="Label(buzzupload/collab_label)">
+  <xmbtext>Разрешить этим пользователям добавлять фотографии в альбом</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/also_send_email_label" xmbdesc="Label(buzzupload/also_send_email_label)">
+  <xmbtext>Уведомить по электронной почте</xmbtext>
+ </action>
+</tooltips>

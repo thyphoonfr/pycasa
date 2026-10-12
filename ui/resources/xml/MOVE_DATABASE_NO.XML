@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Flytt database</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Du må starte Picasa på nytt for at endringene skal tre i kraft.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Merk: Du bør ta sikkerhetskopi av databasen før du prøver denne eksperimentelle funksjonen. Du må ALDRI flytte databasen til et nettverk eller en flyttbar eller ekstern stasjon. Da kan du miste data.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Nåværende databaseplassering:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Ny databaseplassering:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Bla gjennom ...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Standard</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Flytt ved neste omstart</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

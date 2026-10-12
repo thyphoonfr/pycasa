@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Backup ng Google Photos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>1 GB ng storage ng Google Drive ang natitira</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Kumuha ng higit pang storage upang patuloy na i-back up ang iyong mga orihinal na larawan sa buong resolution. Kung hindi naman, lumipat sa mataas na kalidad para sa libre at walang limitasyong storage: de-kalidad na visual sa mas mababang laki ng file.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Humingi ng tulong sa pagpapasya</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Kumuha ng higit pang storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Lumipat sa mataas na kalidad</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>名前:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>日付:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>自動日付</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>音楽:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>スライドショーとムービーに音楽を使用:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>参照...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>撮影場所（オプション）:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>説明（オプション）:</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

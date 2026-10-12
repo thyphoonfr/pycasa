@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>जोड़ें &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; निकालें</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>ऊपर ले जाएं</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>नीचे ले जाएं</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>सामान्य पर रीसेट करें</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>संपन्न</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>ठीक</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>अभी नहीं</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>बटन ऑनलाइन ढूंढें...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>&quot;जोड़ें&quot; और &quot;निकालें&quot; पर क्लिक करके बटन दो सूचियों के बीच पीछे और आगे ले जाएं.  &quot;मौजूदा बटन&quot; सूची के बटन Picasa के निचले हिस्से में उसी क्रम में दिखाई देंगे जिसमें आप उन्हें यहां देंगे.  बटनों का क्रम व्यवस्थित करने के लिए &quot;ऊपर ले जाएं&quot; और &quot;नीचे ले जाएं&quot; का उपयोग करें.  (बाएं-से-दाएं यहां ऐप्स  में ऊपर-से-नीचे के समान हैं)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>उपलब्ध बटन:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>वर्तमान बटन:</xmbtext>
+ </action>
+</tooltips>

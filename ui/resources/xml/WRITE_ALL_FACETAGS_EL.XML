@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Καταχώριση ετικετών προσώπου</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Η καταχώριση προσώπων ή η καταχώριση όλων ενδέχεται να διαρκέσει πολύ. Αν η καταγραφή στοιχείων έχει οριστεί σε λεπτομερή ή σε υψηλότερη ρύθμιση, το αρχείο καταγραφής δικτύου θα περιέχει μηνύματα σχετικά με αρχεία μόνο για ανάγνωση, η ενημέρωση των οποίων δεν ήταν δυνατή. Συνιστάται να αποσυνδέεστε όταν χρησιμοποιείτε αυτήν τη λειτουργία.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Καταχώριση επιλεγμένων</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Καταχώριση προσώπων</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Καταχώριση όλων</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

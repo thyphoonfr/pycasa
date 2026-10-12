@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_mail/to_text" xmbdesc="Label(compose_mail/to_text)">
+  <xmbtext>Til:</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/subject_text" xmbdesc="Label(compose_mail/subject_text)">
+  <xmbtext>Emne:</xmbtext>
+ </action>
+ <action type="Tooltip" target="compose_mail/discardimage" xmbdesc="Tooltip(compose_mail/discardimage)">
+  <xmbtext>Fjern valgt bilde fra vedlegg</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/changeuser" xmbdesc="Label(compose_mail/changeuser)">
+  <xmbtext>Endre bruker</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/send" xmbdesc="Label(compose_mail/send)">
+  <xmbtext>Send</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discard" xmbdesc="Label(compose_mail/discard)">
+  <xmbtext>Forkast</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/sendb" xmbdesc="Label(compose_mail/sendb)">
+  <xmbtext>Send</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discardb" xmbdesc="Label(compose_mail/discardb)">
+  <xmbtext>Forkast</xmbtext>
+ </action>
+</tooltips>

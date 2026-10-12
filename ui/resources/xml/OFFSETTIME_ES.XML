@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Ajustar fecha de la foto</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Fecha de la foto actual: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Fecha nueva de la foto: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Ajustar las fechas de todas las fotos por la cantidad de tiempo</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Configurar todas las fotos en la misma fecha y hora</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

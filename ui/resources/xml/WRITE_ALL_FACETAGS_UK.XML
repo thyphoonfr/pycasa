@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Записування тегів імен</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Записування тегів імен або записування всіх даних може тривати певний час. Якщо для запису подій указано детальний режим або вищий, файл network.log міститиме повідомлення про файли &quot;лише для читання&quot;, які не вдалося оновити. Для використання цієї функції рекомендовано вийти з облікового запису.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Записати вибрані елементи</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Записати теги імен</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Записати все</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

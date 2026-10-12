@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Κλείσιμο</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Καλώς ορίσατε στη μαζική μεταφόρτωση</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Επιλέξτε τα πλαίσια που υπάρχουν δίπλα από τους φακέλους και τα λευκώματα τα οποία θέλετε να επεξεργαστείτε. Στη συνέχεια, επιλέξτε την ενέργεια που θέλετε να κάνετε. Το Picasa θα φιλτράρει τα αντικείμενα στα οποία δεν είναι δυνατό να εφαρμοστεί η λειτουργία. Για παράδειγμα, εάν ένας φάκελος ή λεύκωμα βρίσκεται ήδη στο διαδίκτυο, το Picasa δεν θα το εμφανίσει ως επιλογή για μεταφόρτωση.</xmbtext>
+ </action>
+</tooltips>

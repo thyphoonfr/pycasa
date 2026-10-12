@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="makemoviepanel/rewind" xmbdesc="Label(makemoviepanel/rewind)">
+  <xmbtext>Quay lại trang trình bày đã chọn</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addclips" xmbdesc="Tooltip(makemoviepanel/addclips)">
+  <xmbtext>Tải clip khác từ Thư viện Ảnh</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addtomovie" xmbdesc="Tooltip(makemoviepanel/addtomovie)">
+  <xmbtext>Thêm (các) clip đã chọn vào cuối phim</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/deleteclips" xmbdesc="Tooltip(makemoviepanel/deleteclips)">
+  <xmbtext>Xóa (các) đoạn phim đã chọn khỏi khay</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/durationslider_label" xmbdesc="Label(makemoviepanel/durationslider_label)">
+  <xmbtext>Thời lượng trình chiếu</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/lengthslider_label" xmbdesc="Label(makemoviepanel/lengthslider_label)">
+  <xmbtext>Tổng số ảnh</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/burstslider_label" xmbdesc="Label(makemoviepanel/burstslider_label)">
+  <xmbtext>Không lọc theo thời gian chụp</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transitionslider_label" xmbdesc="Label(makemoviepanel/transitionslider_label)">
+  <xmbtext>Xếp chồng</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/export_youtube" xmbdesc="Label(makemoviepanel/export_youtube)">
+  <xmbtext>YT</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/render" xmbdesc="Label(makemoviepanel/render)">
+  <xmbtext>Tạo phim</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/cancel" xmbdesc="Label(makemoviepanel/cancel)">
+  <xmbtext>Đóng</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/recompute" xmbdesc="Label(makemoviepanel/recompute)">
+  <xmbtext>Áp dụng</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab1" xmbdesc="Label(makemoviepanel/tab1)">
+  <xmbtext>Phim</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/moviesize_label" xmbdesc="Label(makemoviepanel/moviesize_label)">
+  <xmbtext>Kích thước</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/show_captions_label" xmbdesc="Label(makemoviepanel/show_captions_label)">
+  <xmbtext>Hiển thị chú thích</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/crop_to_fit_label" xmbdesc="Label(makemoviepanel/crop_to_fit_label)">
+  <xmbtext>Cắt ảnh có khung đầy đủ</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_low_res_faces_label" xmbdesc="Label(makemoviepanel/remove_low_res_faces_label)">
+  <xmbtext>Xóa khuôn mặt có độ  phân giải thấp</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/ordering_header_label" xmbdesc="Label(makemoviepanel/ordering_header_label)">
+  <xmbtext>Sắp thứ tự trang trình bày:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/smart_order_label" xmbdesc="Label(makemoviepanel/smart_order_label)">
+  <xmbtext>Chuyển tuyến tốt nhất</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/album_order_label" xmbdesc="Label(makemoviepanel/album_order_label)">
+  <xmbtext>Thứ tự album</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/chronological_order_label" xmbdesc="Label(makemoviepanel/chronological_order_label)">
+  <xmbtext>Theo trình tự thời gian</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/audio_label" xmbdesc="Label(makemoviepanel/audio_label)">
+  <xmbtext>Bài hát:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/add_audio" xmbdesc="Label(makemoviepanel/add_audio)">
+  <xmbtext>Tải...</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_audio" xmbdesc="Label(makemoviepanel/remove_audio)">
+  <xmbtext>Xóa</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/aoptions_label" xmbdesc="Label(makemoviepanel/aoptions_label)">
+  <xmbtext>Tùy chọn</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transtype_label" xmbdesc="Label(makemoviepanel/transtype_label)">
+  <xmbtext>Kiểu chuyển đổi</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab2" xmbdesc="Label(makemoviepanel/tab2)">
+  <xmbtext>Trình chiếu</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Đoạn phim</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>Đoạn phim</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/font_label" xmbdesc="Label(makemoviepanel/font_label)">
+  <xmbtext>Phông chữ:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/size_label" xmbdesc="Label(makemoviepanel/size_label)">
+  <xmbtext>Kích thước:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/style_label" xmbdesc="Label(makemoviepanel/style_label)">
+  <xmbtext>Kiểu:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/templatetext" xmbdesc="Label(makemoviepanel/templatetext)">
+  <xmbtext>Mẫu:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/text_color_label" xmbdesc="Label(makemoviepanel/text_color_label)">
+  <xmbtext>Màu chữ</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/back_color_label" xmbdesc="Label(makemoviepanel/back_color_label)">
+  <xmbtext>Màu nền</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/addclips" xmbdesc="Label(makemoviepanel/addclips)">
+  <xmbtext>Tải Thêm...</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/bold" xmbdesc="Tooltip(makemoviepanel/bold)">
+  <xmbtext>Đậm</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/italic" xmbdesc="Tooltip(makemoviepanel/italic)">
+  <xmbtext>Nghiêng</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/outline" xmbdesc="Tooltip(makemoviepanel/outline)">
+  <xmbtext>Tạo viền tự động (giống phụ đề phim)</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/insert_slide" xmbdesc="Tooltip(makemoviepanel/insert_slide)">
+  <xmbtext>Thêm trang trình bày văn bản mới</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_slide" xmbdesc="Tooltip(makemoviepanel/remove_slide)">
+  <xmbtext>Xóa trang trình bày đã chọn</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/add_audio" xmbdesc="Tooltip(makemoviepanel/add_audio)">
+  <xmbtext>Thêm bài hát vào phim này</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_audio" xmbdesc="Tooltip(makemoviepanel/remove_audio)">
+  <xmbtext>Xóa bài hát</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/render" xmbdesc="Tooltip(makemoviepanel/render)">
+  <xmbtext>Tạo phim, rồi đi đến chế độ Chỉnh sửa</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/export_youtube" xmbdesc="Tooltip(makemoviepanel/export_youtube)">
+  <xmbtext>Tạo phim, sau đó tải lên YouTube</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/cancel" xmbdesc="Tooltip(makemoviepanel/cancel)">
+  <xmbtext>Đóng bảng điều khiển Trình làm Phim</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/recompute" xmbdesc="Tooltip(makemoviepanel/recompute)">
+  <xmbtext>Tạo chuỗi mới</xmbtext>
+ </action>
+</tooltips>

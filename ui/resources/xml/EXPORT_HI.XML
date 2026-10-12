@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>फ़ोल्डर में निर्यात करें</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>निर्यात स्थान:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>ब्राउज़ करें...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>निर्यात किए गए फ़ोल्डर का नाम:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>क्रम बनाए रखने के लिए फ़ाइल नामों में संख्याएं जोड़ें</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>चित्र आकार:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>मूल आकार का उपयोग करें</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>इस आकार में बदलें:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>पिक्सेल</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>चित्र गुणवत्ता:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>स्वचालित</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>सामान्य</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>अधिकतम</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>न्यूनतम</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>कस्टम</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>मूल चित्र की गुणवत्ता बनाए रखता है</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>गुणवत्ता और आकार का अच्छा संतुलन</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>बहुत बड़ा फ़ाइल आकार, सूक्ष्‍म विवरण सुरक्षित रखता है</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>सबसे छोटा फ़ाइल आकार, गुणवत्ता में कुछ कमी</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>इसका उपयोग करके मूवी निर्यात करें:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>पहला फ़्रेम</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>पूर्ण मूवी (कोई आकार परिवर्तन नहीं)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>वॉटरमार्क:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>वॉटरमार्क जोड़ें</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>फ़ोटो पर अपने नाम, वेब डोमेन या कॉपीराइट सूचना की मुहर लगाएं.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>निर्यात करें</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="makemoviepanel/rewind" xmbdesc="Label(makemoviepanel/rewind)">
+  <xmbtext>선택한 슬라이드로 돌아가기</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addclips" xmbdesc="Tooltip(makemoviepanel/addclips)">
+  <xmbtext>사진 라이브러리에서 더 많은 클립을 가져옵니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/addtomovie" xmbdesc="Tooltip(makemoviepanel/addtomovie)">
+  <xmbtext>선택한 클립을 동영상의 끝에 추가합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/deleteclips" xmbdesc="Tooltip(makemoviepanel/deleteclips)">
+  <xmbtext>임시 사진첩에서 선택한 클립을 제거합니다.</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/durationslider_label" xmbdesc="Label(makemoviepanel/durationslider_label)">
+  <xmbtext>슬라이드 표시간격</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/lengthslider_label" xmbdesc="Label(makemoviepanel/lengthslider_label)">
+  <xmbtext>전체 사진</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/burstslider_label" xmbdesc="Label(makemoviepanel/burstslider_label)">
+  <xmbtext>촬영 시간 기준으로 필터링 안함</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transitionslider_label" xmbdesc="Label(makemoviepanel/transitionslider_label)">
+  <xmbtext>오버랩</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/export_youtube" xmbdesc="Label(makemoviepanel/export_youtube)">
+  <xmbtext>YT</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/render" xmbdesc="Label(makemoviepanel/render)">
+  <xmbtext>동영상 만들기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/cancel" xmbdesc="Label(makemoviepanel/cancel)">
+  <xmbtext>닫기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/recompute" xmbdesc="Label(makemoviepanel/recompute)">
+  <xmbtext>적용</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab1" xmbdesc="Label(makemoviepanel/tab1)">
+  <xmbtext>동영상</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/moviesize_label" xmbdesc="Label(makemoviepanel/moviesize_label)">
+  <xmbtext>크기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/show_captions_label" xmbdesc="Label(makemoviepanel/show_captions_label)">
+  <xmbtext>설명 보기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/crop_to_fit_label" xmbdesc="Label(makemoviepanel/crop_to_fit_label)">
+  <xmbtext>전체 프레임 사진 잘라내기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_low_res_faces_label" xmbdesc="Label(makemoviepanel/remove_low_res_faces_label)">
+  <xmbtext>저해상도 얼굴 삭제</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/ordering_header_label" xmbdesc="Label(makemoviepanel/ordering_header_label)">
+  <xmbtext>슬라이드 순서 정하기:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/smart_order_label" xmbdesc="Label(makemoviepanel/smart_order_label)">
+  <xmbtext>최고의 전환</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/album_order_label" xmbdesc="Label(makemoviepanel/album_order_label)">
+  <xmbtext>앨범 순서</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/chronological_order_label" xmbdesc="Label(makemoviepanel/chronological_order_label)">
+  <xmbtext>시간 순서대로</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/audio_label" xmbdesc="Label(makemoviepanel/audio_label)">
+  <xmbtext>오디오 트랙:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/add_audio" xmbdesc="Label(makemoviepanel/add_audio)">
+  <xmbtext>로드 중...</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/remove_audio" xmbdesc="Label(makemoviepanel/remove_audio)">
+  <xmbtext>비우기</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/aoptions_label" xmbdesc="Label(makemoviepanel/aoptions_label)">
+  <xmbtext>옵션</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/transtype_label" xmbdesc="Label(makemoviepanel/transtype_label)">
+  <xmbtext>전환 스타일</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab2" xmbdesc="Label(makemoviepanel/tab2)">
+  <xmbtext>슬라이드</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>클립</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/tab3" xmbdesc="Label(makemoviepanel/tab3)">
+  <xmbtext>클립</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/font_label" xmbdesc="Label(makemoviepanel/font_label)">
+  <xmbtext>글꼴:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/size_label" xmbdesc="Label(makemoviepanel/size_label)">
+  <xmbtext>크기:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/style_label" xmbdesc="Label(makemoviepanel/style_label)">
+  <xmbtext>스타일:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/templatetext" xmbdesc="Label(makemoviepanel/templatetext)">
+  <xmbtext>템플릿:</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/text_color_label" xmbdesc="Label(makemoviepanel/text_color_label)">
+  <xmbtext>글꼴색상</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/back_color_label" xmbdesc="Label(makemoviepanel/back_color_label)">
+  <xmbtext>배경색상</xmbtext>
+ </action>
+ <action type="Label" target="makemoviepanel/addclips" xmbdesc="Label(makemoviepanel/addclips)">
+  <xmbtext>더 가져오기...</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/bold" xmbdesc="Tooltip(makemoviepanel/bold)">
+  <xmbtext>굵게</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/italic" xmbdesc="Tooltip(makemoviepanel/italic)">
+  <xmbtext>기울임꼴</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/outline" xmbdesc="Tooltip(makemoviepanel/outline)">
+  <xmbtext>자동 외곽선(예: 동영상 설명)</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/insert_slide" xmbdesc="Tooltip(makemoviepanel/insert_slide)">
+  <xmbtext>새 텍스트 슬라이드를 추가합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_slide" xmbdesc="Tooltip(makemoviepanel/remove_slide)">
+  <xmbtext>선택한 슬라이드를 삭제합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/add_audio" xmbdesc="Tooltip(makemoviepanel/add_audio)">
+  <xmbtext>동영상에 오디오 트랙 추가</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/remove_audio" xmbdesc="Tooltip(makemoviepanel/remove_audio)">
+  <xmbtext>오디오 트랙을 제거합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/render" xmbdesc="Tooltip(makemoviepanel/render)">
+  <xmbtext>동영상을 만들고 수정 모드로 이동합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/export_youtube" xmbdesc="Tooltip(makemoviepanel/export_youtube)">
+  <xmbtext>동영상을 만든 다음 YouTube에 업로드합니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/cancel" xmbdesc="Tooltip(makemoviepanel/cancel)">
+  <xmbtext>동영상 메이커 패널을 닫습니다.</xmbtext>
+ </action>
+ <action type="Tooltip" target="makemoviepanel/recompute" xmbdesc="Tooltip(makemoviepanel/recompute)">
+  <xmbtext>순서 변경</xmbtext>
+ </action>
+</tooltips>

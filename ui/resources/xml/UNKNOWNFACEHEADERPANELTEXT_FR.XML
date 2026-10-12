@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="unknownfaceheaderpanel/cluster" xmbdesc="Label(unknownfaceheaderpanel/cluster)">
+  <xmbtext>Grouper par visage</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showall" xmbdesc="Label(unknownfaceheaderpanel/showall)">
+  <xmbtext>Développer les groupes</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showignored" xmbdesc="Label(unknownfaceheaderpanel/showignored)">
+  <xmbtext>Afficher les visages ignorés</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showunknown" xmbdesc="Label(unknownfaceheaderpanel/showunknown)">
+  <xmbtext>Retour au panneau des visages sans nom</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/addname" xmbdesc="Label(unknownfaceheaderpanel/addname)">
+  <xmbtext>Ajouter un nom</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/addname" xmbdesc="Tooltip(unknownfaceheaderpanel/addname)">
+  <xmbtext>Donner un nom à tous les visages sélectionnés</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/ignore" xmbdesc="Label(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignorer la sélection</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/ignore" xmbdesc="Tooltip(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignorer tous les visages sélectionnés</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Win32Res>
+ <RT_DIALOG>
+  <res resid="#145">
+   <dtitle>
+    <xmbtext>Picasa – informacje</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 435 293)</dlayout>
+   <item itemid="1056" itemtype="Static" layout="rect(0 0 20 20)"/>
+   <item itemid="-1" itemtype="Static" layout="rect(9 171 427 258)">
+    <xmbtext>Wstawiono z IDS_ABOUT w tabeli ciągów</xmbtext>
+   </item>
+   <item itemid="-2" itemtype="Static" layout="rect(9 260 109 268)">
+    <xmbtext>Licencje innych firm</xmbtext>
+   </item>
+   <item itemid="1" itemtype="Button" layout="rect(193 272 243 286)">
+    <xmbtext>OK</xmbtext>
+   </item>
+   <item itemid="1086" itemtype="Edit" layout="rect(6 7 429 227)"/>
+  </res>
+  <res resid="#198">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 95)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 74 179 88)">
+    <xmbtext>Anuluj</xmbtext>
+   </item>
+   <item itemid="1164" itemtype="Static" layout="rect(31 7 179 49)">
+    <xmbtext>Program Picasa zmniejsza rozmiar swojej bazy danych, aby zaoszczędzić miejsce na dysku. Może to potrwać kilka minut.</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(31 45 179 62)"/>
+  </res>
+  <res resid="#211">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 71)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 50 179 64)">
+    <xmbtext>Anuluj</xmbtext>
+   </item>
+   <item itemid="1163" itemtype="Static" layout="rect(31 7 179 32)">
+    <xmbtext>Replikowanie</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(14 42 123 58)">
+    <xmbtext>Trwa aktualizowanie...</xmbtext>
+   </item>
+  </res>
+  <res resid="#323">
+   <dtitle>
+    <xmbtext>Statystyki użytkowania</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 276 116)</dlayout>
+   <item itemid="1" itemtype="Button" layout="rect(7 88 161 102)">
+    <xmbtext>Tak, wyślij statystyki</xmbtext>
+   </item>
+   <item itemid="2" itemtype="Button" layout="rect(170 88 269 102)">
+    <xmbtext>Nie, dziękuję</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(30 34 269 62)">
+    <xmbtext>Czy chcesz pomóc jeszcze bardziej udoskonalić program Picasa, wyrażając zgodę na automatycznie wysyłanie anonimowych statystyk użytkowania do firmy Google?</xmbtext>
+   </item>
+   <item itemid="1316" itemtype="Static" layout="rect(163 69 269 77)">
+    <xmbtext>Prywatność...</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(37 13 193 21)">
+    <xmbtext>Pomóż w ulepszaniu programu Picasa</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 28 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+  </res>
+ </RT_DIALOG>
+</Win32Res>

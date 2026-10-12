@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="headerpanel/view_online" xmbdesc="Label(headerpanel/view_online)">
+  <xmbtext>Xem trên Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/select_star" xmbdesc="Tooltip(headerpanel/select_star)">
+  <xmbtext>Chọn ảnh có gắn dấu sao</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/sync_label" xmbdesc="Label(headerpanel/sync_label)">
+  <xmbtext>Đồng bộ hóa với Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync1" xmbdesc="Tooltip(headerpanel/websync1)">
+  <xmbtext>Dừng đồng bộ hóa thay đổi với web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync0" xmbdesc="Tooltip(headerpanel/websync0)">
+  <xmbtext>Tải lên và đồng bộ hóa các thay đổi trong tương lai với web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/sync_options" xmbdesc="Tooltip(headerpanel/sync_options)">
+  <xmbtext>Tùy chọn trực tuyến</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_movie" xmbdesc="Tooltip(headerpanel/create_movie)">
+  <xmbtext>Tạo phần Giới thiệu Phim</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_collage" xmbdesc="Tooltip(headerpanel/create_collage)">
+  <xmbtext>Tạo ảnh ghép</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/play" xmbdesc="Tooltip(headerpanel/play)">
+  <xmbtext>Phát Trình chiếu toàn màn hình</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/share" xmbdesc="Label(headerpanel/share)">
+  <xmbtext>Tải lên</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/share" xmbdesc="Tooltip(headerpanel/share)">
+  <xmbtext>Tải album lên Google Photos</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/save_edits" xmbdesc="Tooltip(headerpanel/save_edits)">
+  <xmbtext>Lưu ảnh đã chỉnh sửa vào đĩa</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_mail/to_text" xmbdesc="Label(compose_mail/to_text)">
+  <xmbtext>Kepada:</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/subject_text" xmbdesc="Label(compose_mail/subject_text)">
+  <xmbtext>Subjek:</xmbtext>
+ </action>
+ <action type="Tooltip" target="compose_mail/discardimage" xmbdesc="Tooltip(compose_mail/discardimage)">
+  <xmbtext>Keluarkan gambar terpilih dari lampiran</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/changeuser" xmbdesc="Label(compose_mail/changeuser)">
+  <xmbtext>Ganti Pengguna</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/send" xmbdesc="Label(compose_mail/send)">
+  <xmbtext>Kirim</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discard" xmbdesc="Label(compose_mail/discard)">
+  <xmbtext>Buang</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/sendb" xmbdesc="Label(compose_mail/sendb)">
+  <xmbtext>Kirim</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discardb" xmbdesc="Label(compose_mail/discardb)">
+  <xmbtext>Buang</xmbtext>
+ </action>
+</tooltips>

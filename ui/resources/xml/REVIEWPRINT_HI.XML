@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>प्रिंट करने के लिए समीक्षा करें</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>चयनित को निकालें</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>निम्न गुणवत्ता वाली चित्र निकालें</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>चित्र का पूर्वावलोकन</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>जानकारी</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>ठीक</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

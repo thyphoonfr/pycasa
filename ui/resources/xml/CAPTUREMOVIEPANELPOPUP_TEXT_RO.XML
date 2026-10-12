@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="capturemoviepanelpopup/done" xmbdesc="Label(capturemoviepanelpopup/done)">
+  <xmbtext>Terminat</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/capture" xmbdesc="Label(capturemoviepanelpopup/capture)">
+  <xmbtext>Înregistraţi</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/stop" xmbdesc="Label(capturemoviepanelpopup/stop)">
+  <xmbtext>Opriţi</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/live_video" xmbdesc="Label(capturemoviepanelpopup/live_video)">
+  <xmbtext>Aparat foto</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/camchange" xmbdesc="Label(capturemoviepanelpopup/camchange)">
+  <xmbtext>Setări</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/capture" xmbdesc="Tooltip(capturemoviepanelpopup/capture)">
+  <xmbtext>Porniţi înregistrarea din aparatul foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/stop" xmbdesc="Tooltip(capturemoviepanelpopup/stop)">
+  <xmbtext>Opriţi înregistrarea de pe aparatul foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/live_video" xmbdesc="Tooltip(capturemoviepanelpopup/live_video)">
+  <xmbtext>Înregistraţi live din aparatul foto</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/camchange" xmbdesc="Tooltip(capturemoviepanelpopup/camchange)">
+  <xmbtext>Modificaţi setările aparatului foto</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_cancel" xmbdesc="Label(capturemoviepanelpopup/settings_cancel)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_apply" xmbdesc="Label(capturemoviepanelpopup/settings_apply)">
+  <xmbtext>Aplicaţi</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/video_label" xmbdesc="Label(capturemoviepanelpopup/video_label)">
+  <xmbtext>Videoclip</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/size_label" xmbdesc="Label(capturemoviepanelpopup/size_label)">
+  <xmbtext>Dimensiune</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/audio_label" xmbdesc="Label(capturemoviepanelpopup/audio_label)">
+  <xmbtext>Audio</xmbtext>
+ </action>
+</tooltips>

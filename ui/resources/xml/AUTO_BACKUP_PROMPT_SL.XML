@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Varnostno kopirajte svoje fotografije iz Picase</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Z aplikacijo Google Photos Backup lahko samodejno shranite svoje fotografije in videoposnetke v splet. Do elementov boste lahko dostopali v vseh svojih napravah in ostali bodo zasebni, dokler jih ne daste skupno rabo.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Prenesi Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Ne, hvala</xmbtext>
+ </stringres>
+</resources>

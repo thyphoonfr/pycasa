@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>「快速標記」功能可讓您透過單點滑鼠輕鬆套用標記，請在下方輸入您想透過單次點擊存取的標記。根據預設，頂端的兩個「快速標記」會用來追蹤最近套用的標記。取消勾選下方的核取方塊，以手動設定頂端的兩個標記。</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>運用常用的標記自動填入上面的空白方塊</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>保留頂端兩個按鈕來連結最近使用的標記</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>確定</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>取消</xmbtext>
+ </action>
+</tooltips>

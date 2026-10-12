@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="faceheaderpanel/set_thumbnail" xmbdesc="Tooltip(faceheaderpanel/set_thumbnail)">
+  <xmbtext>Albüm Küçük Resmi Olarak Ayarla</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_movie" xmbdesc="Tooltip(faceheaderpanel/create_movie)">
+  <xmbtext>Film Sunumu Oluştur</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_face_movie" xmbdesc="Tooltip(faceheaderpanel/create_face_movie)">
+  <xmbtext>Yüz Filmi Oluştur</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/create_collage" xmbdesc="Tooltip(faceheaderpanel/create_collage)">
+  <xmbtext>Fotoğraf Kolajı Oluştur</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/play" xmbdesc="Tooltip(faceheaderpanel/play)">
+  <xmbtext>Slayt Gösterisini Tam Ekran Oynat</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/pwa_button" xmbdesc="Tooltip(faceheaderpanel/pwa_button)">
+  <xmbtext>PWA web sayfasını açın</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/sug_filter" xmbdesc="Tooltip(faceheaderpanel/sug_filter)">
+  <xmbtext>Yalnızca önerileri göster (açıldığında)</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsug" xmbdesc="Label(faceheaderpanel/confirmsug)">
+  <xmbtext>Tümünü onayla</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/confirmsel" xmbdesc="Label(faceheaderpanel/confirmsel)">
+  <xmbtext>Onayla</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/removesel" xmbdesc="Label(faceheaderpanel/removesel)">
+  <xmbtext>Kaldır</xmbtext>
+ </action>
+ <action type="Label" target="faceheaderpanel/moresug" xmbdesc="Label(faceheaderpanel/moresug)">
+  <xmbtext>Daha fazla öneri bul</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/removesel" xmbdesc="Tooltip(faceheaderpanel/removesel)">
+  <xmbtext>Seçilen önerileri kaldır</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsug" xmbdesc="Tooltip(faceheaderpanel/confirmsug)">
+  <xmbtext>Tüm önerileri onayla</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/confirmsel" xmbdesc="Tooltip(faceheaderpanel/confirmsel)">
+  <xmbtext>Seçilen önerileri onayla</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/face_zoom" xmbdesc="Tooltip(faceheaderpanel/face_zoom)">
+  <xmbtext>Yüze yakınlaştırarak görüntüle</xmbtext>
+ </action>
+ <action type="Tooltip" target="faceheaderpanel/picture_zoom" xmbdesc="Tooltip(faceheaderpanel/picture_zoom)">
+  <xmbtext>Tam resme uzaklaşarak görüntüle</xmbtext>
+ </action>
+ <action type="Text" target="faceheaderpanel/sug_label" xmbdesc="Text(faceheaderpanel/sug_label)">
+  <xmbtext>Öneriler:</xmbtext>
+ </action>
+</tooltips>

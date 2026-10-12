@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadmgr/hide" xmbdesc="Label(uploadmgr/hide)">
+  <xmbtext>Skryť</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/cleanup" xmbdesc="Label(uploadmgr/cleanup)">
+  <xmbtext>Vymazať dokončené</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/pause" xmbdesc="Label(uploadmgr/pause)">
+  <xmbtext>Pozastaviť</xmbtext>
+ </action>
+ <action type="Label" target="uploadmgr/resume" xmbdesc="Label(uploadmgr/resume)">
+  <xmbtext>Pokračovať</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/nopending" xmbdesc="Text(uploadmgr/nopending)">
+  <xmbtext>Žiadna aktivita nahrávania</xmbtext>
+ </action>
+ <action type="Text" target="uploadmgr/throttletext" xmbdesc="Text(uploadmgr/throttletext)">
+  <xmbtext>Zachovať rýchlosť pripojenia</xmbtext>
+ </action>
+</tooltips>

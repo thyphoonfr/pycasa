@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="edittextpanel/edittext_label" xmbdesc="Label(edittextpanel/edittext_label)">
+  <xmbtext>Text bearbeiten</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/font_label" xmbdesc="Label(edittextpanel/font_label)">
+  <xmbtext>Schriftart:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/size_label" xmbdesc="Label(edittextpanel/size_label)">
+  <xmbtext>Größe:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/style_label" xmbdesc="Label(edittextpanel/style_label)">
+  <xmbtext>Stil:</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextapply" xmbdesc="Label(edittextpanel/edittextapply)">
+  <xmbtext>Übernehmen</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/edittextcancel" xmbdesc="Label(edittextpanel/edittextcancel)">
+  <xmbtext>Abbrechen</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/usecaption" xmbdesc="Label(edittextpanel/usecaption)">
+  <xmbtext>Bildunterschrift kopieren</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/usecaption" xmbdesc="Tooltip(edittextpanel/usecaption)">
+  <xmbtext>Text basierend auf Bildunterschrift hinzufügen</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/clearall" xmbdesc="Label(edittextpanel/clearall)">
+  <xmbtext>Alles löschen</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/clearall" xmbdesc="Tooltip(edittextpanel/clearall)">
+  <xmbtext>Vorhandenen Text vollständig entfernen</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/transparency_label" xmbdesc="Label(edittextpanel/transparency_label)">
+  <xmbtext>Transparenz</xmbtext>
+ </action>
+ <action type="Label" target="edittextpanel/align_label" xmbdesc="Label(edittextpanel/align_label)">
+  <xmbtext>Ausrichtung:</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/leftalign" xmbdesc="Tooltip(edittextpanel/leftalign)">
+  <xmbtext>Text links ausrichten</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/centeralign" xmbdesc="Tooltip(edittextpanel/centeralign)">
+  <xmbtext>Text zentrieren</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/rightalign" xmbdesc="Tooltip(edittextpanel/rightalign)">
+  <xmbtext>Text rechts ausrichten</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/no_fill" xmbdesc="Tooltip(edittextpanel/no_fill)">
+  <xmbtext>Deckende Füllfarbe nicht anzeigen (nur Konturen anzeigen)</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/bold" xmbdesc="Tooltip(edittextpanel/bold)">
+  <xmbtext>Fett</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/italic" xmbdesc="Tooltip(edittextpanel/italic)">
+  <xmbtext>Kursiv</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/underline" xmbdesc="Tooltip(edittextpanel/underline)">
+  <xmbtext>Unterstrichen</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextapply" xmbdesc="Tooltip(edittextpanel/edittextapply)">
+  <xmbtext>Textänderungen anwenden und Texttool beenden</xmbtext>
+ </action>
+ <action type="Tooltip" target="edittextpanel/edittextcancel" xmbdesc="Tooltip(edittextpanel/edittextcancel)">
+  <xmbtext>Texttool beenden, ohne Änderungen anzuwenden</xmbtext>
+ </action>
+</tooltips>

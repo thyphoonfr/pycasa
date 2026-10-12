@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Chiudi</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Ulteriori informazioni...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Benvenuti nell&#039;album delle persone senza nome. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Man mano che Picasa esegue una scansione delle tue foto, i volti che trova vengono raggruppati automaticamente, in modo che tu possa indicare i nomi in maniera più semplice.\n\nCose da sapere:\n\nPer identificare una persona, fai clic su &quot;Aggiungi un nome&quot;, quindi digita il nome della persona e premi Invio. Viene creato un nuovo album Persone ogni volta che indichi il nome di qualcuno per la prima volta.\n\nSuggerimento. Accedi con il tuo account Google per visualizzare tutti i tuoi contatti durante l&#039;assegnazione dei nomi.\n\nPer ignorare una persona, fai clic sul pulsante &quot;X&quot; sulla miniatura del volto.\n\nSuggerimenti. Dopo aver indicato il nome di qualcuno, Picasa potrebbe suggerirti altri volti corrispondenti al volto di quella persona. Fai clic sull&#039;album di tale persona per vedere e confermare (o rifiutare) i suggerimenti.\n\n\n Fai clic su &quot;Ulteriori informazioni&quot; per sapere di più su questa funzione.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Man mano che Picasa esegue una scansione delle tue foto, i volti che trova vengono raggruppati automaticamente, in modo che tu possa indicare i nomi in maniera più semplice.\n\nCose da sapere:\n\nPer identificare una persona, fai clic su &quot;Aggiungi un nome&quot;, quindi digita il nome della persona e premi Invio. Viene creato un nuovo album Persone ogni volta che indichi il nome di qualcuno per la prima volta.\n\nSuggerimento. Accedi con il tuo account Google per visualizzare tutti i tuoi contatti durante l&#039;assegnazione dei nomi.\n\nPer ignorare una persona, fai clic sul pulsante &quot;X&quot; sulla miniatura del volto.\n\nSuggerimenti. Dopo aver indicato il nome di qualcuno, Picasa potrebbe suggerirti altri volti corrispondenti al volto di quella persona. Fai clic sull&#039;album di tale persona per vedere e confermare (o rifiutare) i suggerimenti.\n\n\n Fai clic su &quot;Ulteriori informazioni&quot; per sapere di più su questa funzione.</xmbtext>
+ </action>
+</tooltips>

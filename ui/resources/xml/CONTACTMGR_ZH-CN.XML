@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="contactmgr/window1.title">
+  <xmbtext>人物</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup4.title">
+  <xmbtext>搜索：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/delete.title">
+  <xmbtext>删除联系人</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/create.title">
+  <xmbtext>新建联系人</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online_contact.title">
+  <xmbtext>在线联系人</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup22.title">
+  <xmbtext>姓名：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup24.title">
+  <xmbtext>电子邮件：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/sync.title">
+  <xmbtext>将头像标记与网络相册同步</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/album_id_group.title">
+  <xmbtext>相册 ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/contact_id_group.title">
+  <xmbtext>联系人 ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_id_group.title">
+  <xmbtext>焦点 ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/subject_id_group.title">
+  <xmbtext>主题 ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_obfuscated_gaia_id_group.title">
+  <xmbtext>焦点模糊处理 GAIA ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/mobile_obfuscated_gaia_id_group.title">
+  <xmbtext>手机模糊处理 GAIA ID：</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/revert.title">
+  <xmbtext>还原</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online.title">
+  <xmbtext>管理在线联系人</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/refresh_contacts.title">
+  <xmbtext>刷新通讯录</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/ok.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/cancel.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

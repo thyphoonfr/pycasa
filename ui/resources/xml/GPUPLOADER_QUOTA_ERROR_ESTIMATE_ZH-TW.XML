@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ 自動備份</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>儲存空間已滿</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>您選取的資料夾大小超過您剩餘的 Google 雲端硬碟儲存空間。您可以選購更多儲存空間，或者免費備份無限量的標準尺寸相片和影片。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>如果您剛剛才購買儲存空間，可能需要等待幾分鐘，變更才會生效。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>取得更多儲存空間...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>改為上傳標準尺寸相片</xmbtext>
+ </stringres>
+</resources>

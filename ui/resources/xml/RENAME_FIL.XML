@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Pangalanang muli ang mga File</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 (mga) file ang napili upang palitan ang pangalan.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s (na) (mga) file ang napili upang palitan ang pangalan.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Pakipasok ng isang bagong pangalan para sa mga file na ito:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Isama sa filename:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Petsa</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Resolusyon ng larawan</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Halimbawa:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Baguhin ang pangalan</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

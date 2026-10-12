@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Закрыть</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Добро пожаловать в средство пакетной загрузки!</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Установите флажки рядом с папками и альбомами, которые необходимо загрузить. Затем выберите нужное действие. В программе Picasa выполнится фильтрация по элементам, к которым невозможно применить выбранное действие. Например, если вся папка или альбом уже размещены в Интернете, для них не отобразятся параметры загрузки.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Створіть резервну копію ваших фотографій на Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Автоматично зберігайте свої фото й відео онлайн за допомогою додатка Google Photos Backup, а потім переглядайте їх із будь-яких пристроїв. Ці файли бачитимете лише ви, доки не поділитеся ними з іншими.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Завантажити Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Ні, дякую</xmbtext>
+ </stringres>
+</resources>

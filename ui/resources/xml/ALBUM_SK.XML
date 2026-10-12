@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Názov:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Dátum:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Automatický dátum</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Hudba:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Použiť hudbu na prezentáciu snímok a filmovú prezentáciu:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Prehľadávať...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Miesto nasnímania (nepovinné):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Popis (nepovinné):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

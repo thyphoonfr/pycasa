@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="customaspectratio/window1.title">
+  <xmbtext>Pridėti pasirinktinį formato koeficientą</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup3.title">
+  <xmbtext>Matmenys:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label6.title">
+  <xmbtext>  x  </xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup8.title">
+  <xmbtext>Pavadinimas:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup10.title">
+  <xmbtext>Pavyzdys:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label11.title">
+  <xmbtext>   4 x 6   Mažas spaudinys</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/ok.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/cancel.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>انتقال پایگاه داده</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>‏شما باید Picasa را برای اعمال تغییرات راه‌اندازی مجدد کنید.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>لطفاً توجه داشته باشید که: قبل از امتحان کردن این ویژگی آزمایشی، باید از پایگاه داده خود یک نسخهٔ پشتیبان تهیه کنید. هرگز پایگاه داده را به یک شبکه قابل حذف یا درایو خارجی منتقل نکنید زیرا ممکن است داده‌های خود را از دست بدهید.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>موقعیت مکانی پایگاه داده کنونی:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>هیچ مکان پایگاه داده‌ جدید:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>مرور...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>پیش‌‏فرض</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>رفتن به راه‌اندازی مجدد بعدی</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

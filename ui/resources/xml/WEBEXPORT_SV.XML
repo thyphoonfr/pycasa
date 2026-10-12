@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exportera som HTML-sida</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Exportera bilder på:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Originalstorlek</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1 024 bildpunkter (för stora bildskärmar)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 bildpunkter (för stora webbsidor)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 bildpunkter (för webbsidor)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 bildpunkter (för e-post)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Exportera filmer med:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Första ram</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Hel film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Titel på webbsida:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Mapp:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Bläddra...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Klicka på ett mallnamn för att visa ett exempel. Klicka på Exportera när du är klar.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Mallbeskrivning</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Exportera</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

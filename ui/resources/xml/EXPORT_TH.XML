@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>ส่งออกไปยังโฟลเดอร์</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>ตำแหน่งที่ส่งออก:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>เรียกดู...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>ชื่อของโฟลเดอร์ที่ส่งออก:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>เพิ่มตัวเลขในชื่อไฟล์เพื่อรักษาลำดับ</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>ขนาดภาพ:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>ใช้ขนาดเดิม</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>ปรับขนาดเป็น:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>พิกเซล</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>คุณภาพของภาพ:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>อัตโนมัติ</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>ปกติ</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>สูงสุด</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>ต่ำสุด</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>กำหนดเอง</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>รักษาคุณภาพของภาพเดิม</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>คุณภาพและขนาดสมดุลดี</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>ขนาดไฟล์ใหญ่มาก รักษารายละเอียดได้ดี</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>ขนาดไฟล์เล็กที่สุด, สูญเสียคุณภาพบางส่วน</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>ส่งออกภาพยนตร์โดยใช้:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>ภาพแรก</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>ภาพยนตร์เต็มจอ (ไม่ปรับขนาด)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>ลายน้ำ:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>เพิ่มลายน้ำ</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>ประทับตรารูปภาพด้วยชื่อ โดเมนของเว็บ หรือคำชี้แจงลิขสิทธิ์</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>ส่งออก</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

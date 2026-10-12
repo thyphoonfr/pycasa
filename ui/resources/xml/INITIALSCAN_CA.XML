@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Hi ha instal·lada una versió més antiga de Picasa. Vols actualitzar la teva biblioteca d&#039;imatges actual o bé tornar a cercar fotos a l&#039;equip?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Escull una de les opcions següents:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Actualitza la meva biblioteca d&#039;imatges existent</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Selecciona aquesta opció si utilitzes paraules clau o àlbums personalitzats a Picasa 1 i vols conservar-los a Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Torna a cercar fotos al meu equip</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Tria aquesta opció per a una cerca més completa al teu equip, que inclogui informació ampliada de la foto. Conservarà els canvis i l&#039;organització existents, però no mantindrà les paraules clau. Aquesta cerca pot trigar uns quants minuts.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>En cercar fotos, els fitxers mai no es mouen ni es copien a ubicacions noves. Pots seleccionar quines carpetes mostrarà Picasa mitjançant l&#039;eina Gestor de carpetes (disponible al menú Eines)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continua</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa està preparat per cercar imatges a l&#039;equip</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Escull una de les opcions següents:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Cerca fotos a tot l&#039;equip</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Tria aquesta opció si tens fotos emmagatzemades a diverses carpetes del teu equip, especialment si tens fotos emmagatzemades a més d&#039;un disc dur.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Cerca només als Documents, les Fotos, l&#039;Escriptori i la Biblioteca d&#039;iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Tria aquesta opció si només emmagatzemes fotos en aquestes carpetes.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>En cercar imatges, els fitxers mai no es mouen ni es copien a ubicacions noves. Pots seleccionar quines carpetes mostrarà Picasa mitjançant l&#039;eina Gestor de carpetes (disponible al menú Eines)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continua</xmbtext>
+ </action>
+</tooltips>

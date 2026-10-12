@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Jei žymą norite taikyti vienu paspaudimu, galite naudoti sparčiąsias žymas. Toliau įveskite žymas, kurias norite pasiekti vienu paspaudimu. Pagal numatytuosius nustatymus dvi viršutinės sparčiosios žymos yra naudojamos neseniai pritaikytoms žymoms stebėti. Jei dvi viršutines žymas norite nustatyti rankiniu būdu, išvalykite toliau esantį žymimąjį laukelį.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Automatiškai užpildyti aukščiau esančius tuščius laukelius dažniausiai naudojamomis žymomis</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Išlaikyti du viršutinius mygtukus pastaruoju metu naudotoms žymoms</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>Gerai</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Atšaukti</xmbtext>
+ </action>
+</tooltips>

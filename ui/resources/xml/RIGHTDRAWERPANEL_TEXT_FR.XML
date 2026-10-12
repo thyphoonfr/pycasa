@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="rightdrawerpanel/title_text" xmbdesc="Label(rightdrawerpanel/title_text)">
+  <xmbtext>Métadonnées</xmbtext>
+ </action>
+ <action type="Tooltip" target="rightdrawerpanel/close" xmbdesc="Tooltip(rightdrawerpanel/close)">
+  <xmbtext>Fermer ce panneau latéral</xmbtext>
+ </action>
+ <action type="Tooltip" target="rightdrawerpanel/size_toggle" xmbdesc="Tooltip(rightdrawerpanel/size_toggle)">
+  <xmbtext>Basculer entre l&#039;affichage petit ou grand du panneau latéral</xmbtext>
+ </action>
+</tooltips>

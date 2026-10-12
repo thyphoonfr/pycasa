@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>Σύνδεση</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>Να διατηρηθούν τα στοιχεία μου σε αυτό τον υπολογιστή</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>Όνομα χρήστη:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>Κωδικός πρόσβασης:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>Χρησιμοποιήστε το όνομα χρήστη που έχετε στο Hello για να στείλετε φωτογραφίες με το Picasa!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>Σύνδεση</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>Ξεχάσατε τον κωδικό πρόσβασής σας;</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>Λευκώματα Ιστού</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>Σύνδεση στα Λευκώματα Ιστού</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>Με τα Λευκώματα Ιστού, μπορείτε να μοιραστείτε διαδικτυακά λευκώματα φωτογραφιών με τους φίλους και την οικογένειά σας ή να δημιουργήσετε δημόσια λευκώματα για να τα μοιράζεστε με όλους.  Είναι δωρεάν και εύκολο στη χρήση.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>Ο λογαριασμός Google σας είναι έγκυρος αλλά δεν έχετε εγγραφεί για έναν λογαριασμό Λευκωμάτων Ιστού.</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>Πατήστε εδώ για να μάθετε περισσότερα.</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>Ενεργοποίηση Λευκωμάτων Ιστού…</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>Εγγραφή στα Λευκώματα Ιστού</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>Μεταφόρτωση των ταινιών σας στο Βίντεο Google με το Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>Για να ξεκινήσετε τη μεταφόρτωση, συνδεθείτε παρακάτω.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>Κάντε κλικ εδώ για να μάθετε περισσότερα.</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>Δημιουργία λογαριασμού</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>Αποστολή φωτογραφιών με τον λογαριασμό σας Google με χρήση του Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>Η διαδικασία αποστολής φωτογραφιών γίνεται χωρίς πρόγραμμα περιήγησης ιστού</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>Αποστολή φωτογραφιών μεγέθους έως 10 MB</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>Θέλετε λογαριασμό στο Gmail; Δωρεάν λογαριασμός με πάνω από 6,5 GB χώρου αποθήκευσης (κι ακόμη περισσότερο)</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>Προεπισκόπηση των φωτογραφιών σας πριν από την αποστολή</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>Το όνομα χρήστη ή ο κωδικός πρόσβασης δεν είναι σωστό - Δοκιμάστε ξανά</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>Το όνομα χρήστη και ο κωδικός πρόσβασης δεν ταιριάζουν. </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>Πληκτρολογήστε το σωστό κωδικό πρόσβασης παραπάνω και στη συνέχεια πληκτρολογήστε τους χαρακτήρες που βλέπετε στη φωτογραφία που ακολουθεί (με διάκριση πεζών-κεφαλαίων)</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>Να διατηρηθούν τα στοιχεία μου σε αυτό τον υπολογιστή</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>Σύνδεση</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+</tooltips>

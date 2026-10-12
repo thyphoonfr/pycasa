@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="collagepanel/addclips" xmbdesc="Tooltip(collagepanel/addclips)">
+  <xmbtext>Legg til valgte klipp i kollasjen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/deleteclips" xmbdesc="Tooltip(collagepanel/deleteclips)">
+  <xmbtext>Fjern valgte klipp fra brettet </xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/getmoreclips" xmbdesc="Label(collagepanel/getmoreclips)">
+  <xmbtext>Få mer</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/getmoreclips" xmbdesc="Tooltip(collagepanel/getmoreclips)">
+  <xmbtext>Hent flere klipp fra biblioteket</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab1" xmbdesc="Label(collagepanel/tab1)">
+  <xmbtext>Innstillinger</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/tab2" xmbdesc="Label(collagepanel/tab2)">
+  <xmbtext>Klipp</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/shadow_checkbox_label" xmbdesc="Label(collagepanel/shadow_checkbox_label)">
+  <xmbtext>Tegn skygger</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/caption_checkbox_label" xmbdesc="Label(collagepanel/caption_checkbox_label)">
+  <xmbtext>Vis bildetekster</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/caption_checkbox" xmbdesc="Tooltip(collagepanel/caption_checkbox)">
+  <xmbtext>Vis tekst på bilder med hvit ramme</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_frame_center-label" xmbdesc="Label(collagepanel/set_frame_center-label)">
+  <xmbtext>Angi som rammesenter</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/spacing_label" xmbdesc="Label(collagepanel/spacing_label)">
+  <xmbtext>Rutenettavstand</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/min_spacing_label" xmbdesc="Label(collagepanel/min_spacing_label)">
+  <xmbtext>Ingen</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/max_spacing_label" xmbdesc="Label(collagepanel/max_spacing_label)">
+  <xmbtext>Maks.</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_settings_title" xmbdesc="Label(collagepanel/bkg_settings_title)">
+  <xmbtext>Bakgrunnsalternativer</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/borders_label" xmbdesc="Label(collagepanel/borders_label)">
+  <xmbtext>Bildekantlinjer</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/format_title" xmbdesc="Label(collagepanel/format_title)">
+  <xmbtext>Sideformat</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_order-label" xmbdesc="Label(collagepanel/rand_order-label)">
+  <xmbtext>Bland bilder</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/rand_placement-label" xmbdesc="Label(collagepanel/rand_placement-label)">
+  <xmbtext>Bland kollasj</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/view_and_edit-label" xmbdesc="Label(collagepanel/view_and_edit-label)">
+  <xmbtext>Se og rediger</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/cancelbutton-label" xmbdesc="Label(collagepanel/cancelbutton-label)">
+  <xmbtext>Lukk</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/resetbutton-label" xmbdesc="Label(collagepanel/resetbutton-label)">
+  <xmbtext>Tilbakestill</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/makedesktop-label" xmbdesc="Label(collagepanel/makedesktop-label)">
+  <xmbtext>Skrivebordsbakgrunn</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/sharebutton-label" xmbdesc="Label(collagepanel/sharebutton-label)">
+  <xmbtext>Lag kollasj</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/color_bg_label" xmbdesc="Label(collagepanel/color_bg_label)">
+  <xmbtext>Heldekkende farge</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bitmap_bg_label" xmbdesc="Label(collagepanel/bitmap_bg_label)">
+  <xmbtext>Bruk bilde</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_all" xmbdesc="Label(collagepanel/select_all)">
+  <xmbtext>Marker alle</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/select_none" xmbdesc="Label(collagepanel/select_none)">
+  <xmbtext>Opphev markering</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/remove_node" xmbdesc="Label(collagepanel/remove_node)">
+  <xmbtext>Fjern</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/set_background" xmbdesc="Label(collagepanel/set_background)">
+  <xmbtext>Angi som bakgrunn</xmbtext>
+ </action>
+ <action type="Label" target="collagepanel/bkg_from_selection" xmbdesc="Label(collagepanel/bkg_from_selection)">
+  <xmbtext>Bruk valgte</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/portrait" xmbdesc="Tooltip(collagepanel/portrait)">
+  <xmbtext>Stående: Plasser motivet vertikalt</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/landscape" xmbdesc="Tooltip(collagepanel/landscape)">
+  <xmbtext>Liggende: Plasser motivet horisontalt</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/format_menu" xmbdesc="Tooltip(collagepanel/format_menu)">
+  <xmbtext>Velg bredde og høyde for motivet</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/delete_custom_aspect" xmbdesc="Tooltip(collagepanel/delete_custom_aspect)">
+  <xmbtext>Slett gjeldende størrelsesforhold</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/cancelbutton" xmbdesc="Tooltip(collagepanel/cancelbutton)">
+  <xmbtext>Lukk fanen Kollasj</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/makedesktop" xmbdesc="Tooltip(collagepanel/makedesktop)">
+  <xmbtext>Lagre som JPG-bilde i kollasjalbumet og angi det som skrivebordsbakgrunn</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/resetbutton" xmbdesc="Tooltip(collagepanel/resetbutton)">
+  <xmbtext>Angre alle endringer</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/sharebutton" xmbdesc="Tooltip(collagepanel/sharebutton)">
+  <xmbtext>Lagre som JPG-bilde i kollasjalbumet (i prosjektsamlingen).</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_order" xmbdesc="Tooltip(collagepanel/rand_order)">
+  <xmbtext>Plasser bildene i tilfeldig rekkefølge </xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/rand_placement" xmbdesc="Tooltip(collagepanel/rand_placement)">
+  <xmbtext>Bland oppsettet for kollasjen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_all" xmbdesc="Tooltip(collagepanel/select_all)">
+  <xmbtext>Marker alle bilder (Ctrl+A)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/select_none" xmbdesc="Tooltip(collagepanel/select_none)">
+  <xmbtext>Opphev markering av alle bilder (Ctrl+D)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/remove_node" xmbdesc="Tooltip(collagepanel/remove_node)">
+  <xmbtext>Fjern utvalg fra kollasjen (Del)</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/set_background" xmbdesc="Tooltip(collagepanel/set_background)">
+  <xmbtext>Bruk valgt bilde som bakgrunn</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_top" xmbdesc="Tooltip(collagepanel/move_top)">
+  <xmbtext>Flytt bilde til toppen av stabelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_up" xmbdesc="Tooltip(collagepanel/move_up)">
+  <xmbtext>Flytt bilde oppover i stabelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_down" xmbdesc="Tooltip(collagepanel/move_down)">
+  <xmbtext>Flytt bilde ned i stabelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/move_bottom" xmbdesc="Tooltip(collagepanel/move_bottom)">
+  <xmbtext>Flytt bilde til bunnen av stabelen</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_12" xmbdesc="Tooltip(collagepanel/snap_12)">
+  <xmbtext>Juster rotering til rett opp</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_3" xmbdesc="Tooltip(collagepanel/snap_3)">
+  <xmbtext>Juster rotering til 90 grader med klokka</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_6" xmbdesc="Tooltip(collagepanel/snap_6)">
+  <xmbtext>Juster rotering til 180 grader med klokka</xmbtext>
+ </action>
+ <action type="Tooltip" target="collagepanel/snap_9" xmbdesc="Tooltip(collagepanel/snap_9)">
+  <xmbtext>Juster rotering til 270 grader med klokka</xmbtext>
+ </action>
+</tooltips>

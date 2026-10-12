@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Zavřít</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Vítejte v hromadném nahrávání fotek</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Zaškrtněte políčka u složek a alb, s kterými chcete pracovat. Pak zvolte operaci, kterou chcete provést. Aplikace Picasa vyfiltruje položky, u kterých se operace nepoužije. Pokud je například některá složka či album již plně online, nezobrazí se v Picase možnost nahrát je.</xmbtext>
+ </action>
+</tooltips>

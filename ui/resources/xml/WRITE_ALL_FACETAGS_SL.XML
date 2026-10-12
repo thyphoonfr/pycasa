@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Zapiši oznake obrazov</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Zapisovanje obrazov ali zapisovanje vseh je lahko dolgotrajen postopek. Če je pisanje dnevnika nastavljeno na podrobno ali višjo raven, bo datoteka network.log vsebovala sporočila o datotekah samo za branje, ki jih ni bilo mogoče posodobiti. Priporočamo vam, da se ob uporabi te funkcije odjavite.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Zapiši izbrane</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Zapiši obraze</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Zapiši vse</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

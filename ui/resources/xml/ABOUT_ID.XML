@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Tentang Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Semua produk, nama layanan, merek, atau merek dagang lain adalah hak cipta dari pemiliknya masing-masing.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Perangkat lunak ini sebagian didasarkan pada karya Independent JPEG Group. Program ini dilindungi oleh undang-undang hak cipta A.S. dan Internasional.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Lisensi pihak ketiga...</xmbtext>
+ </stringres>
+</resources>

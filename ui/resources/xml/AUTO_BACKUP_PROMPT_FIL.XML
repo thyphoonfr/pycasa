@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Backup ng Google Photos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>I-back up ang iyong mga larawan sa Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Awtomatikong i-save ang iyong mga larawan at video online gamit ang Backup ng Google Photos. Maa-access mo ang iyong mga item mula sa anuman sa iyong mga device at mananatiling pribado ang lahat hanggang sa piliin mong ibahagi ang mga ito.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Kunin ang Backup ng Google Photos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Hindi, Salamat Na Lang</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ automātiskā dublēšana</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Krātuvē nav vietas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Jūs esat atlasījis mapes, kas aizņem vairāk vietas, nekā ir atlicis jūsu Google diska krātuvē. Varat iegādāties papildu vietu krātuvē vai bez maksas dublēt neierobežotu skaitu standarta lieluma fotoattēlu un videoklipu.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Ja vietu krātuvē iegādājāties pirms mirkļa, var paiet dažas minūtes, līdz izmaiņas stāsies spēkā.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Iegūt lielāku krātuvi...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Lietot standarta lielumu</xmbtext>
+ </stringres>
+</resources>

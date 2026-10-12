@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>Actualizando contactos</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Picasa está actualizando los datos de contacto online.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>Actualizar en segundo plano</xmbtext>
+ </stringres>
+</resources>

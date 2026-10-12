@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Dodajte ime</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Odaberite mapu za prikaz lica</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Zanemari</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Ručno dodajte osobu</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Odustani</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Kada Picasa pretražuje vaše fotografije, lica koja pronalazi automatski grupira radi jednostavnijeg imenovanja.\n\nVažne informacije:\n\nDa biste identificirali osobu, kliknite &#039;Dodaj ime&#039;, a zatim upišite ime osobe i pritisnite tipku Enter. Svaki put kada prvi put nekoga imenujete, bit će izrađen novi album Osobe.\n\n(SAVJET: prijavite se na svoj Google račun da biste mogli pristupiti svim svojim kontaktima iz Google računa prilikom imenovanja.)\n\nDa biste zanemarili osobu, kliknite gumb &#039;X&#039; na minijaturi lica.\n\nPrijedlozi: nakon imenovanja osobe Picasa može predložiti dodatna podudarna lica za tu osobu. Kliknite album osobe da biste prikazali i potvrdili (ili odbili) prijedloge.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Kada Picasa pretražuje vaše fotografije, lica koja pronalazi automatski grupira radi jednostavnijeg imenovanja.\n\nVažne informacije:\n\nDa biste identificirali osobu, kliknite &#039;Dodaj ime&#039;, a zatim upišite ime osobe i pritisnite tipku Enter. Svaki put kada prvi put nekoga imenujete, bit će izrađen novi album Osobe.\n\n(SAVJET: prijavite se na svoj Google račun da biste mogli pristupiti svim svojim kontaktima iz Google računa prilikom imenovanja.)\n\nDa biste zanemarili osobu, kliknite gumb &#039;X&#039; na minijaturi lica.\n\nPrijedlozi: nakon imenovanja osobe Picasa može predložiti dodatna podudarna lica za tu osobu. Kliknite album osobe da biste prikazali i potvrdili (ili odbili) prijedloge.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Nijedna osoba još nije pronađena. S obzirom na to da su lica pronađena i grupirana, pojavit će se u albumu Neimenovano. Prilikom pretraživanja informacije o napretku prikazat će se u stavci albuma Neimenovano.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Ovdje će biti navedene imenovane osobe koje se pojavljuju s trenutačno odabranom osobom.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Osobe koje su prikazane na trenutačno odabranim fotografijama bit će ovdje navedene.</xmbtext>
+ </action>
+</tooltips>

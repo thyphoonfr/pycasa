@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Fechar</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Bem-vindo ao Envio em lote</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Marque as caixas ao lado dos álbuns e pastas com que deseja trabalhar. Depois, escolha o que gostaria de fazer. O Picasa filtra os itens aos quais a operação não se aplica. Por exemplo, se todo um álbum ou pasta já estiver on-line, o Picasa não o exibirá como uma opção de upload. </xmbtext>
+ </action>
+</tooltips>

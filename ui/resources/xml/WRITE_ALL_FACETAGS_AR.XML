@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>كتابة علامات الوجوه</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>قد يستغرق كتابة الوجوه أو كتابة الكل وقتًا طويلاً. في حالة تعيين تسجيل الدخول على تفصيلي أو أعلى، سيشتمل سجل الشبكة على رسائل حول الملفات للقراءة فقط التي تعذر تحديثها. يوصى بالخروج أثناء استخدام هذه الميزة.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>كتابة المحدد</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>كتابة الوجوه</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>كتابة الكل</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

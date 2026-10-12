@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Μετακίνηση βάσης δεδομένων</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Θα χρειαστεί να κάνετε επανεκκίνηση του Picasa για να τεθούν σε ισχύ οι αλλαγές.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Σημείωση: Θα πρέπει να κρατήσετε αντίγραφο της βάσης δεδομένων σας προτού δοκιμάσετε αυτή την πειραματική λειτουργία. ΠΟΤΕ μην μετακινείτε τη βάση δεδομένων σε ένα δίκτυο, αφαιρούμενο ή εξωτερικό δίσκο διότι υπάρχει ο κίνδυνος να χάσετε δεδομένα.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Τρέχουσα τοποθεσία βάσης δεδομένων:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Νέα τοποθεσία βάσης δεδομένων:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Αναζήτηση...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Προεπιλογή</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Μετακίνηση στην επόμενη επανεκκίνηση</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>סגור</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>למידע נוסף...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>ברוכים הבאים אל אלבום האנשים &#039;ללא שם&#039;! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>‏בשעה ש-Picasa סורק את התמונות שלך, הוא מקבץ באופן אוטומטי את הפרצופים המתגלים כדי שיהיה קל לתת שמות.\n\nדברים שכדאי לדעת:\n\nכדי לזהות מישהו, לחץ על &#039;הוסף שם&#039;, ואז הקלד את שם אותו אדם והקש Enter.  אלבום &#039;אנשים&#039; חדש ייווצר בכל פעם שתיתן שם למישהו בפעם הראשונה.\n\n(טיפ: היכנס עם חשבון Google כדי לקבל גישה לכל אנשי הקשר שלך בעת מתן שמות.)\n\nכדי להתעלם מאדם מסוים, לחץ על הלחצן &#039;X&#039; בתמונה הממוזערת של הפרצוף.\n\nהצעות: לאחר מתן שם למישהו, Picasa עשוי להציע עוד פרצופים מתאימים לאדם זה. לחץ על האלבום של מישהו כדי להציג ולאשר (או לדחות) הצעות כלשהן. \n\n\n לחץ על &#039;מידע נוסף&#039; לקבלת מידע על התכונה הזו.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>‏בשעה ש-Picasa סורק את התמונות שלך, הוא מקבץ באופן אוטומטי את הפרצופים המתגלים כדי שיהיה קל לתת שמות.\n\nדברים שכדאי לדעת:\n\nכדי לזהות מישהו, לחץ על &#039;הוסף שם&#039;, ואז הקלד את שם אותו אדם והקש Enter.  אלבום &#039;אנשים&#039; חדש ייווצר בכל פעם שתיתן שם למישהו בפעם הראשונה.\n\n(טיפ: היכנס עם חשבון Google כדי לקבל גישה לכל אנשי הקשר שלך בעת מתן שמות.)\n\nכדי להתעלם מאדם מסוים, לחץ על הלחצן &#039;X&#039; בתמונה הממוזערת של הפרצוף.\n\nהצעות: לאחר מתן שם למישהו, Picasa עשוי להציע עוד פרצופים מתאימים לאדם זה. לחץ על האלבום של מישהו כדי להציג ולאשר (או לדחות) הצעות כלשהן. \n\n\n לחץ על &#039;מידע נוסף&#039; לקבלת מידע על התכונה הזו.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="capturemoviepanelpopup/done" xmbdesc="Label(capturemoviepanelpopup/done)">
+  <xmbtext>Gotowe</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/capture" xmbdesc="Label(capturemoviepanelpopup/capture)">
+  <xmbtext>Nagraj</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/stop" xmbdesc="Label(capturemoviepanelpopup/stop)">
+  <xmbtext>Zatrzymaj</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/live_video" xmbdesc="Label(capturemoviepanelpopup/live_video)">
+  <xmbtext>Kamera</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/camchange" xmbdesc="Label(capturemoviepanelpopup/camchange)">
+  <xmbtext>Ustawienia</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/capture" xmbdesc="Tooltip(capturemoviepanelpopup/capture)">
+  <xmbtext>Rozpocznij nagrywanie z kamery</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/stop" xmbdesc="Tooltip(capturemoviepanelpopup/stop)">
+  <xmbtext>Zatrzymaj nagrywanie z kamery</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/live_video" xmbdesc="Tooltip(capturemoviepanelpopup/live_video)">
+  <xmbtext>Nagrywaj wideo na żywo z kamery</xmbtext>
+ </action>
+ <action type="Tooltip" target="capturemoviepanelpopup/camchange" xmbdesc="Tooltip(capturemoviepanelpopup/camchange)">
+  <xmbtext>Zmień ustawienia kamery</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_cancel" xmbdesc="Label(capturemoviepanelpopup/settings_cancel)">
+  <xmbtext>Anuluj</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/settings_apply" xmbdesc="Label(capturemoviepanelpopup/settings_apply)">
+  <xmbtext>Zastosuj</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/video_label" xmbdesc="Label(capturemoviepanelpopup/video_label)">
+  <xmbtext>Wideo</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/size_label" xmbdesc="Label(capturemoviepanelpopup/size_label)">
+  <xmbtext>Rozmiar</xmbtext>
+ </action>
+ <action type="Label" target="capturemoviepanelpopup/audio_label" xmbdesc="Label(capturemoviepanelpopup/audio_label)">
+  <xmbtext>Dźwięk</xmbtext>
+ </action>
+</tooltips>

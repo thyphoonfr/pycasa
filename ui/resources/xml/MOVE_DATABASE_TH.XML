@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>ย้ายฐานข้อมูล</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>คุณต้องเริ่มต้น Picasa ใหม่เพื่อให้การเปลี่ยนแปลงมีผล</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>โปรดทราบ: คุณควรสำรองฐานข้อมูลไว้ก่อนที่จะทดลองใช้คุณลักษณะที่อยู่ในขั้นทดลองเหล่านี้ ห้ามย้ายฐานข้อมูลไปยังเครือข่าย ไดรฟ์ที่ถอดเข้าออกได้หรือไดรฟ์ภายนอกโดยเด็ดขาด เนื่องจากคุณอาจสูญเสียข้อมูลได้</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>ตำแหน่งของฐานข้อมูลปัจจุบัน:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>ตำแหน่งใหม่ของฐานข้อมูล:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>เรียกดู...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>ค่าเริ่มต้น</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>ย้ายเมื่อเริ่มระบบใหม่ครั้งถัดไป</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Legg til navn</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Velg en mappe som skal vise ansikter</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorer</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Legg til person manuelt</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Når Picasa søker gjennom bildene dine, grupperes ansiktene som registreres automatisk, sånn at det er enkelt å navngi dem.\n\nNyttig å vite:\n\nDu kan identifisere en person ved å klikke på «Legg til et navn», skrive inn personens navn og trykke på Enter. Et nytt Folk-album blir opprettet hver gang du navngir noen for første gang.\n\n(TIPS: Logg på med Google-kontoen din for å få tilgang til alle kontaktene dine mens du navngir personer.)\n\nDu kan ignorere en person ved å klikke på «X»-knappen på miniatyrbildet av ansiktet til vedkommende.\n\nForslag: Etter at du har navngitt noen, kan det hende at Picasa foreslår flere samsvarende ansikter for vedkommende. Klikk på albumet til en person hvis du vil se og bekrefte (eller avvise) eventuelle forslag.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Når Picasa søker gjennom bildene dine, grupperes ansiktene som registreres automatisk, sånn at det er enkelt å navngi dem.\n\nNyttig å vite:\n\nDu kan identifisere en person ved å klikke på «Legg til et navn», skrive inn personens navn og trykke på Enter. Et nytt Folk-album blir opprettet hver gang du navngir noen for første gang.\n\n(TIPS: Logg på med Google-kontoen din for å få tilgang til alle kontaktene dine mens du navngir personer.)\n\nDu kan ignorere en person ved å klikke på «X»-knappen på miniatyrbildet av ansiktet til vedkommende.\n\nForslag: Etter at du har navngitt noen, kan det hende at Picasa foreslår flere samsvarende ansikter for vedkommende. Klikk på albumet til en person hvis du vil se og bekrefte (eller avvise) eventuelle forslag.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Har ikke funnet noen folk ennå. Når ansikter gjenkjennes og grupperes, legges de i albumet Uten navn. Mens skanningen pågår, vises fremdriftsinformasjonen i albumet Uten navn.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Navngitte folk som vises i de valgte bildene, står oppført her.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Personer som vises i de valgte bildene, står oppført her.</xmbtext>
+ </action>
+</tooltips>

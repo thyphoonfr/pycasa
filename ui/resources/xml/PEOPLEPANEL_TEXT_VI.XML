@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Thêm tên</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Chọn một thư mục để hiển thị khuôn mặt</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Bỏ qua</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Thêm người theo cách thủ công</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Hủy</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Khi Picasa quét ảnh của bạn, các khuôn mặt mà ứng dụng tìm thấy được tự động nhóm lại để dễ dàng đặt tên.\n\nNhững điều cần biết:\n\nĐể xác định một người, nhấp vào &#039;Thêm tên&#039;, sau đó nhập tên của người đó và nhấn Enter.  Một album Mọi người mới sẽ được tạo ra mỗi khi bạn đặt tên ai đó lần đầu.\n\n(MẸO: Đăng nhập bằng Tài khoản Google của bạn để có quyền truy cập vào tất cả địa chỉ liên hệ của bạn khi đặt tên.)\n\nĐể bỏ qua một người, nhấp nút &#039;X&#039; trên hình thu nhỏ khuôn mặt.\n\nGợi ý: Sau khi bạn đặt tên ai đó, Picasa có thể gợi ý thêm các khuôn mặt phù hợp cho người đó. Nhấp vào tên album của một người để xem và xác nhận (hoặc từ chối) bất kỳ gợi ý nào.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Khi Picasa quét ảnh của bạn, các khuôn mặt mà ứng dụng tìm thấy được tự động nhóm lại để dễ dàng đặt tên.\n\nNhững điều cần biết:\n\nĐể xác định một người, nhấp vào &#039;Thêm tên&#039;, sau đó nhập tên của người đó và nhấn Enter.  Một album Mọi người mới sẽ được tạo ra mỗi khi bạn đặt tên ai đó lần đầu.\n\n(MẸO: Đăng nhập bằng Tài khoản Google của bạn để có quyền truy cập vào tất cả địa chỉ liên hệ của bạn khi đặt tên.)\n\nĐể bỏ qua một người, nhấp nút &#039;X&#039; trên hình thu nhỏ khuôn mặt.\n\nGợi ý: Sau khi bạn đặt tên ai đó, Picasa có thể gợi ý thêm các khuôn mặt phù hợp cho người đó. Nhấp vào tên album của một người để xem và xác nhận (hoặc từ chối) bất kỳ gợi ý nào.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Chưa tìm thấy người nào. Khi các khuôn mặt được tìm thấy và được nhóm, chúng sẽ xuất hiện trong album Chưa đặt tên. Trong khi quét, thông tin tiến trình sẽ xuất hiện trong mục album Chưa đặt tên.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Người đã được đặt tên xuất hiện cùng với người hiện được chọn sẽ được liệt kê tại đây.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Những người xuất hiện trong ảnh đang được chọn sẽ được liệt kê tại đây.</xmbtext>
+ </action>
+</tooltips>

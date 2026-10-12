@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>การสำรองข้อมูลอัตโนมัติของ Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>ไม่มีพื้นที่เก็บข้อมูลแล้ว</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>คุณเลือกโฟลเดอร์ที่มีพื้นที่มากกว่าพื้นที่เก็บข้อมูลที่เหลืออยู่ใน Google ไดรฟ์ คุณสามารถซื้อพื้นที่เก็บข้อมูลเพิ่ม หรือสำรองรูปภาพและวิดีโอขนาดมาตรฐานได้ฟรีไม่จำกัด</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>ถ้าคุณเพิ่งซื้อพื้นที่เก็บข้อมูล อาจต้องใช้เวลาสองถึงสามนาทีจึงจะเห็นการเปลี่ยนแปลง</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>รับพื้นที่เก็บข้อมูลเพิ่ม...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>เปลี่ยนเป็นขนาดมาตรฐาน</xmbtext>
+ </stringres>
+</resources>

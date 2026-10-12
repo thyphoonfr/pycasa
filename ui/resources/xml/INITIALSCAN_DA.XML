@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>En ældre version af Picasa er installeret. Ønsker du at opdatere dit eksisterende billedbibliotek eller søge efter billeder i din computer igen?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Vælg mellem følgende indstillinger:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Opdater mit eksisterende billedbibliotek</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Vælg denne indstilling, hvis du anvender søgeord eller brugertilpassede album i Picasa 1 og ønsker at bevare disse i Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Søg igen i min computer efter billeder</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Vælg denne indstilling for at forbedre søgningen i computeren, hvilket omfatter udvidede billedoplysninger. Derved bevares dine eksisterende ændringer og organisation men bevarer ikke søgeord. Denne søgning kan tage nogle minutter.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Ved søgning efter billeder flyttes eller kopieres filer ikke til nye placeringer. Du kan vælge, hvilke mapper Picasa viser, ved at anvende værktøjet Mappeadministration (findes i menuen Værktøjer)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Fortsæt</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa er klar til at søge efter billeder på din computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Vælg mellem følgende indstillinger:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Søg i hele min computer efter billeder</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Vælg denne indstilling, hvis du har lagret billeder i forskellige mapper på computeren, især hvis du har lagret billeder på mere end én harddisk.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Søg kun i dokumenter, billeder, skrivebordet og iPhoto-biblioteket</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Vælg denne indstilling, hvis du kun gemmer billeder i disse mapper.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Ved søgning efter billeder flyttes eller kopieres filer ikke til nye placeringer. Du kan vælge, hvilke mapper Picasa viser, ved at anvende værktøjet Mappeadministration (findes i menuen Værktøjer)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Fortsæt</xmbtext>
+ </action>
+</tooltips>

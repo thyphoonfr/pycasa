@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>„Google“ nuotraukų atsarginis kopijavimas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>Pasirinkti atsarginio kopijavimo šaltinius</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>„Google“ nuotraukos automatiškai sukuria atsargines nuotraukų ir vaizdo įrašų kopijas iš pasirinktų šaltinių jūsų Nuotraukų bibliotekoje.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>Pridėti...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>Nuotraukos dydis</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>Aukšta kokybė (nemokama neribota saugyklos vieta)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>Puiki vaizdo kokybė mažesnio dydžio faile</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>Originalas (tik paskyros saugykla)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>Visa raiška, kuri bus įskaityta į kvotą</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>Padėkite pagerinti Nuotraukas siųsdami anoniminę naudojimo statistiką.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>Gauti daugiau vietos saugykloje...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>Pradėti atsarginį kopijavimą</xmbtext>
+ </stringres>
+</resources>

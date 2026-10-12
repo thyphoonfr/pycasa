@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="headerpanel/view_online" xmbdesc="Label(headerpanel/view_online)">
+  <xmbtext>Ver na internet</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/select_star" xmbdesc="Tooltip(headerpanel/select_star)">
+  <xmbtext>Seleccionar fotografias marcadas com estrela</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/sync_label" xmbdesc="Label(headerpanel/sync_label)">
+  <xmbtext>Sincronizar com a Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync1" xmbdesc="Tooltip(headerpanel/websync1)">
+  <xmbtext>Parar a sincronização de alterações na Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/websync0" xmbdesc="Tooltip(headerpanel/websync0)">
+  <xmbtext>Carregar e sincronizar alterações futuras na Web</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/sync_options" xmbdesc="Tooltip(headerpanel/sync_options)">
+  <xmbtext>Opções on-line</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_movie" xmbdesc="Tooltip(headerpanel/create_movie)">
+  <xmbtext>Criar apresentação em filme</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/create_collage" xmbdesc="Tooltip(headerpanel/create_collage)">
+  <xmbtext>Criar colagem de fotografias</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/play" xmbdesc="Tooltip(headerpanel/play)">
+  <xmbtext>Reproduzir apresentação de diapositivos em ecrã total</xmbtext>
+ </action>
+ <action type="Label" target="headerpanel/share" xmbdesc="Label(headerpanel/share)">
+  <xmbtext>Carregar</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/share" xmbdesc="Tooltip(headerpanel/share)">
+  <xmbtext>Carregar álbum para o Google Fotos</xmbtext>
+ </action>
+ <action type="Tooltip" target="headerpanel/save_edits" xmbdesc="Tooltip(headerpanel/save_edits)">
+  <xmbtext>Guardar as fotografias editadas no disco</xmbtext>
+ </action>
+</tooltips>

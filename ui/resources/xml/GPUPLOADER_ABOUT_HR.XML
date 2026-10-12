@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Verzija sigurnosnog kopiranja u Google fotografije %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Autorska prava 2015., Google, Inc. Sva prava pridržana.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Softver se djelomično temelji na radu tvrtke Independent JPEG Group. Ovaj je program zaštićen američkim i međunarodnim zakonima o zaštiti autorskih prava.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>YouTube पर अपलोड करें</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>शीर्षक:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>वर्णन:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>वीडियो श्रेणी:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>लोड हो रहा है…</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>टैग:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>ये वे कीवर्ड हैं जिनका उपयोग लोगों को आपके वीडियो ढूंढने में सहायता प्रदान करने के लिए किया जाता है. (रिक्ति द्वारा विभाजित)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>यह वीडियो सार्वजनिक बनाएं</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>आपके वीडियो की सीमा 10 मिनट और 1 GB है</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>बिना अनुमति के कोई भी टीवी शो, संगीत वीडियो, संगीत समारोह, या विज्ञापन तब तक अपलोड न करें जब तक उनमें पूरी तरह से स्वयं आपके द्वारा बनाई गई सामग्री न हो. कॉपीराइट युक्ति पृष्ठ और समुदाय दिशानिर्देश यह निर्धारित करने में आपकी सहायता कर सकते हैं कि क्या आपका वीडियो किसी अन्य के कॉपीराइट का उल्लंघन करता है.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>&quot;वीडियो अपलोड करें&quot; क्लिक करके आप यह इंगित करते हैं कि यह वीडियो YouTube के उपयोग की शर्तों का उल्लंघन नहीं करता और आपके पास इस वीडियो के सभी कॉपीराइट अधिकार हैं या आपके पास इसे अपलोड करने का प्राधिकरण है.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>वीडियो अपलोड करें</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

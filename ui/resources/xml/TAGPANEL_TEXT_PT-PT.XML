@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="tagpanel/addtag" xmbdesc="Tooltip(tagpanel/addtag)">
+  <xmbtext>Adicionar etiqueta aos itens selecionados atualmente</xmbtext>
+ </action>
+ <action type="Tooltip" target="tagpanel/quick_config" xmbdesc="Tooltip(tagpanel/quick_config)">
+  <xmbtext>Configurar etiquetas rápidas</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/add_tag_label" xmbdesc="Label(tagpanel/add_tag_label)">
+  <xmbtext>Escrever etiqueta a adicionar:</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/quick_label" xmbdesc="Label(tagpanel/quick_label)">
+  <xmbtext>Etiquetas rápidas:</xmbtext>
+ </action>
+</tooltips>

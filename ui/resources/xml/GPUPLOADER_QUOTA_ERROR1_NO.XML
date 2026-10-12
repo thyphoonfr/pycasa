@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Sikkerhetskopiering av Google Bilder</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>1 GB gjenværende lagringsplass på Google Disk</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Få mer lagringsplass slik at du kan fortsette med å ta sikkerhetskopier av originale bilder med full oppløsning. Et alternativ er å bytte til gratis ubegrenset høykvalitets-lagring, noe som gir deg en god visuell kvalitet med redusert filstørrelse.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Få hjelp med å ta en beslutning</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Skaff mer lagringsplass</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Bytt til høy kvalitet</xmbtext>
+ </stringres>
+</resources>

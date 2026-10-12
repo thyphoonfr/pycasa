@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>Osveževanje stikov</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Picasa osvežuje podatke o stikih v spletu.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>Osveži v ozadju</xmbtext>
+ </stringres>
+</resources>

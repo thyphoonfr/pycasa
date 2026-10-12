@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Picasa के बारे में</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>अन्य सभी उत्पाद, सेवा नाम, ब्रांड, या ट्रेडमार्क उनके संबंधित स्वामियों की संपत्ति हैं.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>यह सॉफ़्टवेयर आंशिक रूप से स्वतंत्र JPEG समूह के कार्य पर आधारित है. यह प्रोग्राम यू.एस. और अंतर्राष्ट्रीय कॉपीराइट कानून द्वारा सुरक्षित है.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>तृतीय-पक्ष लाइसेंस...</xmbtext>
+ </stringres>
+</resources>

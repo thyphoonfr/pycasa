@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>HTML 페이지로 내보내기</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>다음 위치에 있는 사진 내보내기:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>원본 크기</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024픽셀(큰 모니터용)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800픽셀(큰 웹페이지용)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640픽셀(웹페이지용)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320픽셀(이메일용)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>다음을 사용하여 동영상 내보내기:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>첫 번째 프레임</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>전체 동영상</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>웹페이지 제목:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>폴더:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>예를 보려면 템플릿 이름을 클릭하고 선택 완료 후 내보내기를 클릭하세요.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>템플릿 설명</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>내보내기</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

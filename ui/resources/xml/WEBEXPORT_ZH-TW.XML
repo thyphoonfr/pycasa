@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>匯出為 HTML 網頁</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>使用以下大小匯出圖片：</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>原始大小</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 像素 (適合大型螢幕)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 像素 (適合大型網頁)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 像素 (適合網頁)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 像素 (適合電子郵件)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>匯出電影的方式：</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>第一個畫面</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>完整電影</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>網頁標題：</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>資料夾：</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>瀏覽...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>按一下 [範本名稱] 以檢視範例。當您完成選取時，按一下 [匯出]。</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>範本說明</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>匯出</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

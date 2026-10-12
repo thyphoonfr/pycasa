@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Impor Album dari Album Web</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Foto dalam album web tercentang di bawah ini akan diunduh ke komputer setelah Anda mengeklik tombol Oke. Foto tersebut akan ditata otomatis ke dalam folder menurut nama album.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Anda memiliki 100 album web online.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Impor semua album</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Impor album terpilih:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nama</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Tanggal</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(CATATAN: Hanya foto yang belum ada di komputer akan diunduh)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Oke</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

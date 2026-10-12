@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nama:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Tanggal:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Tanggal otomatis</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Musik:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Gunakan musik untuk presentasi Rangkai Slide dan Film:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Lokasi pengambilan (opsional):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Deskripsi (opsional):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>Oke</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

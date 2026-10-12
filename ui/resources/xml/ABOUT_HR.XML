@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>O programu Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Svi ostali proizvodi, nazivi usluga, robne markeili trgovački znakovi pripadaju svojim vlasnicima.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Softver se djelomično temelji na radu tvrtke Independent JPEG Group. Ovaj je program zaštićen američkim i međunarodnim zakonima o zaštiti autorskih prava.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Licence trećih strana...</xmbtext>
+ </stringres>
+</resources>

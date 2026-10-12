@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="choose_mail/selecttext" xmbdesc="Label(choose_mail/selecttext)">
+  <xmbtext>เลือกวิธีที่คุณต้องการในการส่งอีเมลรูปภาพของคุณ</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1" xmbdesc="Label(choose_mail/mail1)">
+  <xmbtext>ไคลเอนต์เมล</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1a" xmbdesc="Label(choose_mail/mail1a)">
+  <xmbtext>ใช้โปรแกรมอีเมลตามค่าเริ่มต้น</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2" xmbdesc="Label(choose_mail/mail2)">
+  <xmbtext>Google Mail</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2a" xmbdesc="Label(choose_mail/mail2a)">
+  <xmbtext>ใช้บัญชี Gmail หรือบัญชีผู้ใช้ Google</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/gmailsignup1" xmbdesc="Label(choose_mail/gmailsignup1)">
+  <xmbtext>ถ้าคุณไม่มีบัญชี Gmail สมัครบัญชีใหม่ฟรี</xmbtext>
+ </action>
+ <action type="WebTarget" target="choose_mail/gmailsignup1" xmbdesc="WebTarget(choose_mail/gmailsignup1)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/remember" xmbdesc="Label(choose_mail/remember)">
+  <xmbtext>จำการตั้งค่านี้  ไม่แสดงกรอบโต้ตอบนี้อีก</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/help" xmbdesc="Label(choose_mail/help)">
+  <xmbtext>ความช่วยเหลือ</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mailcancel" xmbdesc="Label(choose_mail/mailcancel)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+</tooltips>

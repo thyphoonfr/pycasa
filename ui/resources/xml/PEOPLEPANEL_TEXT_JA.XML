@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>名前を追加</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>顔を表示するフォルダを選択</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>無視</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>人物を手動で追加</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>キャンセル</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Picasa で写真をスキャンすると、顔が検出されて自動的にグループ化されるため、名前を簡単に指定できます。\n\n操作方法:\n\n人物の名前を指定するには、[名前を追加] をクリックしてその人物の名前を入力し、Enter キーを押します。新しい人物の名前を指定するたびに新しい人物アルバムが作成されます。\n\n（ヒント: Google アカウントでログインすると、名前を指定するときにすべての連絡先にアクセスできます）。\n\n特定の人物を無視する場合は、顔のサムネイルに表示されている [X] ボタンをクリックします。\n\n候補: 人物に名前を付けると、その人物に一致すると思われる顔の候補が表示されることがあります。人物のアルバムをクリックして表示し、候補を確認（または却下）してください。</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Picasa で写真をスキャンすると、顔が検出されて自動的にグループ化されるため、名前を簡単に指定できます。\n\n操作方法:\n\n人物の名前を指定するには、[名前を追加] をクリックしてその人物の名前を入力し、Enter キーを押します。新しい人物の名前を指定するたびに新しい人物アルバムが作成されます。\n\n（ヒント: Google アカウントでログインすると、名前を指定するときにすべての連絡先にアクセスできます）。\n\n特定の人物を無視する場合は、顔のサムネイルに表示されている [X] ボタンをクリックします。\n\n候補: 人物に名前を付けると、その人物に一致すると思われる顔の候補が表示されることがあります。人物のアルバムをクリックして表示し、候補を確認（または却下）してください。</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>人物は見つかっていません。顔が検出されてグループ化されると、名前なしアルバムに表示されます。スキャンの進行状況は、名前なしアルバムのアイテムに表示されます。</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>現在選択中の人物と一緒に写っている名前の付いた人物がここに表示されます。</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>現在選択中の写真に写っている人物が一覧表示されます。</xmbtext>
+ </action>
+</tooltips>

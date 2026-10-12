@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Коригиране на датата на снимката</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Текуща дата на снимката: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Нова дата на снимката: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Коригиране на датите на всички снимки с дадената стойност</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Задаване на една и съща дата и час за всички снимки</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

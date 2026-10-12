@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>圧縮しています</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>ディスク容量を確保するために Picasa のデータベースを圧縮しています。この作業には数分かかります。</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>圧縮しています...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

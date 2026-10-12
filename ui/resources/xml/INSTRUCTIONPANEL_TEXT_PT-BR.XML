@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Fechar</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Saiba mais...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Bem-vindo(a) ao álbum de pessoas &quot;Sem nome&quot;! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Conforme o Picasa processa suas fotos, os rostos encontrados são agrupados automaticamente para facilitar a nomeação.\n\nO que você deve saber:\n\nPara identificar uma pessoa, clique em &quot;Adicionar um nome&quot; e, em seguida, digite o nome da pessoa e pressione Enter. Um novo álbum de Pessoa será criado sempre que você nomear alguém pela primeira vez.\n\nDICA: faça o login na sua Conta do Google para acessar todos os contatos quando estiver nomeando.\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura do rosto.\n\nSugestões: após nomear alguém, o Picasa sugere mais faces correspondentes para essa pessoa. Clique no álbum da pessoa para ver e confirmar ou rejeitar qualquer sugestão.\n\n\n Clique em &quot;Saber mais&quot; para saber mais sobre esse recurso.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Conforme o Picasa processa suas fotos, os rostos encontrados são agrupados automaticamente para facilitar a nomeação.\n\nO que você deve saber:\n\nPara identificar uma pessoa, clique em &quot;Adicionar um nome&quot; e, em seguida, digite o nome da pessoa e pressione Enter. Um novo álbum de Pessoa será criado sempre que você nomear alguém pela primeira vez.\n\nDICA: faça o login na sua Conta do Google para acessar todos os contatos quando estiver nomeando.\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura do rosto.\n\nSugestões: após nomear alguém, o Picasa sugere mais faces correspondentes para essa pessoa. Clique no álbum da pessoa para ver e confirmar ou rejeitar qualquer sugestão.\n\n\n Clique em &quot;Saber mais&quot; para saber mais sobre esse recurso.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Przed użyciem Picasy zapoznaj się z warunkami licencji</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Korzystając z Picasy, akceptujesz Warunki korzystania z usług Google oraz Politykę prywatności.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Warunki korzystania z usługi</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/pl/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Polityka prywatności</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/pl/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Wysyłaj anonimowe statystyki użytkowania do Google (to ustawienie możesz później zmienić)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Zgadzam się</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

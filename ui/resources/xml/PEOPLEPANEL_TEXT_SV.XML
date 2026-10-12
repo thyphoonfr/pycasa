@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Lägg till ett namn</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Välj en mapp för visning av ansikten</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorera</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Lägg till en person manuellt</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>När dina foton genomsöks i Picasa grupperas ansiktena som identifieras så att du enkelt kan ange namn på dem.\n\nSaker du behöver veta:\n\nIdentifiera en person genom att klicka på Lägg till ett namn. Ange sedan personens namn och tryck på Retur. Albumet Personer skapas varje gång du anger ett namn på någon för första gången.\n\n(TIPS: Logga in med ditt Google-konto om du vill få tillgång till alla kontakter medan du anger namn.)\n\nOm du vill ignorera en person klickar du på knappen X vid personens miniatyrbild.\n\nFörslag: När du har angett ett namn på någon kan fler matchande ansikten föreslås i Picasa för den personen. Klicka på en persons album om du vill visa och bekräfta (eller avvisa) förslag.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>När dina foton genomsöks i Picasa grupperas ansiktena som identifieras så att du enkelt kan ange namn på dem.\n\nSaker du behöver veta:\n\nIdentifiera en person genom att klicka på Lägg till ett namn. Ange sedan personens namn och tryck på Retur. Albumet Personer skapas varje gång du anger ett namn på någon för första gången.\n\n(TIPS: Logga in med ditt Google-konto om du vill få tillgång till alla kontakter medan du anger namn.)\n\nOm du vill ignorera en person klickar du på knappen X vid personens miniatyrbild.\n\nFörslag: När du har angett ett namn på någon kan fler matchande ansikten föreslås i Picasa för den personen. Klicka på en persons album om du vill visa och bekräfta (eller avvisa) förslag.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Det gick inte att hitta några personer. När ansikten identifieras och grupperas visas de i albumet Namnlös. Under genomsökningen visas förloppsinformation i albumobjektet Namnlös.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Namngivna personer som visas med den valda personen listas här.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Personer som visas på de valda fotona listas här.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Apie „Picasa“</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Visi kiti produktų ir paslaugų pavadinimai, įmonių arba prekių ženklai priklauso jų savininkams.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Programinė įranga iš dalies sukurta pagal nepriklausomos JPEG grupės darbą. Ši programa saugoma JAV ir tarptautinių autorių teisių įstatymų.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Trečiųjų šalių licencijos...</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_share/to_text" xmbdesc="Label(compose_share/to_text)">
+  <xmbtext>گیرنده:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/group_text" xmbdesc="Label(compose_share/group_text)">
+  <xmbtext>گروه‌ها:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/subject_text" xmbdesc="Label(compose_share/subject_text)">
+  <xmbtext>موضوع:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/changeuser" xmbdesc="Label(compose_share/changeuser)">
+  <xmbtext>تغییر کاربر</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/send" xmbdesc="Label(compose_share/send)">
+  <xmbtext>ارسال</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discard" xmbdesc="Label(compose_share/discard)">
+  <xmbtext>رد کردن</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/sendb" xmbdesc="Label(compose_share/sendb)">
+  <xmbtext>ارسال</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/discardb" xmbdesc="Label(compose_share/discardb)">
+  <xmbtext>صرفنظر</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/collab_label" xmbdesc="Label(compose_share/collab_label)">
+  <xmbtext>اجازه به این افراد برای مشارکت در آلبوم من</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/infotext" xmbdesc="Label(compose_share/infotext)">
+  <xmbtext>آماده برای اشتراک‌گذاری! لطفاً گیرندگان دعوت خود را در زیر انتخاب نمایید.</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/visibility_label" xmbdesc="Label(compose_share/visibility_label)">
+  <xmbtext>قابلیت مشاهده آلبوم:</xmbtext>
+ </action>
+ <action type="Label" target="compose_share/cancel" xmbdesc="Label(compose_share/cancel)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+</tooltips>

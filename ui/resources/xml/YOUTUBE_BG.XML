@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Качване в YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Заглавие:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Описание:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Категория на видеоклипа:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Зарежда се...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Маркери:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>С помощта на тези ключови думи хората по-лесно могат да намират видеоклипа ви (разделени с интервал).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Този видеоклип да е обществен</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Видеоклипът ви може да бъде до 10 минути и 1 ГБ</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Не качвайте телевизионни предавания, музикални видеоклипове, музикални концерти и реклами, освен ако съдържанието им не е изцяло създадено от вас. Страницата със съвети за авторското право и Правилата на общността ще ви помогнат да определите дали видеоклипът ви нарушава нечии авторски права.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>С кликването си върху „Качване на видеоклипа“ декларирате, че той не нарушава Общите условия на YouTube, както и че притежавате всички авторски права за него или че сте упълномощени да го качите.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Качване на видеоклипа</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

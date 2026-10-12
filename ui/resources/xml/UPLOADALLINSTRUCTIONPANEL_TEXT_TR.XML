@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Kapat</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Toplu Yüklemeye Hoş Geldiniz!</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Çalışmak istediğiniz klasör ve albümlerin yanındaki kutuları işaretleyin. Ardından gerçekleştirmek istediğiniz işlemi seçin. Picasa işlemin yapılamayacağı öğeleri filtreler. Örneğin bir albümün tamamı zaten çevrimiçiyse Picasa, yüklenebilecekler arasında söz konusu albümü bir seçenek olarak göstermez.</xmbtext>
+ </action>
+</tooltips>

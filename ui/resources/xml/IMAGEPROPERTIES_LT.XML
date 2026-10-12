@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="imageproperties/labelgroup2.title">
+  <xmbtext>Failo pavadinimas:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/name.title">
+  <xmbtext>nuotrauka.jpg</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup4.title">
+  <xmbtext>Vieta:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/labelgroup6.title">
+  <xmbtext>Dydis:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/size.title">
+  <xmbtext>120 k</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/label9.title">
+  <xmbtext>Data:</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/date.title">
+  <xmbtext>WWW 00, 0000 00:00 WW</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column12.title">
+  <xmbtext>Ypatybė</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/column13.title">
+  <xmbtext>Reikšmė</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/prev.title">
+  <xmbtext>Atgal</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/navlabel.title">
+  <xmbtext>x iš x failų</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/next.title">
+  <xmbtext>Kitas</xmbtext>
+ </stringres>
+ <stringres id="imageproperties/button19.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+</resources>

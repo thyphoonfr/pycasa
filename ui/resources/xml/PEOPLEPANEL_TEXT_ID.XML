@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Tambahkan nama</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Pilih folder untuk menampilkan wajah</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Abaikan</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Tambahkan orang secara manual</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Ketika Picasa memindai foto Anda, wajah yang terdeteksi akan otomatis dikelompokkan untuk memudahkan penamaan.\n\nHal-hal yang perlu diketahui:\n\nUntuk mengidentifikasi orang, klik &#039;Tambahkan nama&#039;, lalu ketik nama orang dan tekan Enter. Album Orang baru akan dibuat setiap kali Anda menamai seseorang untuk pertama kalinya.\n\n(KIAT: Masuk menggunakan Akun Google untuk mendapatkan akses ke semua kontak Anda saat menamai.)\n\nUntuk mengabaikan orang, klik tombol &#039;X&#039; di gambar mini wajah.\n\nSaran: Setelah Anda menamai seseorang, Picasa mungkin menyarankan wajah lainnya yang cocok dengan orang tersebut. Klik album orang untuk melihat dan mengonfirmasi (atau menolak) saran apa pun.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Ketika Picasa memindai foto Anda, wajah yang terdeteksi akan otomatis dikelompokkan untuk memudahkan penamaan.\n\nHal-hal yang perlu diketahui:\n\nUntuk mengidentifikasi orang, klik &#039;Tambahkan nama&#039;, lalu ketik nama orang dan tekan Enter. Album Orang baru akan dibuat setiap kali Anda menamai seseorang untuk pertama kalinya.\n\n(KIAT: Masuk menggunakan Akun Google untuk mendapatkan akses ke semua kontak Anda saat menamai.)\n\nUntuk mengabaikan orang, klik tombol &#039;X&#039; di gambar mini wajah.\n\nSaran: Setelah Anda menamai seseorang, Picasa mungkin menyarankan wajah lainnya yang cocok dengan orang tersebut. Klik album orang untuk melihat dan mengonfirmasi (atau menolak) saran apa pun.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Belum ada seorang pun yang ditemukan. Ketika wajah ditemukan dan dikelompokkan, wajah tersebut akan muncul di album Tanpa Nama. Selama pemindaian, informasi kemajuan muncul di item album Tanpa Nama.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Orang yang Dinamai, yang muncul bersama orang yang saat ini dipilih, akan tercantum di sini.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Orang yang muncul di foto yang saat ini dipilih akan tercantum di sini.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="cdchoose/window1.title">
+  <xmbtext>เลือกดิสก์ไดรฟ์ที่บันทึกได้</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label5.title">
+  <xmbtext>Picasa พบไดรฟ์ที่บันทึกได้มากกว่าหนึ่งไดรฟ์\nคุณต้องการใช้ไดรฟ์ใด</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label7.title">
+  <xmbtext>ไดรฟ์:</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button10.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button11.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

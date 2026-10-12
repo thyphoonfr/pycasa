@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Du kan bruge hurtige tags, hvis du vil indsætte et tag med et enkelt klik. Indtast tags nedenfor, som du vil have adgang til via et enkelt klik. Som standard bruges de to øverste hurtige tags til at finde nyligt anvendte tags. Fjern markeringen i feltet nedenfor for manuelt at indstille de to øverste tags.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Udfyld automatisk tomme bokse med hyppigt anvendte tags</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Reserver de to øverste knapper til senest anvendte tags</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Annuller</xmbtext>
+ </action>
+</tooltips>

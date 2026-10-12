@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>환경설정</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>옵션</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>일반</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>사용자 인터페이스:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>특수효과 사용</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>툴팁 표시</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>도움말 태그 표시</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>한 번 클릭하여 수정보기 종료</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>파일:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>가져오는 동안 중복 사진 감지</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>캐시 파일 비우기</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>확인하지 않고 디스크에서 삭제</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>확인 없이 앨범에서 제거</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Picasa 개선을 위한 의견 보내기:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Google에 익명의 사용 통계 보내기</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>개인정보...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>자동 업데이트:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>자동 업데이트</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>업데이트를 다운로드하기 전에 확인</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>업데이트를 확인하지 않음</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>언어설정:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>시스템 기본값(en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>카메라가 연결되어 있으면 다음을 실행하세요.</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>애플리케이션 없음</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>ImageCapture 내에서 애플리케이션 선택...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>가져온 사진 저장 위치:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>이메일</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>이메일 프로그램:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>사진을 보낼 때마다 선택</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>내 컴퓨터의 기본 이메일 프로그램 사용</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>내 Google 계정 사용</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>여러 사진의 크기:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024픽셀</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s픽셀</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>사진 하나의 크기:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>여러 개 동일(1024픽셀)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>동일한 사진 반복(%s픽셀)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>원본 크기</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>동영상을 다음 형식으로 보내기:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>첫 번째 프레임</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>전체 동영상</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>출력 형식:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>인라인 사진 및 설명 보내기(Outlook 전용)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>파일 형식</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>JPEG 파일 및 다음 표시:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD(Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW 형식</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>지원되는 형식</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=ko&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>동영상(.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Quicktime 동영상(.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd(Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW 형식</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>지원되는 형식</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=ko&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>동영상(.mov, .mpg, .m4v, .3gp, .avi, ...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>슬라이드쇼</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>슬라이드쇼 반복</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>슬라이드쇼 중에 음악 트랙 재생</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>음악 트랙 폴더 선택:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>인쇄</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>인쇄 가능한 크기:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>미리보기:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>고품질 미리보기 사용(더 느림)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>프린터 품질:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>호환(절반 해상도)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>고품질(전체 해상도)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>인쇄 리샘플러 품질:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>일반(Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>매우 선명(Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>네트워크</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>프록시 사용자 이름:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>프록시 비밀번호:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>자동으로 네트워크 설정 검색</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>네트워크 로그 수준:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>로깅 사용 안함</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>오류만 로그</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>최소 로그 정보</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>자세한 로그 정보</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>모든 네트워크 정보 로그</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>로그:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>웹앨범</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>기본 업로드 크기:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>큰 파일을 동기화할 때 미리보기를 먼저 업로드</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(권장)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>JPEG 품질:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>원본 이미지 품질 보존(저장용량이 더 많이 소모됨)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>동기화:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>별표 표시된 사진만 동기화</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>모든 동기화를 확인하지 않음(위의 설정 사용)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>이름 태그:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>사진과 함께 이름 태그 정보 업로드</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>워터마크:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>모든 업로드 사진에 워터마크 추가:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>사진에 이름, 웹 도메인 또는 저작권 고지사항을 포함하세요.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>이름 태그</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>얼굴 인식 사용</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>추천 기능 사용:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>제안 임계값:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>클러스터 임계값:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>사진에 이름 태그 저장</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Google 주소록에 인물 앨범 작은 이미지 업로드</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>확인</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

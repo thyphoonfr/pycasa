@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>上传到 YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>标题：</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>说明：</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>视频类别：</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>正在加载...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>标签：</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>使用关键字可以帮助别人找到您的视频。（用空格分隔）</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>公开此视频</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>您的视频需限制在 10 分钟之内，且不能超过 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>如果未获得许可，请勿上传任何电视节目、音乐视频、音乐会，除非整体内容都是您的原创作品。请查阅“版权提示”页和“社区指南”，确定您的视频是否侵犯了他人的版权。</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>如果点击“上传视频”，即表示此视频未违反 YouTube 使用条款，并且您拥有此视频的所有版权或者拥有上传此视频的授权。</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>上传视频</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

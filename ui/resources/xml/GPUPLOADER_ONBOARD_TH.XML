@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>เลือกแหล่งที่มาของการสำรองข้อมูลอัตโนมัติ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>Google รูปภาพจะสำรองข้อมูลรูปภาพและวิดีโอโดยอัตโนมัติจากแหล่งที่มาที่เลือกไปยังห้องสมุดรูปภาพของคุณ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>เพิ่ม...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>ขนาดรูปภาพ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>คุณภาพสูง (พื้นที่เก็บข้อมูลฟรีไม่จำกัด)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>รูปภาพคุณภาพเยี่ยมในขนาดไฟล์ที่เล็กลง</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>ต้นฉบับ (จำกัดตามพื้นที่เก็บข้อมูลของบัญชี)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>การใช้ความละเอียดสูงสุดจะคิดรวมในโควต้าของคุณ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>ช่วยกันปรับปรุงรูปภาพด้วยการส่งสถิติการใช้งานที่ไม่ระบุชื่อ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>รับที่เก็บเพิ่ม...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>เริ่มต้นสำรองข้อมูล</xmbtext>
+ </stringres>
+</resources>

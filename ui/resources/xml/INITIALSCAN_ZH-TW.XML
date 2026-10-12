@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>電腦已安裝舊版的 Picasa。您要更新現有的相片庫，還是重新搜尋您的電腦中的圖片？</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>請從下面選取：</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>更新我現有的圖片庫</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>如果您在 Picasa 1 中使用關鍵字或自訂相簿，並想在 Picasa 3 中保留它們，請選擇此選項。</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>重新搜尋我的電腦中的圖片</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>選擇這個選項，即可讓系統更加全面地搜尋您的電腦，包括圖片延伸資訊。這個選項會保留您現有的修改和組織，但是不會保留關鍵字。這項搜尋可能需要數分鐘才能完成。</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>搜尋圖片絕不會將檔案移動或複製到新位置。您可以透過 [工具] 選單中的「資料夾管理員」工具，選擇要在 Picasa 顯示的資料夾</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>繼續</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa 已準備好搜尋您電腦上的圖片</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>請從下面選取：</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>搜尋電腦中的所有圖片</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>如果您有圖片儲存在您電腦的多個資料夾中，尤其是儲存在超過一台硬碟機上時，請選擇這個選項。</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>只搜尋文件、圖片、桌面和 iPhoto 圖庫</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>如果您的圖片全都儲存在上述資料夾，請選擇這個選項。</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>搜尋圖片並不會使得檔案的位置有所變更或產生任何複製的檔案。您可以透過 [工具] 選單中的「資料夾管理員」工具，選擇要在 Picasa 顯示的資料夾</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>繼續</xmbtext>
+ </action>
+</tooltips>

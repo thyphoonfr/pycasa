@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="contactmgr/window1.title">
+  <xmbtext>افراد</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup4.title">
+  <xmbtext>جستجو:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/delete.title">
+  <xmbtext>حذف شخص</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/create.title">
+  <xmbtext>شخص جدید</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online_contact.title">
+  <xmbtext>مخاطب آنلاین</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup22.title">
+  <xmbtext>نام:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/labelgroup24.title">
+  <xmbtext>ایمیل(ها):</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/sync.title">
+  <xmbtext>همگام‌سازی نشان‌های چهره با آلبوم‌های وب</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/album_id_group.title">
+  <xmbtext>شناسه آلبوم:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/contact_id_group.title">
+  <xmbtext>شناسه مخاطب:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_id_group.title">
+  <xmbtext>شناسه فوکوس:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/subject_id_group.title">
+  <xmbtext>شناسه سوژه:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/focus_obfuscated_gaia_id_group.title">
+  <xmbtext>Focus Obfuscated GAIA ID:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/mobile_obfuscated_gaia_id_group.title">
+  <xmbtext>‏شناسه Mobile Obfuscated GAIA:</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/revert.title">
+  <xmbtext>برگرداندن</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/online.title">
+  <xmbtext>مدیریت مخاطبین آنلاین</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/refresh_contacts.title">
+  <xmbtext>بازخوانی مخاطبین</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/ok.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+ <stringres id="contactmgr/cancel.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

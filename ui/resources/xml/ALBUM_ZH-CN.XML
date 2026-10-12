@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>名称：</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>日期：</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>自动日期</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>音乐：</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>幻灯片和影片演示时配上音乐：</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>浏览...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>拍摄地点（可选）：</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>说明（可选）：</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

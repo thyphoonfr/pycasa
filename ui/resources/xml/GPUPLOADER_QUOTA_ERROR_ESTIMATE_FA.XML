@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>‏پشتیبان‌گیری خودکار Google+‎</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>فضای ذخیره‌سازی کافی نیست</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>‏پوشه‌هایی را انتخاب کرده‌اید که نسبت به Google Drive storage باقیمانده شما فضای بیشتری را اشغال می‌کنند.  می‌توانید فضای ذخیره‌سازی بیشتری خریداری کنید یا از تعداد نامحدودی از عکس‌ها و ویدیوها در اندازه استاندارد به صورت رایگان نسخه پشتیبان تهیه کنید.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>اگر تازه فضای ذخیره‌سازی خریداری کرده‌اید، ممکن است اعمال تغییرات چند دقیقه طول بکشد.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>دریافت فضای ذخیره‌سازی بیشتر...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>تغییر به اندازه استاندارد</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Πληροφορίες για το Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Όλα τα άλλα ονόματα προϊόντων, υπηρεσιών, οι επωνυμίες ή τα εμπορικά σήματα, αποτελούν ιδιοκτησία των αντίστοιχων κατόχων τους.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Αυτό το λογισμικό βασίζεται εν μέρει στην εργασία της ομάδας Independent JPEG Group. Αυτό το πρόγραμμα προστατεύεται από τη νομοθεσία των ΗΠΑ και τη διεθνή νομοθεσία περί πνευματικών δικαιωμάτων.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Άδειες χρήσης τρίτου μέρους...</xmbtext>
+ </stringres>
+</resources>

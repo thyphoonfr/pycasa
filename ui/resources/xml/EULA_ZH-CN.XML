@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>使用Picasa前，请先阅读许可条款</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>使用Picasa即表示您同意Google服务条款和隐私权政策。</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>服务条款</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/zh-CN/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>隐私权政策</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/zh-CN/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>将使用情况统计信息匿名发送给Google（此设置日后可以随时更改）</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>我接受</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

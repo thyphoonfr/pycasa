@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Zapri</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Več o tem ...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Dobrodošli v albumu »Neimenovane osebe«. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Ko Picasa pregleda vaše fotografije, samodejno združi najdene obraze v skupine, da jih lažje poimenujete.\n\nKaj morate upoštevati:\n\nČe želite prepoznati osebo, kliknite »Dodaj ime«, vnesite ime osebe in pritisnite tipko Enter. Ko prvič poimenujete neko novo osebo, bo ustvarjen nov album »Osebe«.\n\n(NASVET: prijavite se z Google Računom, da boste imeli med poimenovanjem dostop do vseh svojih stikov.)\n\nČe želite prezreti osebo, kliknite gumb »X« na sličici obraza.\n\nPredlogi: ko poimenujete neko osebo, Picasa morda predlaga še druge obraze, ki se ujemajo s to osebo. Kliknite album osebe, če si želite ogledati in potrditi (ali zavrniti) morebitne predloge.\n\n\n Kliknite »Več informacij« za več informacij o tej funkciji.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Ko Picasa pregleda vaše fotografije, samodejno združi najdene obraze v skupine, da jih lažje poimenujete.\n\nKaj morate upoštevati:\n\nČe želite prepoznati osebo, kliknite »Dodaj ime«, vnesite ime osebe in pritisnite tipko Enter. Ko prvič poimenujete neko novo osebo, bo ustvarjen nov album »Osebe«.\n\n(NASVET: prijavite se z Google Računom, da boste imeli med poimenovanjem dostop do vseh svojih stikov.)\n\nČe želite prezreti osebo, kliknite gumb »X« na sličici obraza.\n\nPredlogi: ko poimenujete neko osebo, Picasa morda predlaga še druge obraze, ki se ujemajo s to osebo. Kliknite album osebe, če si želite ogledati in potrditi (ali zavrniti) morebitne predloge.\n\n\n Kliknite »Več informacij« za več informacij o tej funkciji.</xmbtext>
+ </action>
+</tooltips>

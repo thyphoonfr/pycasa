@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Додати ім&#039;я</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Виберіть папку для відображення облич</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Пропустити</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Додати користувача вручну</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Скасувати</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Picasa сканує ваші фотографії й автоматично групує ті з них, де впізнає ті самі обличчя, щоб вам було зручно позначати людей.\n\nВарто знати\n\nЩоб позначити людину, натисніть &quot;Додати ім’я&quot;, введіть ім’я й натисніть Enter. Щоразу, коли ви вперше когось позначаєте, створюється новий альбом &quot;Люди&quot;.\n\n(ПОРАДА. Увійдіть у свій обліковий запис Google, щоб мати доступ до всіх своїх контактів, позначаючи людей.)\n\nЩоб ігнорувати людину, натисніть кнопку &quot;X&quot; на ескізі з обличчям.\n\nПропозиції: коли позначено людину, Picasa може запропонувати інші фотографії з цим обличчям. Натисніть альбом цієї людини, щоб переглянути й підтвердити (або відхилити) пропозиції.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Picasa сканує ваші фотографії й автоматично групує ті з них, де впізнає ті самі обличчя, щоб вам було зручно позначати людей.\n\nВарто знати\n\nЩоб позначити людину, натисніть &quot;Додати ім’я&quot;, введіть ім’я й натисніть Enter. Щоразу, коли ви вперше когось позначаєте, створюється новий альбом &quot;Люди&quot;.\n\n(ПОРАДА. Увійдіть у свій обліковий запис Google, щоб мати доступ до всіх своїх контактів, позначаючи людей.)\n\nЩоб ігнорувати людину, натисніть кнопку &quot;X&quot; на ескізі з обличчям.\n\nПропозиції: коли позначено людину, Picasa може запропонувати інші фотографії з цим обличчям. Натисніть альбом цієї людини, щоб переглянути й підтвердити (або відхилити) пропозиції.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Не знайдено людей. Коли обличчя буде знайдено та згруповано, вони з’являться в альбомі &quot;Без імені&quot;. Під час сканування в альбомі &quot;Без імені&quot; з’являється інформація про процес виконання.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Люди з іменами, які з’являються разом із вибраною особою, знаходитимуться тут.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Люди, присутні на наразі вибраних фотографіях, відображатимуться тут.</xmbtext>
+ </action>
+</tooltips>

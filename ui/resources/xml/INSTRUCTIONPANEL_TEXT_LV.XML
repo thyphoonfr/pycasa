@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Aizvērt</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Uzziniet vairāk...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Laipni lūdzam nenosaukto personu albumā! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Kad pakalpojums Picasa skenē jūsu fotoattēlus, tajos redzamās sejas tiek automātiski grupētas, lai tām varētu piešķirt vārdus.\n\nŅemiet vērā:\n\nLai identificētu kādu personu, noklikšķiniet uz &#039;Pievienot vārdu&#039;, pēc tam ievadiet personas vārdu un nospiediet taustiņu Enter. Ikreiz, kad kādai personai pirmoreiz piešķirat vārdu, tiek izveidots jauns personas albums.\n\n(PADOMS. Pierakstieties, izmantojot savu Google kontu, lai vārda piešķiršanas laikā piekļūtu visām savām Google konta kontaktpersonām.)\n\nLai ignorētu kādu personu, noklikšķiniet uz sejas sīktēla pogas &#039;X&#039;.\n\nIeteikumi. Kad personai piešķirat vārdu, pakalpojums Picasa var ieteikt citas atbilstošas šīs personas sejas. Noklikšķiniet uz personas albuma, lai skatītu un apstiprinātu (vai noraidītu) ieteikumus.\n\n\n Noklikšķiniet uz &#039;Uzziniet vairāk&#039;, lai iegūtu papildinformāciju par šo funkciju.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Kad pakalpojums Picasa skenē jūsu fotoattēlus, tajos redzamās sejas tiek automātiski grupētas, lai tām varētu piešķirt vārdus.\n\nŅemiet vērā:\n\nLai identificētu kādu personu, noklikšķiniet uz &#039;Pievienot vārdu&#039;, pēc tam ievadiet personas vārdu un nospiediet taustiņu Enter. Ikreiz, kad kādai personai pirmoreiz piešķirat vārdu, tiek izveidots jauns personas albums.\n\n(PADOMS. Pierakstieties, izmantojot savu Google kontu, lai vārda piešķiršanas laikā piekļūtu visām savām Google konta kontaktpersonām.)\n\nLai ignorētu kādu personu, noklikšķiniet uz sejas sīktēla pogas &#039;X&#039;.\n\nIeteikumi. Kad personai piešķirat vārdu, pakalpojums Picasa var ieteikt citas atbilstošas šīs personas sejas. Noklikšķiniet uz personas albuma, lai skatītu un apstiprinātu (vai noraidītu) ieteikumus.\n\n\n Noklikšķiniet uz &#039;Uzziniet vairāk&#039;, lai iegūtu papildinformāciju par šo funkciju.</xmbtext>
+ </action>
+</tooltips>

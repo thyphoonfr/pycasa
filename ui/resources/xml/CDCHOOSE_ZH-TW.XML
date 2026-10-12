@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="cdchoose/window1.title">
+  <xmbtext>選擇光碟燒錄機</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label5.title">
+  <xmbtext>Picasa 找到幾個光碟燒錄機。\n您想使用哪一個？</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label7.title">
+  <xmbtext>磁碟機：</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button10.title">
+  <xmbtext>確定</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button11.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

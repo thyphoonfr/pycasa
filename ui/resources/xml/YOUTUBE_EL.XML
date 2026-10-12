@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Μεταφόρτωση στο YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Τίτλος:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Περιγραφή:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Κατηγορία βίντεο:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Φόρτωση...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Ετικέτες:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Πρόκειται για λέξεις-κλειδιά που βοηθούν στην εύρεση των βίντεό σας. (ξεχωριστός χώρος)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Κάντε αυτό το βίντεο δημόσιο</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Το βίντεό σας περιορίζεται στα 10 λεπτά και το 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Μην κάνετε μεταφόρτωση τηλεοπτικών σειρών, μουσικών βίντεο, μουσικών συναυλιών ή διαφημιστικών χωρίς άδεια, εκτός αν πρόκειται για περιεχόμενο που δημιουργήσατε εσείς. Η σελίδα &quot;Συμβουλές περί πνευματικών δικαιωμάτων&quot; και οι Οδηγίες κοινότητας μπορούν να σας βοηθήσουν να διαπιστώσετε αν το βίντεό σας παραβιάζει τα πνευματικά δικαιώματα κάποιου άλλου.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Κάνοντας κλικ στην επιλογή &quot;Μεταφόρτωση βίντεο&quot;, δηλώνετε ότι αυτό το βίντεο δεν παραβιάζει τους Όρους Χρήσης του YouTube και ότι είστε ο κάτοχος όλων των πνευματικών δικαιωμάτων αυτού του βίντεο ή ότι είστε εξουσιοδοτημένος να το μεταφορτώσετε.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Μεταφόρτωση βίντεο</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Ознайомтеся з умовами ліцензійної угоди перед використанням Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Використовуючи Picasa, ви приймаєте Загальні положення та умови й Політику конфіденційності Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Загальні положення та умови</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Політика конфіденційності</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Надіслати до Google анонімну статистику використання (пізніше можна завжди змінити налаштування)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Приймаю</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

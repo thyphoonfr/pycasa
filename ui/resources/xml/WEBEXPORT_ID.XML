@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Ekspor sebagai Laman HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Ekspor foto di:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Ukuran Asli</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 piksel (untuk layar besar)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 piksel (untuk laman web ukuran besar)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 piksel (untuk laman Web)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 piksel (untuk email)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Ekspor film menggunakan:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Bingkai pertama</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Film utuh</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Judul laman web:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Folder:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Klik Nama Kerangka untuk menampilkan contoh.  Setelah memilih, klik Ekspor.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Deskripsi Kerangka</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Ekspor</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

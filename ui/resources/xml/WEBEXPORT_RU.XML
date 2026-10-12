@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Экспорт в формате HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Экспорт фотографий в:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Исходный размер</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 пикселя (для больших мониторов)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 пикселей (для больших веб-страниц)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 пикселей (для веб-страниц)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 пикселей (для сообщения электронной почты)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Экспорт фильмов:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Первый кадр</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Весь фильм</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Заголовок веб-страницы:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Папка:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Обзор...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Нажмите на название шаблона, чтобы просмотреть пример. Сделав выбор, нажмите &quot;Экспорт&quot;.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Описание шаблона</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Экспорт</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

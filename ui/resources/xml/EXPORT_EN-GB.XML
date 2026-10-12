@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Export to Folder</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Export location:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Browse...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Name of exported folder:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Add numbers to file names to preserve order</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Image size:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Use original size</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Resize to:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixels</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Image quality:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatic</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Custom</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Preserves original image quality</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Good balance of quality and size</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Very large file size, preserves fine detail</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Smallest file size, some quality loss</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Export films using:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>First frame</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Full film (no resizing)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Watermark:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Add watermark</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Stamp photos with your name, a web domain or a copyright notice.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

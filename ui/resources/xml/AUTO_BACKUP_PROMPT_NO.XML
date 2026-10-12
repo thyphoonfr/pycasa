@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Sikkerhetskopiering av Google Bilder</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Sikkerhetskopiér Picasa-bildene dine</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Bruk Sikkerhetskopiering av Google Bilder til å automatisk lagre bildene og videoene dine på nett. Du har tilgang til tingene dine fra alle enheter, og alt forblir privat til du velger å dele.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Skaff deg Sikkerhetskopiering av Google Bilder</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nei takk</xmbtext>
+ </stringres>
+</resources>

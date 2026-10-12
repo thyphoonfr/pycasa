@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="choose_mail/selecttext" xmbdesc="Label(choose_mail/selecttext)">
+  <xmbtext>Fotoğraflarınızı e-postayla nasıl göndermek istediğinizi belirtin.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1" xmbdesc="Label(choose_mail/mail1)">
+  <xmbtext>POSTA İSTEMCİSİ</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1a" xmbdesc="Label(choose_mail/mail1a)">
+  <xmbtext>Varsayılan e-posta programımı kullan.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2" xmbdesc="Label(choose_mail/mail2)">
+  <xmbtext>Google Posta</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2a" xmbdesc="Label(choose_mail/mail2a)">
+  <xmbtext>Gmail veya Google hesabımı kullan.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/gmailsignup1" xmbdesc="Label(choose_mail/gmailsignup1)">
+  <xmbtext>Gmail adresiniz yok mu? Ücretsiz bir hesap edinin.</xmbtext>
+ </action>
+ <action type="WebTarget" target="choose_mail/gmailsignup1" xmbdesc="WebTarget(choose_mail/gmailsignup1)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/remember" xmbdesc="Label(choose_mail/remember)">
+  <xmbtext>Bu ayarı hatırla ve bu iletişim kutusunu bir daha gösterme.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/help" xmbdesc="Label(choose_mail/help)">
+  <xmbtext>Yardım</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mailcancel" xmbdesc="Label(choose_mail/mailcancel)">
+  <xmbtext>İptal et</xmbtext>
+ </action>
+</tooltips>

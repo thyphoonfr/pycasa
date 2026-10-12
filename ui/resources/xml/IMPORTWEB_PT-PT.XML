@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importar álbuns a partir dos Álbuns Web</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>As imagens dos Álbuns Web marcadas abaixo serão transferidas para o seu computador quando clicar no botão OK. Serão automaticamente organizadas em pastas com base nos nomes do álbum.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Tem 100 álbuns Web on-line.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importar todos os álbuns</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importar álbuns seleccionados:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nome</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOTA: Só serão transferidas as imagens que ainda não se encontram no seu computador)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

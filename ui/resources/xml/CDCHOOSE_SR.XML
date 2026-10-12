@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="cdchoose/window1.title">
+  <xmbtext>Одаберите драјв на који може да се снима</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label5.title">
+  <xmbtext>Picasa је нашла више од једног диска на који може да се снима.\nКоји диск желите да користите?</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label7.title">
+  <xmbtext>Драјвови:</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button10.title">
+  <xmbtext>Потврди</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button11.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

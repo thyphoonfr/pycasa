@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Siirrä tietokanta</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Sinun on käynnistettävä Picasa uudelleen, jotta muutokset tulevat voimaan.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Huomaa: tietokanta kannattaa varmuuskopioida ennen kuin kokeilet tätä kokeellista toimintoa. ÄLÄ KOSKAAN siirrä tietokantaa verkkoon tai siirrettävään tai ulkoiseen asemaan tai saatat menettää tietoja.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Tietokannan nykyinen sijainti:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Tietokannan uusi sijainti:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Selaa...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Oletus</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Siirrä seuraavan uudelleenkäynnistyksen yhteydessä</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

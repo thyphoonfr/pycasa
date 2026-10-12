@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Sulje</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Lisätietoja...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Tervetuloa nimeämättömään henkilöalbumiin. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Kun Picasa skannaa kuvasi, löydetyt kuvat ryhmitellään automaattisesti helppoa nimeämistä varten.\n\nHyvä tietää:\n\nNimeä henkilö klikkaamalla &#039;Lisää nimi&#039;, kirjoita henkilön nimi ja paina Enter-painiketta.  Uusi Henkilöt-albumi luodaan aina, kun nimeät henkilön ensimmäisen kerran.\n\n(VINKKI: kirjaudu sisään Google-tiliisi, jotta voit käyttää kaikkia Google-yhteystietojasi nimeämisen aikana.)\n\nOhita henkilö klikkaamalla &#039;X&#039;-painiketta kasvojen pikkukuvassa.\n\nEhdotukset: Kun olet nimennyt henkilön, Picasa voi ehdottaa muita yhteensopivia kasvoja. Klikkaa henkilön albumia ja tarkastele ja hyväksy (tai hylkää) ehdotukset.\n\n\n Klikkaa &#039;Lisätietoja&#039;, jos haluat lukea lisää tästä toiminnosta.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Kun Picasa skannaa kuvasi, löydetyt kuvat ryhmitellään automaattisesti helppoa nimeämistä varten.\n\nHyvä tietää:\n\nNimeä henkilö klikkaamalla &#039;Lisää nimi&#039;, kirjoita henkilön nimi ja paina Enter-painiketta.  Uusi Henkilöt-albumi luodaan aina, kun nimeät henkilön ensimmäisen kerran.\n\n(VINKKI: kirjaudu sisään Google-tiliisi, jotta voit käyttää kaikkia Google-yhteystietojasi nimeämisen aikana.)\n\nOhita henkilö klikkaamalla &#039;X&#039;-painiketta kasvojen pikkukuvassa.\n\nEhdotukset: Kun olet nimennyt henkilön, Picasa voi ehdottaa muita yhteensopivia kasvoja. Klikkaa henkilön albumia ja tarkastele ja hyväksy (tai hylkää) ehdotukset.\n\n\n Klikkaa &#039;Lisätietoja&#039;, jos haluat lukea lisää tästä toiminnosta.</xmbtext>
+ </action>
+</tooltips>

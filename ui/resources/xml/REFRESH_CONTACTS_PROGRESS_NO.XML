@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>Laster inn kontakter på nytt</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Picasa laster inn nettbasert kontaktinformasjon på nytt.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>Last inn på nytt i bakgrunnen</xmbtext>
+ </stringres>
+</resources>

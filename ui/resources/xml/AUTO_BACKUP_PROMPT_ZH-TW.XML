@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google 相簿備份</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>備份您的 Picasa 相片</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Google 相簿備份會自動將您的相片和影片儲存在線上，方便您透過所有個人裝置存取。除非您選擇與他人分享，否則只有您可以存取這些備份的項目。</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>取得 Google 相簿備份</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>不用了，謝謝</xmbtext>
+ </stringres>
+</resources>

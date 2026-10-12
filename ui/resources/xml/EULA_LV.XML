@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Pirms lietojat programmu Picasa, lūdzu, izskatiet licences noteikumus.</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Lietojot programmu Picasa, jūs piekrītat Google pakalpojumu sniegšanas noteikumiem un konfidencialitātes politikai.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Pakalpojumu sniegšanas noteikumi</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/lv/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Konfidencialitātes politika</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/lv/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Sūtīt anonīmu lietošanas statistiku uzņēmumam Google (šo iestatījumu vēlāk varēsiet mainīt)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Es piekrītu</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

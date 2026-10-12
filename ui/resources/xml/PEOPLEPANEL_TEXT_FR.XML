@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Ajouter un nom</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Sélectionner le dossier dans lequel les visages doivent être affichés</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorer</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Ajouter une personne manuellement</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Annuler</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Lorsque Picasa analyse les photos, les visages détectés sont automatiquement regroupés afin de faciliter l&#039;attribution d&#039;un nom aux individus correspondants.\n\nDeux choses à savoir :\n\nPour identifier une personne, cliquez sur &quot;Ajouter un nom&quot;, puis saisissez son nom et appuyez sur la touche &quot;Entrée&quot;. Un album individuel est créé chaque fois que vous ajoutez le nom de quelqu&#039;un pour la première fois.\n\n(CONSEIL : Connectez-vous à votre compte Google pour avoir accès au nom de tous vos contacts lors de cette opération.)\n\nSi vous ne souhaitez pas identifier une personne, cliquez sur le bouton &quot;X&quot; sur la miniature de son visage.\n\nSuggestions : Une fois que vous identifiez quelqu&#039;un sur une photo, Picasa est susceptible de suggérer d&#039;autres visages correspondants pour cette personne. Cliquez sur l&#039;album de cette dernière pour afficher et confirmer (ou refuser) les suggestions.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Lorsque Picasa analyse les photos, les visages détectés sont automatiquement regroupés afin de faciliter l&#039;attribution d&#039;un nom aux individus correspondants.\n\nDeux choses à savoir :\n\nPour identifier une personne, cliquez sur &quot;Ajouter un nom&quot;, puis saisissez son nom et appuyez sur la touche &quot;Entrée&quot;. Un album individuel est créé chaque fois que vous ajoutez le nom de quelqu&#039;un pour la première fois.\n\n(CONSEIL : Connectez-vous à votre compte Google pour avoir accès au nom de tous vos contacts lors de cette opération.)\n\nSi vous ne souhaitez pas identifier une personne, cliquez sur le bouton &quot;X&quot; sur la miniature de son visage.\n\nSuggestions : Une fois que vous identifiez quelqu&#039;un sur une photo, Picasa est susceptible de suggérer d&#039;autres visages correspondants pour cette personne. Cliquez sur l&#039;album de cette dernière pour afficher et confirmer (ou refuser) les suggestions.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Aucune personne n&#039;a été trouvée pour l&#039;instant. Les visages apparaîtront dans l&#039;album Sans nom, au fur et à mesure qu&#039;ils seront repérés et regroupés. Lors de l&#039;analyse, les informations de progression apparaissent dans l&#039;album Sans nom.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Les personnes associées à un nom et apparaissant avec la personne sélectionnée seront répertoriées ici.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Les personnes qui apparaissent dans les photos sélectionnées seront répertoriées ici.</xmbtext>
+ </action>
+</tooltips>

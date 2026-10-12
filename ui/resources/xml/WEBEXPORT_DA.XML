@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Eksporter som HTML-side</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Eksporter billeder på:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Oprindelig størrelse</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixels (til store skærme)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixels (til store websider)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixels (til websider)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixels (til e-mail)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Eksporter film ved hjælp af:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Første ramme</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Hel film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Titel på webside:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Mappe:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Gennemse...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Klik på et skabelonnavn for at få vist et eksempel. Klik på Eksporter, når du har foretaget dit valg.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Skabelonbeskrivelse</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Eksporter</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

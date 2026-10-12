@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>वेब एल्बम से एल्बम आयात करें</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>आपके द्वारा एक बार ठीक बटन क्लिक किए जाने पर नीचे चेक किए गए वेब एल्बम में मौजूद चित्र आपके कंप्यूटर पर डाउनलोड हो जाएंगे. वे एल्बम नामों के आधार पर अपने आप फ़ोल्डर में व्यवस्थित हो जाएंगे.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>आपके पास 100 वेब एल्बम ऑनलाइन हैं.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>सभी एल्बम आयात करें</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>चयनित एल्बम आयात करें:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>नाम</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>तिथि</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(टिप्पणी: केवल वे चित्र डाउनलोड होंगे, जो आपके कंप्यूटर पर पहले से नहीं हैं)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>ठीक</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

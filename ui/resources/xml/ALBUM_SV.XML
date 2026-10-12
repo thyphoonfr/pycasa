@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Namn:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Datum:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Automatiskt datum</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Musik:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Använd musik för bildspel och filmpresentation:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Bläddra...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Plats tagen (valfritt):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Beskrivning (valfritt):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

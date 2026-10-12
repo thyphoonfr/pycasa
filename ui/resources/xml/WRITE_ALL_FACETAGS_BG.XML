@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Записване на маркерите за лица</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>„Записване на лицата“ или „Записване на избраните“ може да отнеме много време.  Ако записът на регистрационна информация е настроен на ниво „подробно“ или по-високо, в network.log ще има съобщения за файловете само за четене, които не са могли да бъдат актуализирани.  Когато използвате тази функция, се препоръчва да излезете от профила си.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Записване на избраните</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Записване на лицата</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Записване на всички</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

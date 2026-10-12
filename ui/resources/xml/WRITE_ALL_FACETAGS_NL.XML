@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Gezichtstags schrijven</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Gezichtstags schrijven of Alles schrijven kan lang duren. Als logboekregistratie staat ingesteld op gedetailleerd of hoger, bevat het netwerklogboek berichten over alleen lezen-bestanden die niet konden worden bijgewerkt. We bevelen aan om uit te loggen als u deze functie gebruikt.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Selectie schrijven</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Gezichten schrijven</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Alles schrijven</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

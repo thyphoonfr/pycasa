@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Mutaţi baza de date</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Va trebui să reporniţi Picasa pentru ca modificările să se aplice.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Reţineţi: trebuie să creaţi o copie de rezervă pentru baza de date înainte de a încerca această funcţie experimentală. Nu mutaţi NICIODATĂ baza de date într-o reţea, pe o unitate amovibilă sau externă; în caz contrar, puteţi pierde datele.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Locaţia curentă a bazei de date:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Noua locaţie a bazei de date:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Răsfoiţi...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Prestabilit</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Mutaţi la următoarea repornire</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

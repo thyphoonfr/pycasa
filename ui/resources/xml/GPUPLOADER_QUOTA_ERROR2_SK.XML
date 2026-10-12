@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Zálohovanie Fotiek Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Nedostatok úložiska na Disku Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Získajte viac úložiska a naďalej si svoje originálne fotky zálohujte pri plnom rozlíšení. Prípadne prejdite na vysokú kvalitu a získajte neobmedzené úložisko: úžasnú vizuálnu kvalitu pri zníženej veľkosti súboru.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Získať pomoc pri rozhodovaní</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Získať viac úložiska</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Prejsť na vysokú kvalitu</xmbtext>
+ </stringres>
+</resources>

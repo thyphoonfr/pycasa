@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Cadangan Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Cadangkan foto Picasa Anda</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Simpan foto dan video secara online dan otomatis dengan Cadangan Google Foto. Foto dan video itu dapat diakses dengan mudah dari semua perangkat dan hanya Anda yang dapat melihatnya hingga memilih untuk membagikannya.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Dapatkan Cadangan Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Tidak, Terima kasih</xmbtext>
+ </stringres>
+</resources>

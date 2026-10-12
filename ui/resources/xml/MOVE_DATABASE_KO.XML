@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>데이터베이스 이동</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>변경사항을 적용하려면 Picasa를 다시 시작해야 합니다.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>참고사항: 이 실험실 기능을 사용하려면 데이터베이스를 백업해야 합니다. 데이터 손실의 위험이 있으므로 데이터베이스를 네트워크나 이동식 또는 외부 드라이브로 이동해서는 안됩니다.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>현재 데이터베이스 위치:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>새 데이터베이스 위치:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>기본값</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>다음에 다시 시작할 때 이동</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>‏۱ گیگابایت فضای ذخیره‌سازی Google Drive باقی‌مانده</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>فضای ذخیره‌سازی بیشتری دریافت کنید تا پشتیبان گرفتن از عکس‌های اصلی‌تان در وضوح کامل ادامه یابد. یا برای فضای ذخیره‌سازی رایگان، به کیفیت بالا جابه‌جا شوید: کیفیت تصویری عالی در فایل کم‌حجم.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>دریافت راهنمایی برای تصمیم‌گیری</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>دریافت فضای ذخیره‌سازی بیشتر</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>تغییر به کیفیت بالا</xmbtext>
+ </stringres>
+</resources>

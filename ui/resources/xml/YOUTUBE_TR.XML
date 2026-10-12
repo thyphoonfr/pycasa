@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>YouTube&#039;a Yükle</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Başlık:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Açıklama:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Video kategorisi:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Yükleniyor...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Etiketler:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Bunlar, kullanıcıların videonuzu bulmasına yardımcı olacak anahtar kelimelerdir. (boşlukla ayırın)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Bu videoyu herkese açık yap</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videonuz 10 dakika ve 1 GB boyutla sınırlıdır.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Tümüyle kendi oluşturduğunuz içerik değilse TV dizileri, müzik videoları, müzik konserleri veya reklamlar yayınlamayın. Telif Hakları İpuçları sayfası ve Topluluk Kuralları, videonuzun başka birinin telif haklarını ihlal edip etmediğini belirlemenize yardımcı olabilir.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>&quot;Video Yükle&quot;yi tıklayarak bu videonun YouTube&#039;un Kullanım Şartları&#039;nı ihlal etmediğini ve bu videonun tüm telif haklarına sahip olduğunuzu veya bu videoyu yüklemek için izniniz bulunduğunu beyan etmiş olursunuz.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Video Yükle</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

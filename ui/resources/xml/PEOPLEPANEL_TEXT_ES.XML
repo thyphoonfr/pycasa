@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Añadir un nombre</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Seleccionar la carpeta de la cual se desean ver las caras</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorar</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Añadir a una persona manualmente</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Cuando Picasa analiza tus fotos, agrupa automáticamente las caras que detecta para que te sea más sencillo asignarles un nombre.\n\nImportante:\n\nPara identificar a una persona, haz clic en Añadir un nombre y, a continuación, escribe su nombre y pulsa Intro. La primera vez que introduzcas el nombre de una persona se creará un álbum nuevo para ella.\n\n(CONSEJO: Inicia sesión con tu cuenta de Google para acceder a todos tus contactos mientras asignas nombres).\n\nPara ignorar a una persona, haz clic en el botón X situado en la miniatura de la cara correspondiente.\n\nSugerencias: Cuando introduzcas el nombre de una persona, Picasa puede sugerirte más caras suyas. Haz clic en el álbum de dicha persona para ver y confirmar (o rechazar) las sugerencias.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Cuando Picasa analiza tus fotos, agrupa automáticamente las caras que detecta para que te sea más sencillo asignarles un nombre.\n\nImportante:\n\nPara identificar a una persona, haz clic en Añadir un nombre y, a continuación, escribe su nombre y pulsa Intro. La primera vez que introduzcas el nombre de una persona se creará un álbum nuevo para ella.\n\n(CONSEJO: Inicia sesión con tu cuenta de Google para acceder a todos tus contactos mientras asignas nombres).\n\nPara ignorar a una persona, haz clic en el botón X situado en la miniatura de la cara correspondiente.\n\nSugerencias: Cuando introduzcas el nombre de una persona, Picasa puede sugerirte más caras suyas. Haz clic en el álbum de dicha persona para ver y confirmar (o rechazar) las sugerencias.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Todavía no se ha encontrado a ninguna persona. A medida que se vayan encontrando y agrupando las caras, se mostrarán en el álbum sin nombre. El progreso de la exploración se muestra en el elemento del álbum sin nombre.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Aquí se mostrará la lista de las personas con nombre que aparecen con la persona seleccionada.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Las personas que aparezcan en las fotos seleccionadas estarán en esta lista.</xmbtext>
+ </action>
+</tooltips>

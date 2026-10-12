@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="compose_mail/to_text" xmbdesc="Label(compose_mail/to_text)">
+  <xmbtext>प्रति:</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/subject_text" xmbdesc="Label(compose_mail/subject_text)">
+  <xmbtext>विषयः</xmbtext>
+ </action>
+ <action type="Tooltip" target="compose_mail/discardimage" xmbdesc="Tooltip(compose_mail/discardimage)">
+  <xmbtext>अटैचमेंट से चयनित चित्र निकालें</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/changeuser" xmbdesc="Label(compose_mail/changeuser)">
+  <xmbtext>उपयोगकर्ता बदलें</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/send" xmbdesc="Label(compose_mail/send)">
+  <xmbtext>भेजें</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discard" xmbdesc="Label(compose_mail/discard)">
+  <xmbtext>अभी नहीं</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/sendb" xmbdesc="Label(compose_mail/sendb)">
+  <xmbtext>भेजें</xmbtext>
+ </action>
+ <action type="Label" target="compose_mail/discardb" xmbdesc="Label(compose_mail/discardb)">
+  <xmbtext>अभी नहीं</xmbtext>
+ </action>
+</tooltips>

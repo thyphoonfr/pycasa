@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Ο αποθηκευτικός σας χώρος Google Drive εξαντλήθηκε</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Αποκτήστε περισσότερο αποθηκευτικό χώρο για να συνεχίσετε να δημιουργείτε αντίγραφα ασφαλείας των αρχικών φωτογραφιών σας σε πλήρη ανάλυση. Εναλλακτικά, κάντε εναλλαγή σε υψηλή ποιότητα για απεριόριστο δωρεάν αποθηκευτικό χώρο: υψηλή οπτική ποιότητα σε μικρότερο μέγεθος αρχείου.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Λάβετε βοήθεια για να αποφασίσετε</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Λήψη περισσότερου αποθηκευτικού χώρου</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Αλλαγή σε υψηλή ποιότητα</xmbtext>
+ </stringres>
+</resources>

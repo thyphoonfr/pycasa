@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>閉じる</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>詳細...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>名前なし人物アルバムへようこそ</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Picasa で写真をスキャンすると、顔が検出されて自動的にグループ化されるため、名前を簡単に指定できます。\n\n操作方法:\n\n人物の名前を指定するには、[名前を追加] をクリックしてその人物の名前を入力し、Enter キーを押します。新しい人物の名前を指定するたびに新しい人物アルバムが作成されます。\n\n（ヒント: Google アカウントでログインすると、名前を指定するときに Google アカウントのすべての連絡先にアクセスできます）。\n\n特定の人物を無視する場合は、顔のサムネイルに表示されている [X] ボタンをクリックします。\n\n候補: 人物に名前を付けると、その人物に一致すると思われる顔の候補が表示されることがあります。人物のアルバムをクリックして表示し、候補を確認（または却下）してください。\n\n\nこの機能については [詳細] をクリックしてください。</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Picasa で写真をスキャンすると、顔が検出されて自動的にグループ化されるため、名前を簡単に指定できます。\n\n操作方法:\n\n人物の名前を指定するには、[名前を追加] をクリックしてその人物の名前を入力し、Enter キーを押します。新しい人物の名前を指定するたびに新しい人物アルバムが作成されます。\n\n（ヒント: Google アカウントでログインすると、名前を指定するときに Google アカウントのすべての連絡先にアクセスできます）。\n\n特定の人物を無視する場合は、顔のサムネイルに表示されている [X] ボタンをクリックします。\n\n候補: 人物に名前を付けると、その人物に一致すると思われる顔の候補が表示されることがあります。人物のアルバムをクリックして表示し、候補を確認（または却下）してください。\n\n\nこの機能については [詳細] をクリックしてください。</xmbtext>
+ </action>
+</tooltips>

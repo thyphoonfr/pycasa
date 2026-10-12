@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>कोई नाम जोड़ें</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>चेहरे प्रदर्शित करने के लिए कोई फ़ोल्डर चयनित करें</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>अनदेखा करें</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>मैन्युअल रूप से जोड़ें कोई व्यक्ति जोड़ें</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>अभी नहीं</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>जैसे ही Picasa आपकी फ़ोटो स्कैन करता है, वैसे ही उसे मिलने वाले चेहरों को आसानी से नाम देने के लिए अपने आप समूहीकृत कर दिया जाता है.\n\nजानने योग्य बातें:\n\nकिसी व्यक्ति को पहचानने के लिए, &#039;एक नाम जोड़ें&#039; क्लिक करें, फिर व्यक्ति का नाम लिखें और Enter दबाएं.  जब भी आप पहली बार किसी व्यक्ति का नाम लेंगे, तब एक नया लोग एल्बम बनाया जाएगा.\n\n(टिप: नाम देते समय अपने सभी संपर्कों की एक्सेस प्राप्त करने के लिए अपने Google खाते से प्रवेश करें.)\n\nकिसी व्यक्ति को अनदेखा करने के लिए, चेहरा थंबनेल पर &#039;X&#039; बटन क्लिक करें.\n\nसुझाव: आपके द्वारा किसी व्यक्ति को नाम दिए जाने के बाद, Picasa उस व्यक्ति के लिए मेल खाते और चेहरों का सुझाव दे सकता है. किसी भी सुझाव को देखने और उसकी पुष्टि (या अस्वीकार) करने के लिए व्यक्ति के एल्बम पर क्लिक करें.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>जैसे ही Picasa आपकी फ़ोटो स्कैन करता है, वैसे ही उसे मिलने वाले चेहरों को आसानी से नाम देने के लिए अपने आप समूहीकृत कर दिया जाता है.\n\nजानने योग्य बातें:\n\nकिसी व्यक्ति को पहचानने के लिए, &#039;एक नाम जोड़ें&#039; क्लिक करें, फिर व्यक्ति का नाम लिखें और Enter दबाएं.  जब भी आप पहली बार किसी व्यक्ति का नाम लेंगे, तब एक नया लोग एल्बम बनाया जाएगा.\n\n(टिप: नाम देते समय अपने सभी संपर्कों की एक्सेस प्राप्त करने के लिए अपने Google खाते से प्रवेश करें.)\n\nकिसी व्यक्ति को अनदेखा करने के लिए, चेहरा थंबनेल पर &#039;X&#039; बटन क्लिक करें.\n\nसुझाव: आपके द्वारा किसी व्यक्ति को नाम दिए जाने के बाद, Picasa उस व्यक्ति के लिए मेल खाते और चेहरों का सुझाव दे सकता है. किसी भी सुझाव को देखने और उसकी पुष्टि (या अस्वीकार) करने के लिए व्यक्ति के एल्बम पर क्लिक करें.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>अभी तक कोई लोग नहीं मिले. जैसे-जैसे चेहरे मिलेंगे और उन्हें समूहीकृत किया जाएगा, वैसे-वैसे वे अनामित एल्बम में प्रकट होने लगेंगे. स्कैन करते समय, प्रगति जानकारी अनामित एल्बम आइटम में प्रकट होती है.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>वर्तमान में चयनित व्यक्ति के साथ प्रकट होने वाले नामित लोग यहां सूचीबद्ध किए जाएंगे.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>वर्तमान में चयनित फ़ोटो में प्रकट होने वाले लोग यहां सूचीबद्ध किए जाएंगे.</xmbtext>
+ </action>
+</tooltips>

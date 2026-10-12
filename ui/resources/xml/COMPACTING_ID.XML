@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Memadatkan</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa memadatkan basis datanya untuk menghemat ruang disk. Proses ini mungkin memakan waktu beberapa menit.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Memadatkan...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

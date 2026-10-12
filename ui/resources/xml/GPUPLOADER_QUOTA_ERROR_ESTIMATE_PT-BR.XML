@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Backup automático do Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Sem espaço de armazenamento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Você selecionou pastas que ocupam mais espaço do que o espaço de armazenamento restante no Google Drive. Adquira mais espaço de armazenamento ou faça o backup de um número ilimitado de fotos e vídeos no tamanho padrão gratuitamente.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Se você acabou de adquirir espaço de armazenamento, as alterações podem levar alguns minutos para entrar em vigor.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Adquirir mais espaço de armazenamento...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Mudar para o tamanho padrão</xmbtext>
+ </stringres>
+</resources>

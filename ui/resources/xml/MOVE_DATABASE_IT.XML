@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Sposta database</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Riavvia Picasa per rendere effettive le modifiche.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Tieni presente che prima di provare questa funzione sperimentale dovrai eseguire il backup del tuo database. Non spostare MAI il database in una rete o su un&#039;unità rimovibile o esterna. In caso contrario i tuoi dati potrebbero andare persi.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Percorso corrente del database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nuovo percorso del database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Sfoglia...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Predefinito</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Passa al riavvio successivo</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

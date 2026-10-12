@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Bestanden hernoemen</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 bestand(en) geselecteerd om naam te wijzigen.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s bestand(en) geselecteerd om te hernoemen. </xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Geef een nieuwe naam op voor deze bestanden:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Opnemen in bestandsnaam:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Datum</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Beeldresolutie</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Bijvoorbeeld:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Naam wijzigen</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

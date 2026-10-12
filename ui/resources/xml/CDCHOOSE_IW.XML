@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="cdchoose/window1.title">
+  <xmbtext>בחר כונן תקליטורים לצריבה</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label5.title">
+  <xmbtext>‏Picasa גילה יותר מכונן צריבה אחד.\nבאיזה כונן ברצונך להשתמש?</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/label7.title">
+  <xmbtext>כוננים:</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button10.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+ <stringres id="cdchoose/button11.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

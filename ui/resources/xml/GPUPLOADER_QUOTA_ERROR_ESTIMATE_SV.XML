@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Automatisk säkerhetskopiering i Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Slut på lagring</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Du har valt mappar som innehåller mer utrymme än vad du har ledigt på Google Drive.  Du kan köpa mer lagringsutrymme eller säkerhetskopiera ett obegränsat antal foton och videoklipp i standardstorlek gratis.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Om du nyss har köpt lagringsutrymme kan det ta några minuter innan ändringarna träder i kraft.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Skaffa mer lagringsutrymme...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Byt till standardstorlek</xmbtext>
+ </stringres>
+</resources>

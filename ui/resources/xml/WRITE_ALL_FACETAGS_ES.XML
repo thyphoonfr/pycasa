@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Escribe en las etiquetas de cara</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Etiquetar las caras o todo puede llevar mucho tiempo. Si el registro está configurado como detallado o en un nivel más elevado, el registro de la red contendrá mensajes sobre archivos de solo lectura que no se han podido actualizar. Mientras se usa esta función, se recomienda cerrar la sesión</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Escribe en los elementos seleccionados</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Escribe en las caras</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Escribe en todos los elementos</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

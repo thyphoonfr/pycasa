@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Fazer upload para o YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Título:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descrição:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoria do vídeo:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Carregando...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tags:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Estas são palavras-chave usadas para ajudar as pessoas a localizar seu vídeo (separadas por espaço).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Tornar este vídeo público</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Seu vídeo pode ter no máximo 10 minutos e 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Não faça o upload de qualquer programa de TV, vídeos ou concertos musicais e de comerciais sem permissão, a não ser que tenham sido inteiramente criados por você. A página de dicas sobre direitos autorais e as Diretrizes da Comunidade podem ajudá-lo a determinar se o seu vídeo viola os direitos autorais de outra pessoa.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Ao clicar em &quot;Fazer upload de vídeo&quot;, você concorda que o vídeo não viola os Termos de Uso do YouTube e que você possui todos os direitos autorais deste vídeo ou tem autorização para enviá-lo.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Fazer upload de vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Stäng</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Läs mer...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Välkommen till albumet med namnlösa personer! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>När dina foton genomsöks i Picasa grupperas ansiktena som identifieras så att du enkelt kan ange namn på dem.\n\nSaker du behöver veta:\n\nIdentifiera en person genom att klicka på Lägg till ett namn. Ange sedan personens namn och tryck på Retur. Ett nytt personalbum skapas varje gång du anger ett namn på någon för första gången.\n\n(Tips! Logga in med ditt Google-konto och få tillgång till alla kontakter i Google-kontot medan du anger namn.)\n\nIgnorera en person genom att klicka på knappen X på miniatyrbilden av ansiktet.\n\nFörslag: När du har angett ett namn på någon kan fler matchande ansikten föreslås i Picasa för personen. Klicka på en persons album om du vill visa och bekräfta (eller avvisa) förslag.\n\n\n Klicka på Läs mer om du vill ha information om den här funktionen.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>När dina foton genomsöks i Picasa grupperas ansiktena som identifieras så att du enkelt kan ange namn på dem.\n\nSaker du behöver veta:\n\nIdentifiera en person genom att klicka på Lägg till ett namn. Ange sedan personens namn och tryck på Retur. Ett nytt personalbum skapas varje gång du anger ett namn på någon för första gången.\n\n(Tips! Logga in med ditt Google-konto och få tillgång till alla kontakter i Google-kontot medan du anger namn.)\n\nIgnorera en person genom att klicka på knappen X på miniatyrbilden av ansiktet.\n\nFörslag: När du har angett ett namn på någon kan fler matchande ansikten föreslås i Picasa för personen. Klicka på en persons album om du vill visa och bekräfta (eller avvisa) förslag.\n\n\n Klicka på Läs mer om du vill ha information om den här funktionen.</xmbtext>
+ </action>
+</tooltips>

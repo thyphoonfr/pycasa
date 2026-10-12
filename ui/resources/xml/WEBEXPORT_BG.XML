@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Експортиране като HTML страница</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Експортиране на снимките като:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Оригинален размер</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 пиксела (за големи монитори)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 пиксела (за големи уеб страници)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 пиксела (за уеб страници)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 пиксела (за имейл)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Експортиране на филми:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Първи кадър</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Целият филм</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Заглавие на уеб страницата:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Папка:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Преглед...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Кликнете върху име на шаблон, за да видите пример.  Когато направите избора си, кликнете върху „Експортиране“.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Описание на шаблона</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Експортиране</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>नाम:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>तिथि:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>स्वचालित तिथि</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>संगीत:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>स्लाइड शो और मूवी प्रस्तुति के लिए संगीत का उपयोग करें:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>ब्राउज़ करें...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>लिया गया स्थान (वैकल्पिक):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>वर्णन (वैकल्पिक):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>ठीक</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

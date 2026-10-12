@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Sigurnosno kopiranje u Google fotografije</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Preostao je 1 GB pohrane na Google disku</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Nabavite više pohrane kako biste nastavili s izradom sigurnosnih kopija originalnih fotografija u punoj razlučivosti. Ili prijeđite na visoku kvalitetu za besplatnu neograničenu pohranu: sjajna vizualna kvaliteta uz smanjenu veličinu datoteke.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Potražite pomoć pri odlučivanju</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Pribavite još prostora za pohranu</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Prebacite se na visoku kvalitetu</xmbtext>
+ </stringres>
+</resources>

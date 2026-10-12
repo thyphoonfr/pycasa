@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Scrivi i tag di riconoscimento facciale</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Scrivere i volti o scrivere tutto potrebbe richiedere molto tempo. Se l&#039;accesso è impostato su dettagliato o superiore, network.log contiene messaggi relativi a file di sola lettura che potrebbero non essere aggiornati. Durante l&#039;utilizzo di questa funzionalità, si consiglia di uscire.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Scrivi selezionato</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Scrivi volti</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Scrivi tutto</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

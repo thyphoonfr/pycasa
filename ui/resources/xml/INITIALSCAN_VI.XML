@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Một phiên bản Picasa cũ hơn đã được cài đặt.  Bạn có muốn cập nhật thư viện ảnh hiện có hoặc tìm kiếm ảnh trong máy tính của mình lần nữa không?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Vui lòng chọn trong số các tùy chọn sau đây:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Cập nhật thư viện ảnh hiện có của tôi</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Chọn tùy chọn này nếu bạn sử dụng từ khóa hoặc album tùy chỉnh trong Picasa 1 và bạn muốn giữ nguyên những tùy chỉnh này trong Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Tìm kiếm ảnh trong máy tính lần nữa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Chọn tùy chọn này để tìm kiếm toàn diện hơn trong máy tính của bạn, bao gồm cả thông tin ảnh mở rộng.  Tùy chọn này sẽ giữ lại các chỉnh sửa và kiểu tổ chức hiện có nhưng không giữ lại các từ khóa.  Quá trình tìm kiếm này có thể mất vài phút.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Tính năng tìm kiếm ảnh không bao giờ di chuyển hoặc sao chép tệp đến vị trí mới. Bạn có thể chọn thư mục nào được Picasa hiển thị bằng cách sử dụng công cụ Trình quản lý thư mục (có sẵn trong menu Công cụ)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Tiếp tục</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa đã sẵn sàng tìm kiếm ảnh trên máy tính của bạn</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Vui lòng chọn trong số các tùy chọn sau đây:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Tìm kiếm ảnh trong toàn bộ máy tính của tôi</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Hãy chọn tùy chọn này nếu bạn có ảnh được lưu trữ trong các thư mục khác nhau trong máy tính, đặc biệt nếu bạn có ảnh được lưu trữ trong nhiều ổ cứng.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Chỉ tìm kiếm trong Documents, Pictures, Desktop và Thư viện iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Hãy chọn tùy chọn này nếu bạn chỉ lưu trữ ảnh của mình trong các thư mục này.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Tìm kiếm ảnh không bao giờ di chuyển hoặc sao chép tệp đến vị trí mới. Bạn có thể chọn thư mục nào được hiển thị trong Picasa bằng cách sử dụng công cụ Trình quản lý Thư mục (có sẵn trong menu Công cụ)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Tiếp tục</xmbtext>
+ </action>
+</tooltips>

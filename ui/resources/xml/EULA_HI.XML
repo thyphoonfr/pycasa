@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>कृपया Picasa का उपयोग करने से पहले लाइसेंस की शर्तों की समीक्षा करें</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Picasa का उपयोग करके आप Google सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>सेवा की शर्तें</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>गोपनीयता नीति</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Google को अनाम उपयोग आंकड़े भेजें (आप बाद में कभी भी इस सेटिंग को बदल सकते हैं)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>मैं सहमत हूं</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

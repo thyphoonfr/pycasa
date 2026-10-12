@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Dosyaları Yeniden Adlandır</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 dosya yeniden adlandırılmak için seçildi.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s dosya yeniden adlandırılmak için seçildi.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Lütfen bu dosyalar için yeni bir ad girin:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Dosya adına dahil et:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Tarih</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Resim çözünürlüğü</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Örnek:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Yeniden adlandır</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

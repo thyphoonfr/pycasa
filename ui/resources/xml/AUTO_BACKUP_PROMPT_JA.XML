@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google フォト バックアップ</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Picasa の写真をバックアップ</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Google フォト バックアップを使うと、写真や動画をオンラインに自動的に保存できます。バックアップした写真や動画は、自分から共有しない限り一般公開されることはありません。</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google フォト バックアップをダウンロード</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>ダウンロードしない</xmbtext>
+ </stringres>
+</resources>

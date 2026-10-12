@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Fotók Automatikus mentés</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>A Picasa-fotók biztonsági mentése</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>A Google Fotók Automatikus mentés funkciójával online másolatokat készíthet fotóiról és videóiról. Amíg meg nem osztja a tartalmakat, azok privát elérésűek maradnak, és csak Ön érheti el őket.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>A Google Fotók Automatikus mentés beszerzése</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Köszönöm, nem</xmbtext>
+ </stringres>
+</resources>

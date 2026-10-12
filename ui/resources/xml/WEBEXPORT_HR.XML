@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Izvezi kao HTML stranicu</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Izvezi slike u:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Izvorna veličina</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 piksela (za velike monitore)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 piksela (za velike web-stranice)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 piksela (za web-stranice)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 piksela (za e-poštu)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Izvezi filmove pomoću sljedećeg:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Prvi okvir</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Cijeli film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Naslov web-stranice:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Mapa:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Kliknite Naziv predloška da biste vidjeli primjer. Kada odaberete željeni predložak, kliknite Izvoz.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Opis predloška</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Izvoz</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Zmienianie nazw plików</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Wybrano 1 plik do zmiany nazwy.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Wybrano następującą liczbę plików do zmiany nazwy: %s.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Wprowadź nową nazwę dla tych plików:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Uwzględnij w nazwie pliku:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Rozdzielczość zdjęcia</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Przykład:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Zmień nazwę</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

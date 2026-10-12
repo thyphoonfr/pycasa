@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Gi filer nytt navn</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 fil er valgt for å endre navn.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s fil(er) er valgt for å endre navn.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Skriv inn et nytt navn på disse filene:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Inkluder i filnavn:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Dato</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Bildeoppløsning</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Eksempel:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Gi nytt navn</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

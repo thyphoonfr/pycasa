@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="customaspectratio/window1.title">
+  <xmbtext>Tambahkan Rasio Aspek Khusus</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup3.title">
+  <xmbtext>Ukuran:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label6.title">
+  <xmbtext>  x  </xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup8.title">
+  <xmbtext>Nama:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup10.title">
+  <xmbtext>Contoh:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label11.title">
+  <xmbtext>   4 x 6   Ukuran kecil</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/ok.title">
+  <xmbtext>Oke</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/cancel.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

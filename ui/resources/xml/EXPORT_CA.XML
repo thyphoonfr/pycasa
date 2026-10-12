@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Exporta a la carpeta</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Exporta la ubicació:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Nom de la carpeta exportada:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Afegeix números als noms dels fitxers per conservar l&#039;ordre</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Mida de la imatge:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Utilitza la mida original</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Canvia la mida per:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>píxels</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Qualitat d&#039;imatge:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automàtic</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Màxim</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Mínim</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Personalitzat</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Manté la qualitat d&#039;imatge original</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Balanç adequat de qualitat i de mida</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Mida de fitxer molt gran, conserva els detalls</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Mida de fitxer més petita, pèrdua parcial de la qualitat</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Exporta les pel·lícules mitjançant:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Primer marc</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Tota la pel·lícula (sense redimensionar)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Filigrana:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Afegeix una filigrana</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Marca les fotos amb el teu nom, amb un domini web o bé amb un avís de copyright.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Exporta</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

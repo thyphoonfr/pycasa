@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>HTML Sayfası Olarak Dışa Aktar</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Şu konumdaki resimleri dışa aktar:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Orijinal Boyut</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 piksel (büyük ekranlar için)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 piksel (büyük Web sayfaları için)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 piksel (Web sayfaları için)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 piksel (e-posta için)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Filmleri şununla dışa aktar:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>İlk kare</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Filmin tamamı</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Web sayfası başlığı:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Klasör:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Göz at...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Bir örnek görmek için Şablon Adı&#039;nı tıklayın. Seçiminizi yaptıktan sonra Dışa Aktar&#039;ı tıklayın.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Şablon Açıklaması</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Dışa Aktar</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

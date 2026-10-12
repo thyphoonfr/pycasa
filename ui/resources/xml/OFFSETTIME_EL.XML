@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Προσαρμογή ημερομηνίας φωτογραφίας:</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Ημερομηνία τρέχουσας φωτογραφίας: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Νέα ημερομηνία φωτογραφίας: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Προσαρμογή όλων των ημερομηνιών φωτογραφιών κατά ποσότητα</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Ορισμός της ίδιας ημερομηνίας και ώρας σε όλες τις φωτογραφίες</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

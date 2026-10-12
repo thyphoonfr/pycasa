@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Zálohování Fotek Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Na úložišti Disku Google zbývá 1 GB</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Pokud chcete své fotky i nadále zálohovat v plném rozlišení, musíte si pořídit další úložný prostor. Také můžete přepnout na vysokou kvalitu s neomezeným úložištěm zdarma: vaše fotky tak budou mít skvělou kvalitu a zároveň menší velikost.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Nechte si s rozhodnutím poradit</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Získat další úložný prostor</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Přepnout na vysokou kvalitu</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>डेटाबेस ले जाएं</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>परिवर्तनों को प्रभावी करने के लिए आपको Picasa फिर से प्रारंभ करना होगा.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>कृपया ध्यान दें: इस प्रायोगिक सुविधा को आज़माने से पहले आपको अपने डेटाबेस का बैकअप लेना चाहिए. डेटाबेस को कभी भी नेटवर्क पर, निकालने योग्य या बाहरी ड्राइव पर न ले जाएं अन्यथा आप डेटा खो सकते हैं.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>वर्तमान डेटाबेस स्थान:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>नया डेटाबेस स्थान:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>ब्राउज़ करें...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>सामान्य</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>अगली बार फिर से प्रारंभ होने पर ले जाएं</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

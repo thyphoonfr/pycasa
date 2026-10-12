@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Auto Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Έχει εξαντληθεί ο αποθηκευτικός χώρος</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Έχετε επιλέξει φακέλους που καταλαμβάνουν περισσότερο χώρο από τον αποθηκευτικό χώρο που σας απομένει στο Google Drive. Μπορείτε να αγοράσετε περισσότερο αποθηκευτικό χώρο ή να δημιουργήσετε απεριόριστα αντίγραφα ασφαλείας για τις φωτογραφίες και τα βίντεό σας δωρεάν σε κανονικό μέγεθος.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Εάν έχετε μόλις αγοράσει αποθηκευτικό χώρο, ενδέχεται να χρειαστούν μερικά λεπτά για να εφαρμοστούν οι αλλαγές.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Αποκτήστε περισσότερο αποθηκευτικό χώρο…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Αλλαγή σε κανονικό μέγεθος</xmbtext>
+ </stringres>
+</resources>

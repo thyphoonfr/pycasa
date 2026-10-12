@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Fotoğraf Tarihini Ayarla</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Geçerli fotoğraf tarihi: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Yeni fotoğraf tarihi: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Tüm fotoğraf tarihlerini sayıya göre ayarla</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Tüm fotoğrafları aynı tarih ve saate ayarla</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>Tamam</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

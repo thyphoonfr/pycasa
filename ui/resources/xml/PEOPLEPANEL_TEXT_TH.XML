@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>เพิ่มชื่อ</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>เลือกโฟลเดอร์เพื่อแสดงใบหน้า</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>ละเว้น</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>เพิ่มบุคคลด้วยตนเอง</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>ขณะที่ Picasa สแกนรูปภาพของคุณ ใบหน้าที่พบจะถูกจัดกลุ่มโดยอัตโนมัติเพื่อให้กำหนดชื่อได้ง่าย\n\nสิ่งที่ควรทราบ:\n\nในการระบุตัวบุคคล ให้คลิก &quot;เพิ่มชื่อ&quot; จากนั้นพิมพ์ชื่อของบุคคลนั้นและกด Enter อัลบั้มผู้คนใหม่จะถูกสร้างขึ้นทุกครั้งที่คุณกำหนดชื่อบุคคลหนึ่งเป็นครั้งแรก\n\n(เคล็ดลับ: ลงชื่อเข้าใช้บัญชี Google ของคุณเพื่อเข้าถึงรายชื่อติดต่อทั้งหมดของคุณขณะที่กำหนดชื่อ)\n\nในการละเว้นบุคคล ให้คลิกที่ปุ่ม &quot;X&quot; ที่ภาพขนาดย่อของใบหน้า\n\nคำแนะนำ: หลังจากที่คุณกำหนดชื่อคน Picasa อาจแนะนำใบหน้าอื่นๆ ที่ตรงกันสำหรับคนนั้น คลิกที่อัลบั้มของคนนั้นเพื่อดูและยืนยัน (หรือปฏิเสธ) คำแนะนำ</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>ขณะที่ Picasa สแกนรูปภาพของคุณ ใบหน้าที่พบจะถูกจัดกลุ่มโดยอัตโนมัติเพื่อให้กำหนดชื่อได้ง่าย\n\nสิ่งที่ควรทราบ:\n\nในการระบุตัวบุคคล ให้คลิก &quot;เพิ่มชื่อ&quot; จากนั้นพิมพ์ชื่อของบุคคลนั้นและกด Enter อัลบั้มผู้คนใหม่จะถูกสร้างขึ้นทุกครั้งที่คุณกำหนดชื่อบุคคลหนึ่งเป็นครั้งแรก\n\n(เคล็ดลับ: ลงชื่อเข้าใช้บัญชี Google ของคุณเพื่อเข้าถึงรายชื่อติดต่อทั้งหมดของคุณขณะที่กำหนดชื่อ)\n\nในการละเว้นบุคคล ให้คลิกที่ปุ่ม &quot;X&quot; ที่ภาพขนาดย่อของใบหน้า\n\nคำแนะนำ: หลังจากที่คุณกำหนดชื่อคน Picasa อาจแนะนำใบหน้าอื่นๆ ที่ตรงกันสำหรับคนนั้น คลิกที่อัลบั้มของคนนั้นเพื่อดูและยืนยัน (หรือปฏิเสธ) คำแนะนำ</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>ยังไม่พบบุคคล เมื่อพบใบหน้าและมีการจัดกลุ่มใบหน้า ใบหน้านี้จะปรากฏในอัลบั้มที่ไม่ได้ตั้งชื่อ ในขณะสแกน ข้อมูลของสถานะการดำเนินการจะปรากฏในรายการอัลบั้มที่ไม่ได้ตั้งชื่อ</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>บุคคลที่มีชื่อที่ปรากฏพร้อมกับบุคคลที่เลือกในปัจจุบันจะถูกระบุไว้ที่นี่</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>คนที่ปรากฏในรูปภาพที่เลือกไว้จะถูกระบุไว้ที่นี่</xmbtext>
+ </action>
+</tooltips>

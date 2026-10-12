@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Varat izmantot ātrās atzīmes, lai lietotu atzīmi, vienu reizi noklikšķinot. Tālāk ierakstiet atzīmes, kurām vēlaties piekļūt, vienu reizi noklikšķinot. Pēc noklusējuma pirmās divas ātrās atzīmes tiek izmantotas, lai izsekotu pēdējās lietotās atzīmes. Lai manuāli iestatītu pirmās divas atzīmes, noņemiet atzīmi no tālāk norādītās izvēles rūtiņas.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Automātiski aizpildīt iepriekš redzamos tukšos lodziņus ar biežāk lietotajām atzīmēm</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Rezervēt augšējās divas pogas pēdējām lietotajām atzīmēm</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>Labi</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Atcelt</xmbtext>
+ </action>
+</tooltips>

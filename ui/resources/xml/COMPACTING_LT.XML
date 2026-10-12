@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Glaudinama</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>„Picasa“ spaudžia savo duomenų bazę, kad taupytų disko vietą. Tai gali užtrukti kelias minutes.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Glaudinama...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

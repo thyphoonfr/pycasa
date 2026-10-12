@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="poster/window1.title">
+  <xmbtext>Definições do póster</xmbtext>
+ </stringres>
+ <stringres id="poster/label2.title">
+  <xmbtext>Sugestão: se não pretender cortar, recorte a imagem até que esta tenha o mesmo tamanho que o papel.</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup3.title">
+  <xmbtext>Tamanho do póster:</xmbtext>
+ </stringres>
+ <stringres id="poster/item5.title">
+  <xmbtext>200%</xmbtext>
+ </stringres>
+ <stringres id="poster/item6.title">
+  <xmbtext>300%</xmbtext>
+ </stringres>
+ <stringres id="poster/item7.title">
+  <xmbtext>400%</xmbtext>
+ </stringres>
+ <stringres id="poster/item8.title">
+  <xmbtext>500%</xmbtext>
+ </stringres>
+ <stringres id="poster/item9.title">
+  <xmbtext>600%</xmbtext>
+ </stringres>
+ <stringres id="poster/item10.title">
+  <xmbtext>700%</xmbtext>
+ </stringres>
+ <stringres id="poster/item11.title">
+  <xmbtext>800%</xmbtext>
+ </stringres>
+ <stringres id="poster/item12.title">
+  <xmbtext>900%</xmbtext>
+ </stringres>
+ <stringres id="poster/item13.title">
+  <xmbtext>1000%</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup14.title">
+  <xmbtext>Tamanho do papel:</xmbtext>
+ </stringres>
+ <stringres id="poster/overlap.title">
+  <xmbtext>Sobrepor imagens</xmbtext>
+ </stringres>
+ <stringres id="poster/button18.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="poster/button19.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

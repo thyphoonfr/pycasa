@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Cópia de segurança automática do Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Atingiu o limite de armazenamento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Selecionou pastas que contêm mais espaço do que o armazenamento do Google Drive disponível. Pode comprar mais espaço de armazenamento ou efetuar uma cópia de segurança de um número ilimitado de fotografias e vídeos em tamanho padrão, de forma gratuita.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Se acabou de adquirir espaço de armazenamento, poderá demorar alguns minutos até que as alterações entrem em vigor.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Obter mais espaço de armazenamento...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Alterar para o tamanho padrão</xmbtext>
+ </stringres>
+</resources>

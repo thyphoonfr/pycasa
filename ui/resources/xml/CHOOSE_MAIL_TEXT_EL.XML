@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="choose_mail/selecttext" xmbdesc="Label(choose_mail/selecttext)">
+  <xmbtext>Επιλέξτε πώς θέλετε να στείλετε τις φωτογραφίες σας μέσω ηλεκτρονικού ταχυδρομείου.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1" xmbdesc="Label(choose_mail/mail1)">
+  <xmbtext>ΠΡΟΓΡΑΜΜΑ ΗΛΕΚΤΡΟΝΙΚΟΥ ΤΑΧΥΔΡΟΜΕΙΟΥ</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1a" xmbdesc="Label(choose_mail/mail1a)">
+  <xmbtext>Χρήση του προεπιλεγμένου προγράμματος ηλεκτρονικού ταχυδρομείου.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2" xmbdesc="Label(choose_mail/mail2)">
+  <xmbtext>Google Mail</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2a" xmbdesc="Label(choose_mail/mail2a)">
+  <xmbtext>Χρήση του λογαριασμού μου στο Gmail ή στο Google.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/gmailsignup1" xmbdesc="Label(choose_mail/gmailsignup1)">
+  <xmbtext>Δεν έχετε Gmail; Αποκτήστε δωρεάν λογαριασμό.</xmbtext>
+ </action>
+ <action type="WebTarget" target="choose_mail/gmailsignup1" xmbdesc="WebTarget(choose_mail/gmailsignup1)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/remember" xmbdesc="Label(choose_mail/remember)">
+  <xmbtext>Απομνημόνευση της ρύθμισης, να μην εμφανιστεί αυτό το πλαίσιο διαλόγου ξανά.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/help" xmbdesc="Label(choose_mail/help)">
+  <xmbtext>Βοήθεια</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mailcancel" xmbdesc="Label(choose_mail/mailcancel)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+</tooltips>

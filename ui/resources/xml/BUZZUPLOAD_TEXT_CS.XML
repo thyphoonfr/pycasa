@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="buzzupload/uploadinfo" xmbdesc="Text(buzzupload/uploadinfo)">
+  <xmbtext>Kontrola stavu online...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/webalbumstext" xmbdesc="Text(buzzupload/webalbumstext)">
+  <xmbtext>Aktualizace seznamu webových alb...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/upload_label" xmbdesc="Text(buzzupload/upload_label)">
+  <xmbtext>Nahrát do tohoto alba:</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/uploadsize_label" xmbdesc="Text(buzzupload/uploadsize_label)">
+  <xmbtext>Velikost k nahrání</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/newalbum2" xmbdesc="Label(buzzupload/newalbum2)">
+  <xmbtext>Nové</xmbtext>
+ </action>
+ <action type="Tooltip" target="buzzupload/newalbum2" xmbdesc="Tooltip(buzzupload/newalbum2)">
+  <xmbtext>Změnit název nového alba</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/ok" xmbdesc="Label(buzzupload/ok)">
+  <xmbtext>Nahrát</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/cancel" xmbdesc="Label(buzzupload/cancel)">
+  <xmbtext>Zrušit</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/desclabel" xmbdesc="Text(buzzupload/desclabel)">
+  <xmbtext>Popis</xmbtext>
+ </action>
+ <action type="Text1" target="buzzupload/comments_label" xmbdesc="Text1(buzzupload/comments_label)">
+  <xmbtext>E-mailová zpráva</xmbtext>
+ </action>
+ <action type="Text2" target="buzzupload/comments_label" xmbdesc="Text2(buzzupload/comments_label)">
+  <xmbtext>[Nepovinné] Sdílíte obsah na Google+? Přidejte k němu zprávu</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/options_label" xmbdesc="Label(buzzupload/options_label)">
+  <xmbtext>Velikost snímku</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/visibility_label" xmbdesc="Label(buzzupload/visibility_label)">
+  <xmbtext>Viditelnost alba</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/collab_label" xmbdesc="Label(buzzupload/collab_label)">
+  <xmbtext>Tyto osoby mohou přispívat do mého alba</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/also_send_email_label" xmbdesc="Label(buzzupload/also_send_email_label)">
+  <xmbtext>Odeslat oznámení e-mailem</xmbtext>
+ </action>
+</tooltips>

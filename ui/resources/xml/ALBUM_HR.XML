@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Naziv:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Datum:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Automatski datiraj</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Glazba:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Koristi glazbu za prezentaciju i filmsku prezentaciju:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Mjesto snimanja (nije obavezno):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Opis (izborno):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

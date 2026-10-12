@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="choose_mail/selecttext" xmbdesc="Label(choose_mail/selecttext)">
+  <xmbtext>Izaberite kako želite slati fotografije u e-pošti.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1" xmbdesc="Label(choose_mail/mail1)">
+  <xmbtext>KLIJENT ZA POŠTU</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail1a" xmbdesc="Label(choose_mail/mail1a)">
+  <xmbtext>Koristi moj zadani program za e-poštu.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2" xmbdesc="Label(choose_mail/mail2)">
+  <xmbtext>Google Mail</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mail2a" xmbdesc="Label(choose_mail/mail2a)">
+  <xmbtext>Koristi moj Gmail ili Google račun.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/gmailsignup1" xmbdesc="Label(choose_mail/gmailsignup1)">
+  <xmbtext>Nemate Gmail? Otvorite besplatan račun.</xmbtext>
+ </action>
+ <action type="WebTarget" target="choose_mail/gmailsignup1" xmbdesc="WebTarget(choose_mail/gmailsignup1)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/remember" xmbdesc="Label(choose_mail/remember)">
+  <xmbtext>Zapamti postavku, nemoj više prikazivati taj dijaloški okvir.</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/help" xmbdesc="Label(choose_mail/help)">
+  <xmbtext>Pomoć</xmbtext>
+ </action>
+ <action type="Label" target="choose_mail/mailcancel" xmbdesc="Label(choose_mail/mailcancel)">
+  <xmbtext>Odustani</xmbtext>
+ </action>
+</tooltips>

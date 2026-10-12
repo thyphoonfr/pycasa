@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="input/prompt.title">
+  <xmbtext>Uzvedne:</xmbtext>
+ </stringres>
+ <stringres id="input/button6.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+ <stringres id="input/button7.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

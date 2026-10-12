@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>YouTube에 업로드</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>제목:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>설명:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>동영상 카테고리:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>로드 중...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>태그:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>사람들이 사용자의 동영상을 쉽게 찾을 수 있도록 도와주는 키워드입니다(공백으로 구분).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>동영상 공개하기</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>동영상이 10분 및 1GB로 제한되어 있습니다.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>본인이 직접 만든 콘텐츠가 아니라면 무단으로 TV 프로그램, 뮤직비디오, 음악 공연, 광고를 올리지 마세요. 저작권 도움말과 커뮤니티 가이드 페이지에서는 본인의 동영상이 다른 사람의 저작권을 침해하는지 여부를 판단할 수 있도록 도와줍니다.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>&quot;동영상 업로드&quot;를 클릭하는 것은 이 동영상이 YouTube의 이용약관을 위반하지 않으며 귀하가 이 동영상의 모든 저작권을 소유하거나 이 동영상을 업로드할 수 있는 권한을 보유하고 있음을 의미합니다.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>동영상 업로드</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

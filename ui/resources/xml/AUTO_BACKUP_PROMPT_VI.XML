@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Sao lưu ảnh Picasa của bạn</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Tự động lưu ảnh và video của bạn trực tuyến bằng Google Photos Backup. Các nội dung của bạn có thể truy cập được từ bất kỳ thiết bị nào và mọi thứ vẫn được giữ riêng tư tới khi bạn chọn chia sẻ.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Tải Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Không, cám ơn</xmbtext>
+ </stringres>
+</resources>

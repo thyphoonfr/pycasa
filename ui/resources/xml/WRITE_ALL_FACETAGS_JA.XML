@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>顔タグを書き込み</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>顔を書き込んだり、すべて書き込んだりするには時間がかかることがあります。ログ記録が詳細以上に設定されている場合、network.log には更新できなかった読み取り専用ファイルに関するメッセージが含まれます。この機能の使用中にはログアウトすることをおすすめします。</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>選択対象を書き込み</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>顔を書き込み</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>すべて書き込み</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

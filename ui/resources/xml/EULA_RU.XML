@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Прежде чем приступать к работе с Picasa, ознакомьтесь с условиями лицензии</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Начиная работу с Picasa, вы принимаете Условия использования и Политику конфиденциальности Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Условия использования</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/ru/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Политика конфиденциальности</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/ru/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Отправлять в Google анонимную статистику использования (этот параметр можно будет изменить в любой момент)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Принимаю</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

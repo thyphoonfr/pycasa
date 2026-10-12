@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Du kan bruke hurtigetiketter med ett enkelt klikk. Skriv inn etiketter du vil ha ett-klikkstilgang til nedenfor. De to øverste etikettene brukes som standard for å spore nylig brukte etiketter. Fjern avmerkingen i ruten nedenfor for å velge de to øverste etikettene manuelt.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Fyll automatisk inn feltene ovenfor med ofte brukte etiketter</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Reserver de to øverste knappene til nylig brukte etiketter</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+</tooltips>

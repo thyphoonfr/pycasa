@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Export as HTML Page</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Export pictures at:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Original Size</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixels (for large monitors)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixels (for large web pages)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixels (for web pages)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixels (for email)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Export videos using:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>First frame</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Full film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Web page title:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Folder:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Browse...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Click a Template Name to view an example.  When you have made your selection, click Export.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Template Description</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Cancel</xmbtext>
+ </stringres>
+</resources>

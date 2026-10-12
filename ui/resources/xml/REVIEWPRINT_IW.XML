@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>סקירה לפני הדפסה</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>הסר את הפריטים שנבחרו</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>מחק תצלומים באיכות נמוכה</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>תצוגה מקדימה של תמונה</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>מידע</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nimi:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Päiväys:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Automaattinen päiväys</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Musiikki:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Käytä musiikkia diasarjassa ja elokuvaesityksessä:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Selaa…</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Kuvauspaikka (valinnainen):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Kuvaus (valinnainen):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

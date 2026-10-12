@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>フォルダにエクスポート</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>エクスポート場所:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>参照...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>エクスポート フォルダの名前:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>ファイル名に番号を追加して順番を保持</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>画像サイズ:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>元のサイズを使用</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>次のサイズに変更:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>ピクセル</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>画質:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>自動</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>標準</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>上限</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>下限</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>カスタム</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>元の画質を保持</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>画質とサイズの最適なバランス</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>非常に大きなファイル サイズ、微細なディテールを保持</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>最小ファイル サイズ、画質がやや低下</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>次の方法でムービーをエクスポート:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>最初のフレーム</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>ムービー全体（リサイズなし）</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>透かし:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>透かしを追加</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>名前、URL、著作権表示などを写真に入れます。</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>エクスポート</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

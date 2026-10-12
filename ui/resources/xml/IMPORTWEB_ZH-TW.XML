@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>從網路相簿匯入相簿</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>當您按一下 [確定] 按鈕後，以下網路相簿中勾選的照片就會下載至您的電腦。系統會按照相簿名稱自動將照片整理至不同的資料夾。</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>目前您有 100 個線上網路相簿。</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>匯入所有相簿</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>匯入所選相簿：</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>名稱</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>日期</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(附註：只會下載不在您電腦上的圖片)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>確定</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

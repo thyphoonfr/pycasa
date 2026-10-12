@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Win32Res>
+ <RT_DIALOG>
+  <res resid="#145">
+   <dtitle>
+    <xmbtext>เกี่ยวกับ Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 435 293)</dlayout>
+   <item itemid="1056" itemtype="Static" layout="rect(0 0 20 20)"/>
+   <item itemid="-1" itemtype="Static" layout="rect(9 171 427 258)">
+    <xmbtext>เพิ่มจาก IDS_ABOUT ตามตารางอักษร</xmbtext>
+   </item>
+   <item itemid="-2" itemtype="Static" layout="rect(9 260 109 268)">
+    <xmbtext>สัญญาอนุญาตของบุคคลที่สาม</xmbtext>
+   </item>
+   <item itemid="1" itemtype="Button" layout="rect(193 272 243 286)">
+    <xmbtext>ตกลง</xmbtext>
+   </item>
+   <item itemid="1086" itemtype="Edit" layout="rect(6 7 429 227)"/>
+  </res>
+  <res resid="#198">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 95)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 74 179 88)">
+    <xmbtext>ยกเลิก</xmbtext>
+   </item>
+   <item itemid="1164" itemtype="Static" layout="rect(31 7 179 49)">
+    <xmbtext>Picasa กำลังย่อขนาดฐานข้อมูลเพื่อประหยัดพื้นที่ของดิสก์ การทำงานนี้จะใช้เวลาหลายนาที</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(31 45 179 62)"/>
+  </res>
+  <res resid="#211">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 71)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 50 179 64)">
+    <xmbtext>ยกเลิก</xmbtext>
+   </item>
+   <item itemid="1163" itemtype="Static" layout="rect(31 7 179 32)">
+    <xmbtext>คัดลอก</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(14 42 123 58)">
+    <xmbtext>กำลังอัปเดต...</xmbtext>
+   </item>
+  </res>
+  <res resid="#323">
+   <dtitle>
+    <xmbtext>สถิติการใช้งาน</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 276 116)</dlayout>
+   <item itemid="1" itemtype="Button" layout="rect(7 88 161 102)">
+    <xmbtext>ใช่ ส่งสถิติ</xmbtext>
+   </item>
+   <item itemid="2" itemtype="Button" layout="rect(170 88 269 102)">
+    <xmbtext>ไม่ ขอบคุณ</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(30 34 269 62)">
+    <xmbtext>คุณต้องการช่วยเราทำให้ Picasa ดีขึ้นกว่าเดิม ด้วยการส่งสถิติการใช้งานที่ไม่ระบุชื่อให้กับ Google หรือไม่</xmbtext>
+   </item>
+   <item itemid="1316" itemtype="Static" layout="rect(163 69 269 77)">
+    <xmbtext>ข้อมูลส่วนบุคคล...</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(37 13 193 21)">
+    <xmbtext>ช่วยกันปรับปรุง Picasa</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 28 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+  </res>
+ </RT_DIALOG>
+</Win32Res>

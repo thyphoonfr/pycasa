@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>Ανανέωση επαφών</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Το Picasa ανανεώνει τις πληροφορίες των επαφών στο διαδίκτυο.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>Ανανέωση στο παρασκήνιο</xmbtext>
+ </stringres>
+</resources>

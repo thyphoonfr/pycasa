@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Zamknij</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Witamy w przesyłaniu grupowym</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Zaznacz pola obok folderów i albumów, z którymi chcesz pracować. Następnie wybierz czynności do wykonania. Program Picasa odfiltruje elementy, w przypadku których wybrana czynność nie miałaby zastosowania. Jeśli na przykład cały folder lub album znajduje się już w internecie, program Picasa nie wyświetli opcji do przesłania tego folderu lub albumu.</xmbtext>
+ </action>
+</tooltips>

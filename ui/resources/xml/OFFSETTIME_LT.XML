@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Koreguoti nuotraukos datą</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Dabartinė nuotraukos data: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Nauja nuotraukos data: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Koreguoti visų nuotraukų datas pagal dydį</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Visoms nuotraukoms nustatyti tą pačią datą ir laiką</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>Gerai</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

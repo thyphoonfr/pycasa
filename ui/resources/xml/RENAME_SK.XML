@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Premenovať súbory</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Počet súborov vybratých na premenovanie: 1.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Počet súborov vybratých na premenovanie: %s.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Zadajte nový názov týchto súborov:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Zahrnúť do názvu súboru:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Dátum</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Rozlíšenie obrázka</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Príklad:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Premenovať</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

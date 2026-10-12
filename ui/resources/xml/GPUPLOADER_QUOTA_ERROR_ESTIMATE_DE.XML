@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Automatische Sicherung</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Speicherplatz ist aufgebraucht</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Die Gesamtgröße der von Ihnen ausgewählten Ordner überschreitet den verbleibenden Google Drive-Speicherplatz. Sie können entweder zusätzlichen Speicherplatz kaufen oder kostenlos eine unbegrenzte Zahl an Fotos und Videos in der Standardgröße sichern.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Wenn Sie gerade erst Speicherplatz erworben haben, kann es einige Minuten dauern, bis die Änderungen wirksam werden.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Zusätzlichen Speicherplatz erwerben…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Zur Standardgröße wechseln</xmbtext>
+ </stringres>
+</resources>

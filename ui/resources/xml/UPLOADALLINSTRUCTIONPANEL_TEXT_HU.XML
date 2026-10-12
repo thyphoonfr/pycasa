@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Bezárás</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Üdvözli a csoportos feltöltés</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Jelölje be azon mappák és albumok melletti jelölőnégyzeteket, amelyekkel dolgozni kíván. Ezt követően adja meg, hogy mit szeretne tenni. A Picasa kiszűri azokat az elemeket, amelyeken az adott művelet nem hajtható végre. Ha például egy teljes mappa vagy album már online állapotú, a Picasa nem fogja azt feltölthetőként megjeleníteni.</xmbtext>
+ </action>
+</tooltips>

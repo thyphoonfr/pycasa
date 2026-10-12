@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>I-export sa Folder</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Lokasyon ng export:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Mag-browse...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Pangalan ng nai-export na folder</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Magdagdag ng mga numero sa mga pangalan ng file upang mapanatili ang ayos</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Laki ng larawan:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Gamitin ang orihinal na sukat</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>I-resize sa:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>mga pixel</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Kalidad ng larawan:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Awtomatiko</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Pinakamaliit</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Custom</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Pinapanatili ang orihinal na kalidad ng larawan</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Mainam na balanse ng kalidad at sukat</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Napakalaking sukat ng file, pinapanatili ang pinong detalye</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Pinakamaliit na sukat ng file, may ilang kawalan sa kalidad</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>I-export ang mga movie gamit ang:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Unang frame</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Buong movie (hindi pinalitan ang sukat)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Watermark:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Magdagdag ng watermark</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Lagyan ang mga larawan ng iyong pangalan, web domain, o paunawa sa copyright.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>I-export</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

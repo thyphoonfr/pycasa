@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google fotoattēlu dublēšana</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Google diska krātuvē atlicis 1 GB</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Iegūstiet lielāku krātuvi, lai turpinātu saglabāt savus oriģinālos fotoattēlus pilnā izšķirtspējā. Lai izmantotu neierobežotu bezmaksas krātuvi, kurā uzglabāt lieliskas vizuālās kvalitātes attēlus ar samazinātu faila lielumu, pārslēdzieties uz augstu kvalitāti.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Saņemiet padomus</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Iegūstiet vairāk vietas krātuvē</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Pārslēdzieties uz augstu kvalitāti</xmbtext>
+ </stringres>
+</resources>

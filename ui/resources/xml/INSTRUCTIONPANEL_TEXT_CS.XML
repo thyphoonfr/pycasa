@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Zavřít</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Další informace...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Vítá vás album pro nepojmenované osoby. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Tváře lidí, které Picasa při skenování vašich fotek najde, jsou automaticky seskupovány, abyste je mohli snadněji označit jménem.\n\nZákladní informace:\n\nPokud chcete někoho označit, klikněte na „Přidat jméno“, zadejte jméno daného člověka a poté stiskněte Enter. Pokaždé, když někoho poprvé označíte jménem, vytvoří se nové album „Osoby“.\n\n(Tip: Přihlaste se pomocí svého účtu Google a při označování jménem tak budete mít přístup ke všem svým kontaktům.)\n\nPokud někoho chcete ignorovat, klikněte na miniatuře tváře na tlačítko „X“.\n\nDoporučení: Poté co někoho pojmenujete, vám Picasa může k označení jménem nabídnout další podobné obličeje. Návrhy na označení můžete zobrazit a schválit (či odmítnout) poté, co kliknete na album daného člověka.\n\n\n Další informace o této funkci si můžete přečíst po kliknutí na „Další informace“.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Tváře lidí, které Picasa při skenování vašich fotek najde, jsou automaticky seskupovány, abyste je mohli snadněji označit jménem.\n\nZákladní informace:\n\nPokud chcete někoho označit, klikněte na „Přidat jméno“, zadejte jméno daného člověka a poté stiskněte Enter. Pokaždé, když někoho poprvé označíte jménem, vytvoří se nové album „Osoby“.\n\n(Tip: Přihlaste se pomocí svého účtu Google a při označování jménem tak budete mít přístup ke všem svým kontaktům.)\n\nPokud někoho chcete ignorovat, klikněte na miniatuře tváře na tlačítko „X“.\n\nDoporučení: Poté co někoho pojmenujete, vám Picasa může k označení jménem nabídnout další podobné obličeje. Návrhy na označení můžete zobrazit a schválit (či odmítnout) poté, co kliknete na album daného člověka.\n\n\n Další informace o této funkci si můžete přečíst po kliknutí na „Další informace“.</xmbtext>
+ </action>
+</tooltips>

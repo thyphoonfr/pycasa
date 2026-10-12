@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>Đang làm mới danh sách liên hệ</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Picasa đang làm mới thông tin liên hệ trực tuyến.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>Làm mới dưới nền</xmbtext>
+ </stringres>
+</resources>

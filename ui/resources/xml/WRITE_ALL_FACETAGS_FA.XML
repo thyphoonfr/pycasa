@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>نوشتن نشان‌های چهره</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>نوشتن چهره‌ها یا نوشتن همه موارد ممکن است طول بکشد. در صورتی که گزارش‌گیری روی کامل یا بالاتر تنظیم شده باشد، گزارش شبکه شامل پیام‌های مربوط به فایل‌های فقط خواندنی می‌شود که قابل به‌روزرسانی نیستند. هنگام استفاده از این ویژگی، خروج از سیستم توصیه می‌شود.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>نوشتن موارد انتخاب شده</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>نوشتن چهره‌ها</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>نوشتن همه موارد</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

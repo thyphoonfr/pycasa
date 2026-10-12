@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Copia de seguridad automática de Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Espacio de almacenamiento agotado</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Has seleccionado carpetas que contienen un espacio mayor que tu espacio de almacenamiento restante de Google Drive. Puedes comprar más espacio de almacenamiento o realizar copias de seguridad ilimitadas de fotos y vídeos a tamaño estándar de forma gratuita.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Si acabas de comprar espacio de almacenamiento, puede que los cambios tarden unos minutos en aplicarse.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Obtener más espacio de almacenamiento...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Cambiar a tamaño estándar</xmbtext>
+ </stringres>
+</resources>

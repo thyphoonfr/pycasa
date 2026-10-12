@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>На компютъра ви е инсталирана по-стара версия на Picasa.  Искате ли да актуализирате съществуващата си библиотека със снимки, или предпочитате  търсенето на снимки в компютъра ви да се извърши отново?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Моля, изберете от следните опции:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Актуализиране на съществуващата ми библиотека със снимки</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Изберете тази опция, ако използвате ключови думи или персонализирани албуми в Picasa 1 и искате да ги запазите в Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Повторно търсене на снимки в компютъра ми</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Изберете тази опция за по-пълно търсене в компютъра ви, при което ще бъде включена и разширена информация за снимките.  Съществуващите ви редакции и подредба ще бъдат запазени, но не и ключовите ви думи.  Това търсене може да отнеме няколко минути.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>При търсенето на снимки файловете никога не се преместват или копират на друго място. Можете да изберете кои папки да се показват в Picasa с помощта на инструмента за управление на папки, който се намира в меню „Инструменти“.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Напред</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa е готова да търси снимки в компютъра ви</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Моля, изберете от следните опции:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Търсене на снимки в целия ми компютър</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Изберете тази опция, ако съхранявате снимките си в различни папки в компютъра си и най-вече ако ги съхранявате на повече от един твърд диск.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Търсене само в „Documents“, „Pictures“, работния плот и библиотеката на iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Изберете тази опция, ако съхранявате снимките си само в тези папки.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>При търсенето на снимки файловете никога не се преместват или копират на друго място. Можете да изберете кои папки да се показват в Picasa с помощта на инструмента за управление на папки, който се намира в меню „Инструменти“.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Напред</xmbtext>
+ </action>
+</tooltips>

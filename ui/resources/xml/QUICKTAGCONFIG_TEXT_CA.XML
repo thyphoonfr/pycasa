@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Pots utilitzar les etiquetes ràpides per aplicar una etiqueta amb un sol clic. Escriu les etiquetes a les quals vols tenir accés amb un sol clic a continuació. De manera predeterminada, les dues etiquetes ràpides principals s&#039;utilitzen per fer el seguiment de les etiquetes aplicades recentment. Desmarca la casella de selecció que trobaràs a continuació per definir les dues etiquetes principals manualment.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Emplena automàticament els quadres buits anteriors amb etiquetes d&#039;ús habitual</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Reserva els dos botons de la part superior per a les etiquetes utilitzades recentment</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>D&#039;acord</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Cancel·la</xmbtext>
+ </action>
+</tooltips>

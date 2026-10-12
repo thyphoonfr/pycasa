@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Premakni zbirko podatkov</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Če želite uporabiti spremembe, ponovno zaženite Picaso.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Opomba: Preden preskusite to poskusno funkcijo, ustvarite varnostno kopijo zbirke podatkov. Zbirke podatkov NIKOLI ne premaknite v omrežje oziroma na izmenljivi ali zunanji pogon, sicer lahko izgubite podatke.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Trenutno mesto zbirke podatkov:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Novo mesto zbirke podatkov:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Prebrskaj ...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Privzeto</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Premakni ob naslednjem ponovnem zagonu</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

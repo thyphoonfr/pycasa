@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Uploaden naar YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Titel:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Beschrijving:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Videocategorie:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Wordt geladen...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tags:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Dit zijn zoekwoorden waarmee gebruikers uw video kunnen vinden. (gescheiden door spaties)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Deze video openbaar maken</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Uw video wordt beperkt tot 10 minuten en 1 GB.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>U mag zonder toestemming geen tv-programma&#039;s, muziekvideo&#039;s, concerten of reclameboodschappen uploaden, tenzij ze uitsluitend inhoud bevatten die u zelf heeft gemaakt. Op de pagina&#039;s Tips over auteursrecht en Community-richtlijnen vindt u meer informatie zodat u kunt bepalen of uw video al dan niet inbreuk maakt op de auteursrechten van anderen. </xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Door op &quot;Video uploaden&quot; te klikken geeft u aan dat deze video niet in strijd is met de Gebruiksvoorwaarden van YouTube en dat u alle auteursrechten voor deze video bezit of de machtiging heeft om deze video te uploaden.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Google Video uploaden</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

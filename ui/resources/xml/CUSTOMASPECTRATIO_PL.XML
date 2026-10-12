@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="customaspectratio/window1.title">
+  <xmbtext>Dodaj niestandardowy format zdjęcia</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup3.title">
+  <xmbtext>Wymiary:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label6.title">
+  <xmbtext>  x  </xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup8.title">
+  <xmbtext>Nazwa:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/labelgroup10.title">
+  <xmbtext>Przykład:</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/label11.title">
+  <xmbtext>   10 x 15 cm   Mała odbitka</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="customaspectratio/cancel.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

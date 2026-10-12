@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Pangalan:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Petsa:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Awtomatikong petsa</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Musika:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Gamitin ang musika para sa Slideshow at pagtatanghal ng movie:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Mag-browse...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Lugar kung saan kinuha (opsyonal):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Pagsasalarawan (opsyonal):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

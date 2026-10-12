@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Vie html-sivuna</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Vie kuvat:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Alkuperäinen koko</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 kuvapistettä (suuriin monitoreihin)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 kuvapistettä (suurille verkkosivuille)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 kuvapistettä (verkkosivuille)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 kuvapistettä (sähköposti)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Vie elokuvat käyttämällä:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Ensimmäinen kehys</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Koko elokuva</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Verkkosivun otsikko:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Kansio:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Selaa…</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Näet esimerkin mallista, kun klikkaat sen nimeä. Klikkaa valintasi jälkeen Vie.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Mallin kuvaus</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Vie</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

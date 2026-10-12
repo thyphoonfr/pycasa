@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>匯出到資料夾</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>匯出位置：</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>瀏覽...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>匯出資料夾名稱：</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>為檔案名稱加入數字以維持排列順序</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>圖片大小：</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>使用原始大小</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>調整大小為：</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>像素</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>影像品質：</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>自動</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>一般</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>最大值</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>最小值</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>自訂</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>保留原始影像品質</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>在圖像畫質與檔案大小之間取得適當平衡</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>檔案很大，可忠實保留圖像細節</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>檔案最小，會犧牲部分圖像畫質</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>匯出電影的方式：</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>第一個畫面</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>完整電影 (未調整大小)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>浮水印：</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>新增浮水印</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>在相片上加入您的姓名、網域或版權聲明。</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>匯出</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

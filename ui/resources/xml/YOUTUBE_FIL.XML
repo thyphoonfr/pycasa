@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>I-upload sa YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Pamagat:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Pagsasalarawan:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Kategorya ng video:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Nilo-load...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Mga Tag:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Ito ang ginagamit na mga keyword upang tulungan ang mga tao na hanapin ang iyong video. (pinaghiwalay ng puwang)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Gawing pampubliko ang video na ito</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Ang video mo ay limitado sa 10 minuto at 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Huwag mag-upload ng mga palabas sa TV, mga music video, mga music concert, o mga patalastas nang walang pahintulot maliban kung ang mga ito ay lubusang naglalaman ng mga nilalaman na ikaw mismo ang gumawa. Matutulungan kang matiyak ng pahina na Mga Tip sa Copyright at Mga Gabay sa Komunidad kung nilabag ng iyong video ang copyright ng iba.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Sa pag-click sa &quot;I-upload ang Video,&quot; kinakatawan mo na ang video na ito ay hindi lumalabag sa Mga Tuntunin ng Paggamit ng YouTube at pag-aari mo ang lahat ng mga copyright ng video na ito o may pahintulot sa pag-upload nito.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Mag-upload ng Video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

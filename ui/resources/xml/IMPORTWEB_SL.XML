@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Uvozi albume iz spletnih albumov ...</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Spodaj izbrane slike v spletnih albumih bodo prenesene v računalnik, ko kliknete gumb »V redu«. Na podlagi imen albumov bodo samodejno razvrščene v mape.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>V spletu imate 100 spletnih albumov.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Uvozi vse albume</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Uvozi izbrane albume:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Ime</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Datum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(OPOMBA: Prenesene bodo le slike, ki še niso v računalniku.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>V redu</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

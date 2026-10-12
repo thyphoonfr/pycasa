@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Налаштування</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Параметри</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Основна інформація</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Інтерфейс користувача:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Використати спеціальні ефекти</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Показувати підказки</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Відобразити теги довідки</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Натисніть один раз, щоб вийти з вікна редагування</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Файли:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Визначати копії під час імпорту</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Очистити кеш</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Вилучити з диска без підтвердження</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Вилучити з альбому без підтвердження</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Допомогти покращити Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Надіслати Google анонімну статистику використання</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Конфіденційність...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492&amp;hl=uk</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Автоматичні оновлення:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Оновлювати автоматично</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Запитувати перед завантаженням оновлень</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Не перевіряти наявність оновлень в режимі онлайн</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Мова:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Параметри системи за умовчанням (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Коли камеру приєднано, запустити:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>програми немає</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Вибрати програму в ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Зберегти імпортовані зображення в:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Огляд...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>Електронна пошта</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Програма електронної пошти:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Вибирати кожен раз під час надсилання фотографій</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Відкрити стандартну програму електронної пошти</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Використати мій обліковий запис Google</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Розмір кількох зображень:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 пікселів</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s пікс.</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Розмір окремих зображень:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Як і кілька (1024 пікс.)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Як і кілька (%s пікс.)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Початковий розмір</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Надіслати відеофайли як:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Перший фрейм</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Відео повністю</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Вихідний формат:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Надіслати онлайн фотографії та підписи (лише Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Типи файлів</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Показувати JPEG-файли, а також</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Формати RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Підтримувані формати</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Відео (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Фільми QuickTime (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Формати RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Підтримувані формати</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Відеофайли (.mov, .mpg, .m4v, .3gp, .avi, ...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Слайд-шоу</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Слайд-шоу по колу</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Відтворити музичні доріжки під час показу слайд-шоу</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Виберіть папку з музичними файлами:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Огляд...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Друк</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Доступні розміри друку:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Попередні перегляди:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Використати попередні перегляди високої якості (із меншою швидкістю)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Якість принтера:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Сумісний (часткова роздільна здатність)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Висока якість (повна роздільна здатність)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Друк із нижчою якістю:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Загальний (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Дуже чіткий (Lanzcos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Мережа</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Ім’я користувача проксі-сервера:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Пароль для проксі-сервера:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Автоматично виявляти налаштування мережі</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Рівень журналу мережі:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Вимкнути запис подій</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Лише помилки журналу</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Мінімальна реєстраційна інформація</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Детальна реєстраційна інформація</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Вносити до журналу всю інформацію мережі</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Журнал:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Веб-альбоми</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Розмір завантаження за умовчанням:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Під час синхронізації файлів великого розміру спершу завантажте файли попереднього перегляду</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(рекомендовано)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>Якість JPEG:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Зберегти оригінальну якість зображення (використовує більше місця)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Синхронізація:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Синхронізувати лише позначені зірочкою фотографії</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Не відображати запит на підтвердження кожної синхронізації (використовувати вищезазначені налаштування)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Теги імен:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Додати до завантажень фотографій</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Водяні знаки:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Додати водяний знак для всіх завантажених фотографій:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Додавайте до фотографій своє ім’я, веб-домен чи сповіщення про авторське право.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Теги імен</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Увімкнути пошук обличчя</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Увімкнути пропозиції:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Поріг пропозиції:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Поріг кластера:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Зберігати теги імен у фотографіях</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Завантажити ескізи з альбому &quot;Люди&quot; до Контактів Google</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

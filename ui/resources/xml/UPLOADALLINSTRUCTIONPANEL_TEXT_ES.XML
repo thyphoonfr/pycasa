@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Cerrar</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Te damos la bienvenida a la subida por lotes</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Selecciona las casillas de las carpetas y de los álbumes con los que quieras trabajar. A continuación, elige la función que te gustaría aplicar. Picasa filtra los elementos a los que no puede aplicarse dicha operación. Por ejemplo, si una carpeta completa o un álbum ya están publicados online, Picasa no mostrará la opción para subir estos elementos.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nume:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Data:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Dată automată</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Muzică:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Folosiţi muzică pentru prezentări de tip slideshow şi film:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Răsfoiţi...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Locul fotografierii (opţional):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Descriere (opţional):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

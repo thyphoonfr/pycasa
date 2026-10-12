@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>คุณสามารถใช้แท็กอย่างรวดเร็วเพื่อใช้แท็กด้วยคลิกเดียว พิมพ์แท็กที่ตำแหน่งด้านล่างที่คุณต้องการสิทธิ์ในการเข้าถึงแบบคลิกเดียว โดยค่าเริ่มต้น แท็กอย่างรวดเร็วสองรายการบนสุดจะถูกใช้งานเพื่อติดตามแท็กที่ใช้งานล่าสุด ให้ยกเลิกการทำเครื่องหมายในช่องทำเครื่องหมายที่ด้านล่างนี้เพื่อตั้งค่าแท็กสองรายการบนสุดด้วยตนเอง</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>เติมช่องว่างเปล่าด้านบนด้วยแท็กที่ใช้งานบ่อยโดยอัตโนมัติ</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>เก็บปุ่มสองปุ่มบนสุดไว้สำหรับแท็กที่ใช้ล่าสุด</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>ตกลง</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+</tooltips>

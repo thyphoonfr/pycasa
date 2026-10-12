@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Export do složky</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Umístění pro export:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Procházet...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Název složky pro export:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Přidat čísla k názvům souborů kvůli zachování pořadí</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Velikost fotky:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Použít původní velikost</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Změnit velikost na:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixelů</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Kvalita fotky:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatická</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normální</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maximum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Vlastní</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Zachová původní kvalitu fotky</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Dobrý poměr kvality a velikosti</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Velmi velký soubor, zachovává jemné detaily</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Nejmenší soubor, určitá ztráta kvality</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Exportovat filmy jako:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>První snímek</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Celý film (beze změny velikosti)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vodoznak:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Přidat vodoznak</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Orazítkujte fotky svým jménem, webovou doménou nebo upozorněním na autorská práva.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

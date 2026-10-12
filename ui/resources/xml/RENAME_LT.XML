@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Pervardyti failus</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Pervardyti pasirinktas 1 failas.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Pervardyti pasirinkta failų: %s.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Prašome įvesti naują šių failų pavadinimą:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Yra failo pavadinime:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Vaizdo skyra</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Pavyzdys:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Pervardyti</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

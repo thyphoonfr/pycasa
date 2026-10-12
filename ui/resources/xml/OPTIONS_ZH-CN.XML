@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>偏好设置</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>选项</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>常规</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>用户界面：</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>使用特殊效果</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>显示工具提示</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>显示帮助标签</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>点击以退出修改视图</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>文件：</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>在导入时检测重复的照片</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>清除缓存文件</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>直接从磁盘删除，不进行确认</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>不经确认，直接从相册中删除</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>帮助改进 Picasa：</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>将匿名使用情况统计信息发送到 Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>隐私权...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=zh_CN&amp;answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>自动更新：</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>自动更新</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>下载更新前询问</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>不检查更新</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>语言：</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>系统默认 (zh-CN)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>连接相机之后，启动：</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>无应用</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>选择 ImageCapture 内的应用...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>将导入的图片保存至：</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>浏览...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>电子邮件</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>电子邮件程序：</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>每次发送图片时都请让我选择</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>使用计算机默认的电子邮件程序</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>使用我的 Google 帐户</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>多张图片的大小：</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 像素</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s 像素</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>单张图片的大小：</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>统一（1024 像素）</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>统一（%s 像素）</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>原始大小</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>视频发送格式：</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>第一幅</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>完整视频</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>输出格式：</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>发送内嵌照片和图片说明（仅限 Outlook）</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>文件类型</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>显示 JPEG 文件及以下文件：</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF、.TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW 格式</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>支持的格式</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=zh_CN&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>视频（.AVI、.MPG、.ASF、.WMV）</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Quicktime 视频 (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif、.tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW 格式</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>支持的格式</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=zh_CN&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>视频（.mov、.mpg、.m4v、.3gp、.avi...）</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>幻灯片</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>循环播放幻灯片</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>在幻灯片演示过程中播放音乐曲目</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>选择音乐曲目所在的文件夹：</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>浏览...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>打印</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>可用的打印大小：</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>预览：</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>使用高质量预览（较慢）</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>打印机质量：</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>兼容（半分辨率）</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>高质量（全分辨率）</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>打印重采样质量：</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>常规 (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>进一步锐化 (Lanzcos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>网络</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>代理用户名：</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>代理密码：</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>自动检测网络设置</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>网络日志级别：</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>停用日志记录</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>仅记录错误</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>最小日志信息</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>详细的日志信息</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>记录所有网络信息</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>日志：</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>网络相册</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>默认上传大小：</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>在同步大型文件时，先上传预览</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>（推荐）</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>JPEG 质量：</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>保留原始图片质量（使用更多存储空间）</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>正在同步：</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>仅同步加星标的照片</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>每次同步时不需要确认（使用以上设置）</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>名称标签：</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>包含照片上传</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>水印：</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>为所有上传的照片添加水印：</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>在照片上标记您的姓名、网络域名或版权声明。</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>名称标签</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>启用头像检测</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>启用建议：</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>建议阈值：</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>分组阈值：</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>存储照片中的名称标签</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>将人物相册缩略图上传至 Google 通讯录</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

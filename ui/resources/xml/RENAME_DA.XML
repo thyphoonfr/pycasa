@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Omdøb filer</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 fil(er) blev valgt til omdøbning.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s fil(er) blev valgt til omdøbning.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Angiv et nyt navn for disse filer:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Inkluder i filnavn:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Dato</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Billedopløsning</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Eksempel:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Omdøb</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

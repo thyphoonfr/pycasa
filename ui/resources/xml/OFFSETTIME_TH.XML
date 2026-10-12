@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>ปรับเปลี่ยนวันที่ของรูปภาพ</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>วันที่ของรูปภาพในปัจจุบัน: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>วันที่ของรูปภาพใหม่: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>ปรับเปลี่ยนวันที่ของรูปภาพทั้งหมดตามจำนวน</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>ตั้งค่ารูปภาพทั้งหมดให้เป็นวันที่และเวลาเดียวกัน</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

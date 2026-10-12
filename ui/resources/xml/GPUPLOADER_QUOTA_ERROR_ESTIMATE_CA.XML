@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Còpia de seguretat automàtica de Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Sense emmagatzematge</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Has seleccionat carpetes que contenen més espai del que tens disponible a Google Drive storage. Pots comprar més espai d&#039;emmagatzematge o crear una còpia de seguretat de fotos i vídeos il·limitats amb la mida estàndard de franc.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Si acabes de comprar emmagatzematge, pot ser que els canvis triguin uns quants minuts a fer-se efectius.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Obtén més emmagatzematge...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Canvia a la mida estàndard</xmbtext>
+ </stringres>
+</resources>

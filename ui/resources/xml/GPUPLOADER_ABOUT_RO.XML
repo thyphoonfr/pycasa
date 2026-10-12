@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Backup Google Foto, versiunea %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Drepturi de autor 2015, Google Inc. Toate drepturile rezervate.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Această aplicație software se bazează parțial pe contribuția Independent JPEG Group. Acest program este protejat prin legislația privind drepturile de autor din Statele Unite ale Americii, precum și prin legislația internațională în materie de drepturi de autor.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+</resources>

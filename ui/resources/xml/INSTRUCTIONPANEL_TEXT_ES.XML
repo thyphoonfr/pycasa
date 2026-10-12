@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Cerrar</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Más información...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Te damos la bienvenida al álbum de personas sin nombre </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Cuando Picasa analiza tus fotos, agrupa automáticamente las caras que detecta para que te sea más sencillo asignarles un nombre.\n\nImportante:\n\nPara identificar a una persona, haz clic en Añadir un nombre y, a continuación, escribe su nombre y pulsa Intro. La primera vez que introduzcas el nombre de una persona, se creará un álbum nuevo para ella.\n\n(CONSEJO: Inicia sesión con tu cuenta de Google para acceder a todos tus contactos mientras asignas nombres).\n\nPara ignorar a una persona, haz clic en el botón X situado en la miniatura de la cara correspondiente.\n\nSugerencias: Cuando introduzcas el nombre de una persona, Picasa puede sugerirte más caras suyas. Haz clic en el álbum de dicha persona para ver y confirmar (o rechazar) las sugerencias.\n\n\n Haz clic en Más información para obtener información acerca de esta función.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Cuando Picasa analiza tus fotos, agrupa automáticamente las caras que detecta para que te sea más sencillo asignarles un nombre.\n\nImportante:\n\nPara identificar a una persona, haz clic en Añadir un nombre y, a continuación, escribe su nombre y pulsa Intro. La primera vez que introduzcas el nombre de una persona, se creará un álbum nuevo para ella.\n\n(CONSEJO: Inicia sesión con tu cuenta de Google para acceder a todos tus contactos mientras asignas nombres).\n\nPara ignorar a una persona, haz clic en el botón X situado en la miniatura de la cara correspondiente.\n\nSugerencias: Cuando introduzcas el nombre de una persona, Picasa puede sugerirte más caras suyas. Haz clic en el álbum de dicha persona para ver y confirmar (o rechazar) las sugerencias.\n\n\n Haz clic en Más información para obtener información acerca de esta función.</xmbtext>
+ </action>
+</tooltips>

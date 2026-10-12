@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Lähetä YouTubeen</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Otsikko:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Kuvaus:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Videoluokka:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Ladataan...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tagit:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Näiden avainsanojen avulla käyttäjät löytävät videosi paremmin. (erotettu välilyönnillä)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Julkaise tämä video</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videon pituus voi olla enintään 10 minuuttia ja koko 1 Gt.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Älä lähetä ilman lupaa televisiosarjoja, musiikkivideoita, konsertteja tai mainoksia, joiden sisältöä et ole itse tehnyt kokonaan. Tekijänoikeusvinkit-sivu ja yhteisön säännöt voivat auttaa sinua ottamaan selville, loukkaako videosi jonkun muun tekijänoikeutta.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Valitsemalla Lähetä video vakuutat, että kyseinen video ei riko YouTuben käyttöehtoja ja että omistat videon kaikki tekijänoikeudet tai että sinulla on oikeus lähettää video.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Lähetä video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

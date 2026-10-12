@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Je nainstalována starší verze Picasy. Chcete aktualizovat stávající knihovnu fotek nebo znovu vyhledat fotky v počítači?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Vyberte si z následujících možností:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Aktualizovat moji stávající knihovnu fotek</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Zvolte tuto možnost, pokud v Picase 1 používáte klíčová slova nebo vlastní alba a chcete je zachovat i v Picase 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Vyhledat znovu fotky v počítači</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Vyberte tuto možnost pro kompletnější prohledávání počítače, které zahrnuje rozšířené informace fotek. Zachovává stávající úpravy a organizaci, ale nezachovává klíčová slova. Toto prohledávání může trvat několik minut.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Při vyhledávání se fotky nikdy nepřesouvají ani nekopírují do nových umístění. Pomocí nástroje Správce složek (v nabídce Nástroje) můžete zvolit, které složky se v Picase zobrazí.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Pokračovat</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa je připravena zahájit vyhledávání fotek v počítači.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Vyberte si z následujících možností:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Hledat fotky v celém počítači</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Tuto možnost vyberte tehdy, pokud máte fotky uloženy v různých složkách v počítači a obzvlášť pokud je máte uloženy na více než jednom pevném disku.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Hledat pouze ve složkách Dokumenty, Obrázky, na ploše a ve složce iPhoto Library</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Tuto možnost vyberte tehdy, pokud fotky ukládáte jen v těchto složkách.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Při vyhledávání se fotky nikdy nepřesouvají ani nekopírují do nových umístění. V nástroji Správce složek (nachází se v nabídce Nástroje) můžete zvolit, které složky se v Picase zobrazí.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Pokračovat</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>‏קרא את תנאי הרישיון לפני השימוש ב-Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>‏על ידי שימוש ב-Picasa אתה מסכים לתנאים ולהגבלות של Google ולמדיניות הפרטיות שלה.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>תנאים והגבלות</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/he/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>מדיניות הפרטיות</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/he/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>‏שלח ל-Google נתוני שימוש סטטיסטיים אנונימיים (תמיד תוכל לשנות הגדרה זו בהמשך)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>אני מסכים</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

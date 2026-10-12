@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Pievienot vārdu</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Atlasīt mapi, lai parādītu sejas</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorēt</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Pievienot personu manuāli</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Atcelt</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Kad pakalpojums Picasa skenē jūsu fotoattēlus, tajos redzamās sejas tiek automātiski grupētas, lai tām varētu piešķirt vārdus.\n\nŅemiet vērā:\n\nLai identificētu kādu personu, noklikšķiniet uz &#039;Pievienot vārdu&#039;, pēc tam ievadiet personas vārdu un nospiediet taustiņu Enter. Ikreiz, kad kādai personai pirmoreiz piešķirat vārdu, tiek izveidots jauns personas albums.\n\n(PADOMS. Pierakstieties, izmantojot savu Google kontu, lai vārda piešķiršanas laikā piekļūtu visām savām Google konta kontaktpersonām.)\n\nLai ignorētu kādu personu, noklikšķiniet uz sejas sīktēla pogas &#039;X&#039;.\n\nIeteikumi. Kad personai piešķirat vārdu, pakalpojums Picasa var ieteikt citas atbilstošas šīs personas sejas. Noklikšķiniet uz personas albuma, lai skatītu un apstiprinātu (vai noraidītu) ieteikumus.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Kad pakalpojums Picasa skenē jūsu fotoattēlus, tajos redzamās sejas tiek automātiski grupētas, lai tām varētu piešķirt vārdus.\n\nŅemiet vērā:\n\nLai identificētu kādu personu, noklikšķiniet uz &#039;Pievienot vārdu&#039;, pēc tam ievadiet personas vārdu un nospiediet taustiņu Enter. Ikreiz, kad kādai personai pirmoreiz piešķirat vārdu, tiek izveidots jauns personas albums.\n\n(PADOMS. Pierakstieties, izmantojot savu Google kontu, lai vārda piešķiršanas laikā piekļūtu visām savām Google konta kontaktpersonām.)\n\nLai ignorētu kādu personu, noklikšķiniet uz sejas sīktēla pogas &#039;X&#039;.\n\nIeteikumi. Kad personai piešķirat vārdu, pakalpojums Picasa var ieteikt citas atbilstošas šīs personas sejas. Noklikšķiniet uz personas albuma, lai skatītu un apstiprinātu (vai noraidītu) ieteikumus.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Vēl nav atrasta neviena persona. Kamēr notiks seju atrašana un grupēšana, tās būs redzamas albumā Nenosaukts. Meklēšanas laikā albuma Nenosaukts vienumā tiks parādīta informācija par darbības norisi.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Nosauktās personas, kas redzamas kopā ar pašreiz atlasīto personu, tiks norādītas šeit.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Šeit būs norādītas personas, kas redzamas pašlaik atlasītajos fotoattēlos.</xmbtext>
+ </action>
+</tooltips>

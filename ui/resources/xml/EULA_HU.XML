@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Kérjük, olvassa el a licencfeltételeket a Picasa használata előtt.</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>A Picasa használatával elfogadja a Google Általános Szerződési Feltételeit és az adatvédelmi irányelveket.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Általános Szerződési Feltételek</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/hu/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Adatvédelmi irányelvek</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/hu/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Névtelen használati statisztikák küldése a Google részére (ez a beállítás később bármikor módosítható)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Elfogadom</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

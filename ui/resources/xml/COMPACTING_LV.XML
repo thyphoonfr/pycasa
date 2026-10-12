@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Saspiešana</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Programma Picasa saspiež savu datu bāzi, lai ietaupītu vietu diskā. Šī darbība var ilgt vairākas minūtes.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Notiek saspiešana...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

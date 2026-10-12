@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Sarhan</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Malugod na pagdating sa Batch Upload</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Lagyan ng check ang mga kahon na katabi ng mga folder at album na gusto mong gamitin. Matapos ay piliin kung alin ang gusto mong gawin. Ipi-filter ng Picasa ang mga item kung saan ang operasyon ay hindi angkop. Halimbawa, kung ang buong folder o album ay online na, hindi ito ipapakita ng Picasa bilang opsyon para mag-upload.</xmbtext>
+ </action>
+</tooltips>

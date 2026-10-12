@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Reanomena els fitxers</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>S&#039;ha seleccionat 1 fitxer per canviar-li el nom.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>S&#039;han seleccionat %s fitxers per canviar-los el nom.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Escriu un nom nou per a aquests fitxers:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Inclou al nom del fitxer:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Resolució de la imatge</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Exemple:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Reanomena</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

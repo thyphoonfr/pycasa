@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Postavke</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Opcije</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Općenito</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Korisničko sučelje:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Koristi posebne efekte</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Prikaži savjete</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Prikaži oznake pomoći</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Kliknite da biste izašli iz prikaza za uređivanje</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Datoteke:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Otkrij duplikate tijekom uvoza</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Očisti datoteke predmemorije</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Izbriši s diska bez potvrde</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Ukloni iz albuma bez potvrde</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Pridonesite poboljšanju programa Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Pošaljite anonimnu statistiku korištenja Googleu</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Privatnost...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Automatska ažuriranja:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Automatski ažuriraj</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Pitaj prije preuzimanja ažuriranja</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Ne provjeravaj ima li novih ažuriranja</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Jezik:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Zadane postavke sustava (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Kada je kamera priključena, pokreni sljedeće:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>bez aplikacije</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Odaberite aplikaciju unutar programa ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Uvezene slike spremi u:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>E-pošta</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Program za e-poštu:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Ponudi mogućnost pri svakom slanju slika</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Koristi zadani program za e-poštu na mom računalu</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Koristi moj Google račun</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Veličina za više slika:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 piksela</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>Broj piksela: %s</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Veličina za jednu sliku:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Kao i više (1024 piksela)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Kao i više (%s piks.)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Izvorna veličina</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Pošalji filmove kao:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Prvi okvir</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Cijeli film</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Izlazni format:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Pošalji ugrađene fotografije i natpise (samo Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Vrste datoteka</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Prikaži JPEG datoteke i:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Oblici RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Podržani oblici</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmovi (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Quicktime filmovi (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Oblici RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Podržani oblici</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmovi (.mov, .mpg, .m4v, .3gp, .avi...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Prezentacija</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Ponavljaj prezentaciju</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Reproduciraj glazbu tijekom prezentacije</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Odaberite mapu s pjesmama:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Pregledaj...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Ispis</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Dostupne veličine ispisa:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Pregledi:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Koristi preglede visoke kvalitete (sporije)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Kvaliteta pisača:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Kompatibilno (pola razlučivosti)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Visoka kvaliteta (puna razlučivost)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Kvaliteta obrade ispisa:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Općenito (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Vrlo oštro (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Mreža</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Proxy korisničko ime:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Proxy zaporka:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Automatski otkrij mrežne postavke</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Razina mrežnog dnevnika:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Onemogući bilježenje</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Zapisuj samo pogreške</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Minimalne informacije iz dnevnika</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Detaljne informacije iz dnevnika</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Bilježi sve informacije o mreži</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Dnevnik:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Web-albumi</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Zadana veličina prijenosa:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Prilikom sinkroniziranja velikih datoteka najprije učitaj preglede</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(preporučeno)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>JPEG kvaliteta:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Zadrži izvornu kvalitetu slike (koristi više prostora za pohranu)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Sinkronizacija:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Sinkroniziraj samo fotografije označene zvjezdicom</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Ne potvrđuj svaku sinkronizaciju (koristi gore navedene postavke)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Oznake s imenima:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Obuhvati s prijenosima fotografija</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Vodeni žigovi:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Dodaj vodeni žig na sve prenesene fotografije:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Označite fotografije svojim imenom, web-domenom ili obaviješću o autorskim pravima.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Oznake s imenom</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Omogući prepoznavanje lica</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Omogući prijedloge:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Prag prijedloga:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>praglica0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Prag grupiranja:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>praglica1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Pohrani oznake s imenom na fotografiji</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Prenesi minijature iz albuma osoba na uslugu Google Kontakti</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>U redu</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

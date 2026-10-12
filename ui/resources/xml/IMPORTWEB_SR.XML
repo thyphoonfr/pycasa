@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Увези албуме из веб-албума</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Слике у веб-албумима изабране испод ће бити преузете на рачунар када кликнете на дугме „Потврди“. Биће аутоматски организоване у директоријуме на основу имена албума.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Имате 100 веб-албума на мрежи.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Увези све албуме</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Увези изабране албуме:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Име</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Датум</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(НАПОМЕНА: Биће преузете само слике које се не налазе већ на вашем рачунару)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Потврди</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

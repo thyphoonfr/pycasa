@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>סמן תמונה בתגים גיאוגרפיים על ידי ניווט למיקום שבו צילמת את התמונה. מקם את הצלב ולאחר מכן לחץ על הלחצן &#039;סמן בתג גיאוגרפי&#039;.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>תג גיאוגרפי</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>סמן הכל בתג גיאוגרפי</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>בוצע</xmbtext>
+ </action>
+</tooltips>

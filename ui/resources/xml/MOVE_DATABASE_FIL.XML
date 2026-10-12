@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Ilipat ang Database</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Kailangan mong muling simulan ang Picasa upang mapatupad ang mga pagbabago.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Pakitandaan: Dapat mong i-backup ang iyong database bago subukan ang experimental na tampok na ito.  HUWAG KAILANMAN ilipat ang database sa isang network, na-aalis, o external na drive, o baka ka mawalan ng data.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Kasalukuyang lokasyon ng Database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Bagong lokasyon ng Database:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Mag-browse...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Default</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Ilipat sa susunod na restart</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

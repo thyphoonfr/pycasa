@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Veritabanını Taşı</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Değişikliklerin etkili olması için Picasa&#039;yı yeniden başlatmanız gerekecek.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Lütfen Dikkat Edin: Bu deneysel özelliği kullanmadan önce veritabanınızı yedeklemeniz gerekir. Veritabanını ASLA bir ağ konumuna, taşınabilir veya harici sürücüye taşımayın. Taşımanız durumunda veri kaybedebilirsiniz.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Mevcut Veritabanı konumu:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Yeni Veritabanı konumu:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Göz at...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Varsayılan</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Sonraki yeniden başlatmada taşı</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

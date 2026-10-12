@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="login/signin" xmbdesc="Label(login/signin)">
+  <xmbtext>ลงชื่อเข้าใช้</xmbtext>
+ </action>
+ <action type="Label" target="login/cancel" xmbdesc="Label(login/cancel)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpass" xmbdesc="Label(login/rememberpass)">
+  <xmbtext>จดจำฉันไว้ในคอมพิวเตอร์เครื่องนี้</xmbtext>
+ </action>
+ <action type="Label" target="login/usernametxt" xmbdesc="Label(login/usernametxt)">
+  <xmbtext>ชื่อผู้ใช้งาน:</xmbtext>
+ </action>
+ <action type="Label" target="login/passwordtxt" xmbdesc="Label(login/passwordtxt)">
+  <xmbtext>รหัสผ่าน:</xmbtext>
+ </action>
+ <action type="Label" target="login/picasaintro" xmbdesc="Label(login/picasaintro)">
+  <xmbtext>ใช้ชื่อผู้ใช้ Hello ของคุณเพื่อส่งรูปภาพด้วย Picasa!</xmbtext>
+ </action>
+ <action type="Label" target="login/plogin" xmbdesc="Label(login/plogin)">
+  <xmbtext>ลงชื่อเข้าใช้</xmbtext>
+ </action>
+ <action type="Label" target="login/pcancel" xmbdesc="Label(login/pcancel)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+ <action type="Label" target="login/forgotpw" xmbdesc="Label(login/forgotpw)">
+  <xmbtext>ลืมรหัสผ่านหรือ</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotos_logotext" xmbdesc="Label(login/gphotos_logotext)">
+  <xmbtext>Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotosintro" xmbdesc="Label(login/gphotosintro)">
+  <xmbtext>ลงชื่อเข้าใช้งาน Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotostext" xmbdesc="Label(login/gphotostext)">
+  <xmbtext>เมื่อใช้ Web Albums คุณจะสามารถแชร์อัลบั้มรูปภาพออนไลน์กับเพื่อนฝูงและครอบครัว หรือสร้างอัลบั้มสาธารณะเพื่อเผยแพร่แก่คนทั้งโลกได้ ใช้งานง่ายและให้บริการฟรี</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotossignup" xmbdesc="Label(login/gphotossignup)">
+  <xmbtext>บัญชีผู้ใช้ Google ของคุณถูกต้อง แต่คุณยังไม่ได้ลงทะเบียนใช้งานสำหรับบัญชี Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gphotoslink" xmbdesc="Label(login/gphotoslink)">
+  <xmbtext>คลิกที่นี่เพื่อเรียนรู้เพิ่มเติม</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_activate" xmbdesc="Label(login/webalbum_activate)">
+  <xmbtext>เปิดใช้งาน Web Albums...</xmbtext>
+ </action>
+ <action type="Label" target="login/webalbum_signup" xmbdesc="Label(login/webalbum_signup)">
+  <xmbtext>ลงทะเบียนใช้งานสำหรับ Web Albums</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideointro" xmbdesc="Label(login/gvideointro)">
+  <xmbtext>อัปโหลดรูปภาพของคุณไปที่ Google Video โดยใช้ Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideotext" xmbdesc="Label(login/gvideotext)">
+  <xmbtext>หากต้องการเริ่มการอัปโหลด ให้ลงชื่อเข้าใช้งานที่ด้านล่าง</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideolink" xmbdesc="Label(login/gvideolink)">
+  <xmbtext>คลิกที่นี่เพื่อค้นหาเพิ่มเติม</xmbtext>
+ </action>
+ <action type="Label" target="login/gvideosignup2" xmbdesc="Label(login/gvideosignup2)">
+  <xmbtext>สร้างบัญชี</xmbtext>
+ </action>
+ <action type="Label" target="login/gmailintro" xmbdesc="Label(login/gmailintro)">
+  <xmbtext>ส่งรูปภาพด้วยบัญชีผู้ใช้ Google ของคุณ โดยใช้ Picasa</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint1" xmbdesc="Label(login/gpoint1)">
+  <xmbtext>กระบวนการส่งรูปภาพทั้งหมดทำได้โดยไม่ต้องใช้เว็บเบราว์เซอร์</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint2" xmbdesc="Label(login/gpoint2)">
+  <xmbtext>ส่งรูปภาพขนาดใหญ่ถึง 10MB</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint4" xmbdesc="Label(login/gpoint4)">
+  <xmbtext>ต้องการใช้ Gmail หรือไม่ รับบัญชีฟรีพร้อมพื้นที่เก็บข้อมูลกว่า 6.5 กิกะไบต์ (และยังเพิ่มขึ้นเรื่อยๆ)</xmbtext>
+ </action>
+ <action type="WebTarget" target="login/gpoint4" xmbdesc="WebTarget(login/gpoint4)">
+  <xmbtext>http://mail.google.com</xmbtext>
+ </action>
+ <action type="Label" target="login/gpoint3" xmbdesc="Label(login/gpoint3)">
+  <xmbtext>แสดงตัวอย่างรูปภาพของคุณก่อนทำการส่งภาพ</xmbtext>
+ </action>
+ <action type="Label" target="login/error" xmbdesc="Label(login/error)">
+  <xmbtext>ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง - กรุณาลองใหม่อีกครั้ง</xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror" xmbdesc="Label(login/captchaerror)">
+  <xmbtext>ชื่อผู้ใช้และรหัสผ่านไม่ตรงกัน </xmbtext>
+ </action>
+ <action type="Label" target="login/captchaerror2" xmbdesc="Label(login/captchaerror2)">
+  <xmbtext>ป้อนรหัสผ่านที่ถูกต้องข้างต้นโดยพิมพ์อักขระที่คุณเห็นในรูปภาพด้านล่าง (มีความแตกต่างระหว่างตัวพิมพ์ใหญ่และพิมพ์เล็ก)</xmbtext>
+ </action>
+ <action type="Label" target="login/rememberpasscaptcha" xmbdesc="Label(login/rememberpasscaptcha)">
+  <xmbtext>จดจำฉันไว้ในคอมพิวเตอร์เครื่องนี้</xmbtext>
+ </action>
+ <action type="Label" target="login/signincaptcha" xmbdesc="Label(login/signincaptcha)">
+  <xmbtext>ลงชื่อเข้าใช้</xmbtext>
+ </action>
+ <action type="Label" target="login/cancelcaptcha" xmbdesc="Label(login/cancelcaptcha)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+</tooltips>

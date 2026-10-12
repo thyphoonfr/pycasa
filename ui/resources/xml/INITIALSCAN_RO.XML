@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Este instalată o versiune anterioară a produsului Picasa. Doriţi să actualizaţi fototeca dvs. existentă sau să căutaţi din nou fotografii în computer?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Vă rugăm alegeţi din următoarele opţiuni:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Doresc să se actualizeze fototeca mea existentă</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Alegeţi această opţiune dacă folosiţi cuvinte-cheie sau albume personalizate în Picasa 1 şi doriţi să păstraţi aceste opţiuni în Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Doresc să se caute din nou fotografiile pe computerul meu</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Alegeţi această opţiune pentru o căutare mai cuprinzătoare în computerul dvs., care include mai multe informaţii despre fotografii. Opţiunea va păstra editările şi organizarea existente, dar nu va păstra cuvintele-cheie. Această căutare poate dura câteva minute.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Căutarea de fotografii nu implică mutarea sau copierea de fişiere în locaţii noi. Puteţi alege dosarele de afişat în Picasa folosind instrumentul Administrator de dosare (disponibil în meniul Instrumente)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continuaţi</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa este pregătit să caute fotografii pe computerul dvs.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Vă rugăm alegeţi din următoarele opţiuni:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Doresc să fie căutate fotografii în tot computerul meu</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Alegeţi această opţiune dacă aveţi fotografii stocate în dosare diferite din computerul dvs., mai ales dacă aveţi fotografii stocate pe mai multe hard diskuri.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Doresc să se caute numai în Documents (Documente), Pictures (Imagini), pe Desktop şi în iPhoto Library (Fototeca iPhoto)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Alegeţi această opţiune dacă stocaţi numai fotografiile dvs. în aceste dosare.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Căutarea de fotografii nu implică mutarea sau copierea de fişiere în locaţii noi. Puteţi alege dosarele de afişat în Picasa folosind instrumentul Administrator de dosare (disponibil în meniul Instrumente)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continuaţi</xmbtext>
+ </action>
+</tooltips>

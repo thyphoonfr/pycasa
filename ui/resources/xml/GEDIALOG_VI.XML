@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>Gắn thẻ địa lý cho ảnh bằng cách chuyển đến vị trí bạn lấy ảnh. Xác định vị trí hình chữ thập và bấm vào nút &#039;Gắn thẻ địa lý&#039;</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>Gắn thẻ</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>Gắn thẻ địa lý cho tất cả</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>Xong</xmbtext>
+ </action>
+</tooltips>

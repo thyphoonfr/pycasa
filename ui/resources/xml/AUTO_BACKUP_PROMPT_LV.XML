@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google fotoattēlu dublēšana</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Dublējiet savus Picasa fotoattēlus</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Automātiski saglabājiet savus fotoattēlus un videoklipus tiešsaistē, izmantojot Google fotoattēlu dublēšanu. Jūsu vienumi būs pieejami no visām jūsu ierīcēm un redzami tikai jums, līdz izvēlēsities tos kopīgot.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Iegūt Google fotoattēlu dublēšanas funkciju</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nē, paldies</xmbtext>
+ </stringres>
+</resources>

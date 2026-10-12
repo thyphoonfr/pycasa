@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Creació d&#039;etiquetes de cara</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>L&#039;escriptura de cares o de tot pot necessitar força temps. Si la creació de registres està establerta com a detallada o en un nivell superior, el registre de la xarxa contindrà missatges sobre fitxers només de lectura que pot ser que no estiguin actualitzats. Et recomanem que tanquis la sessió mentre utilitzes aquesta funció.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Escriptura de la selecció</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Escriptura de cares</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Escriptura de tot</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

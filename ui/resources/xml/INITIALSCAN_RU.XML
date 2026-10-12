@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Установлена более ранняя версия Picasa. Обновить существующую библиотеку фотографий или попытаться найти фотографии на компьютере еще раз?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Выберите один из следующих вариантов:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Обновление существующей библиотеки</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Выберите этот параметр, если используете ключевые слова или персонализированные альбомы в Picasa 1 и хотите сохранить их в Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Повторный поиск всех фотографий на компьютере</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Выберите этот вариант, чтобы выполнить полный поиск на своем компьютере, в который будет включена расширенная информация о фотографиях. При этом существующие изменения и систематизация сохраняются, а ключевые слова – нет. Поиск может занять несколько минут.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>При поиске фотографий файлы никогда не копируются и не перемещаются в другие папки. Выбрать папки, которые будут отображаться в Picasa, можно с помощью инструмента &quot;Менеджер папок&quot; (в меню &quot;Инструменты&quot;).</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Продолжить</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Программа Picasa готова к поиску фотографий на компьютере</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Выберите один из следующих вариантов:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Поиск всех фотографий на компьютере</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Выберите этот параметр, если фотографии хранятся на компьютере в разных папках, особенно в том случае, если фотографии хранятся на разных жестких дисках.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Искать только в Моих документах, Моих рисунках, на рабочем столе и в библиотеке iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Выберите этот вариант, если вы сохраняете фотографии только в этих папках.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>При поиске фотографий файлы никогда не копируются и не перемещаются в другие папки. Выбрать папки, которые будут отображаться в Picasa, можно с помощью инструмента &quot;Менеджер папок&quot; (в меню &quot;Инструменты&quot;).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Продолжить</xmbtext>
+ </action>
+</tooltips>

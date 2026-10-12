@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Ghi thẻ khuôn mặt</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Ghi khuôn mặt hoặc ghi tất cả khuôn mặt có thể mất nhiều thời gian. Nếu ghi nhật ký được đặt thành chi tiết hoặc cao hơn, network.log sẽ chứa thông báo về tệp chỉ đọc. Bạn không thể cập nhật tệp chỉ đọc này. Chúng tôi khuyên bạn nên đăng xuất trong khi sử dụng tính năng này.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Ghi khuôn mặt được chọn</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Ghi khuôn mặt</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Ghi tất cả</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

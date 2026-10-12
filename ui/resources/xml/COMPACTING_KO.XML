@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>압축 중</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa에서 디스크 공간을 절약하기 위해 데이터베이스를 압축하고 있습니다. 몇 분 정도 걸릴 수 있습니다.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>압축 중...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

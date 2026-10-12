@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Een naam toevoegen</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Een map selecteren voor het weergeven van gezichten</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Negeren</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Een persoon handmatig toevoegen</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Annuleren</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Terwijl uw foto&#039;s door Picasa worden gescand, worden de gevonden gezichten automatisch gegroepeerd zodat u ze gemakkelijk een naam kunt geven.\n\nNuttige informatie:\n\nAls u een persoon wilt identificeren, klikt u op &#039;Een naam toevoegen&#039;. Geef vervolgens de naam van de persoon op en druk op Enter. Er wordt een nieuw persoonsalbum gemaakt wanneer u iemand voor het eerst een naam geeft.\n\n(TIP: log in met uw Google-account om toegang te krijgen tot al uw contacten terwijl u namen geeft.)\n\nAls u een persoon wilt negeren, klikt u op de knop &#039;X&#039; op de miniatuur van het gezicht.\n\nSuggesties: nadat u iemand een naam heeft gegeven, kan Picasa meer overeenkomende gezichten voor die persoon voorstellen. Klik op het album van een persoon om suggesties te bekijken en te bevestigen (of af te wijzen).</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Terwijl uw foto&#039;s door Picasa worden gescand, worden de gevonden gezichten automatisch gegroepeerd zodat u ze gemakkelijk een naam kunt geven.\n\nNuttige informatie:\n\nAls u een persoon wilt identificeren, klikt u op &#039;Een naam toevoegen&#039;. Geef vervolgens de naam van de persoon op en druk op Enter. Er wordt een nieuw persoonsalbum gemaakt wanneer u iemand voor het eerst een naam geeft.\n\n(TIP: log in met uw Google-account om toegang te krijgen tot al uw contacten terwijl u namen geeft.)\n\nAls u een persoon wilt negeren, klikt u op de knop &#039;X&#039; op de miniatuur van het gezicht.\n\nSuggesties: nadat u iemand een naam heeft gegeven, kan Picasa meer overeenkomende gezichten voor die persoon voorstellen. Klik op het album van een persoon om suggesties te bekijken en te bevestigen (of af te wijzen).</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Er zijn nog geen personen gevonden. Wanneer gezichten worden gevonden en gegroepeerd, worden ze weergegeven in het naamloze album. Tijdens het scannen worden voortgangsgegevens weergegeven in het naamloze albumitem.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Personen met een naam, die worden weergegeven met de geselecteerde persoon, worden hier vermeld.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Personen die in de geselecteerde foto&#039;s voorkomen, worden hier weergegeven.</xmbtext>
+ </action>
+</tooltips>

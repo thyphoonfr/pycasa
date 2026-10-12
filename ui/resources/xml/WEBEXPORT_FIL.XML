@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>I-export bilang HTML Page</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>I-export ang mga larawan sa:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Orihinal na Sukat</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixels (para sa mga malalaking monitor)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixels (para sa malaking mga Web page)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixels (para sa mga Web page)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 na mga pixel (para sa e-mail)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>I-export ang mga movie gamit ang:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Unang frame</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Buong movie</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Pamagat ng web page:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Folder:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Mag-browse...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Mag-click sa Pangalan ng Template upang tingnan ang isang halimbawa. Kapag nakapili ka na, i-click ang Export.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Pagsasalarawan ng Template</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>I-export</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

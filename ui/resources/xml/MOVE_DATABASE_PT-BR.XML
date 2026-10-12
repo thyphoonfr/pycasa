@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Mover banco de dados</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Para que as mudanças tenham efeito, você deve reiniciar o Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Observação: você deve fazer backup do banco de dados antes de experimentar este recurso. NUNCA mova o banco de dados para uma rede, unidade removível ou unidade externa ou seus dados podem ser perdidos.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Local atual do banco de dados:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Novo local do banco de dados:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Procurar...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Padrão</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Mover na próxima reinicialização</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

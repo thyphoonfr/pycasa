@@ -1,0 +1,248 @@
+{
+  "105": {
+    "file": "group_icon_105.ico",
+    "image_count": 10,
+    "frames": [
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 4,
+        "res_id": 13
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 4,
+        "res_id": 14
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 4,
+        "res_id": 15
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 8,
+        "res_id": 16
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 8,
+        "res_id": 17
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 8,
+        "res_id": 18
+      },
+      {
+        "width": 256,
+        "height": 256,
+        "bpp": 32,
+        "res_id": 19
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 32,
+        "res_id": 20
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 32,
+        "res_id": 21
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 32,
+        "res_id": 22
+      }
+    ]
+  },
+  "106": {
+    "file": "group_icon_106.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 4,
+        "res_id": 23
+      }
+    ]
+  },
+  "150": {
+    "file": "group_icon_150.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 4,
+        "res_id": 24
+      }
+    ]
+  },
+  "151": {
+    "file": "group_icon_151.ico",
+    "image_count": 2,
+    "frames": [
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 8,
+        "res_id": 25
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 8,
+        "res_id": 26
+      }
+    ]
+  },
+  "152": {
+    "file": "group_icon_152.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 4,
+        "res_id": 27
+      }
+    ]
+  },
+  "153": {
+    "file": "group_icon_153.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 4,
+        "res_id": 28
+      }
+    ]
+  },
+  "157": {
+    "file": "group_icon_157.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 12,
+        "bpp": 4,
+        "res_id": 29
+      }
+    ]
+  },
+  "158": {
+    "file": "group_icon_158.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 12,
+        "bpp": 4,
+        "res_id": 30
+      }
+    ]
+  },
+  "159": {
+    "file": "group_icon_159.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 12,
+        "bpp": 4,
+        "res_id": 31
+      }
+    ]
+  },
+  "161": {
+    "file": "group_icon_161.ico",
+    "image_count": 1,
+    "frames": [
+      {
+        "width": 16,
+        "height": 12,
+        "bpp": 4,
+        "res_id": 32
+      }
+    ]
+  },
+  "320": {
+    "file": "group_icon_320.ico",
+    "image_count": 10,
+    "frames": [
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 4,
+        "res_id": 33
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 4,
+        "res_id": 34
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 4,
+        "res_id": 35
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 8,
+        "res_id": 36
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 8,
+        "res_id": 37
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 8,
+        "res_id": 38
+      },
+      {
+        "width": 256,
+        "height": 256,
+        "bpp": 32,
+        "res_id": 39
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "bpp": 32,
+        "res_id": 40
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "bpp": 32,
+        "res_id": 41
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bpp": 32,
+        "res_id": 42
+      }
+    ]
+  }
+}

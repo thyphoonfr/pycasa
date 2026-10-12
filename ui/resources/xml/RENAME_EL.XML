@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Μετονομασία αρχείων</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 αρχείο έχει επιλεγεί για μετονομασία.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s αρχεία έχουν επιλεγεί για μετονομασία.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Εισαγάγετε νέο όνομα για αυτά τα αρχεία:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Συμπερίληψη στο όνομα αρχείου:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Ημερομηνία</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Ανάλυση εικόνας</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Παράδειγμα:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Μετονομασία</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

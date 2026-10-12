@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Zapisz twarze</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Zapisywanie twarzy lub wszystkich danych może trochę potrwać. Jeśli masz ustawiony szczegółowy lub wyższy poziom raportowania, to w pliku network.log znajdziesz komunikaty o plikach tylko do odczytu, których nie udało się zaktualizować. Podczas używania tej funkcji zalecamy wylogowanie się.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Wybrane zapisywanie</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Zapisz twarze</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Zapisz wszystko</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

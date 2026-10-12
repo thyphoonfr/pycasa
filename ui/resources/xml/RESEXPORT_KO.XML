@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Win32Res>
+ <RT_DIALOG>
+  <res resid="#145">
+   <dtitle>
+    <xmbtext>Picasa 정보</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 435 293)</dlayout>
+   <item itemid="1056" itemtype="Static" layout="rect(0 0 20 20)"/>
+   <item itemid="-1" itemtype="Static" layout="rect(9 171 427 258)">
+    <xmbtext>문자열 표의 IDS_ABOUT에서 삽입됨</xmbtext>
+   </item>
+   <item itemid="-2" itemtype="Static" layout="rect(9 260 109 268)">
+    <xmbtext>타사 라이선스</xmbtext>
+   </item>
+   <item itemid="1" itemtype="Button" layout="rect(193 272 243 286)">
+    <xmbtext>확인</xmbtext>
+   </item>
+   <item itemid="1086" itemtype="Edit" layout="rect(6 7 429 227)"/>
+  </res>
+  <res resid="#198">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 95)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 74 179 88)">
+    <xmbtext>취소</xmbtext>
+   </item>
+   <item itemid="1164" itemtype="Static" layout="rect(31 7 179 49)">
+    <xmbtext>Picasa에서 디스크 공간을 절약하기 위해 데이터베이스를 압축하고 있습니다. 몇 분 정도 걸릴 수 있습니다.</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(31 45 179 62)"/>
+  </res>
+  <res resid="#211">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 71)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 50 179 64)">
+    <xmbtext>취소</xmbtext>
+   </item>
+   <item itemid="1163" itemtype="Static" layout="rect(31 7 179 32)">
+    <xmbtext>복제 중입니다.</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(14 42 123 58)">
+    <xmbtext>업데이트 중입니다...</xmbtext>
+   </item>
+  </res>
+  <res resid="#323">
+   <dtitle>
+    <xmbtext>사용 통계</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 276 116)</dlayout>
+   <item itemid="1" itemtype="Button" layout="rect(7 88 161 102)">
+    <xmbtext>예, 통계를 보냅니다.</xmbtext>
+   </item>
+   <item itemid="2" itemtype="Button" layout="rect(170 88 269 102)">
+    <xmbtext>아니요, 보내지 않습니다.</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(30 34 269 62)">
+    <xmbtext>자동으로 Google에 익명의 사용 통계를 보내서 Picasa를 개선할 수 있도록 도와주시겠습니까?</xmbtext>
+   </item>
+   <item itemid="1316" itemtype="Static" layout="rect(163 69 269 77)">
+    <xmbtext>개인정보...</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(37 13 193 21)">
+    <xmbtext>Picasa 개선을 위한 의견 보내기</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 28 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+  </res>
+ </RT_DIALOG>
+</Win32Res>

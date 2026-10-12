@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>S&#039;ha esgotat l&#039;espai d&#039;emmagatzematge de Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Obtén més espai d&#039;emmagatzematge per poder continuar creant còpies de seguretat de les fotos originals amb alta resolució. També pots triar que les còpies de seguretat es desin amb alta qualitat i, d&#039;aquesta manera, obtenir emmagatzematge gratuït il·limitat: bona qualitat visual amb una mida de fitxer reduïda.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Consulta l&#039;ajuda per triar l&#039;opció més adient</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Obtén més emmagatzematge</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Canvia a l&#039;alta qualitat</xmbtext>
+ </stringres>
+</resources>

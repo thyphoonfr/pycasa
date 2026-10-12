@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Lukk</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Les mer</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Velkommen til albumet med folk uten navn. </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Når Picasa søker gjennom bildene dine, grupperes ansiktene som registreres automatisk, sånn at det er enkelt å navngi dem.\n\nNyttig å vite:\n\nDu kan identifisere en person ved å klikke på «Legg til et navn», skrive inn personens navn og trykke på Enter. Et nytt Folk-album blir opprettet hver gang du navngir noen for første gang.\n\n(TIPS: Logg på med Google-kontoen din for å få tilgang til alle Google-kontaktene dine mens du navngir personer.)\n\nDu kan ignorere en person ved å klikke på «X»-knappen på miniatyrbildet av ansiktet til vedkommende.\n\nForslag: Etter at du har navngitt noen, kan det hende at Picasa foreslår flere samsvarende ansikter for vedkommende. Klikk på albumet til en person hvis du vil se og bekrefte (eller avvise) eventuelle forslag.\n\n\n Klikk på «Finn ut mer» for mer informasjon om denne funksjonen.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Når Picasa søker gjennom bildene dine, grupperes ansiktene som registreres automatisk, sånn at det er enkelt å navngi dem.\n\nNyttig å vite:\n\nDu kan identifisere en person ved å klikke på «Legg til et navn», skrive inn personens navn og trykke på Enter. Et nytt Folk-album blir opprettet hver gang du navngir noen for første gang.\n\n(TIPS: Logg på med Google-kontoen din for å få tilgang til alle Google-kontaktene dine mens du navngir personer.)\n\nDu kan ignorere en person ved å klikke på «X»-knappen på miniatyrbildet av ansiktet til vedkommende.\n\nForslag: Etter at du har navngitt noen, kan det hende at Picasa foreslår flere samsvarende ansikter for vedkommende. Klikk på albumet til en person hvis du vil se og bekrefte (eller avvise) eventuelle forslag.\n\n\n Klikk på «Finn ut mer» for mer informasjon om denne funksjonen.</xmbtext>
+ </action>
+</tooltips>

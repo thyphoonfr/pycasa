@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Przenieś bazę danych</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>W celu wprowadzenia zmian konieczne będzie ponowne uruchomienie programu Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Uwaga: przed wypróbowaniem tej funkcji eksperymentalnej należy utworzyć kopię zapasową bazy danych. NIGDY nie należy przenosić bazy danych na dysk sieciowy, wymienny lub zewnętrzny, ponieważ grozi to utratą danych.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Bieżąca lokalizacja bazy danych:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nowa lokalizacja bazy danych:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Przeglądaj...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Wartość domyślna</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Przenieś podczas następnego uruchomienia</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

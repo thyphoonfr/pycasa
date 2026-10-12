@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Eksportuoti į aplanką</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Eksportavimo vieta:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Naršyti…</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Paskirties aplanko pavadinimas:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Prie failų pavadinimų pridėkite numerius, kad būtų išlaikyta tvarka</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Vaizdo dydis:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Naudoti pradinį dydį</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Keisti dydį:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>taškai (-ų)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Vaizdo kokybė:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatinis</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Įprastas</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maks.</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Maž.</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Pasirinktinis</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Išsaugo pradinę vaizdo kokybę</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Geras kokybės ir failo dydžio santykis</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Labai didelis failas, išsaugomos smulkiausios detalės</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Mažiausias failo dydis, prastesnė kokybė</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Eksportuoti filmus naudojant:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Pirmas kadras</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Visas filmas (nekeičiant dydžio)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vandens ženklas:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Pridėti vandens ženklą</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Pažymėkite nuotraukas savo vardu, žiniatinklio domenu ar autorių teisių pastaba.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Eksportuoti</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

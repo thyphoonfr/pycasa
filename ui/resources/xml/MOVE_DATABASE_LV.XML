@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Datu bāzes pārvietošana</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Lai izmaiņas stātos spēkā, ir jārestartē Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Lūdzu, ņemiet vērā — pirms šīs izmēģinājuma funkcijas izmantošanas izveidojiet datu bāzes dublējumu. NEKĀDĀ GADĪJUMĀ nepārvietojiet datu bāzi uz tīkla, noņemamu vai ārēju diskdzini, jo tā var tikt zaudēti dati.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Pašreizējā datu bāzes atrašanās vieta:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Jaunā datu bāzes atrašanās vieta:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Noklusējums</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Pārvietot nākamajā restartēšanas reizē</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

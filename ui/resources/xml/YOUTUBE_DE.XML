@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Auf YouTube hochladen</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Titel:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Beschreibung:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Videokategorie:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Wird geladen...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tags:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Dies sind Suchbegriffe, mit denen andere Nutzer Ihr Video suchen können (durch Leerzeichen getrennt)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Video als &quot;öffentlich&quot; markieren</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Ihr Video ist auf 10 Minuten und 1 GB beschränkt.</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Laden Sie keine TV-Programme, Musikvideos, Konzerte oder Werbung hoch, ohne vorher die Erlaubnis dafür eingeholt zu haben. Dies gilt natürlich nicht für Inhalte, deren Urheber Sie selbst sind. Die Seite &quot;Tipps zum Urheberrecht&quot; und die Community-Richtlinien können Ihnen dabei helfen, festzustellen, ob Ihr Video die Urheberrechte einer anderen Person verletzt.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Durch Klicken auf &quot;Video hochladen&quot; bestätigen Sie, dass dieses Video nicht gegen die YouTube-Nutzungsbedingungen verstößt und Sie im Besitz aller Urheberrechte an diesem Video sind oder dazu befugt sind, das Video hochzuladen.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Video hochladen</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Abbrechen</xmbtext>
+ </stringres>
+</resources>

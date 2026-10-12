@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>कॉम्पैक्ट कर रहा है</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>डिस्क स्थान बचाने के लिए Picasa  अपने डेटाबेस को संकुचित कर रहा है. इसमें कई मिनट लग सकते हैं.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>संकुचित कर रहा है...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

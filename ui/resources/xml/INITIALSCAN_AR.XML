@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>بيكاسا</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>هناك إصدار قديم مثبت من بيكاسا.  هل تريد تحديث مكتبة الصور الحالية أم تريد البحث في الكمبيوتر عن الصور مرة أخرى؟</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>الرجاء الانتقاء من الخيارات التالية:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>تحديث مكتبة الصور الموجودة</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>اختر هذا الخيار إذا كنت تستخدم الكلمات الأساسية أو ألبومات مخصصة في بيكاسا 1 وتريد الاحتفاظ بها في بيكاسا 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>البحث في جهاز الكمبيوتر عن الصور مرة أخرى</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>اختر هذا الخيار لإجراء بحث أكثر شمولاً في جهاز الكمبيوتر، والذي يتضمن معلومات موسعة عن الصورة.  سيحتفظ البحث بالتعديلات الموجودة والتنظيم، ولكنه لن يحتفظ بالكلمات الرئيسية.  قد يستغرق هذا البحث عدة دقائق.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>لا يؤدي البحث عن الصور إلى نقل الملفات إلى أماكن جديدة أو نسخها مطلقًا، ويمكنك اختيار المجلدات التي يتم عرضها من خلال بيكاسا باستخدام أداة إدارة المجلدات (متوفرة من القائمة أدوات)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>متابعة</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>بيكاسا</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>بيكاسا مستعدة للبحث عن الصور على الكمبيوتر</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>الرجاء الانتقاء من الخيارات التالية:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>البحث في جهاز الكمبيوتر كله عن الصور</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>اختر هذا الخيار إذا خزنت الصور في مجلدات مختلفة داخل الكمبيوتر، لاسيما إذا كانت لديك صور مخزنة في أكثر من محرك أقراص ثابت واحد.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>‏فحص مستنداتي وصوري وسطح المكتب ومكتبة iPhoto فقط</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>حدد هذا الخيار إذا كنت تخزن صورك فقط في هذه المجلدات.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>لا يؤدي البحث عن الصور إلى نقل الملفات إلى أماكن جديدة أو نسخها مطلقًا، ويمكنك اختيار المجلدات التي يتم عرضها من خلال بيكاسا باستخدام أداة إدارة المجلدات (متوفرة من القائمة أدوات)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>متابعة</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>A Gyorscímkék funkció segítségével egyetlen kattintással alkalmazhat címkéket. Alább írja be azokat a címkéket, amelyekhez egy kattintással hozzá szeretne férni. Alapértelmezés szerint a felső két gyorscímke a legutóbb alkalmazott címkéket követi. A felső két címke kézi beállításához törölje a jelet a jelölőnégyzetből.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>A fenti üres mezők automatikus kitöltése gyakran használatos címkékkel</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>A felső két gomb lefoglalása a legutóbb használt címkék számára</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Mégse</xmbtext>
+ </action>
+</tooltips>

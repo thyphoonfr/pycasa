@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>从网络相册中导入相册</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>点击“确定”按钮后，下面选中的网络相册中的图片就会下载到您的计算机。这些图片会根据相册名称自动整理到各个文件夹中。</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>您有 100 个在线网络相册。</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>导入所有相册</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>导入选定的相册：</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>名称</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>日期</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>（请注意：只会下载您的计算机上没有的图片）</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

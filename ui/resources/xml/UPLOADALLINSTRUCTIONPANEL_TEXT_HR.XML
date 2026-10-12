@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Zatvori</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Dobro došli u skupni prijenos</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Potvrdite okvire uz mape i albume s kojima želite raditi. Zatim odaberite što biste htjeli učiniti. Picasa će filtrirati stavke za operacije koje nije moguće primijeniti. Ako je, primjerice, cijela mapa ili cijeli album već na mreži, Picasa neće prikazati mogućnost prijenosa.</xmbtext>
+ </action>
+</tooltips>

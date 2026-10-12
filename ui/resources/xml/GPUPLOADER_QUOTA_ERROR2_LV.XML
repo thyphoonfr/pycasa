@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google fotoattēlu dublēšana</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Google diska krātuvē nepietiek vietas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Iegūstiet lielāku krātuvi, lai turpinātu saglabāt savus oriģinālos fotoattēlus pilnā izšķirtspējā. Lai izmantotu neierobežotu bezmaksas krātuvi, kurā uzglabāt lieliskas vizuālās kvalitātes attēlus ar samazinātu faila lielumu, ieslēdziet augstas kvalitātes iestatījumu.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Saņemiet padomus</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Iegūstiet vairāk vietas krātuvē</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Ieslēdziet augstas kvalitātes iestatījumu</xmbtext>
+ </stringres>
+</resources>

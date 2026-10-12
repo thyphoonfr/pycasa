@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>สำรองข้อมูลรูปภาพ Picasa ของคุณ</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>บันทึกรูปภาพและวิดีโอโดยอัตโนมัติแบบออนไลน์ด้วย Google Photos Backup รายการของคุณสามารถเข้าถึงได้จากทุกอุปกรณ์ และข้อมูลทั้งหมดจะเป็นแบบส่วนตัวจนกว่าคุณจะแชร์</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>ดาวน์โหลด Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>ไม่เป็นไร ขอบคุณ</xmbtext>
+ </stringres>
+</resources>

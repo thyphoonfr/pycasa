@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>导出为 HTML 页</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>导出图片位置：</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>原始尺寸</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 像素（适用于大显示器）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 像素（适用于大网页）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 像素（适用于网页）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 像素（适用于电子邮件）</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>导出视频方式：</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>第一幅</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>完整视频</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>网页标题：</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>文件夹：</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>浏览...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>点击模板名称可以查看示例。选好以后，请点击“导出”。</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>模板说明</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>导出</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>با رفتن به موقعیت مکانی عکسی که گرفته‌اید، به آن عکس برچسب مکان اختصاص دهید. خطهای داخلی دوربین را تنظیم کرده و سپس دکمه &#039;برچسب مکان&#039; را فشار دهید.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>برچسب مکان</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>برچسب مکان زدن به همه</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>انجام شد</xmbtext>
+ </action>
+</tooltips>

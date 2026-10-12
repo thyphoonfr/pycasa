@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>调整照片日期</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>当前照片日期：</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>新照片日期：</xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>按数量调整所有照片的日期</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>将所有照片设置为相同的日期和时间</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>确定</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

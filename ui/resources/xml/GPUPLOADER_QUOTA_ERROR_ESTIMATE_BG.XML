@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Автоматично създаване на резервно копие</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Хранилището свърши</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Избрахте папки, чието съдържание е по-голямо от оставащото ви хранилище в Google Диск. Можете или да купите още хранилище, или да създавате безплатно неограничен брой резервни копия на снимки и видеоклипове със стандартен размер.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Ако сте купили хранилище току-що, може да са необходими няколко минути промените да влязат в сила.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Получете още хранилище...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Превключване към стандартен размер</xmbtext>
+ </stringres>
+</resources>

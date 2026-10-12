@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Импорт альбомов из Веб-альбомов</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Выберите альбомы, которые хотите загрузить, и нажмите &quot;ОК&quot;. Все фотографии будут добавлены в соответствующие папки (при необходимости они будут созданы автоматически).</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>У вас 100 альбомов в Интернете.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Импортировать все альбомы</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Выбрать альбомы для импорта</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Название</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Дата</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>Примечание. Файлы, которые уже есть на компьютере, не будут загружены.</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>ОК</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

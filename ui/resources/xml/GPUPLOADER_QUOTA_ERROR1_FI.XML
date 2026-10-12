@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>1 Gt Google Drive -tallennustilaa jäljellä</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Hanki lisää tallennustilaa, jos haluat jatkaa alkuperäisten kuvien varmuuskopioimista täydellä tarkkuudella. Voit vaihtoehtoisesti vaihtaa korkeaan laatuun ja saada rajoittamattomasti tallennustilaa: tuloksena on upea visuaalinen laatu pienemmällä tiedostokoolla.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Ohjeita päätöksentekoon</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Osta lisää tallennustilaa</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Vaihda korkeaan laatuun</xmbtext>
+ </stringres>
+</resources>

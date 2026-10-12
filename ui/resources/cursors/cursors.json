@@ -1,0 +1,74 @@
+{
+  "1": {
+    "file": "cursor_1.cur",
+    "hotspot_x": 9,
+    "hotspot_y": 8,
+    "size_bytes": 326
+  },
+  "2": {
+    "file": "cursor_2.cur",
+    "hotspot_x": 0,
+    "hotspot_y": 19,
+    "size_bytes": 326
+  },
+  "3": {
+    "file": "cursor_3.cur",
+    "hotspot_x": 7,
+    "hotspot_y": 9,
+    "size_bytes": 326
+  },
+  "4": {
+    "file": "cursor_4.cur",
+    "hotspot_x": 7,
+    "hotspot_y": 9,
+    "size_bytes": 326
+  },
+  "5": {
+    "file": "cursor_5.cur",
+    "hotspot_x": 14,
+    "hotspot_y": 15,
+    "size_bytes": 326
+  },
+  "6": {
+    "file": "cursor_6.cur",
+    "hotspot_x": 0,
+    "hotspot_y": 0,
+    "size_bytes": 326
+  },
+  "7": {
+    "file": "cursor_7.cur",
+    "hotspot_x": 2,
+    "hotspot_y": 2,
+    "size_bytes": 326
+  },
+  "8": {
+    "file": "cursor_8.cur",
+    "hotspot_x": 12,
+    "hotspot_y": 9,
+    "size_bytes": 326
+  },
+  "9": {
+    "file": "cursor_9.cur",
+    "hotspot_x": 14,
+    "hotspot_y": 15,
+    "size_bytes": 326
+  },
+  "10": {
+    "file": "cursor_10.cur",
+    "hotspot_x": 0,
+    "hotspot_y": 0,
+    "size_bytes": 326
+  },
+  "11": {
+    "file": "cursor_11.cur",
+    "hotspot_x": 7,
+    "hotspot_y": 9,
+    "size_bytes": 326
+  },
+  "12": {
+    "file": "cursor_12.cur",
+    "hotspot_x": 15,
+    "hotspot_y": 14,
+    "size_bytes": 326
+  }
+}

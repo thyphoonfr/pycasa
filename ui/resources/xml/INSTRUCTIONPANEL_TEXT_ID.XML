@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Tutup</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Pelajari selengkapnya...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Selamat datang di album orang Belum Dinamai! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Ketika Picasa memindai foto Anda, wajah yang terdeteksi akan otomatis dikelompokkan untuk memudahkan penamaan.\n\nHal-hal yang perlu diketahui:\n\nUntuk mengidentifikasi orang, klik &#039;Tambahkan nama&#039;, lalu ketik nama orang dan tekan Enter. Album Orang baru akan dibuat setiap kali Anda menamai seseorang untuk pertama kalinya.\n\n(KIAT: Masuk menggunakan Akun Google untuk mendapatkan akses ke semua kontak Akun Google Anda saat menamai.)\n\nUntuk mengabaikan orang, klik tombol &#039;X&#039; di gambar mini wajah.\n\nSaran: Setelah Anda menamai seseorang, Picasa mungkin menyarankan wajah lainnya yang cocok dengan orang tersebut. Klik album orang untuk melihat dan mengonfirmasi (atau menolak) saran apa pun.\n\n\n Klik &#039;Pelajari Lebih Lanjut&#039; untuk informasi tentang fitur ini.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Ketika Picasa memindai foto Anda, wajah yang terdeteksi akan otomatis dikelompokkan untuk memudahkan penamaan.\n\nHal-hal yang perlu diketahui:\n\nUntuk mengidentifikasi orang, klik &#039;Tambahkan nama&#039;, lalu ketik nama orang dan tekan Enter. Album Orang baru akan dibuat setiap kali Anda menamai seseorang untuk pertama kalinya.\n\n(KIAT: Masuk menggunakan Akun Google untuk mendapatkan akses ke semua kontak Akun Google Anda saat menamai.)\n\nUntuk mengabaikan orang, klik tombol &#039;X&#039; di gambar mini wajah.\n\nSaran: Setelah Anda menamai seseorang, Picasa mungkin menyarankan wajah lainnya yang cocok dengan orang tersebut. Klik album orang untuk melihat dan mengonfirmasi (atau menolak) saran apa pun.\n\n\n Klik &#039;Pelajari Lebih Lanjut&#039; untuk informasi tentang fitur ini.</xmbtext>
+ </action>
+</tooltips>

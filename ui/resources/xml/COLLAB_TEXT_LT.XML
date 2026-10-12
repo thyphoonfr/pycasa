@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="collab/uploadsize_label" xmbdesc="Text(collab/uploadsize_label)">
+  <xmbtext>Įkėlimo dydis</xmbtext>
+ </action>
+ <action type="Text" target="collab/privacy_label" xmbdesc="Text(collab/privacy_label)">
+  <xmbtext>Privatumas</xmbtext>
+ </action>
+ <action type="Text" target="collab/choose_contact_label" xmbdesc="Text(collab/choose_contact_label)">
+  <xmbtext>Pasirinkite kontaktą:</xmbtext>
+ </action>
+ <action type="Text" target="collab/contact_album_list_label" xmbdesc="Text(collab/contact_album_list_label)">
+  <xmbtext>Kontakto albumai, prie kurių galite prisidėti:</xmbtext>
+ </action>
+ <action type="Label" target="collab/ok" xmbdesc="Label(collab/ok)">
+  <xmbtext>Įkelti</xmbtext>
+ </action>
+ <action type="Label" target="collab/cancel" xmbdesc="Label(collab/cancel)">
+  <xmbtext>Atšaukti</xmbtext>
+ </action>
+ <action type="Label" target="collab/storagetext" xmbdesc="Label(collab/storagetext)">
+  <xmbtext>Sužinokite daugiau...</xmbtext>
+ </action>
+</tooltips>

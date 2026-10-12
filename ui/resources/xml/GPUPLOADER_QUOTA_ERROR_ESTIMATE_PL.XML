@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Automatyczna kopia zapasowa Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Brak miejsca</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Wybrałeś foldery, które zajmują więcej miejsca niż pozostałe wolne miejsce na Dysku Google. Możesz kupić więcej miejsca lub bezpłatnie zapisywać nieograniczoną liczbę zdjęć i filmów w standardowym rozmiarze.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Jeśli właśnie kupiłeś miejsce, poczekaj kilka minut na zastosowanie zmian.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Zwiększ ilość miejsca...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Zmień rozmiar na standardowy</xmbtext>
+ </stringres>
+</resources>

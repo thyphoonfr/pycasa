@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google फ़ोटो बैकअप</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Google डिस्क मेमोरी नहीं है</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>अपनी मूल फ़ोटो का पूर्ण स्क्रीन रिज़ॉल्यूशन में बैक अप लेने के लिए अधिक मेमोरी प्राप्त करें. या निःशुल्क असीमित मेमोरी के लिए उच्च गुणवत्ता पर स्विच करें: कम फ़ाइल आकार में श्रेष्ठ दृश्य गुणवत्ता.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>निर्णय लेने में सहायता प्राप्त करें</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>अधिक मेमोरी प्राप्त करें</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>उच्च गुणवत्ता पर स्विच करें</xmbtext>
+ </stringres>
+</resources>

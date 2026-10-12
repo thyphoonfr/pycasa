@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Foto&#039;s Back-up</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Back-ups van je Picasa-foto&#039;s maken</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Uw foto&#039;s en video&#039;s automatisch online opslaan met Google Foto&#039;s Back-up. Uw items zijn toegankelijk op al uw apparaten en blijven privé, tenzij u ervoor kiest ze te delen.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google Foto&#039;s Back-up downloaden</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nee, bedankt</xmbtext>
+ </stringres>
+</resources>

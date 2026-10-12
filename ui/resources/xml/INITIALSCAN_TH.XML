@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>มี Picasa เวอร์ชันก่อนหน้านี้ติดตั้งอยู่แล้ว  คุณต้องการอัปเดตไลบรารีภาพเดิมหรือค้นในคอมพิวเตอร์ของคุณเพื่อหาภาพอีกครั้ง</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>กรุณาเลือกจากตัวเลือกต่างๆ ต่อไปนี้:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>อัปเดตไลบรารีภาพที่มีอยู่ของฉัน</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>เลือกตัวเลือกนี้ถ้าคุณใช้คำหลักหรืออัลบั้มที่กำหนดเองใน Picasa 1 และคุณต้องการเก็บรักษาไว้ใน Picasa 3</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>ค้นหาภาพในคอมพิวเตอร์ของฉันอีกครั้ง</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>เลือกตัวเลือกนี้เพื่อค้นหาเต็มรูปแบบมากขึ้นภายในเครื่องคอมพิวเตอร์ของคุณ ซึ่งมีข้อมูลเพิ่มเติมของภาพ ตัวเลือกนี้จะรักษาการแก้ไขและการจัดระเบียบ แต่ไม่เก็บค่าคำหลัก การค้นหานี้อาจใช้เวลานานหลายนาที</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>การค้นหาภาพจะไม่ย้ายหรือคัดลอกไฟล์ไปยังตำแหน่งใหม่ คุณสามารถเลือกว่าจะให้แสดงโฟลเดอร์ใดใน Picasa โดยใช้เครื่องมือจัดการโฟลเดอร์ (มีให้จากเมนูเครื่องมือ)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>ดำเนินการต่อ</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa พร้อมที่จะค้นหาภาพในคอมพิวเตอร์ของคุณแล้ว</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>กรุณาเลือกจากตัวเลือกต่างๆ ต่อไปนี้:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>ค้นหาภาพในคอมพิวเตอร์ของฉัน</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>เลือกตัวเลือกนี้หากคุณเก็บภาพไว้ในโฟลเดอร์ต่างๆ ในเครื่องคอมพิวเตอร์ของคุณ โดยเฉพาะหากคุณมีภาพเก็บไว้ในฮาร์ดดิสก์มากกว่าหนึ่งไดรฟ์</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>ค้นหาเฉพาะเอกสาร ภาพ เดสก์ท็อป และห้องสมุดรูปภาพ iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>เลือกตัวเลือกนี้หากคุณเก็บภาพไว้ในโฟลเดอร์เหล่านี้</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>การค้นหาภาพจะไม่ย้ายหรือคัดลอกไฟล์ไปยังตำแหน่งใหม่ คุณสามารถเลือกว่าจะให้แสดงโฟลเดอร์ใดใน Picasa โดยใช้เครื่องมือจัดการโฟลเดอร์ (มีให้จากเมนูเครื่องมือ)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>ดำเนินการต่อ</xmbtext>
+ </action>
+</tooltips>

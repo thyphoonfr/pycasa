@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Ganti Nama File</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 file dipilih untuk berganti nama.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s file terpilih untuk diganti namanya.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Masukkan nama baru untuk file ini:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Sertakan dalam nama file:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Tanggal</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Resolusi gambar</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Contoh:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Ganti Nama</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

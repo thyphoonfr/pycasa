@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Pridėti vardą</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Pasirinkite aplanką, iš kurio norite rodyti veidus</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignoruoti</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Pridėkite asmenį rankiniu būdu</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Atšaukti</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Kai „Picasa“ nuskaito nuotraukas, rasti veidai automatiškai sugrupuojami, kad juos būtų lengva įvardyti.\n\nDalykai, kuriuos verta žinoti.\n\nJei norite identifikuoti asmenį, spustelėkite &#039;Pridėti vardą&#039;, tada įveskite asmens vardą ir paspauskite Įvesti. Kiekvieną kartą, kai identifikuojate asmenį pirmą kartą, sukuriamas naujas Žmonių albumas.\n\n(PATARIMAS. Prisijunkite naudodamiesi savo „Google“ paskyra, jei įvardindami norite gauti prieigą prie visų savo kontaktų.)\n\nJei norite asmenį ignoruoti, spustelėkite &#039;X&#039; mygtuką ant veido miniatiūros.\n\nPasiūlymai. Kai identifikuojate asmenį, „Picasa“ gali pasiūlyti daugiau šį asmenį atitinkančių veidų. Spustelėkite asmens albumą, jei norite peržiūrėti ir patvirtinti (arba atmesti) pasiūlymus.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Kai „Picasa“ nuskaito nuotraukas, rasti veidai automatiškai sugrupuojami, kad juos būtų lengva įvardyti.\n\nDalykai, kuriuos verta žinoti.\n\nJei norite identifikuoti asmenį, spustelėkite &#039;Pridėti vardą&#039;, tada įveskite asmens vardą ir paspauskite Įvesti. Kiekvieną kartą, kai identifikuojate asmenį pirmą kartą, sukuriamas naujas Žmonių albumas.\n\n(PATARIMAS. Prisijunkite naudodamiesi savo „Google“ paskyra, jei įvardindami norite gauti prieigą prie visų savo kontaktų.)\n\nJei norite asmenį ignoruoti, spustelėkite &#039;X&#039; mygtuką ant veido miniatiūros.\n\nPasiūlymai. Kai identifikuojate asmenį, „Picasa“ gali pasiūlyti daugiau šį asmenį atitinkančių veidų. Spustelėkite asmens albumą, jei norite peržiūrėti ir patvirtinti (arba atmesti) pasiūlymus.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Kol kas nerasta jokių žmonių. Kadangi veidai yra surandami ir sugrupuojami, jie bus rodomi albume be pavadinimo. Nuskaitant eigos informacija rodoma albumo be pavadinimo elemente.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Su šiuo metu pasirinktu asmeniu rodomi žmonės su vardais bus nurodyti čia.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Šiuo metu pasirinktose nuotraukose esantys žmonės bus nurodyti čia.</xmbtext>
+ </action>
+</tooltips>

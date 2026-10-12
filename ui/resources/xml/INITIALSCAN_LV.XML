@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Ir instalēta vecāka programmas Picasa versija. Vai vēlaties atjaunināt esošo attēlu bibliotēku vai arī vēlreiz meklēt datorā attēlus?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Izvēlieties kādu no šīm opcijām:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Atjaunināt esošo attēlu bibliotēku</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Izvēlieties šo opciju, ja programmā Picasa 1 lietojat atslēgvārdus vai pielāgotos albumus un vēlaties tos saglabāt programmā Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Vēlreiz meklēt datorā attēlus</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Izvēlieties šo opciju, lai pilnīgāk meklētu datorā, tajā skaitā attēlu paplašinātajā informācijā. Tādējādi tiks saglabāti esošie labojumi un kārtošanas veids, bet ne atslēgvārdi. Meklēšana var ilgt vairākas minūtes.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Meklējot attēlus, faili netiek pārvietoti vai kopēti uz jaunām atrašanās vietām. Izmantojot rīku Mapju pārvaldnieks (pieejams izvēlnē Rīki), varat izvēlēties mapes, kuras tiks rādītas programmā Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Turpināt</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Programma Picasa ir gatava datorā meklēt attēlus</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Izvēlieties kādu no šīm opcijām:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Meklēt attēlus visā datorā</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Izvēlieties šo opciju, ja saglabājāt attēlus vairākās datora mapēs, it īpaši, ja attēli tiek saglabāti vairākos cietajos diskos.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Meklēt tikai mapēs Dokumenti un Attēli, darbvirsmā un iPhoto bibliotēkā</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Izvēlieties šo opciju, ja saglabājat attēlus tikai šajās mapēs.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Meklējot attēlus, faili netiek pārvietoti vai kopēti uz jaunām atrašanās vietām. Izmantojot rīku Mapju pārvaldnieks (pieejams izvēlnē Rīki), varat izvēlēties mapes, kuras tiks rādītas programmā Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Turpināt</xmbtext>
+ </action>
+</tooltips>

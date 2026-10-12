@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Di chuyển cơ sở dữ liệu</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Bạn cần khởi động lại Picasa để các thay đổi có hiệu lực.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Vui lòng lưu ý: Bạn nên sao lưu cơ sở dữ liệu của mình trước khi thử tính năng thử nghiệm này. KHÔNG di chuyển cơ sở dữ liệu tới mạng, ổ đĩa di động hoặc ổ đĩa bên ngoài, nếu không bạn có thể bị mất dữ liệu.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Vị trí hiện tại của cơ sở dữ liệu:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Vị trí mới của cơ sở dữ liệu:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Duyệt...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Mặc định</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Di chuyển vào lần khởi động lại tiếp theo</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

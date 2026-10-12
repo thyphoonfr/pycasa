@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Импортиране на албуми от Уеб Албуми</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Снимките от уеб албумите, отметнати по-долу, ще се изтеглят на компютъра ви, щом кликнете върху бутона „OK“. Те автоматично ще се подредят по папки в зависимост от имената на албумите.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Имате 100 онлайн уеб албума.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Импортиране на всички албуми</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Импортиране на избраните албуми:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Име</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Дата</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(ЗАБЕЛЕЖКА: Ще се изтеглят само снимките, които още не са на компютъра ви)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

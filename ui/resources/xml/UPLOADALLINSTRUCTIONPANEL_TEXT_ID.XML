@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Tutup</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Selamat datang di Unggahan Massal</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Centang kotak di samping folder dan album yang akan Anda kerjakan. Lalu, pilih apa yang ingin Anda lakukan. Picasa akan memfilter apabila operasi tidak berlaku. Sebagai contoh, jika seluruh folder atau album sudah online, Picasa tidak akan menampilkannya sebagai opsi untuk mengunggah.</xmbtext>
+ </action>
+</tooltips>

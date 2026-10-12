@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Kopia zapasowa Zdjęć Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Twórz kopie zapasowe swoich zdjęć z Picasy</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Kopia zapasowa Zdjęć Google automatycznie zapisuje w internecie Twoje zdjęcia i filmy. Zapisane elementy są dostępne z dowolnego Twojego urządzenia i pozostają prywatne, dopóki ich nie udostępnisz.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Pobierz Kopię zapasową Zdjęć Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nie, dziękuję</xmbtext>
+ </stringres>
+</resources>

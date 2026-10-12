@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nom:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Data:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Data automàtica</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Música:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Utilitza música per a la presentació de pel·lícules i diapositives</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Lloc on es va fer (opcional):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Descripció (opcional):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

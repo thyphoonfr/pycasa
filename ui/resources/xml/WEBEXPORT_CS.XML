@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exportovat jako stránku HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Exportovat fotky na:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Původní velikost</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixelů (pro velké monitory)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixelů (pro velké webové stránky)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixelů (pro webové stránky)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixelů (pro e-mail)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Exportovat filmy jako:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>První snímek</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Celý film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Název webové stránky:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Složka:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Procházet...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Kliknutím na název šablony zobrazte ukázku. Až si vyberete, klikněte na tlačítko Exportovat.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Popis šablony</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Export</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Zrušit</xmbtext>
+ </stringres>
+</resources>

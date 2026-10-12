@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Anda dapat menggunakan Tag Cepat untuk memberi tag dengan sekali klik.  Ketikkan tag di bawah untuk akses satu klik.  Secara default, dua Tag Cepat teratas digunakan untuk melacak tag yang baru saja digunakan.  Hapus centang pada kotak di bawah untuk mengatur kedua tag teratas secara manual.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Isi otomatis kotak kosong di atas dengan tag yang umum digunakan</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Cadangkan dua tombol atas untuk tag yang baru digunakan</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>Oke</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+</tooltips>

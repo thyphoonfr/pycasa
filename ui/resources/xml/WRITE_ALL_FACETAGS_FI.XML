@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Kirjoita kasvotageja</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Kasvojen tai kaikkien tietojen kirjoittaminen voi kestää kauan. Jos kirjauksen asetuksena on yksityiskohtaiset tiedot tai sitä tarkemmat tiedot, network.log sisältää viestejä vain luku -tiedostoista, joita ei voitu päivittää. Suosittelemme uloskirjautumista tämän ominaisuuden käytön ajaksi.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Kirjoita valitut</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Kirjoita kasvotunnisteet</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Kirjoita kaikki</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

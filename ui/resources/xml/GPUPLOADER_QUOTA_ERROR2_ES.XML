@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Te has quedado sin almacenamiento en Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Obtén más almacenamiento para continuar creando copias de seguridad de tus fotos originales en resolución completa. También puedes elegir que las copias se guarden en alta resolución y, de esta manera, obtener espacio gratuito ilimitado: gran calidad visual con un tamaño reducido de archivo.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Obtener ayuda para decidir</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Obtener más almacenamiento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Cambiar a alta calidad</xmbtext>
+ </stringres>
+</resources>

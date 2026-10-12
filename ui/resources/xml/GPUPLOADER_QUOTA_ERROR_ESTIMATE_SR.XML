@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ аутоматске резервне копије</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Немате више складишног простора</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Изабрали сте директоријуме који заузимају више простора од преосталог складишног простора на Google диску. Можете да купите још складишног простора или да бесплатно направите резервне копије неограниченог броја слика и видео снимака у стандардној величини.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Ако сте управо купили складишни простор, можда ће бити потребно неколико минута да промене ступе на снагу.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Набавите још складишног простора...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Пребаците на стандардну величину</xmbtext>
+ </stringres>
+</resources>

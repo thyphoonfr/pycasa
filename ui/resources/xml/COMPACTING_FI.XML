@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Tiivistetään</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa-tietokantaa tiivistetään levytilan säästämiseksi. Tämä voi kestää useita minuutteja.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Tiivistetään...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

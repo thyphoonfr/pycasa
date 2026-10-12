@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google 포토 백업</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Picasa 사진 백업</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Google 포토 백업을 사용하여 사진과 동영상을 온라인에 자동으로 저장하세요. 모든 기기에서 항목에 액세스할 수 있으며 공유하도록 선택하지 않는 한 비공개로 유지됩니다.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google 포토 백업 다운로드</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>아니요</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>הוסף שם</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>בחר תיקייה כדי להציג פנים</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>התעלם</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>הוסף אדם באופן ידני</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>ביטול</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>‏בשעה ש-Picasa סורק את התמונות שלך, הוא מקבץ באופן אוטומטי את הפרצופים המתגלים כדי שיהיה קל לתת שמות.\n\nדברים שכדאי לדעת:\n\nכדי לזהות מישהו, לחץ על &#039;הוסף שם&#039;, ואז הקלד את שם אותו אדם והקש Enter.  אלבום &#039;אנשים&#039; חדש ייווצר בכל פעם שתיתן שם למישהו בפעם הראשונה.\n\n(טיפ: היכנס עם חשבון Google כדי לקבל גישה לכל אנשי הקשר שלך בעת מתן שמות.)\n\nכדי להתעלם מאדם מסוים, לחץ על הלחצן &#039;X&#039; בתמונה הממוזערת של הפרצוף.\n\nהצעות: לאחר מתן שם למישהו, Picasa עשוי להציע עוד פרצופים מתאימים לאדם זה. לחץ על האלבום של מישהו כדי להציג ולאשר (או לדחות) הצעות כלשהן.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>‏בשעה ש-Picasa סורק את התמונות שלך, הוא מקבץ באופן אוטומטי את הפרצופים המתגלים כדי שיהיה קל לתת שמות.\n\nדברים שכדאי לדעת:\n\nכדי לזהות מישהו, לחץ על &#039;הוסף שם&#039;, ואז הקלד את שם אותו אדם והקש Enter.  אלבום &#039;אנשים&#039; חדש ייווצר בכל פעם שתיתן שם למישהו בפעם הראשונה.\n\n(טיפ: היכנס עם חשבון Google כדי לקבל גישה לכל אנשי הקשר שלך בעת מתן שמות.)\n\nכדי להתעלם מאדם מסוים, לחץ על הלחצן &#039;X&#039; בתמונה הממוזערת של הפרצוף.\n\nהצעות: לאחר מתן שם למישהו, Picasa עשוי להציע עוד פרצופים מתאימים לאדם זה. לחץ על האלבום של מישהו כדי להציג ולאשר (או לדחות) הצעות כלשהן.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>עדיין לא נמצאו אנשים. תוך כדי האיתור והקיבוץ של אנשים, הם יופיעו באלבום &#039;ללא שם&#039;. במהלך הסריקה, פרטי ההתקדמות יופיעו באלבום &#039;ללא שם&#039;.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>אנשים שניתן להם שם ואשר מופיעים יחד עם האדם שנבחר יופיעו ברשימה זו.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>אנשים המופיעים בתמונות שנבחרו יופיעו ברשימה זו.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="input/prompt.title">
+  <xmbtext>Упит:</xmbtext>
+ </stringres>
+ <stringres id="input/button6.title">
+  <xmbtext>Потврди</xmbtext>
+ </stringres>
+ <stringres id="input/button7.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

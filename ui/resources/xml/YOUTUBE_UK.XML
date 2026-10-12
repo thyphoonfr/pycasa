@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Завантажити на YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Назва:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Опис:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Категорія відео:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Завантаження...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Теги:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Ці ключові слова допомагають користувачам знайти ваш відеозапис (розділені пробілом).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Зробити це відео доступним для всіх</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Тривалість та об&#039;єм відео мають обмеження до 10 хвилин і 1 Гб відповідно</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Не завантажуйте жодних телепрограм, відеокліпів, записів концертів і рекламних роликів без належного дозволу, крім тих випадків, коли їх вміст повністю створений вами. Сторінка з порадами щодо авторського права і Правила спільноти допоможуть визначити, чи не порушує ваше відео авторські права іншої особи.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Натискаючи &quot;Завантажити відео&quot;, ви підтверджуєте, що цей відеофайл не порушує Умови використання YouTube, а також, що ви володієте всіма авторськими правами на цей файл або маєте право завантажувати його в мережу.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Завантажити відео</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

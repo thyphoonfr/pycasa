@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Uždaryti</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Sužinokite daugiau…</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Sveiki! Tai - žmonių albumas be pavadinimo.</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Kai „Picasa“ nuskaito nuotraukas, rasti veidai automatiškai sugrupuojami, kad juos būtų lengva įvardyti.\n\nDalykai, kuriuos verta žinoti.\n\nJei norite identifikuoti asmenį, spustelėkite &#039;Pridėti vardą&#039;, tada įveskite asmens vardą ir paspauskite Įvesti. Kiekvieną kartą, kai identifikuojate asmenį pirmą kartą, sukuriamas naujas Žmonių albumas.\n\n(PATARIMAS. Prisijunkite naudodamiesi savo „Google“ paskyra, jei įvardindami norite gauti prieigą prie visų savo kontaktų.)\n\nJei norite asmenį ignoruoti, spustelėkite &#039;X&#039; mygtuką ant veido miniatiūros.\n\nPasiūlymai. Kai identifikuojate asmenį, „Picasa“ gali pasiūlyti daugiau šį asmenį atitinkančių veidų. Spustelėkite asmens albumą, jei norite peržiūrėti ir patvirtinti (arba atmesti) pasiūlymus.\n\n\n Spustelėkite &#039;Sužinoti daugiau&#039;, jei reikia daugiau informacijos apie šią funkciją.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Kai „Picasa“ nuskaito nuotraukas, rasti veidai automatiškai sugrupuojami, kad juos būtų lengva įvardyti.\n\nDalykai, kuriuos verta žinoti.\n\nJei norite identifikuoti asmenį, spustelėkite &#039;Pridėti vardą&#039;, tada įveskite asmens vardą ir paspauskite Įvesti. Kiekvieną kartą, kai identifikuojate asmenį pirmą kartą, sukuriamas naujas Žmonių albumas.\n\n(PATARIMAS. Prisijunkite naudodamiesi savo „Google“ paskyra, jei įvardindami norite gauti prieigą prie visų savo kontaktų.)\n\nJei norite asmenį ignoruoti, spustelėkite &#039;X&#039; mygtuką ant veido miniatiūros.\n\nPasiūlymai. Kai identifikuojate asmenį, „Picasa“ gali pasiūlyti daugiau šį asmenį atitinkančių veidų. Spustelėkite asmens albumą, jei norite peržiūrėti ir patvirtinti (arba atmesti) pasiūlymus.\n\n\n Spustelėkite &#039;Sužinoti daugiau&#039;, jei reikia daugiau informacijos apie šią funkciją.</xmbtext>
+ </action>
+</tooltips>

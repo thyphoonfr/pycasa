@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="geopanel/search_label" xmbdesc="Label(geopanel/search_label)">
+  <xmbtext>Търсене на адрес:</xmbtext>
+ </action>
+ <action type="Text" target="geopanel/loading_title" xmbdesc="Text(geopanel/loading_title)">
+  <xmbtext>Картата се зарежда...</xmbtext>
+ </action>
+</tooltips>

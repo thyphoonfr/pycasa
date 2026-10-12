@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="buzzupload/uploadinfo" xmbdesc="Text(buzzupload/uploadinfo)">
+  <xmbtext>Kontrollerar onlinestatus...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/webalbumstext" xmbdesc="Text(buzzupload/webalbumstext)">
+  <xmbtext>Listan med webbalbum uppdateras...</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/upload_label" xmbdesc="Text(buzzupload/upload_label)">
+  <xmbtext>Ladda upp till detta album:</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/uploadsize_label" xmbdesc="Text(buzzupload/uploadsize_label)">
+  <xmbtext>Storlek som ska laddas upp</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/newalbum2" xmbdesc="Label(buzzupload/newalbum2)">
+  <xmbtext>Ny</xmbtext>
+ </action>
+ <action type="Tooltip" target="buzzupload/newalbum2" xmbdesc="Tooltip(buzzupload/newalbum2)">
+  <xmbtext>Byt namn på nytt album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/ok" xmbdesc="Label(buzzupload/ok)">
+  <xmbtext>Ladda upp</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/cancel" xmbdesc="Label(buzzupload/cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Text" target="buzzupload/desclabel" xmbdesc="Text(buzzupload/desclabel)">
+  <xmbtext>Beskrivning</xmbtext>
+ </action>
+ <action type="Text1" target="buzzupload/comments_label" xmbdesc="Text1(buzzupload/comments_label)">
+  <xmbtext>E-postmeddelande</xmbtext>
+ </action>
+ <action type="Text2" target="buzzupload/comments_label" xmbdesc="Text2(buzzupload/comments_label)">
+  <xmbtext>[Valfritt] Dela på Google+? Lägg till ett meddelande</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/options_label" xmbdesc="Label(buzzupload/options_label)">
+  <xmbtext>Bildstorlek</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/visibility_label" xmbdesc="Label(buzzupload/visibility_label)">
+  <xmbtext>Synlighet för album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/collab_label" xmbdesc="Label(buzzupload/collab_label)">
+  <xmbtext>Låt de här personerna bidra till mitt album</xmbtext>
+ </action>
+ <action type="Label" target="buzzupload/also_send_email_label" xmbdesc="Label(buzzupload/also_send_email_label)">
+  <xmbtext>Skicka e-postmeddelanden</xmbtext>
+ </action>
+</tooltips>

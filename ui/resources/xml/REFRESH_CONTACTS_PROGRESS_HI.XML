@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="refresh_contacts_progress/window1.title">
+  <xmbtext>संपर्कों को रीफ़्रेश किया जा रहा है</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/label3.title">
+  <xmbtext>Picasa ऑनलाइन संपर्क जानकारी को रीफ़्रेश कर रहा है.</xmbtext>
+ </stringres>
+ <stringres id="refresh_contacts_progress/ok.title">
+  <xmbtext>पृष्ठभूमि में रीफ़्रेश करें</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>เปลี่ยนชื่อไฟล์</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>เลือกไฟล์ที่จะเปลี่ยนชื่อ 1 ไฟล์</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>มีการเลือกไฟล์ที่จะเปลี่ยนชื่อ %s ไฟล์</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>โปรดป้อนชื่อใหม่สำหรับโฟลเดอร์นี้:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>รวมในชื่อไฟล์:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>วันที่</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>ความละเอียดภาพ</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>ตัวอย่าง:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>เปลี่ยนชื่อ</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

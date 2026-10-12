@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Écrire les tags de visage</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>L&#039;opération &quot;Écrire les tags de visage&quot; ou &quot;Tout écrire&quot; peut prendre du temps. Si le niveau de consignation est défini sur &quot;détaillé&quot; ou un niveau supérieur, le fichier network.log contiendra des messages relatifs à des fichiers en lecture seule qui n&#039;ont pas pu être mis à jour. Il est recommandé de se déconnecter pendant l&#039;utilisation de cette fonctionnalité.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Écriture sélectionnée</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Écrire les tags de visage</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Tout écrire</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

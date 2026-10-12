@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="buttonmgr/add" xmbdesc="Label(buttonmgr/add)">
+  <xmbtext>เพิ่ม &gt;&gt;</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/remove" xmbdesc="Label(buttonmgr/remove)">
+  <xmbtext>&lt;&lt; ย้ายออก</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/moveup" xmbdesc="Label(buttonmgr/moveup)">
+  <xmbtext>ย้ายขึ้น</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/movedown" xmbdesc="Label(buttonmgr/movedown)">
+  <xmbtext>ย้ายลง</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/usedefaults" xmbdesc="Label(buttonmgr/usedefaults)">
+  <xmbtext>รีเซ็ตเป็นค่าเริ่มต้น</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/done" xmbdesc="Label(buttonmgr/done)">
+  <xmbtext>เสร็จเรียบร้อย</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/ok" xmbdesc="Label(buttonmgr/ok)">
+  <xmbtext>ตกลง</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/cancel" xmbdesc="Label(buttonmgr/cancel)">
+  <xmbtext>ยกเลิก</xmbtext>
+ </action>
+ <action type="Label" target="buttonmgr/browse" xmbdesc="Label(buttonmgr/browse)">
+  <xmbtext>ค้นหาปุ่มแบบออนไลน์...</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/instructions" xmbdesc="Text(buttonmgr/instructions)">
+  <xmbtext>ย้ายปุ่มไปมาระหว่างทั้งสองรายการด้วยการคลิก &quot;เพิ่ม&quot; และ &quot;ลบ&quot; ปุ่มในรายการ &quot;ปุ่มปัจจุบัน&quot; จะปรากฏที่ด้านล่างของ Picasa ตามลำดับที่คุณระบุในที่นี้  ใช้ &quot;ย้ายขึ้น&quot; และ &quot;ย้ายลง&quot; เพื่อเรียงลำดับของปุ่ม (บนสุดถึงต่ำสุดในที่นี้เทียบเท่ากับซ้ายไปขวาในแอปพลิเคชัน)</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/leftlist_text" xmbdesc="Text(buttonmgr/leftlist_text)">
+  <xmbtext>ปุ่มที่พร้อมใช้งาน:</xmbtext>
+ </action>
+ <action type="Text" target="buttonmgr/rightlist_text" xmbdesc="Text(buttonmgr/rightlist_text)">
+  <xmbtext>ปุ่มปัจจุบัน:</xmbtext>
+ </action>
+</tooltips>

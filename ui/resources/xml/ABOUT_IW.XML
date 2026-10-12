@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>‏מידע על Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>כל המוצרים, שמות השירותים, המותגים או הסימנים המסחריים האחרים הם קניינם של בעליהם בהתאמה.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>‏תוכנה זו מבוססת בחלקה על העבודה של Independent JPEG Group. התוכנית מוגנת מתוקף חוקי זכויות היוצרים של ארצות הברית וחוקי זכויות יוצרים בינלאומיים.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>רישיונות צד שלישי...</xmbtext>
+ </stringres>
+</resources>

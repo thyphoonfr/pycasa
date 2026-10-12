@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Μήνυμα</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Να μην εμφανιστεί ξανά η ερώτηση</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Ναι</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Όχι</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

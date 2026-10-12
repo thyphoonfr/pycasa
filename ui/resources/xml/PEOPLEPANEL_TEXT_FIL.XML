@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Magdagdag ng pangalan</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Pumili ng folder kung saan ipapakita ang mga mukha</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Huwag Pansinin</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Mano-manong idagdag ang tao</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Habang sina-scan ng Picasa ang iyong mga larawan, awtomatikong ipinapangkat ang mga mukhang nahahanap nito para sa madaling pagpapangalan.\n\nMga bagay na dapat malaman:\n\nUpang matukoy ang isang tao, i-click ang &#039;Magdagdag ng pangalan&#039;, pagkatapos ay i-type ang pangalan ng tao at pindutin ang Enter.  Isang bagong album ng Mga Tao ang magagawa sa tuwing pinapangalanan mo ang isang tao sa unang pagkakataon.\n\n(TIP: Mag-sign in sa iyong Google Account upang makakuha ng access sa lahat ng iyong contact habang nagpapangalan.)\n\nUpang balewalain ang isang tao, i-click ang button na &#039;X&#039; sa thumbnail na mukha.\n\nMga Suhestyon: Pagkatapos mong pangalanan ang isang tao, maaaring magmungkahi ang Picasa ng higit pang mga tumutugmang mukha para sa taong iyon. Mag-click sa album ng isang tao upang tingnan at kumpirmahin (o tanggihan) ang anumang mga suhestyon.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Habang sina-scan ng Picasa ang iyong mga larawan, awtomatikong ipinapangkat ang mga mukhang nahahanap nito para sa madaling pagpapangalan.\n\nMga bagay na dapat malaman:\n\nUpang matukoy ang isang tao, i-click ang &#039;Magdagdag ng pangalan&#039;, pagkatapos ay i-type ang pangalan ng tao at pindutin ang Enter.  Isang bagong album ng Mga Tao ang magagawa sa tuwing pinapangalanan mo ang isang tao sa unang pagkakataon.\n\n(TIP: Mag-sign in sa iyong Google Account upang makakuha ng access sa lahat ng iyong contact habang nagpapangalan.)\n\nUpang balewalain ang isang tao, i-click ang button na &#039;X&#039; sa thumbnail na mukha.\n\nMga Suhestyon: Pagkatapos mong pangalanan ang isang tao, maaaring magmungkahi ang Picasa ng higit pang mga tumutugmang mukha para sa taong iyon. Mag-click sa album ng isang tao upang tingnan at kumpirmahin (o tanggihan) ang anumang mga suhestyon.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Wala pang nahanap na mga tao. Habang ang mga mukha ay nahahanap at napapagsama-sama, sila ay lalabas sa album na Walang Pangalan. Habang ini-scan, ang impormasyon sa progreso ay lalabas sa item ng Walang Pangalan na album.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Ang mga Pinangalanang Tao na lumalabas kasama ang kasalukuyang napiling tao ay ililista dito.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Ang mga tao na nasa kasalukuyang nakapiling mga larawan ay ililista dito.</xmbtext>
+ </action>
+</tooltips>

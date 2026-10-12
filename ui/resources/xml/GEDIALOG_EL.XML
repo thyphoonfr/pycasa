@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>Προσθέστε ετικέτα geotag σε μια φωτογραφία με πλοήγηση στη θέση στην οποία την τραβήξατε. Τοποθετήστε το νηματοειδή σταυρό και στη συνέχεια πατήστε το κουμπί &#039;Ετικέτα geotag&#039;.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>Geotag</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>Προσθήκη ετικέτας geotag σε όλα</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>Τέλος</xmbtext>
+ </action>
+</tooltips>

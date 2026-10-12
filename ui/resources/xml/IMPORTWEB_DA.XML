@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importer album fra Webalbum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Billeder i de webalbummer, som er markeret nedenfor, downloades til din computer, når du klikker på knappen OK. De organiseres automatisk i mapper ud fra deres albumnavne.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Du har 100 webalbummer på nettet.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importer alle album</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importer valgte album:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Navn</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Dato</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(BEMÆRK! Kun billeder, der ikke allerede findes på din computer, vil blive downloadet)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

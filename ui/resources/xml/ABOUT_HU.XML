@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>A Picasa névjegye</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Minden más termék-, szolgáltatás és márkanév, illetve bejegyzett védjegy tulajdonosuk birtokában van.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Ez a szoftver részben az Independent JPEG Group munkáján alapul. Ezt a programot az amerikai egyesült államokbeli és nemzetközi szerzői jogi törvények védik.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Harmadik felek licencei...</xmbtext>
+ </stringres>
+</resources>

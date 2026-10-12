@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>웹앨범에서 앨범 가져오기</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>&#039;확인&#039; 버튼을 클릭하면 아래에 선택 표시된 웹앨범의 사진들이 컴퓨터로 다운로드됩니다. 다운로드된 사진은 앨범 이름을 기준으로 폴더에 자동으로 정리됩니다.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>웹앨범 100개가 온라인에 있습니다.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>모든 앨범 가져오기</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>선택한 앨범 가져오기:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>이름</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>날짜</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(참고: 사용자의 컴퓨터에 없는 사진만 다운로드됩니다.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>확인</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

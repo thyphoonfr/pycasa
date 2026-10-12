@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>ניתן להשתמש בתגים מהירים כדי להחיל תג בלחיצה אחת. הקלד למטה את התגים שאתה מעוניין שתהיה לך גישת &#039;לחיצה אחת&#039; אליהם. כברירת מחדל, שני התגים המהירים העליונים משמשים למעקב אחר התגים האחרונים שהחלת. הסר את הסימון בתיבה למטה כדי להגדיר ידנית את שני התגים העליונים.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>מלא אוטומטית את התיבות הריקות שמעל בתגים שבשימוש שכיח</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>שמור את שני הלחצנים העליונים לתגים שהיו בשימוש לאחרונה</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>אישור</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>ביטול</xmbtext>
+ </action>
+</tooltips>

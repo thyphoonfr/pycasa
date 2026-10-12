@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>이름 추가</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>얼굴을 표시할 폴더 선택</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>무시</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>수동으로 인물 추가</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>취소</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Picasa에서 사진을 스캔해 찾은 얼굴에 따라 그룹으로 분류해 주므로 쉽게 이름을 지정할 수 있습니다.\n\n알아야 할 사항:\n\n인물을 식별하기 위해서는 &#039;이름 추가&#039;를 클릭한 다음, 인물의 이름을 입력하고 Enter 키를 누릅니다. 인물 이름을 처음으로 지정할 때마다 새 인물 앨범이 만들어집니다.\n\n(도움말: Google 계정으로 로그인하면 이름을 지정하는 동안 모든 주소록에 액세스할 수 있습니다.)\n\n인물을 무시하려면 얼굴 썸네일 이미지에서 &#039;X&#039; 버튼을 클릭합니다.\n\n제안: 한 인물의 이름을 지정하면 Picasa에서 해당 인물과 일치하는 얼굴이 있는 사진을 더 제안할 수 있습니다. 제안을 보고 확인 또는 거부하려면 인물의 앨범을 클릭하세요.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Picasa에서 사진을 스캔해 찾은 얼굴에 따라 그룹으로 분류해 주므로 쉽게 이름을 지정할 수 있습니다.\n\n알아야 할 사항:\n\n인물을 식별하기 위해서는 &#039;이름 추가&#039;를 클릭한 다음, 인물의 이름을 입력하고 Enter 키를 누릅니다. 인물 이름을 처음으로 지정할 때마다 새 인물 앨범이 만들어집니다.\n\n(도움말: Google 계정으로 로그인하면 이름을 지정하는 동안 모든 주소록에 액세스할 수 있습니다.)\n\n인물을 무시하려면 얼굴 썸네일 이미지에서 &#039;X&#039; 버튼을 클릭합니다.\n\n제안: 한 인물의 이름을 지정하면 Picasa에서 해당 인물과 일치하는 얼굴이 있는 사진을 더 제안할 수 있습니다. 제안을 보고 확인 또는 거부하려면 인물의 앨범을 클릭하세요.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>검색된 인물이 없습니다. 검색되고 그룹화된 얼굴은 이름 없는 앨범에 나타납니다. 검색하는 동안 이름 없는 앨범 항목에 진행률 정보가 표시됩니다.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>현재 선택한 인물과 함께 나타나는 이름이 지정된 인물이 여기에 표시됩니다.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>현재 선택한 사진에 나타나는 인물이 여기에 표시됩니다.</xmbtext>
+ </action>
+</tooltips>

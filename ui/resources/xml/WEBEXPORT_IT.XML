@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Esporta come pagina HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Esporta immagini in:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Dimensioni originali</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 pixel (per monitor grandi)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pixel (per pagine web di grandi dimensioni)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pixel (per pagine web)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 pixel (per email)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Esporta filmati con:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Primo fotogramma</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Film intero</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Titolo pagina web:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Cartella:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Sfoglia...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Fai clic su un nome di modello per visualizzare un esempio. Dopo avere eseguito la selezione, fai clic su Esporta.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Descrizione modello</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Esporta</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

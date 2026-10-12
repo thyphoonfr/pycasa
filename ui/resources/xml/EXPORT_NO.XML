@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Eksporter til mappe</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Eksporter til:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Bla gjennom</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Navn på eksportert mappe:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Legg til tall i filnavnene å bevare rekkefølgen</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Bildestørrelse:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Bruk opprinnelig størrelse</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Endre størrelse til:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>piksler</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Bildekvalitet:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automatisk</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maksimum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Tilpasset</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Bevarer opprinnelig bildekvalitet</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>God balanse mellom kvalitet og størrelse</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Veldig stor filstørrelse, bevarer fine detaljer</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Minste filstørrelse, noe redusert kvalitet</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Eksporter filmer med:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Det første bildet</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Full filmstørrelse (ingen skalering)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vannmerke:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Legg til vannmerke</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Stemple bildene med navnet ditt, et domenenavn eller en merknad om opphavsrett.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Eksporter</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

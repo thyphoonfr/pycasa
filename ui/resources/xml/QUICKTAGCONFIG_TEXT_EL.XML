@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Μπορείτε να χρησιμοποιήσετε τις Γρήγορες ετικέτες για να εφαρμόσετε μια ετικέτα με ένα μόνο κλικ.  Πληκτρολογήστε παρακάτω τις ετικέτες στις οποίες θέλετε να έχετε πρόσβαση με ένα κλικ.  Από προεπιλογή, οι δύο πρώτες Γρήγορες ετικέτες χρησιμοποιούνται για τον εντοπισμό των ετικετών που έχουν εφαρμοστεί πρόσφατα.  Καταργήστε την επιλογή του πλαισίου ελέγχου παρακάτω για να ορίσετε με μη αυτόματο τρόπο τις δύο πρώτες ετικέτες.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Αυτόματη συμπλήρωση των πλαισίων παραπάνω με τις πιο συχνά χρησιμοποιούμενες ετικέτες</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Διατήρηση των δύο επάνω κουμπιών για ετικέτες που χρησιμοποιήθηκαν πρόσφατα</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+</tooltips>

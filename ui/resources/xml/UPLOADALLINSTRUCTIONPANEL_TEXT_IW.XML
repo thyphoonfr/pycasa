@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>סגור</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>ברוכים הבאים להעלאת תצלומים מרובים</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>‏סמן את התיבות ליד התיקיות והאלבומים שברצונך לעבוד עמם. לאחר מכן בחר מה לעשות. Picasa תסנן את הפריטים שעליהם הפעולה לא תחול. למשל, אם תיקייה או אלבום שלם כבר מקוונים, Picasa לא תראה אותם כניתנים להורדה.</xmbtext>
+ </action>
+</tooltips>

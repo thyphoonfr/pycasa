@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importar álbumes desde Álbumes web</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Las imágenes de los álbumes web marcadas a continuación se descargarán en tu equipo después de hacer clic en el botón &quot;Aceptar&quot;. Se organizarán automáticamente en las carpetas en función de los nombres de los álbumes.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Cuentas con 100 álbumes web online.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importar todos los álbumes</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importar álbumes seleccionados:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nombre</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Fecha</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOTA: solo se descargarán las imágenes que aún no estén en el equipo).</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Aceptar</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

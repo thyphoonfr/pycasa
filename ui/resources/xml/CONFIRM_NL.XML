@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Bericht</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Deze vraag niet meer stellen</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Ja</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Nee</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

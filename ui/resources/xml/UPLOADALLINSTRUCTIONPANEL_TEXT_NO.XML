@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Lukk</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Velkommen til bunkeopplasting</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Merk av ved siden av mappene og albumene du vil arbeide med. Deretter velger du hva du vil gjøre. Picasa filtrerer vekk elementene som operasjonen ikke kan gjelde for. Hvis for eksempel en hel mappe eller album allerede er lastet opp, viser ikke Picasa dem som et alternativ for opplasting.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Automatisk backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Der er ikke mere lagerplads</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Du har valgt mapper, der indeholder mere plads, end den lagerplads, du har tilbage på Google Drev. Du kan enten købe mere lagerplads eller vælge gratis at sikkerhedskopiere et ubegrænset antal billeder og videoer i standardstørrelse.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Hvis du lige har købt lagerplads, kan det tage nogle få minutter, før ændringerne træder i kraft.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Få mere lagerplads...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Skift til standardstørrelse</xmbtext>
+ </stringres>
+</resources>

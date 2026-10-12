@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Redenumiţi fişiere</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 fişier a fost selectat pentru redenumire.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s (de) fişier(e) a(u) fost selectat(e) pentru redenumire.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Introduceţi un nume nou pentru aceste fişiere:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Includeţi în numele fişierului:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Rezoluţia imaginii</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Exemplu:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Redenumiţi</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

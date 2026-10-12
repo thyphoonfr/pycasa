@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>चेहरे टैग लिखें</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>चेहरे लिखने या सभी लिखने में अधिक समय लग सकता है.  यदि लॉगिंग को विस्तृत या उच्च पर सेट किया गया है, तो नेटवर्क लॉग में अपडेट न की जा सकने वाली केवल-पढ़ने के लिए फ़ाइलों के बारे में संदेश होंगे.  इस सुविधा का उपयोग करते समय प्रस्थान करना सुझाए गए है.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>चयनित लिखें</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>चेहरा लिखें</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>सभी लिखें</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

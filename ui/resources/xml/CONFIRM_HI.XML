@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>संदेश</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>फिर से मत पूछें</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>हां</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>नहीं</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

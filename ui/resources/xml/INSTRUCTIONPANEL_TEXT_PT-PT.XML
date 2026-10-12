@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Fechar</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Saiba mais...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Bem-vindo ao álbum de pessoas Sem nome! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>À medida que o Picasa analisa as suas fotografias, as caras encontradas são automaticamente agrupadas para facilitar a atribuição de nomes.\n\nInformações a reter:\n\nPara identificar uma pessoa, clique em &quot;Adicionar nome&quot;; e, em seguida, escreva o nome da pessoa e prima Enter. Sempre que atribuir um nome a alguém pela primeira vez, é criado um novo álbum Pessoas.\n\n(SUGESTÃO: inicie sessão com a sua Conta Google para obter acesso a todos os seus contactos durante a atribuição de nomes.)\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura de cara.\n\nSugestões: após atribuir um nome a alguém, o Picasa pode sugerir mais caras correspondentes para essa pessoa. Clique no álbum de uma pessoa para ver e confirmar (ou rejeitar) as sugestões.\n\n\n Clique em &quot;Saiba mais&quot; para obter mais informações sobre esta funcionalidade.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>À medida que o Picasa analisa as suas fotografias, as caras encontradas são automaticamente agrupadas para facilitar a atribuição de nomes.\n\nInformações a reter:\n\nPara identificar uma pessoa, clique em &quot;Adicionar nome&quot;; e, em seguida, escreva o nome da pessoa e prima Enter. Sempre que atribuir um nome a alguém pela primeira vez, é criado um novo álbum Pessoas.\n\n(SUGESTÃO: inicie sessão com a sua Conta Google para obter acesso a todos os seus contactos durante a atribuição de nomes.)\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura de cara.\n\nSugestões: após atribuir um nome a alguém, o Picasa pode sugerir mais caras correspondentes para essa pessoa. Clique no álbum de uma pessoa para ver e confirmar (ou rejeitar) as sugestões.\n\n\n Clique em &quot;Saiba mais&quot; para obter mais informações sobre esta funcionalidade.</xmbtext>
+ </action>
+</tooltips>

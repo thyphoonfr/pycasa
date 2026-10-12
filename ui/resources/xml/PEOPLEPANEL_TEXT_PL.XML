@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Dodaj nazwę</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Wybierz folder w celu wyświetlenia twarzy</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignoruj</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Dodaj osobę ręcznie</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Anuluj</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Podczas skanowania zdjęć Picasa automatycznie grupuje znalezione twarze, aby ułatwić przypisywanie nazw.\n\nWarto wiedzieć:\n\nAby zidentyfikować osobę, kliknij „Dodaj nazwę”, wpisz imię i nazwisko tej osoby, a następnie naciśnij Enter. Za każdym razem, gdy po raz pierwszy przypiszesz komuś nazwę, zostanie utworzony nowy album osób.\n\nWSKAZÓWKA: aby podczas przypisywania nazw móc korzystać ze wszystkich swoich kontaktów, zaloguj się na konto Google.\n\nAby zignorować daną osobę, kliknij przycisk „X” na miniaturze twarzy.\n\nSugestie: gdy przypiszesz nazwę jakiejś osobie, Picasa może zasugerować więcej pasujących twarzy. Kliknij album tej osoby, aby wyświetlić i potwierdzić (lub odrzucić) wszelkie sugestie.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Podczas skanowania zdjęć Picasa automatycznie grupuje znalezione twarze, aby ułatwić przypisywanie nazw.\n\nWarto wiedzieć:\n\nAby zidentyfikować osobę, kliknij „Dodaj nazwę”, wpisz imię i nazwisko tej osoby, a następnie naciśnij Enter. Za każdym razem, gdy po raz pierwszy przypiszesz komuś nazwę, zostanie utworzony nowy album osób.\n\nWSKAZÓWKA: aby podczas przypisywania nazw móc korzystać ze wszystkich swoich kontaktów, zaloguj się na konto Google.\n\nAby zignorować daną osobę, kliknij przycisk „X” na miniaturze twarzy.\n\nSugestie: gdy przypiszesz nazwę jakiejś osobie, Picasa może zasugerować więcej pasujących twarzy. Kliknij album tej osoby, aby wyświetlić i potwierdzić (lub odrzucić) wszelkie sugestie.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Nie znaleziono jeszcze żadnych osób. Znajdowane i grupowane twarze będą się pojawiać w albumie osób bez nazw. Podczas skanowania informacje o postępie będą widoczne w elemencie albumu osób bez nazw.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Tu będą wymienione nazwane osoby widoczne z obecnie wybraną osobą.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Tu będą wymienione osoby widoczne na obecnie wybranych zdjęciach.</xmbtext>
+ </action>
+</tooltips>

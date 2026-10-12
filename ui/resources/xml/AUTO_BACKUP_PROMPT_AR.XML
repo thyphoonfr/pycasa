@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>نسخ صور بيكاسا احتياطيًا</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>‏يمكنك حفظ صورك ومقاطع الفيديو التابعة لك تلقائيًا عبر الإنترنت باستخدام Google Photos Backup. ويمكن الوصول إلى عناصرك من أي جهاز من أجهزتك كما يظل كل شيء خاصًا ما لم تختر مشاركته.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>‏الحصول على Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>لا، شكرًا</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Nhập album từ Album Web</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Ảnh trong album web được chọn dưới đây sẽ tải xuống máy tính của bạn khi bạn nhấp vào nút OK. Các ảnh này sẽ được sắp xếp tự động vào thư mục theo tên album.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Bạn có 100 album web trực tuyến.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Nhập tất cả album</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Nhập album đã chọn:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Tên</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Ngày</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(LƯU Ý: Chỉ những bức ảnh chưa có trong máy tính của bạn mới được tải xuống)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

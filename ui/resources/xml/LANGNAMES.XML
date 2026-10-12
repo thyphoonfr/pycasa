@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="Lang::ar">
+  <xmbtext>العربية</xmbtext>
+ </stringres>
+ <stringres id="Lang::fa">
+  <xmbtext>فارسی</xmbtext>
+ </stringres>
+ <stringres id="Lang::iw">
+  <xmbtext>עִבְרִית</xmbtext>
+ </stringres>
+ <stringres id="Lang::id">
+  <xmbtext>Bahasa Indonesia</xmbtext>
+ </stringres>
+ <stringres id="Lang::ca">
+  <xmbtext>Català</xmbtext>
+ </stringres>
+ <stringres id="Lang::da">
+  <xmbtext>Dansk</xmbtext>
+ </stringres>
+ <stringres id="Lang::de">
+  <xmbtext>Deutsch</xmbtext>
+ </stringres>
+ <stringres id="Lang::enUK">
+  <xmbtext>English (UK)</xmbtext>
+ </stringres>
+ <stringres id="Lang::enUS">
+  <xmbtext>English (US)</xmbtext>
+ </stringres>
+ <stringres id="Lang::es">
+  <xmbtext>Español</xmbtext>
+ </stringres>
+ <stringres id="Lang::fr">
+  <xmbtext>Français</xmbtext>
+ </stringres>
+ <stringres id="Lang::hr">
+  <xmbtext>Hrvatski</xmbtext>
+ </stringres>
+ <stringres id="Lang::it">
+  <xmbtext>Italiano</xmbtext>
+ </stringres>
+ <stringres id="Lang::lv">
+  <xmbtext>Latviešu</xmbtext>
+ </stringres>
+ <stringres id="Lang::lt">
+  <xmbtext>Lietuvių</xmbtext>
+ </stringres>
+ <stringres id="Lang::hu">
+  <xmbtext>Magyar</xmbtext>
+ </stringres>
+ <stringres id="Lang::nl">
+  <xmbtext>Nederlands</xmbtext>
+ </stringres>
+ <stringres id="Lang::no">
+  <xmbtext>Norsk</xmbtext>
+ </stringres>
+ <stringres id="Lang::pl">
+  <xmbtext>Polski</xmbtext>
+ </stringres>
+ <stringres id="Lang::pt">
+  <xmbtext>Português</xmbtext>
+ </stringres>
+ <stringres id="Lang::pt-BR">
+  <xmbtext>Português do Brasil</xmbtext>
+ </stringres>
+ <stringres id="Lang::ro">
+  <xmbtext>Română</xmbtext>
+ </stringres>
+ <stringres id="Lang::sk">
+  <xmbtext>Slovenský</xmbtext>
+ </stringres>
+ <stringres id="Lang::sl">
+  <xmbtext>Slovenščina</xmbtext>
+ </stringres>
+ <stringres id="Lang::fi">
+  <xmbtext>Suomi</xmbtext>
+ </stringres>
+ <stringres id="Lang::sv">
+  <xmbtext>Svenska</xmbtext>
+ </stringres>
+ <stringres id="Lang::fil">
+  <xmbtext>Filipino</xmbtext>
+ </stringres>
+ <stringres id="Lang::vi">
+  <xmbtext>Tiếng Việt</xmbtext>
+ </stringres>
+ <stringres id="Lang::tr">
+  <xmbtext>Türkçe</xmbtext>
+ </stringres>
+ <stringres id="Lang::cs">
+  <xmbtext>Česky</xmbtext>
+ </stringres>
+ <stringres id="Lang::el">
+  <xmbtext>Ελληνικά</xmbtext>
+ </stringres>
+ <stringres id="Lang::ru">
+  <xmbtext>Русский</xmbtext>
+ </stringres>
+ <stringres id="Lang::sr">
+  <xmbtext>Српски</xmbtext>
+ </stringres>
+ <stringres id="Lang::uk">
+  <xmbtext>Українська</xmbtext>
+ </stringres>
+ <stringres id="Lang::bg">
+  <xmbtext>Български</xmbtext>
+ </stringres>
+ <stringres id="Lang::hi">
+  <xmbtext>हिन्दी</xmbtext>
+ </stringres>
+ <stringres id="Lang::th">
+  <xmbtext>ภาษาไทย</xmbtext>
+ </stringres>
+ <stringres id="Lang::zh-CN">
+  <xmbtext>中文(简体)</xmbtext>
+ </stringres>
+ <stringres id="Lang::zh-TW">
+  <xmbtext>中文 (繁體)</xmbtext>
+ </stringres>
+ <stringres id="Lang::ja">
+  <xmbtext>日本語</xmbtext>
+ </stringres>
+ <stringres id="Lang::ko">
+  <xmbtext>한국어</xmbtext>
+ </stringres>
+</resources>

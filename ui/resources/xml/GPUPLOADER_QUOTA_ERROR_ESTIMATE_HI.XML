@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ ऑटो बैकअप</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>संग्रहण स्थान समाप्त</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>आपने ऐसे फ़ोेल्‍डर चुने हैं जो आपके शेष Google डिस्‍क संग्रहण से अधिक स्‍थान घेरते है.  आप अधिक संग्रहण स्‍थान खरीद सकते हैं, या नि:शुल्‍क रूप से मानक आकार पर असीमित फ़ोटो और वीडियो का बैक अप ले सकते हैं.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>यदि आपने अभी संग्रहण खरीदा है, तो बदलावों को लागू होने में कुछ मिनट लग सकते हैं.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>और संग्रहण स्थान प्राप्त करें...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>मानक आकार पर स्विच करें</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Stäng</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Välkommen till batchuppladdning</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Markera rutorna bredvid de mappar och album som du vill arbeta med. Välj sedan vad du vill göra. Picasa filtrerar bort de objekt som åtgärden inte gäller för. Om exempelvis en hel mapp eller helt album redan är online, visas det inte som ett alternativ för uppladdning i Picasa.</xmbtext>
+ </action>
+</tooltips>

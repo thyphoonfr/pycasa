@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Fájlok átnevezése</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 fájl kiválasztva átnevezésre.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s fájl kiválasztva átnevezésre.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Kérjük, adjon új nevet ezeknek a fájloknak:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Befoglalás a fájlnévbe:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Dátum</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Képfelbontás</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Példa:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Átnevezés</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Sluiten</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Welkom bij Batch-upload</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Schakel de vakjes in die naast de mappen en albums staan waarmee u wilt werken. Kies vervolgens wat u wilt doen. Picasa filtert de items waarop de actie niet van toepassing is. Als een hele map of een heel album bijvoorbeeld al online staat, wordt het door Picasa niet weergegeven als een uploadoptie.</xmbtext>
+ </action>
+</tooltips>

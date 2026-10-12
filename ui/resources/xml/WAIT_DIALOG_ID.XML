@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="wait_dialog/cancelbutton" xmbdesc="Label(wait_dialog/cancelbutton)">
+  <xmbtext>Batal</xmbtext>
+ </action>
+</tooltips>

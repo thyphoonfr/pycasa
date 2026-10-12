@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Albümleri Web Albümleri&#039;nden İçe Aktar...</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Tamam düğmesini tıkladığınızda, aşağıda işaretlenmiş olan web albümlerindeki resimler bilgisayarınıza indirilir. Resimler otomatik olarak albüm adlarına göre ayarlanan klasörlere ayrılarak düzenlenirler.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>100 adet çevrimiçi web albümünüz var.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Tüm albümleri içe aktar</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Seçilen albümleri içe aktar:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Ad</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Tarih</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOT: Yalnızca bilgisayarınızda olmayan resimler indirilecektir)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>Tamam</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

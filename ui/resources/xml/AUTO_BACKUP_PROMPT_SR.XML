@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Резервне копије Google слика</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Направите резервне копије Picasa слика</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Аутоматски чувајте резервне копије слика и видеа онлајн помоћу Резервних копија Google слика. Ставкама можете да приступате са било ког уређаја, а све оне остају приватне док не одлучите да их делите.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Набавите Резервне копије Google слика</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Не, хвала</xmbtext>
+ </stringres>
+</resources>

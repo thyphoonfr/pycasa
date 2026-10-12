@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>폴더로 내보내기</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>내보내기 위치:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>내보낸 폴더 이름:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>정렬을 위해 파일 이름에 숫자 추가</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>이미지 크기:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>원본 크기 사용</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>크기 조정:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>픽셀</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>이미지 품질:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>자동</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>보통</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>최대</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>최소</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>맞춤 설정</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>원본 이미지 품질 유지</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>품질과 크기의 적절한 균형</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>매우 큰 파일, 세부사항 유지</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>최소 파일 크기, 일부 품질 손실</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>다음을 사용하여 동영상 내보내기:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>첫 번째 프레임</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>전체 동영상(크기 조정 없음)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>워터마크:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>워터마크 추가</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>사진에 이름, 웹 도메인 또는 저작권 고지사항을 포함하세요.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>내보내기</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

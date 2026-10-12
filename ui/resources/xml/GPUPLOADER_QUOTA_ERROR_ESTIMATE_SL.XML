@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Samodejno varnostno kopiranje Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Zmanjkalo vam je prostora za shranjevanje</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Izbrali ste mape, v katerih je več datotek, kot jih lahko shranite v svoj preostali prostor za shranjevanje v storitvi Google Drive. Kupite dodatni prostor za shranjevanje ali brezplačno varnostno kopirajte neomejeno število fotografij in videoposnetkov v standardni velikosti.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Če ste pravkar kupili prostor za shranjevanje, bodo spremembe izvedene čez nekaj minut.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Nakup dodatnega prostora za shranjevanje ...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Preklopi na standardno velikost</xmbtext>
+ </stringres>
+</resources>

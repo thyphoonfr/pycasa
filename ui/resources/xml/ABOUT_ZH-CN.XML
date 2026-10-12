@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>关于 Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>其他所有产品、服务名称、品牌、或商标都归其各自的拥有者所有。</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>本软件部分源自于 Independent JPEG Group 的工作。本程序受美国和国际版权法保护。</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>第三方许可证...</xmbtext>
+ </stringres>
+</resources>

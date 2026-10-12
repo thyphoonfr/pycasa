@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>訊息</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>不要再詢問</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>是</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>否</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

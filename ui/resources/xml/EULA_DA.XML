@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Læs licensvilkårene, før du bruger Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Når du bruger Picasa, accepterer du Googles servicevilkår og privatlivspolitik.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Servicevilkår</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/da/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Privatlivspolitik</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/da/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Send anonyme brugsstatistikker til Google (du kan altid ændre denne indstilling senere).</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Accepterer</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

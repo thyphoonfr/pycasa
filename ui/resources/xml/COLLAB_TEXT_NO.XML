@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="collab/uploadsize_label" xmbdesc="Text(collab/uploadsize_label)">
+  <xmbtext>Opplastingsstørrelse</xmbtext>
+ </action>
+ <action type="Text" target="collab/privacy_label" xmbdesc="Text(collab/privacy_label)">
+  <xmbtext>Personvern</xmbtext>
+ </action>
+ <action type="Text" target="collab/choose_contact_label" xmbdesc="Text(collab/choose_contact_label)">
+  <xmbtext>Velg en kontakt:</xmbtext>
+ </action>
+ <action type="Text" target="collab/contact_album_list_label" xmbdesc="Text(collab/contact_album_list_label)">
+  <xmbtext>Dine kontakters album hvor du kan legge til filer:</xmbtext>
+ </action>
+ <action type="Label" target="collab/ok" xmbdesc="Label(collab/ok)">
+  <xmbtext>Last opp</xmbtext>
+ </action>
+ <action type="Label" target="collab/cancel" xmbdesc="Label(collab/cancel)">
+  <xmbtext>Avbryt</xmbtext>
+ </action>
+ <action type="Label" target="collab/storagetext" xmbdesc="Label(collab/storagetext)">
+  <xmbtext>Mer informasjon ...</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="unknownfaceheaderpanel/cluster" xmbdesc="Label(unknownfaceheaderpanel/cluster)">
+  <xmbtext>Raggruppa per volto</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showall" xmbdesc="Label(unknownfaceheaderpanel/showall)">
+  <xmbtext>Espandi gruppi</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showignored" xmbdesc="Label(unknownfaceheaderpanel/showignored)">
+  <xmbtext>Mostra volti ignorati</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showunknown" xmbdesc="Label(unknownfaceheaderpanel/showunknown)">
+  <xmbtext>Torna a Senza nome</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/addname" xmbdesc="Label(unknownfaceheaderpanel/addname)">
+  <xmbtext>Aggiungi un nome</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/addname" xmbdesc="Tooltip(unknownfaceheaderpanel/addname)">
+  <xmbtext>Assegna un nome a tutti i volti selezionati</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/ignore" xmbdesc="Label(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignora selezionati</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/ignore" xmbdesc="Tooltip(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignora tutti i volti selezionati</xmbtext>
+ </action>
+</tooltips>

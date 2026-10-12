@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Преименуј датотеке</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 датотека је изабрана за преименовање.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Датотеке (%s) су изабране за преименовање.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Унесите ново име за ове датотеке:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Укључи у име датотеке:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Датум</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Резолуција слике</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Пример:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Преименуј</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

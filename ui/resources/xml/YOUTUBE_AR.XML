@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>‏تحميل إلى YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>العنوان:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>الوصف:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>فئة الفيديو:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>جارٍ التحميل...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>العلامات:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>هذه هي الكلمات الرئيسية المستخدمة في مساعدة الأشخاص في العثور على الفيديو الخاص بك. (يتم الفصل بينها بمسافات)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>جعل هذا الفيديو عامًا</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>مدة الفيديو محدودة إلى 10 دقائق و1 غيغابايت</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>لا يُسمح بتحميل البرامج التلفزيونية أو مقاطع الفيديو الموسيقية أو الحفلات الموسيقية أو الإعلانات بدون الحصول على إذن إلا إذا كان المحتوى من إنشائك أنت. يمكن أن تساعدك صفحة النصائح المتعلقة بحقوق الطبع والنشر وإرشادات المنتدى في معرفة ما إذا كان مقطع الفيديو يُخالف حقوق الطبع والنشر لجهة معينة.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>‏بالنقر على &quot;تحميل الفيديو,&quot; فإنك تقر بأن هذا الفيديو لا ينتهك بنود استخدام YouTube وأنك تمتلك جميع حقوق الطبع والنشر في هذا الفيديو أو لديك إذن بتحميله.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>تحميل فيديو</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

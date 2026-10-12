@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Експортиране в папка</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Местоположение за експортиране:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Преглед...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Име на експортираната папка:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Добавяне на номера към имената на файловете, за да се запази редът</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Размер на изображението:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Оригинален размер</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Преоразмеряване до:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>пиксела</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Качество на изображението:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Автоматично</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Нормално</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Максимално</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Минимално</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Персонализирано</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Оригиналното качество на изображението се запазва</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Добър баланс между качество и размер</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Файлът е много голям, но запазва фините детайли в снимката</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Файлът е възможно най-малък, но качеството е влошено</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Експортиране на филми:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Първи кадър</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Целият филм (без преоразмеряване)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Воден знак:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Добавяне на воден знак</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Означете снимките си със своето име, уеб домейн или съобщение за авторско право.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Експортиране</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

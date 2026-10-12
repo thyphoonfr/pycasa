@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>사진 날짜 조정</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>현재 사진 날짜: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>새 사진 날짜: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>양별로 모든 사진 날짜 조정</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>모든 사진의 날짜와 시간을 동일하게 설정합니다.</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>확인</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

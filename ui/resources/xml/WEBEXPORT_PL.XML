@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Eksportuj jako stronę HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Eksportuj zdjęcia:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Rozmiar oryginalny</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 piksele (dla dużych monitorów)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 pikseli (dla dużych stron internetowych)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 pikseli (dla stron internetowych)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 piks. (dla poczty e-mail)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Eksportuj filmy za pomocą:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Pierwsza klatka</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Pełny film</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Tytuł strony internetowej:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Folder:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Przeglądaj...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Kliknij nazwę szablonu, aby wyświetlić przykład. Po dokonaniu wyboru kliknij przycisk Eksportuj.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Opis szablonu</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Eksport</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

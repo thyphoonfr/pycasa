@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="tagpanel/addtag" xmbdesc="Tooltip(tagpanel/addtag)">
+  <xmbtext>Legg til etikett til valgte elementer</xmbtext>
+ </action>
+ <action type="Tooltip" target="tagpanel/quick_config" xmbdesc="Tooltip(tagpanel/quick_config)">
+  <xmbtext>Konfigurer hurtigetiketter</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/add_tag_label" xmbdesc="Label(tagpanel/add_tag_label)">
+  <xmbtext>Skriv inn etikettnavn for å legge til:</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/quick_label" xmbdesc="Label(tagpanel/quick_label)">
+  <xmbtext>Hurtigetiketter:</xmbtext>
+ </action>
+</tooltips>

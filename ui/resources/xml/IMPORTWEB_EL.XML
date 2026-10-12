@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Εισαγωγή λευκωμάτων από Λευκώματα Ιστού</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Οι φωτογραφίες στα λευκώματα ιστού που ελέγχθηκαν παρακάτω θα ληφθούν στον υπολογιστή σας μόλις κάνετε κλικ στο κουμπί ΟΚ. Θα οργανωθούν αυτόματα σε φακέλους βάσει των ονομάτων των λευκωμάτων.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Διαθέτετε 100 λευκώματα ιστού στο διαδίκτυο.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Εισαγωγή όλων των λευκωμάτων</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Εισαγωγή επιλεγμένων λευκωμάτων:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Όνομα</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Ημερομηνία</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(ΣΗΜΕΙΩΣΗ: Θα γίνει λήψη μόνο των φωτογραφιών που δεν υπάρχουν ήδη στον υπολογιστή σας)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

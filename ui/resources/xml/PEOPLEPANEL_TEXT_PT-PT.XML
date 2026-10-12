@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Adicionar nome</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Seleccionar pasta para apresentar as caras</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorar</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Adicionar pessoa manualmente</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>À medida que o Picasa analisa as suas fotografias, as caras encontradas são automaticamente agrupadas para facilitar a atribuição de nomes.\n\nInformações a reter:\n\nPara identificar uma pessoa, clique em &quot;Adicionar nome&quot; e, em seguida, escreva o nome da pessoa e prima Enter. Sempre que atribuir um nome a alguém pela primeira vez, é criado um novo álbum Pessoas.\n\n(SUGESTÃO: inicie sessão com a sua Conta Google para obter acesso a todos os seus contactos durante a atribuição de nomes.)\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura de cara.\n\nSugestões: após atribuir um nome a alguém, o Picasa pode sugerir mais caras correspondentes para essa pessoa. Clique no álbum de uma pessoa para ver e confirmar (ou rejeitar) as sugestões.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>À medida que o Picasa analisa as suas fotografias, as caras encontradas são automaticamente agrupadas para facilitar a atribuição de nomes.\n\nInformações a reter:\n\nPara identificar uma pessoa, clique em &quot;Adicionar nome&quot; e, em seguida, escreva o nome da pessoa e prima Enter. Sempre que atribuir um nome a alguém pela primeira vez, é criado um novo álbum Pessoas.\n\n(SUGESTÃO: inicie sessão com a sua Conta Google para obter acesso a todos os seus contactos durante a atribuição de nomes.)\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura de cara.\n\nSugestões: após atribuir um nome a alguém, o Picasa pode sugerir mais caras correspondentes para essa pessoa. Clique no álbum de uma pessoa para ver e confirmar (ou rejeitar) as sugestões.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Ainda não foram encontradas pessoas. À medida que forem encontradas e agrupadas caras, estas surgirão no álbum Sem Nome. Durante a procura, as informações do progresso surgem no item do álbum Sem Nome.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>As pessoas com nome que surge com a pessoa atualmente selecionada serão apresentadas aqui.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>As pessoas que surgem nas fotografias selecionadas serão apresentadas aqui.</xmbtext>
+ </action>
+</tooltips>

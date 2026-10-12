@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Перейменувати файли</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>Вибрано 1 файл для перейменування.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>Вибрано таку кількість файлів для перейменування: %s.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Введіть нове ім’я для цих файлів:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Включити до імені файлу:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Дата</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Роздільна здатність зображення</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Приклад:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Перейменувати</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

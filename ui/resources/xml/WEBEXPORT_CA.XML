@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Exporta com a pàgina HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Exporta les fotos a:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Mida original</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1.024 píxels (per a monitors grans)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 píxels (per a pàgines web grans)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 píxels (per a pàgines web)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 píxels (per a correu electrònic)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Exporta les pel·lícules mitjançant:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Primer marc</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Tota la pel·lícula</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Títol de la pàgina web:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Carpeta:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Fes clic en un nom de plantilla per visualitzar un exemple. Quan hagis completat la selecció, fes clic a Exporta.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Descripció de la plantilla</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Exporta</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

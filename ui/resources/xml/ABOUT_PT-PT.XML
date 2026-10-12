@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Sobre o Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Todos os outros produtos, nomes de serviços, marcas e marcas registadas são propriedade dos respectivos proprietários.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Este software é baseado em parte no trabalho desenvolvido pelo Independent JPEG Group. Este programa está protegido por legislação de direitos de autor internacional e dos Estados Unidos.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Licenças de terceiros...</xmbtext>
+ </stringres>
+</resources>

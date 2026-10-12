@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Aizvērt</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Esiet sveicināts grupas augšupielādē!</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Atzīmējiet izvēles rūtiņas tām mapēm un albumiem, ar kuriem vēlaties strādāt. Pēc tam izvēlieties, ko darīt, un Picasa filtrēs vienumus, kuriem šī darbība netiks lietota. Piemēram, ja visa mape vai albums jau ir pieejams tiešsaistē, programma Picasa nerādīs to kā augšupielādes opciju.</xmbtext>
+ </action>
+</tooltips>

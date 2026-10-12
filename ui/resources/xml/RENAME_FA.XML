@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>تغییر نام فایل‌ها</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>۱ فایل برای تغییر نام انتخاب شده است.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s فایل برای تغییر نام انتخاب شد.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>لطفاً یک نام جدید برای این فایل‌ها وارد کنید:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>شامل نام فایل:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>تاریخ</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>وضوح تصویر</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>مثال:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>تغییرنام</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

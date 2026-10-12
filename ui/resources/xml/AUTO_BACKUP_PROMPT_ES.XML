@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Haz copias de seguridad de tus fotos de Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Guarda automáticamente tus fotos y vídeos online con Copia de seguridad de Google Fotos. Tus elementos estarán disponibles en todos tus dispositivos y serán privados a menos que elijas compartirlos.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Obtener Copia de seguridad de Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>No, gracias</xmbtext>
+ </stringres>
+</resources>

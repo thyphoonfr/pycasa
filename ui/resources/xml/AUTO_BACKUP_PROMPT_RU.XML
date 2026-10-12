@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Автозагрузка Google Фото</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Мгновенно загружайте фото из Picasa в Google+</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Приложение &quot;Автозагрузка Google Фото&quot; позволяет автоматически сохранять все фото и видео в вашем личном веб-альбоме. Эти файлы всегда будут в вашем распоряжении и доступны только вам, пока вы не решите ими поделиться.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Скачать приложение &quot;Автозагрузка Google Фото&quot;</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Нет, спасибо</xmbtext>
+ </stringres>
+</resources>

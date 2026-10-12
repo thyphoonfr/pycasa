@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Ανατρέξτε στους όρους άδειας χρήσης πριν από τη χρήση του Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Με τη χρήση του Picasa αποδέχεστε τους Όρους Παροχής Υπηρεσιών και την Πολιτική Απορρήτου της Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Όροι Παροχής Υπηρεσιών</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/el/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Πολιτική Απορρήτου</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/el/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Αποστολή ανώνυμων στατιστικών στοιχείων χρήσης στην Google (Μπορείτε να αλλάξετε αυτήν τη ρύθμιση αργότερα)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Συμφωνώ</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

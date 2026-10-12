@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>फ़ोटो तिथि एडजस्ट करें</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>वर्तमान फ़ोटो तिथि: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>नए फ़ोटो की तिथि: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>सभी फ़ोटो तिथियों को राशि द्वारा एडजस्ट करें</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>सभी फ़ोटो को उसी तिथि और समय पर सेट करें</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>ठीक</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ 自動バックアップ</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>保存容量が不足しています</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>選択したフォルダの容量が、Google ドライブの残りの保存容量を超えています。追加の保存容量を購入するか、写真や動画を制限なく無料でバックアップできる標準サイズをご利用ください。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>保存容量を購入したばかりの場合、変更が反映されるまでには数分かかることがあります。</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>追加の保存容量を取得…</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>標準サイズに切り替え</xmbtext>
+ </stringres>
+</resources>

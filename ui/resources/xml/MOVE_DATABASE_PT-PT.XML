@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Mover Base de Dados</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Será necessário reiniciar o Picasa para que as alterações entrem em vigor.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Nota: Deve efetuar uma cópia de segurança da sua base de dados antes de testar esta funcionalidade experimental. NUNCA mova a base de dados para uma unidade de rede ou para uma unidade externa ou removível, sob pena de poder perder dados.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Localização atual da Base de Dados:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nova localização da Base de Dados:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Procurar...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Predefinição</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Mover no próximo reinício</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

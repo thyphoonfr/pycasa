@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Ekspor ke Folder</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Lokasi ekspor:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Nama folder yang diekspor:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Tambahkan angka ke nama file agar tetap urut</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Ukuran gambar:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Gunakan ukuran asli</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Ubah ukuran menjadi:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>piksel</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Mutu gambar:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Otomatis</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normal</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maksimum</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimum</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Sesuaikan</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Mempertahankan mutu foto asli</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Keseimbangan yang baik antara mutu dan ukuran</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Ukuran file sangat besar, menjaga detail halus</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Ukuran file terkecil, mutu berkurang</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Ekspor film menggunakan:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Bingkai pertama</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Film utuh (ukuran asli)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Tanda air:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Tambahkan tanda air</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Bubuhi foto dengan nama, domain web, atau pernyataan hak cipta.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Ekspor</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

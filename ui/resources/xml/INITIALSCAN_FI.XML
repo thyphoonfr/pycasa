@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Asennettuna on Picasan vanhempi versio. Haluatko päivittää nykyisen kuvakirjaston vai etsiä tietokoneesta uudestaan kuvia?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Valitse seuraavista vaihtoehdoista:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Päivitä nykyinen kuvakirjasto</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Valitse tämä vaihtoehto, jos käytät avainsanoja tai muokattuja albumeita Picasa-versiossa 1 ja haluat säilyttää ne Picasa-versiossa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Etsi kuvat uudelleen tietokoneestani</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Valitse tämä asetus, jos haluat tehdä tietokoneestasi perusteellisemman etsinnän, johon sisältyy laajemmat kuvatiedot. Nykyiset muokkauksesi ja järjestelysi säilyvät, mutta avainsanasi eivät. Etsintä voi kestää useita minuutteja.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Kuvien etsiminen ei koskaan siirrä kuvia tai kopioi tiedostoja uuteen sijaintiin. Kansion hallintatyökalun avulla voit valita, mitkä tiedostot Picasa näyttää (käytettävissä Työkalut-valikossa).</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Jatka</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa on valmis etsimään kuvia tietokoneestasi</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Valitse seuraavista vaihtoehdoista:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Hae kuvia kaikkialta tietokoneestani </xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Valitse tämä vaihtoehto, jos kuvasi sijaitsevat useissa eri kansioissa, ja erityisesti silloin, jos kuvia on usealla kiintolevyllä.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Etsi valokuvat vain kansioista Omat tiedostot, Omat kuvatiedostot, työpöytä ja iPhoton kuvakirjasto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Valitse tämä vaihtoehto, jos kuvasi sijaitsevat ainoastaan näissä kansioissa.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Kuvien etsiminen ei koskaan siirrä kuvia tai kopioi tiedostoja uuteen sijaintiin. Kansion hallintatyökalun avulla voit valita, mitkä tiedostot Picasa näyttää (käytettävissä Työkalut-valikossa).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Jatka</xmbtext>
+ </action>
+</tooltips>

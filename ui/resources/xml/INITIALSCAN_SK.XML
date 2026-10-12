@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>V počítači je nainštalovaná staršia verzia programu Picasa. Chcete aktualizovať existujúcu knižnicu obrázkov alebo znova vyhľadať obrázky v počítači?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Vyberte niektorú z nasledovných možností:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Aktualizovať moju existujúcu knižnicu obrázkov</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Vyberte túto možnosť, ak používate kľúčové slová alebo vlastné albumy v programe Picasa 1 a chcete ich zachovať v programe Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Znova vyhľadať obrázky v mojom počítači</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Výberom tejto možnosti sa vykoná podrobnejšie vyhľadávanie v počítači, ktorého súčasťou budú rozšírené informácie o obrázkoch.  Táto možnosť zachová existujúce úpravy a organizáciu, ale nezachová kľúčové slová. Toto vyhľadávanie môže trvať niekoľko minút.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Vyhľadávanie obrázkov nikdy nepremiestňuje ani nekopíruje súbory na nové miesta. Pomocou nástroja Správca priečinkov môžete vybrať, ktoré priečinky zobrazí program Picasa (tento nástroj je dostupný v ponuke Nástroje)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Pokračovať</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Program Picasa je pripravený vyhľadať obrázky vo vašom počítači</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Vyberte niektorú z nasledovných možností:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Hľadať obrázky v celom počítači</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Túto možnosť vyberte iba v prípade, ak máte obrázky uložené na počítači v rôznych priečinkoch, najmä ak sú uložené na viacerých pevných diskoch.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Vyhľadávať iba v priečinkoch Moje dokumenty, Moje obrázky, Pracovná plocha a iPhoto Library (Knižnica iPhoto)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Túto možnosť vyberte, ak ukladáte svoje obrázky iba do týchto priečinkov.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Vyhľadávanie obrázkov nikdy nepremiestňuje ani nekopíruje súbory na nové miesta. Pomocou nástroja Správca priečinkov môžete vybrať, ktoré priečinky program Picasa zobrazí (tento nástroj je dostupný v ponuke Nástroje)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Pokračovať</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Déplacer la base de données</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Les modifications prendront effet au redémarrage de Picasa.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Remarque : Nous vous recommandons de faire une sauvegarde de votre base de données avant de tester cette fonctionnalité expérimentale. Pour écarter tout risque de perte de données, NE PLACEZ JAMAIS la base de données sur un réseau ou un lecteur externe ou amovible.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Emplacement actuel de la base de données :</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Nouvel emplacement de la base de données :</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Parcourir...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Par défaut</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Déplacer au prochain redémarrage</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

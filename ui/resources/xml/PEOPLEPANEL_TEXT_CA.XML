@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Afegeix un nom</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Selecciona una carpeta per visualitzar cares</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignora</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Afegeix una persona manualment</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Cancel·la</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>A mesura que s&#039;analitzen les fotos a Picasa, les cares que es detecten s&#039;agrupen de manera automàtica per facilitar l&#039;assignació de noms\n\nInformació important:\n\nPer identificar una persona, fes clic a Afegeix un nom. Seguidament, escriu el nom de la persona i prem Retorn. Es crearà un àlbum Persones nou cada vegada que identifiquis una persona per primera vegada.\n\n(CONSELL: inicia la sessió amb el compte de Google per accedir a tots els contactes mentre assignes noms.)\n\nPer no identificar una persona, fes clic al botó X de la miniatura de cara.\n\nSuggeriments: després d&#039;identificar una persona per nom, Picasa pot suggerir més cares que coincideixin amb aquesta persona. Fes clic a l&#039;àlbum d&#039;una persona per veure i confirmar (o rebutjar) qualsevol suggeriment.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>A mesura que s&#039;analitzen les fotos a Picasa, les cares que es detecten s&#039;agrupen de manera automàtica per facilitar l&#039;assignació de noms\n\nInformació important:\n\nPer identificar una persona, fes clic a Afegeix un nom. Seguidament, escriu el nom de la persona i prem Retorn. Es crearà un àlbum Persones nou cada vegada que identifiquis una persona per primera vegada.\n\n(CONSELL: inicia la sessió amb el compte de Google per accedir a tots els contactes mentre assignes noms.)\n\nPer no identificar una persona, fes clic al botó X de la miniatura de cara.\n\nSuggeriments: després d&#039;identificar una persona per nom, Picasa pot suggerir més cares que coincideixin amb aquesta persona. Fes clic a l&#039;àlbum d&#039;una persona per veure i confirmar (o rebutjar) qualsevol suggeriment.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Encara no s&#039;ha trobat cap persona. A mesura que es trobin i s&#039;agrupin, les cares apareixeran a l&#039;àlbum Sense nom. Mentre dura l&#039;anàlisi, la informació de progrés apareix a l&#039;element de l&#039;àlbum Sense nom.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Les persones a qui s&#039;ha posat nom i que apareixen amb la persona seleccionada actualment es mostraran aquí.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Les persones que apareixen a les fotos seleccionades actualment es mostraran aquí.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>クイック タグを使用すると、1 回クリックするだけでタグを適用できます。ワンクリックで適用したいタグを下に入力してください。デフォルトでは、上位 2 つのクイック タグを使用して、最近適用されたタグがトラッキングされます。上位 2 つのタグを手動で設定するには、下のチェックボックスをオフにします。</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>よく使用するタグを上の空のボックスに自動入力します</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>最近使用したタグの上位 2 つのボタンを保持</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>キャンセル</xmbtext>
+ </action>
+</tooltips>

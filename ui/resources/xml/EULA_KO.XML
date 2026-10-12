@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Picasa를 사용하려면 먼저 라이선스 내용을 검토하세요.</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Picasa를 사용하면 Google 서비스 약관 및 개인정보취급방침에 동의하는 것으로 간주됩니다.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>서비스 약관</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>개인정보취급방침</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Google에 익명의 사용 통계 보내기(나중에 언제든지 이 설정을 변경할 수 있음)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>동의함</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

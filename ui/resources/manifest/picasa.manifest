@@ -1,0 +1,26 @@
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" 
+	manifestVersion="1.0"> 
+	<asmv3:trustInfo xmlns:asmv3="urn:schemas-microsoft-com:asm.v3"> 
+	<asmv3:security> 
+	<asmv3:requestedPrivileges> 
+	<asmv3:requestedExecutionLevel level="asInvoker" uiAccess="false" /> 
+	</asmv3:requestedPrivileges> 
+	</asmv3:security> 
+	</asmv3:trustInfo> 
+	<assemblyIdentity processorArchitecture="x86"  
+    version="5.1.0.0" 
+    type="win32" 
+    name="Picasa.exe"/> 
+    <description>Picasa</description> 
+    <dependency> 
+    <dependentAssembly> 
+    <assemblyIdentity 
+         type="win32" 
+         name="Microsoft.Windows.Common-Controls" 
+         version="6.0.0.0" 
+         publicKeyToken="6595b64144ccf1df" 
+         language="*" 
+         processorArchitecture="x86"/> 
+    </dependentAssembly> 
+    </dependency>	 
+	</assembly>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Nameščena je starejša različica Picase. Ali želite nadgraditi obstoječo knjižnico slik ali v računalniku ponovno poiskati slike?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Izbirate lahko med naslednjimi možnostmi:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Posodobi obstoječo knjižnico slik</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Izberite to možnost, če uporabljate ključne besede ali albume po meri v Picasi 1 in jih želite ohraniti v Picasi 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Ponovno poišči slike v računalniku</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Izberite to možnost, če želite, da program podrobneje preišče vsebino računalnika in zbere več informacij o slikah. Obstoječe spremembe in razvrstitev slik ne bodo spremenjene, ključne besede pa ne bodo ohranjene. Iskanje lahko traja več minut.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Pri iskanju slik nikoli ne premaknete ali kopirate datotek na nova mesta. Z orodjem »Upravitelj map« (ki je na voljo v meniju »Orodja«) lahko izberete, katere mape naj prikaže Picasa.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Naprej</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa je pripravljena za iskanje slik v računalniku.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Izbirate lahko med naslednjimi možnostmi:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Preišči moj celotni računalnik, ali so v njem slike</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>To možnost izberite, če imate slike shranjene v različnih mapah v računalniku, še posebej takrat, ko so slike shranjene na več kot enem trdem disku.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Preišči samo mape Documents, Pictures, the Desktop in iPhoto Library</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>To možnost izberite, če svoje slike shranjujete le v te mape.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Z iskanjem slik nikoli ne premaknete ali kopirate datotek na nova mesta. Z orodjem »Upravitelj map« lahko izberete, katere mape želite prikazati v Picasi (na voljo v meniju »Orodja«).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Naprej</xmbtext>
+ </action>
+</tooltips>

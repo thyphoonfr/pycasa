@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Flyt database</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Du skal genstarte Picasa, før ændringerne kan træde i kraft.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Bemærk! Du bør sikkerhedskopiere din database, før du forsøger dig med denne eksperimenterende funktion. Flyt ALDRIG databasen til et netværk, flytbart eller eksternt drev, da det kan betyde, at du mister data.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Aktuel databaseplacering:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Ny databaseplacering:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Gennemse...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Standard</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Flyt ved næste genstart</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Annuller</xmbtext>
+ </stringres>
+</resources>

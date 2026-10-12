@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Προτιμήσεις</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Επιλογές</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Γενικά</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Διεπαφή χρήστη:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Χρήση ειδικών εφέ</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Εμφάνιση συμβουλών εργαλείων</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Εμφάνιση ετικετών βοήθειας</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Ένα κλικ για έξοδο από την προβολή επεξεργασίας</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Αρχεία:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Ανίχνευση διπλότυπων κατά την εισαγωγή</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Διαγραφή κρυφών αρχείων</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Διαγραφή από το δίσκο χωρίς επιβεβαίωση</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Κατάργηση από λεύκωμα χωρίς επιβεβαίωση</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Βοηθήστε στη βελτίωση του Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Αποστολή ανώνυμων στατιστικών στοιχείων χρήσης στην Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Απόρρητο...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Αυτόματες ενημερώσεις:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Αυτόματη ενημέρωση</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Ερώτηση πριν από τη λήψη ενημερώσεων</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Να μην γίνεται έλεγχος για ενημερώσεις</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Γλώσσα:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Προεπιλογή συστήματος (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Όταν συνδέεται φωτογραφική μηχανή, να εκτελείται:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>καμία εφαρμογή</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Επιλογή εφαρμογής εντός του ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Αποθήκευση φωτογραφιών που εισήχθησαν σε:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Αναζήτηση...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>Ηλεκτρονικό ταχυδρομείο</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Πρόγραμμα ηλεκτρονικού ταχυδρομείου:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Να επιλέγω εγώ όποτε πραγματοποιώ αποστολή φωτογραφιών</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Χρήση του προεπιλεγμένου προγράμματος ηλεκτρονικού ταχυδρομείου</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Χρήση του λογαριασμού μου Google</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Μέγεθος πολλών φωτογραφιών:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 εικονοστοιχεία</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s εικονοστοιχεία</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Μέγεθος μεμονωμένων φωτογραφιών:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Όμοιο με πολλά (1024 εικονοστοιχεία)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Όμοιο με πολλά (%s εικονοστοιχεία)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Αρχικό μέγεθος</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Αποστολή ταινιών ως:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Πρώτο καρέ</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Ολόκληρη η ταινία</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Μορφή εξόδου:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Αποστολή ενσωματωμένων φωτογραφιών και λεζάντων (μόνο από το Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Τύποι αρχείων</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Προβολή αρχείων JPEG και:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Μορφές RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Υποστηριζόμενες μορφές</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=el&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Ταινίες (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Ταινίες Quicktime (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Μορφές RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Υποστηριζόμενες μορφές</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=el&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Ταινίες (.mov, .mpg, .m4v, .3gp, .avi, ...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Προβολή διαφανειών</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Επανεκκίνηση προβολής διαφανειών</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Αναπαραγωγή μουσικής κατά την προβολή διαφανειών</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Επιλέξτε έναν φάκελο με αρχεία μουσικής:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Αναζήτηση...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Εκτύπωση</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Διαθέσιμα μεγέθη εκτύπωσης:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Προεπισκοπήσεις:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Χρήση υψηλής ποιότητας προεπισκοπήσεων (πιο αργή)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Ποιότητα εκτυπωτή:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Συμβατό (μισή ανάλυση)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Υψηλή ποιότητα (πλήρης ανάλυση)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Ποιότητα ανασχεδιασμού εκτύπωσης:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Γενικά (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Μεγάλη ευκρίνεια (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Δίκτυο</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Όνομα χρήστη διακομιστή μεσολάβησης:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Κωδικός πρόσβασης διακομιστή μεσολάβησης:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Αυτόματη ανίχνευση ρυθμίσεων δικτύου</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Επίπεδο καταγραφής δικτύου:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Απενεργοποίηση καταγραφής</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Μόνο σφάλματα καταγραφής</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Ελάχιστες πληροφορίες καταγραφής</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Λεπτομερείς πληροφορίες καταγραφής</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Καταγραφή όλων των πληροφοριών δικτύου</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Καταγραφή</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Λευκώματα Ιστού</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Προεπιλεγμένο μέγεθος μεταφόρτωσης:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Για το συγχρονισμό μεγάλων αρχείων, μεταφορτώστε πρώτα τις προεπισκοπήσεις</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(συνιστάται)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>Ποιότητα JPEG:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Διατήρηση αρχικής ποιότητας εικόνας (χρησιμοποιεί μεγαλύτερο χώρο αποθήκευσης)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Γίνεται συγχρονισμός:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Συγχρονισμός μόνο φωτογραφιών με αστέρι</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Να μην ζητείται επιβεβαίωση κάθε συγχρονισμού (χρήση των παραπάνω ρυθμίσεων)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Ετικέτες ονομάτων:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Να συμπεριληφθούν με τις μεταφορτώσεις φωτογραφιών</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Υδατογραφήματα:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Προσθήκη υδατογραφήματος για όλες τις μεταφορτώσεις φωτογραφιών:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Σφραγίστε τις φωτογραφίες με το όνομά σας, έναν τομέα ιστού ή μια ειδοποίηση πνευματικών δικαιωμάτων.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Ετικέτες ονομάτων</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Ενεργοποίηση εντοπισμού προσώπων</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Ενεργοποίηση προτάσεων:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Όριο προτάσεων:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Όριο συμπλέγματος:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Αποθήκευση ετικετών ονομάτων στη φωτογραφία</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Μεταφόρτωση μικρογραφιών λευκωμάτων ατόμων στις επαφές Google</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Ακύρωση</xmbtext>
+ </stringres>
+</resources>

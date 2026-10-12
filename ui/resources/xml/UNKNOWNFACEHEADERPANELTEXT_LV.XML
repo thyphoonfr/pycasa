@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="unknownfaceheaderpanel/cluster" xmbdesc="Label(unknownfaceheaderpanel/cluster)">
+  <xmbtext>Grupēt pēc sejas</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showall" xmbdesc="Label(unknownfaceheaderpanel/showall)">
+  <xmbtext>Izvērst grupas</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showignored" xmbdesc="Label(unknownfaceheaderpanel/showignored)">
+  <xmbtext>Rādīt ignorētās sejas</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/showunknown" xmbdesc="Label(unknownfaceheaderpanel/showunknown)">
+  <xmbtext>Atpakaļ uz nenosauktajām</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/addname" xmbdesc="Label(unknownfaceheaderpanel/addname)">
+  <xmbtext>Pievienot vārdu</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/addname" xmbdesc="Tooltip(unknownfaceheaderpanel/addname)">
+  <xmbtext>Norādiet vārdus visām atlasītajām sejām</xmbtext>
+ </action>
+ <action type="Label" target="unknownfaceheaderpanel/ignore" xmbdesc="Label(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignorēt atlasīto</xmbtext>
+ </action>
+ <action type="Tooltip" target="unknownfaceheaderpanel/ignore" xmbdesc="Tooltip(unknownfaceheaderpanel/ignore)">
+  <xmbtext>Ignorējiet visas atlasītās sejas</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Eksportēšana uz mapi</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Eksportēšanas vieta:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Eksportētās mapes nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Lai saglabātu secību, pievienot failu nosaukumiem numurus</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Attēla lielums:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Lietot sākotnējo lielumu</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Mainīt lielumu uz:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pikseļi</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Attēla kvalitāte:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automātiski</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Parasts</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Maksimums</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Minimums</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Pielāgots</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Saglabā sākotnējā attēla kvalitāti</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Labs kvalitātes un lieluma līdzsvars</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Ļoti liels fails, saglabā sīkas detaļas</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Mazākais faila lielums, neliels kvalitātes zudums</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Eksportēt filmas, izmantojot:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Pirmais kadrs</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Visu filmu (nemainot lielumu)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Ūdenszīme:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Ūdenszīmes pievienošana</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Pievienojiet fotoattēliem spiedogu ar savu vārdu, tīmekļa domēnu vai paziņojumu par autortiesībām.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Eksportēt</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

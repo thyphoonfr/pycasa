@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Экспорт в папку</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Путь к папке для экспорта:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Обзор...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Папка для экспорта:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Пронумеровать файлы и экспортировать по порядку</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Размер изображения:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Исходный размер</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Заданный размер</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320 | 480 | 640 | 800 | 1024 | 1200 | 1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>пикс.</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Качество изображения:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>По умолчанию</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Среднее</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Максимальное</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Минимальное</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Заданное</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Сохраняется исходное качество</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Оптимальное соотношение качества и размера</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Высокая степень детализации, макс. размер файла</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Частичная потеря качества, мин. размер файла</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Экспорт фильмов:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Первый кадр</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Весь файл (с исходным разрешением)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Водяной знак:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Добавить водяной знак</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Вы можете указать свое имя, адрес сайта или сведения об авторских правах.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Экспорт</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

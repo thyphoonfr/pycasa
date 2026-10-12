@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>שם:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>תאריך:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>תאריך אוטומטי</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>מוזיקה:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>השתמש במוסיקה להצגת מצגות וסרטים:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>עיון...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>מקום הצילום (אופציונלי):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>תיאור (אופציונלי):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

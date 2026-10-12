@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>„Google+“ automatinis atsarginis kopijavimas</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Baigėsi saugyklos vieta</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Pasirinkote aplankus, kurie užima daugiau vietos nei jos liko jūsų „Google“ disko saugykloje. Galite įsigyti daugiau saugyklos vietos arba nemokamai kurti neribotą nuotraukų ir vaizdo įrašų kopijų skaičių naudodami standartinį dydį.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Jei ką tik įsigijote saugyklos vietos, gali praeiti kelios minutės, kol pakeitimai įsigalios.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Gauti daugiau saugyklos vietos...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Įjungti standartinį dydį</xmbtext>
+ </stringres>
+</resources>

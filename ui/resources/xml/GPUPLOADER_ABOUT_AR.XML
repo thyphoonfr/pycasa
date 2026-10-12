@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>‏الإصدار %1$s من Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>‏حقوق الطبع والنشر لعام‏ 2015 لصالح شركة Google Inc.‎. جميع الحقوق محفوظة.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>‏يعتمد هذا البرنامج جزئيًا على أعمال شركة Independent JPEG Group. ويتمتع هذا البرنامج بحماية قانون حقوق الطبع والنشر في الولايات المتحدة والقانون الدولي.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>موافق</xmbtext>
+ </stringres>
+</resources>

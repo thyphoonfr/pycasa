@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Picasa を使用する前に、ライセンス規約をご確認ください</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Picasa をご利用になると、Google 利用規約とプライバシー ポリシーに同意したものと見なされます。</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>利用規約</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/ja/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>プライバシー ポリシー</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/ja/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>使用状況に関する匿名の統計情報を Google に送信する（この設定はいつでも変更できます）</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>同意する</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

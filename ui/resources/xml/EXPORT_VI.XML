@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Xuất sang thư mục</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Vị trí xuất:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Duyệt...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Tên thư mục được xuất:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Thêm số vào tên tệp để giữ nguyên thứ tự</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Kích thước hình ảnh:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Sử dụng kích thước gốc</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Sửa lại kích thước thành:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>pixel</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Chất lượng ảnh:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Tự động</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Bình thường</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Tối đa</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Tối thiểu</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Tùy chỉnh</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Giữ chất lượng ảnh gốc</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Cân bằng hợp lý giữa chất lượng và kích thước</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Kích thước tệp càng lớn càng giữ được độ nét</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Kích thước tệp nhỏ nhất, giảm chất lượng</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Xuất phim bằng cách sử dụng:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Khung đầu tiên</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Phim đầy đủ (không sửa lại kích thước)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vân nước:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Thêm vân nước</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Đóng dấu ảnh bằng tên của bạn, tên miền web hoặc thông báo bản quyền.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Xuất</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

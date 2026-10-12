@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Добавете име</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Избиране на папка за показване на лица</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Игнориране</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Добавете човек ръчно</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Отказ</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Докато Picasa сканира снимките ви, намерените лица се групират автоматично за лесно наименуване.\n\nКакво трябва да знаете:\n\nЗа да идентифицирате човек, кликнете върху „Добавете име“, въведете името му и натиснете „Enter“. Всеки път, когато наименувате някого за първи път, ще се създава нов албум „Хора“.\n\n(СЪВЕТ: Влезте с профила си в Google, за да получите достъп до всичките си контакти по време на наименуването.)\n\nЗа да пренебрегнете човек, кликнете върху бутона „X“ върху миниизображението на лицето.\n\nПредложения: След като наименувате някого, Picasa може да предложи още съответстващи лица за него. Кликнете върху албума на човек, за да прегледате и потвърдите (или отхвърлите) предложенията.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Докато Picasa сканира снимките ви, намерените лица се групират автоматично за лесно наименуване.\n\nКакво трябва да знаете:\n\nЗа да идентифицирате човек, кликнете върху „Добавете име“, въведете името му и натиснете „Enter“. Всеки път, когато наименувате някого за първи път, ще се създава нов албум „Хора“.\n\n(СЪВЕТ: Влезте с профила си в Google, за да получите достъп до всичките си контакти по време на наименуването.)\n\nЗа да пренебрегнете човек, кликнете върху бутона „X“ върху миниизображението на лицето.\n\nПредложения: След като наименувате някого, Picasa може да предложи още съответстващи лица за него. Кликнете върху албума на човек, за да прегледате и потвърдите (или отхвърлите) предложенията.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Все още няма намерени хора. С намирането и групирането на лицата те ще се показват в албума „Без име“. Информацията за напредъка се показва в този албум по време на сканирането.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Тук ще се покаже списък с наименуваните хора, които присъстват заедно с текущо избрания човек.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Тук ще се покаже списък с хората, които присъстват в текущо избраните снимки.</xmbtext>
+ </action>
+</tooltips>

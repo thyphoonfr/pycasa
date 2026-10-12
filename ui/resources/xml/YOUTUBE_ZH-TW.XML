@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>上傳到 YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>標題：</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>說明：</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>影片類別：</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>載入中…</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>標記：</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>這些關鍵字用於協助人們尋找您的影片 (關鍵字需以空格隔開)。</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>公開此影片</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>您的影片限制為 10 分鐘和 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>未經版權所有人允許，請勿上傳任何電視節目、MV、演唱會或廣告，除非您所上傳的內容完全屬於您個人創作的作品。如果想知道自己的影片是否侵犯他人版權，請參考「版權提示」與「社群規範」中的相關規定。</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>按一下 [上傳影片] 即代表這部影片並未違反 YouTube 的使用條款，而且您擁有這部影片的所有版權或擁有授權可以上傳這部影片。</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>上傳影片</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

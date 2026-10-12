@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="collab/uploadsize_label" xmbdesc="Text(collab/uploadsize_label)">
+  <xmbtext>Für Upload vorgesehene Größe</xmbtext>
+ </action>
+ <action type="Text" target="collab/privacy_label" xmbdesc="Text(collab/privacy_label)">
+  <xmbtext>Datenschutz</xmbtext>
+ </action>
+ <action type="Text" target="collab/choose_contact_label" xmbdesc="Text(collab/choose_contact_label)">
+  <xmbtext>Kontakt auswählen:</xmbtext>
+ </action>
+ <action type="Text" target="collab/contact_album_list_label" xmbdesc="Text(collab/contact_album_list_label)">
+  <xmbtext>Kontaktalben, zu denen Sie einen Beitrag leisten können:</xmbtext>
+ </action>
+ <action type="Label" target="collab/ok" xmbdesc="Label(collab/ok)">
+  <xmbtext>Hochladen</xmbtext>
+ </action>
+ <action type="Label" target="collab/cancel" xmbdesc="Label(collab/cancel)">
+  <xmbtext>Abbrechen</xmbtext>
+ </action>
+ <action type="Label" target="collab/storagetext" xmbdesc="Label(collab/storagetext)">
+  <xmbtext>Weitere Informationen</xmbtext>
+ </action>
+</tooltips>

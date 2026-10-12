@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Tietoja Picasasta</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Muiden tuotteiden palveluiden, tuotemerkkientai tavaramerkkien nimien oikeudet kuuluvat niiden omistajille.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Tämä ohjelma on osittain Independent JPEG Groupin tekemä. Tätä ohjelmaa suojaavat USA:n tekijänoikeuslait ja kansainväliset tekijänoikeuslait.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Kolmannen osapuolen lisenssit...</xmbtext>
+ </stringres>
+</resources>

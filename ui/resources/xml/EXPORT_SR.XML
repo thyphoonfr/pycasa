@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Извези у директоријум</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Локација за извоз:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Прегледај...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Име извезеног директоријума:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Додајте бројеве именима датотека да бисте задржали редослед</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Величина слике:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Користи оригиналну величину</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Промени величину у:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>пиксела</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Квалитет слике:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Аутоматски</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Нормално</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Максимално</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Минимум</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Прилагођено</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Задржава квалитет првобитне слике</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Добар баланс квалитета и величине</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Веома велика датотека, задржава фине детаље</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Најмања величина датотеке, део квалитета се губи</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Извоз филмова помоћу:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Први оквир</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Цео филм (без промене величине)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Водени жиг:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Додај водени жиг</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Означите фотографије својим именом, веб доменом или обавештењем о ауторским правима.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Извоз</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

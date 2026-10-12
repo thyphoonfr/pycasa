@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Zatvori</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Saznajte više...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Dobro došli u Neimenovani album s osobama! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Kada Picasa pretražuje vaše fotografije, lica koja pronalazi automatski grupira radi jednostavnijeg imenovanja.\n\nVažne informacije:\n\nda biste identificirali osobu, kliknite &#039;Dodaj ime&#039;, a zatim upišite ime osobe i pritisnite tipku Enter. Svaki put kada prvi put nekoga imenujete, bit će izrađen novi album Osobe.\n\n(SAVJET: prijavite se na svoj Google račun da biste mogli pristupiti svim svojim kontaktima iz Google računa prilikom imenovanja.)\n\nDa biste zanemarili osobu, kliknite gumb &#039;X&#039; na minijaturi lica.\n\Prijedlozi: nakon imenovanja osobe Picasa može predložiti dodatna podudarna lica za tu osobu. Kliknite album osobe da biste prikazali i potvrdili (ili odbili) prijedloge.\n\n\n Kliknite &#039;Saznajte više&#039; da biste doznali više o toj značajci.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Kada Picasa pretražuje vaše fotografije, lica koja pronalazi automatski grupira radi jednostavnijeg imenovanja.\n\nVažne informacije:\n\nda biste identificirali osobu, kliknite &#039;Dodaj ime&#039;, a zatim upišite ime osobe i pritisnite tipku Enter. Svaki put kada prvi put nekoga imenujete, bit će izrađen novi album Osobe.\n\n(SAVJET: prijavite se na svoj Google račun da biste mogli pristupiti svim svojim kontaktima iz Google računa prilikom imenovanja.)\n\nDa biste zanemarili osobu, kliknite gumb &#039;X&#039; na minijaturi lica.\n\Prijedlozi: nakon imenovanja osobe Picasa može predložiti dodatna podudarna lica za tu osobu. Kliknite album osobe da biste prikazali i potvrdili (ili odbili) prijedloge.\n\n\n Kliknite &#039;Saznajte više&#039; da biste doznali više o toj značajci.</xmbtext>
+ </action>
+</tooltips>

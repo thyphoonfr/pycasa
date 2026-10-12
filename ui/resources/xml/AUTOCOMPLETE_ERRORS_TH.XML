@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="autocomplete_errors/window1.title">
+  <xmbtext>ข้อผิดพลาดอัตโนมัติ</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/label3.title">
+  <xmbtext>ไม่สามารถแปะรายชื่อผู้ติดต่อที่พบในข้อความคลิปบอร์ดต่อไปนี้ได้อย่างถูกต้อง</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column5.title">
+  <xmbtext>รายชื่อผู้ติดต่อ</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column6.title">
+  <xmbtext>ข้อผิดพลาด</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/column7.title">
+  <xmbtext>สถานะ</xmbtext>
+ </stringres>
+ <stringres id="autocomplete_errors/ok.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+</resources>

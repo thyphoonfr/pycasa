@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Namen hinzufügen</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Ordner auswählen, um Gesichter anzuzeigen</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorieren</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Person manuell hinzufügen</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Abbrechen</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Während Picasa Ihre Fotos durchsucht, werden die gefundenen Gesichter automatisch gruppiert, um die Benennung zu vereinfachen.\n\nWas Sie dazu wissen müssen:\n\nUm eine Person zu kennzeichnen, klicken Sie auf &quot;Namen hinzufügen&quot;, geben den Namen der Person ein und drücken die Eingabetaste. Immer, wenn Sie eine Person zum ersten Mal benennen, wird ein neues Personenalbum erstellt.\n\n(Tipp: Melden Sie sich mit Ihrem Google-Konto an, um bei der Benennung Zugriff auf Ihre Kontakte zu haben.)\n\nUm eine Person zu ignorieren, klicken Sie auf der Miniaturansicht des Gesichts auf das &quot;X&quot;.\n\nVorschläge: Wenn Sie eine Person benannt haben, schlägt Picasa möglicherweise weitere passende Gesichter für diese Person vor. Klicken Sie auf das Album einer Person, um die Vorschläge anzusehen und zu bestätigen bzw. abzulehnen.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Während Picasa Ihre Fotos durchsucht, werden die gefundenen Gesichter automatisch gruppiert, um die Benennung zu vereinfachen.\n\nWas Sie dazu wissen müssen:\n\nUm eine Person zu kennzeichnen, klicken Sie auf &quot;Namen hinzufügen&quot;, geben den Namen der Person ein und drücken die Eingabetaste. Immer, wenn Sie eine Person zum ersten Mal benennen, wird ein neues Personenalbum erstellt.\n\n(Tipp: Melden Sie sich mit Ihrem Google-Konto an, um bei der Benennung Zugriff auf Ihre Kontakte zu haben.)\n\nUm eine Person zu ignorieren, klicken Sie auf der Miniaturansicht des Gesichts auf das &quot;X&quot;.\n\nVorschläge: Wenn Sie eine Person benannt haben, schlägt Picasa möglicherweise weitere passende Gesichter für diese Person vor. Klicken Sie auf das Album einer Person, um die Vorschläge anzusehen und zu bestätigen bzw. abzulehnen.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Es wurden noch keine Personen gefunden. Wenn Gesichter gefunden und gruppiert werden, werden sie im Album &quot;Unbenannt&quot; angezeigt. Während des Scanvorgangs werden Statusinformationen im Albumelement &quot;Unbenannt&quot; angezeigt.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Mit Namen versehene Personen, die mit der zurzeit ausgewählten Person zu sehen sind, werden hier aufgeführt.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Personen, die auf den zurzeit ausgewählten Fotos zu sehen sind, werden hier aufgeführt.</xmbtext>
+ </action>
+</tooltips>

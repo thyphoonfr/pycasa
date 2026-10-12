@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>เหลือพื้นที่เก็บข้อมูล Google ไดรฟ์อีก 1 GB</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>เพิ่มพื้นที่เก็บข้อมูลเพื่อให้สามารถสำรองข้อมูลรูปภาพต้นฉบับในความละเอียดตามจริง หรือเปลี่ยนเป็นคุณภาพสูงเพื่อใช้พื้นที่เก็บข้อมูลฟรีไม่จำกัด คุณจะได้เก็บรูปภาพที่มีคุณภาพดีเยี่ยมโดยมีขนาดไฟล์ลดลง</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>ช่วยเลือกหน่อย</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>รับพื้นที่เก็บข้อมูลเพิ่ม</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>เปลี่ยนเป็นคุณภาพสูง</xmbtext>
+ </stringres>
+</resources>

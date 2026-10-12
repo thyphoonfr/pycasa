@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Une version plus ancienne de Picasa est installée. Voulez-vous mettre à jour votre photothèque actuelle ou effectuer une nouvelle recherche d&#039;images sur votre ordinateur ?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Sélectionnez l&#039;une des options suivantes :</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Mettre à jour ma photothèque existante</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Choisissez cette option si vous utilisez des mots clés ou des albums personnalisés dans Picasa 1, et que vous souhaitez les conserver dans Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Faire une nouvelle recherche de photos sur mon ordinateur</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Choisissez cette option pour effectuer sur votre ordinateur une recherche plus complète incluant des données supplémentaires relatives aux photos. Les retouches et l&#039;organisation actuelles seront conservées, mais pas les mots clés. Cette recherche peut prendre plusieurs minutes.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>La recherche d&#039;images laisse vos fichiers intacts : ils ne sont ni déplacés, ni copiés vers de nouveaux emplacements. Vous pouvez choisir les dossiers affichés par Picasa à l&#039;aide du Gestionnaire de dossiers (disponible dans le menu Outils).</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Continuer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa va rechercher les photos stockées sur votre ordinateur.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Sélectionnez l&#039;une des options suivantes :</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Rechercher des photos parmi tout le contenu de mon ordinateur</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Choisissez cette option si vos photos sont stockées dans différents dossiers de l&#039;ordinateur, et notamment si elles sont enregistrées sur plusieurs disques durs.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Rechercher uniquement sur Documents, Images, le Bureau et la photothèque iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Choisissez cette option si vous stockez uniquement vos photos dans ces dossiers.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>La recherche d&#039;images laisse vos fichiers intacts : ils ne sont ni déplacés ni copiés vers de nouveaux emplacements. Vous pouvez choisir les dossiers à afficher dans Picasa à l&#039;aide du Gestionnaire de dossiers (disponible dans le menu Outils).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Continuer</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirmsync/window1.title">
+  <xmbtext>वेब पर एल्बम सिंक्रनाइज़ करें</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/msg.title">
+  <xmbtext>यह एल्बम वेब एल्बम पर अपलोड करें और इसे समन्वयन में रखें?</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/label3.title">
+  <xmbtext>वर्तमान सेटिंग:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup7.title">
+  <xmbtext>आकारः</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/size.title">
+  <xmbtext>सामान्य आकार यहां जाता है</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/labelgroup9.title">
+  <xmbtext>दृश्यता:</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/visibility.title">
+  <xmbtext>असूचीबद्ध</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/starred.title">
+  <xmbtext>केवल तारांकित फ़ोटो सिंक्रनाइज़ करें</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/dontask.title">
+  <xmbtext>मुझसे दोबारा न पूछें (हमेशा वर्तमान सेटिंग का उपयोग करें)</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/change.title">
+  <xmbtext>सेटिंग बदलें...</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button16.title">
+  <xmbtext>सिंक्रनाइज़ करें</xmbtext>
+ </stringres>
+ <stringres id="confirmsync/button17.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

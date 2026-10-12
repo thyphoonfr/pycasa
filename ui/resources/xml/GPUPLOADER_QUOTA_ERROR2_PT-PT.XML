@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Cópia de segurança do Google Fotos</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Atingiu o limite de armazenamento do Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Obtenha mais armazenamento para continuar a criar cópias de segurança das suas fotos originais na resolução máxima. Em alternativa, altere para alta qualidade para usufruir de armazenamento ilimitado gratuito: ótima qualidade visual com um tamanho de ficheiro reduzido.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Obter ajuda na decisão</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Obter mais armazenamento</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Alterar para alta qualidade</xmbtext>
+ </stringres>
+</resources>

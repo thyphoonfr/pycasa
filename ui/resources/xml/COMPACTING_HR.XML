@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Sažima se</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa sažima svoju bazu podataka radi štednje prostora na disku. To može potrajati nekoliko minuta.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Sažima se...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

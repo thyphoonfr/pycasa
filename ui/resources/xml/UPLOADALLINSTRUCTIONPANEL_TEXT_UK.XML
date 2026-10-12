@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Закрити</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Ласкаво просимо до групового завантаження</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Поставте прапорці поряд із папками й альбомами, з якими хочете працювати. Після цього виберіть дію. Picasa відфільтрує елементи, до яких ця дія не застосується. Наприклад, якщо ціла папка або альбом уже розміщені в Інтернеті, Picasa не покаже параметри завантаження для них.</xmbtext>
+ </action>
+</tooltips>

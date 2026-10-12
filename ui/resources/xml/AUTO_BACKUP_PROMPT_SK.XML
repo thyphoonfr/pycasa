@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Zálohovanie Fotiek Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Zálohujte si fotky v službe Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>So Zálohovaním Fotiek Google si môžete automaticky ukladať fotky a videá online. K položkám budete mať prístup z ľubovoľného zariadenia a budú súkromné, kým sa ich nerozhodnete zdieľať.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Získať Zálohovanie Fotiek Google</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nie, ďakujem</xmbtext>
+ </stringres>
+</resources>

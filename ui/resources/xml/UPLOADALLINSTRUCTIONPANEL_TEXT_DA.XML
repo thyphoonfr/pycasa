@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Luk</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Velkommen til gruppeoverførsel</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Markér afkrydsningsfelterne ved siden af de mapper og album, du gerne vil arbejde med. Vælg derefter, hvad du gerne vil foretage dig. Picasa vil filtrere de enheder, hvor handlingen ikke skal udføres. Hvis en hel mappe eller album eksempelvis allerede er online, så vil Picasa ikke vise den som en valgmulighed til upload.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Faceți backup pentru fotografiile din Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Salvează-ți în mod automat fotografiile și videoclipurile online folosind Backup Google Foto.Elementele pot fi accesate de pe orice dispozitiv și rămân private până când decizi să le trimiți.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Descarcă Backup Google Foto</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Nu, mulțumesc</xmbtext>
+ </stringres>
+</resources>

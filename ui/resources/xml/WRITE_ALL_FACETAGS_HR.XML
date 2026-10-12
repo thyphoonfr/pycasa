@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Zapisivanje oznaka lica</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Zapisivanje lica ili zapisivanje svega može dugo trajati. Ako je bilježenje postavljeno na detaljno ili višu postavku, mrežni će dnevnik sadržavati poruke o datotekama samo za čitanje koje nije moguće ažurirati. Tijekom upotrebe te značajke preporučuje se odjava.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Zapisivanje odabranog</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Zapisivanje lica</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Zapisivanje svega</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

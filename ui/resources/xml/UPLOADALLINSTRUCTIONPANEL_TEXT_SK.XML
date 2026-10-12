@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Zavrieť</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Vitajte v dávkovom nahrávaní</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Začiarknite políčka vedľa priečinkov a albumov, s ktorými chcete pracovať. Potom vyberte požadovanú úlohu. Program Picasa bude filtrovať položky, pre ktoré sa operácia nedá vykonať. Ak je napríklad celý priečinok alebo album už online, program Picasa ho nezobrazí ako možnosť na nahranie.</xmbtext>
+ </action>
+</tooltips>

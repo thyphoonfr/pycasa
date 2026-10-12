@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Δημιουργήστε αντίγραφα ασφαλείας για τις φωτογραφίες σας στο Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Αποθηκεύστε αυτόματα τις φωτογραφίες και τα βίντεό σας στο διαδίκτυο με το Google Photos Backup. Τα στοιχεία σας είναι προσβάσιμα από οποιαδήποτε από τις συσκευές σας και τα πάντα διατηρούνται ιδιωτικά έως ότου επιλέξετε να τα μοιραστείτε.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Αποκτήστε το Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Όχι, ευχαριστώ</xmbtext>
+ </stringres>
+</resources>

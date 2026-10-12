@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Nom :</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Date :</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Date automatique</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Musique :</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Utiliser de la musique pour la présentation du diaporama et du film :</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Parcourir...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Lieu de prise de vue (facultatif) :</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Description (facultative) :</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Annuler</xmbtext>
+ </stringres>
+</resources>

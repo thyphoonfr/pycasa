@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Automatikus mentés</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Elfogyott a tárhelye</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>A kiválasztott mappák több tárhelyet tartalmaznak, mint a Google Drive-on fennmaradó tárhelye. Vásárolhat további tárhelyet, vagy normál méretben ingyenesen biztonsági másolatot készíthet korlátlan mennyiségű fotóról.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Tárhely vásárlása esetén pár percbe telhet, amíg életbe lépnek a módosítások.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>További tárhely beszerzése...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Váltás normál méretre</xmbtext>
+ </stringres>
+</resources>

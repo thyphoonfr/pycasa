@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Pakisuri ang mga tuntunin ng lisensya bago gamitin ang Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Sa pamamagitan ng paggamit sa Picasa, sumasang-ayon ka sa Mga Tuntunin ng Serbisyo ng Google at Patakaran sa Privacy.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Mga Tuntunin ng Serbisyo</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/fil/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Patakaran sa Privacy</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/fil/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Magpadala sa Google ng mga anonymous na istatistika sa paggamit (Mababago mo ang setting na ito anumang oras sa ibang pagkakataon)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Sumasang-ayon ako</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Kanselahin</xmbtext>
+ </stringres>
+</resources>

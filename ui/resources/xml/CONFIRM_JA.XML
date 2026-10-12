@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>メッセージ</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>再度表示させない</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>はい</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>いいえ</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

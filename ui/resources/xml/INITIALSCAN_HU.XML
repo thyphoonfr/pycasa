@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>A Picasa egyik régebbi verziója van a számítógépre telepítve. Frissíti a meglévő képtárat, vagy újrakeresi a képeket a számítógépen?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Kérjük, válasszon az alábbi opciók közül:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>A meglévő képtár frissítése</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Akkor válassza ezt az opciót, ha a Picasa 1-es verziójában kulcsszavakat vagy egyéni albumokat használ, és ezeket a Picasa 3-as verziójában is meg szeretné őrizni.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Képek ismételt keresése a saját gépen</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Akkor válassza ezt az opciót, ha szélesebb körű keresést szeretne futtatni a számítógépen, amely a kiterjesztett képadatokra is kiterjed. A művelet megőrzi az eddigi szerkesztéseket és elrendezéseket, de nem őrzi meg a kulcsszavakat. A keresés eltarthat néhány percig.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Miközben a program képeket keres, soha nem másolja vagy helyezi őket új helyre. Az Eszközök menüből elérhető Mappakezelő eszközzel megadhatja, hogy a Picasa mely mappákat jelenítse meg</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Folytatás</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>A Picasa készen áll arra, hogy képeket keressen a számítógépen</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Kérjük, válasszon az alábbi opciók közül:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Képek keresése a teljes számítógépen</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Akkor válassza ezt az opciót, ha különböző mappákban tárolja a képeket a számítógépen, különösen akkor, ha a képek egynél több meghajtón találhatók.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Keresés csak a Dokumentumok és a Képek mappában, az asztalon és az iPhoto könyvtárban</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Akkor válassza ezt az opciót, ha csak ezekben a mappákban tárolja képeit.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Miközben a program képeket keres, soha nem másolja vagy helyezi őket új helyre. Az Eszközök menüből elérhető Mappakezelő eszközzel megadhatja, hogy a Picasa mely mappákat jelenítse meg</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Folytatás</xmbtext>
+ </action>
+</tooltips>

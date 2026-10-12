@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>กำลังย่อ</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa กำลังย่อขนาดฐานข้อมูลเพื่อประหยัดพื้นที่ของดิสก์ การทำงานนี้จะใช้เวลาหลายนาที</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>กำลังย่อ...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

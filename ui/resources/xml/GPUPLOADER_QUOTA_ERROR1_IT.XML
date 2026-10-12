@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>1 GB di spazio di archiviazione di Google Drive residuo</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Ottieni altro spazio di archiviazione per continuare a eseguire il backup delle foto originali alla massima risoluzione, oppure passa ad &quot;alta qualità&quot; per avere uno spazio di archiviazione illimitato: qualità visiva eccellente anche per file di dimensioni ridotte.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Fatti aiutare nella decisione</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Aumenta lo spazio di archiviazione</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Passa ad &quot;alta qualità&quot;</xmbtext>
+ </stringres>
+</resources>

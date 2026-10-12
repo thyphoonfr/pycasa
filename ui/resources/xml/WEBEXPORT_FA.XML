@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>‏صادر کردن به‌عنوان صفحه HTML</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>صادر کردن عکس‌ها در:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>اندازه اصلی</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>۱۰۲۴ پیکسل (برای مانیتورهای بزرگ)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>۸۰۰ پیکسل (برای صفحات وب بزرگ)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>۶۴۰ پیکسل (برای صفحات وب)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>۳۲۰ پیکسل (برای ایمیل)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>صادر کردن فیلم‌ها با استفاده از:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>قاب اول</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>فیلم کامل</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>عنوان صفحهٔ وب:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>پوشه:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>مرور...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>برای مشاهده یک نمونه، روی نام یک الگو کلیک کنید. بعد از انتخاب خود، صادر کردن را کلیک کنید.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>توضیح الگو</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>صادر کردن</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

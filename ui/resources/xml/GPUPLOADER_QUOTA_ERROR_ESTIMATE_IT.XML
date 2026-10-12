@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Backup automatico Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Spazio di archiviazione esaurito</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Hai selezionato cartelle che contengono più spazio dello spazio di archiviazione rimanente su Google Drive. Puoi acquistare ulteriore spazio di archiviazione o effettuare gratuitamente il backup di un numero illimitato di foto e video con dimensioni standard.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Se hai appena acquistato spazio di archiviazione, potresti dover attendere qualche minuto prima che le modifiche abbiano effetto.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Ottieni altro spazio di archiviazione...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Passa alle dimensioni standard</xmbtext>
+ </stringres>
+</resources>

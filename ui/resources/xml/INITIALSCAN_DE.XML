@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Eine ältere Version von Picasa ist installiert. Möchten Sie Ihre vorhandene Fotogalerie aktualisieren oder Ihren Computer erneut nach Bildern durchsuchen?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Bitte treffen Sie eine Auswahl aus den folgenden Optionen:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Bestehende Fotogalerie aktualisieren</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Wählen Sie diese Option, wenn Sie Suchbegriffe und benutzerdefinierte Alben in Picasa 1 verwenden und diese in Picasa 3 beibehalten möchten.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Meinen Computer erneut nach Bildern durchsuchen</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Wählen Sie diese Option, um eine umfassendere Suche auf Ihrem Computer durchzuführen, die erweiterte Bildinformationen einschließt. Ihre bestehenden Änderungen und Sortierungen werden beibehalten, nicht aber Ihre Stichwörter. Dieser Suchvorgang kann einige Minuten dauern.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Beim Durchsuchen nach Bildern werden Dateien nie an andere Speicherorte verschoben oder kopiert. Mit dem Ordner-Manager (im Menü &quot;Tools&quot;) können Sie festlegen, welche Ordner von Picasa angezeigt werden.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Weiter</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa ist bereit, Ihren Computer nach Bildern zu durchsuchen.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Bitte treffen Sie eine Auswahl aus den folgenden Optionen:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Meinen gesamten Computer nach Bildern durchsuchen</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Wählen Sie diese Option, wenn Bilder in verschiedenen Ordnern auf Ihrem Computer gespeichert sind, besonders, wenn Sie Bilder auf mehr als einer Festplatte gespeichert haben.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Nur Dokumente, Bilder, den Desktop und die iPhoto-Galerie durchsuchen</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Wählen Sie diese Option aus, wenn Sie Ihre Bilder nur in diesen Ordnern speichern.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Beim Durchsuchen nach Bildern werden Dateien nie an andere Speicherorte verschoben oder kopiert. Mit dem Ordner-Manager (im Menü \&quot;Tools\&quot;) können Sie festlegen, welche Ordner von Picasa angezeigt werden.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Weiter</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Citiți termenii de acordare a licenței înainte de a instala Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Dacă folosiți Picasa, înseamnă că sunteți de acord cu Termenii și condițiile Google, precum și cu Politica de confidențialitate Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Termeni și condiții</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/ro/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Politica de confidențialitate</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/ro/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Trimiteți la Google statistici anonime privind utilizarea (Puteți oricând schimba această setare ulterior)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>De acord</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

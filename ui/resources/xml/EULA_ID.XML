@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Tinjau persyaratan lisensi sebelum menggunakan Picasa</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Dengan menggunakan Picasa, Anda menyetujui Persyaratan Layanan dan Kebijakan Privasi Google.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Persyaratan Layanan</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/id/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Kebijakan Privasi</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/id/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Kirim statistik penggunaan anonim ke Google (Anda dapat mengubah setelan ini kapan pun)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Saya Setuju</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="reviewprint/window1.title">
+  <xmbtext>ตัวอย่างสำหรับการพิมพ์</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/remove.title">
+  <xmbtext>ลบรายการที่เลือก</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/removeall.title">
+  <xmbtext>นำรูปภาพคุณภาพต่ำออก</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/top.title">
+  <xmbtext>ตัวอย่างรูปภาพ</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/bottom.title">
+  <xmbtext>ข้อมูล</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button14.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+ <stringres id="reviewprint/button15.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

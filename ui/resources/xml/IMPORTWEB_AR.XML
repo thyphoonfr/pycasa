@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>استيراد من ألبومات الويب</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>سيتم تنزيل الصور في ألبومات الويب المحددة أدناه إلى جهاز الكمبيوتر بعد النقر على الزر &quot;موافق&quot;. وسيتم تنظيمها تلقائيًا في مجلدات وفقًا لأسماء الألبومات.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>لديك 100 من ألبومات الويب على الإنترنت.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>استيراد جميع الألبومات</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>استيراد الألبومات المحددة:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>الاسم</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>التاريخ</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(ملاحظة: لن يتم تنزيل سوى الصور غير الموجودة من قبل على جهاز الكمبيوتر)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>موافق</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>ייצא לתיקייה</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>מיקום ייצוא:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>עיון...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>שם התיקייה המיוצאת:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>הוסף מספר לשמות קבצים כדי לשמור על הסדר</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>גודל תמונה:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>השתמש בגודל המקורי</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>שנה לגודל:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>פיקסלים</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>איכות תמונה:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>אוטומטי</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>רגיל</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>מקסימום</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>מינימום</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>מותאם אישית</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>שומר על איכות התמונה המקורית</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>איזון טוב בין איכות לגודל</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>קובץ גדול מאוד, מציג פרטים קטנים</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>קובץ בגודל הקטן ביותר, פגיעה מסוימת באיכות</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>יצא סרטים באמצעות:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>מסגרת ראשונה</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>סרט מלא (ללא שינוי גודל)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>סימן מים:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>הוסף סימן מים</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>הוסף לתמונות חותמת עם שמך, דומיין אינטרנט או הודעת זכויות יוצרים.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>יצא</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

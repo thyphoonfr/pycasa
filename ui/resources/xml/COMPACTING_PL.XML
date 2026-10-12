@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Kompaktowanie</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Program Picasa zmniejsza rozmiar swojej bazy danych, aby zaoszczędzić miejsce na dysku. Może to potrwać kilka minut.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Kompaktowanie...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Anuluj</xmbtext>
+ </stringres>
+</resources>

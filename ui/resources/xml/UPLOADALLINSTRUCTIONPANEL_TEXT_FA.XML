@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>بستن</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>به &quot;بارگذاری دسته‌ای&quot; خوش آمدید</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>‏کادرهای کنار پوشه‌ها و آلبوم‌هایی را که می‌خواهید با آن‌ها کار کنید علامت بزنید. سپس آنچه را که می‌خواهید انجام دهید انتخاب کنید. هر کجا که عملیات قابل اجرا نباشد، Picasa موارد را فیلتر می‌کند. به‌عنوان مثال اگر کل یک پوشه یا آلبوم در حال حاضر وجود داشته باشد، Picasa آنرا به‌عنوان یک گزینه برای آپلود نشان نمی‌دهد.</xmbtext>
+ </action>
+</tooltips>

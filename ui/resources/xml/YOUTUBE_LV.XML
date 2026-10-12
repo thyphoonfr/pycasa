@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Augšupielāde vietnē YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Nosaukums:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Apraksts:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Videoklipa kategorija:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Notiek ielāde...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Atzīmes:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Šie atslēgvārdi (atdalīti ar atstarpi) tiek lietoti, lai palīdzētu citām personām atrast jūsu videoklipu.</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Šī videoklipa publicēšana</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videoklips nedrīkst būt ilgāks par 10 minūtēm vai lielāks par 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Ir aizliegts augšupielādēt TV pārraides, mūzikas videoklipus, mūzikas koncertus vai reklāmas, ja neesat saņēmis atļauju to darīt vai ja šajos materiālos nav tikai un vienīgi jūsu izveidots saturs. Autortiesību padomu lapa un kopienas vadlīnijas var palīdzēt noteikt, vai jūsu videoklips pārkāpj kādas citas personas autortiesības.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Noklikšķinot uz &quot;Augšupielādēt videoklipu&quot;, jūs apliecināt, ka šis videoklips nepārkāpj YouTube pakalpojumu sniegšanas noteikumus un ka jums pieder visas šī videoklipa autortiesības vai arī esat saņēmis atļauju to augšupielādēt.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Videoklipa augšupielāde</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

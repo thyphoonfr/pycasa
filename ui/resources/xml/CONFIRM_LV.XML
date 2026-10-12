@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Ziņojums</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Turpmāk nejautāt</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Jā</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Nē</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

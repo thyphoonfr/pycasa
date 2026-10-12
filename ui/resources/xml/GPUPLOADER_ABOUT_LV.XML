@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Google fotoattēlu dublēšana</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Google fotoattēlu dublēšanas funkcijas versija %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Autortiesības 2015, Google, Inc. Visas tiesības paturētas.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Šī programmatūra ir daļēji balstīta uz Independent JPEG Group darbu. Šo programmu aizsargā ASV un starptautiskie autortiesības reglamentējošie tiesību akti.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+</resources>

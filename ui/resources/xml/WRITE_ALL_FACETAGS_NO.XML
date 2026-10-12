@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Lagre ansiktsmerker</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Lagre ansikter eller Lagre alle kan ta lang tid. Hvis loggingen er satt til detaljert eller høyere, inneholder network.log meldinger om skrivebeskyttede filer som ikke kunne oppdateres. Vi anbefaler at du logger deg av før du bruker denne funksjonen.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Lagre valgte</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Lagre ansikter</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Lagre alle</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

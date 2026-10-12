@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Picasa について</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>その他のサービス、サービス名、ブランド、商標はすべて、それぞれの所有者に帰属します。</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>このソフトウェアは Independent JPEG Group の開発に一部基づいています。このプログラムは、米国および世界の著作権法によって保護されています。</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>サードパーティのライセンス...</xmbtext>
+ </stringres>
+</resources>

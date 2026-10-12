@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Είναι εγκαταστημένη μια παλαιότερη έκδοση του Picasa.  Θέλετε να ενημερώσετε την υπάρχουσα βιβλιοθήκη φωτογραφιών ή να πραγματοποιήσετε ξανά αναζήτηση στον υπολογιστή σας για φωτογραφίες;</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Επιλέξτε μία από τις ακόλουθες επιλογές:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Ενημέρωση της ήδη υπάρχουσας βιβλιοθήκης φωτογραφιών</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Κάντε αυτήν την επιλογή εάν χρησιμοποιείτε λέξεις-κλειδιά ή προσαρμοσμένα λευκώματα στο Picasa 1 και θέλετε να τα διατηρήσετε στο Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Επανάληψη αναζήτησης φωτογραφιών στον υπολογιστή μου</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Ενεργοποιήστε αυτή την επιλογή για μια πιο ολοκληρωμένη αναζήτηση στον υπολογιστή σας, η οποία συμπεριλαμβάνει εκτεταμένες πληροφορίες φωτογραφιών.  Θα διατηρηθούν οι υπάρχουσες αλλαγές και η οργάνωσή σας, αλλά όχι και οι λέξεις-κλειδιά.  Η αναζήτηση αυτή ενδέχεται να διαρκέσει αρκετά λεπτά.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Η αναζήτηση για φωτογραφίες δεν μετακινεί και δεν αντιγράφει ποτέ αρχεία σε νέες τοποθεσίες. Μπορείτε να επιλέξετε ποιοι φάκελοι θα εμφανίζονται από το Picasa χρησιμοποιώντας το εργαλείο &quot;Διαχείριση Φακέλων&quot; (διατίθεται στο μενού &quot;Εργαλεία&quot;)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Συνέχεια</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Το Picasa είναι έτοιμο να αναζητήσει φωτογραφίες στον υπολογιστή σας</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Επιλέξτε μία από τις ακόλουθες επιλογές:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Αναζήτηση φωτογραφιών σε ολόκληρο τον υπολογιστή μου</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Επιλέξτε εάν έχετε φωτογραφίες αποθηκευμένες σε διάφορους φακέλους στον υπολογιστή σας και ιδιαίτερα εάν έχετε φωτογραφίες αποθηκευμένες σε περισσότερους από έναν σκληρούς δίσκους.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Αναζήτηση μόνο στα έγγραφα, τις φωτογραφίες, την επιφάνεια εργασίας και τη βιβλιοθήκη iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Ενεργοποιήστε αυτή την επιλογή εάν αποθηκεύετε τις φωτογραφίες σας μόνο σε αυτούς τους φακέλους.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Η αναζήτηση για φωτογραφίες δεν μετακινεί και δεν αντιγράφει σε καμία περίπτωση αρχεία σε νέες τοποθεσίες. Μπορείτε να επιλέξετε ποιοι φάκελοι θα εμφανίζονται στο Picasa χρησιμοποιώντας το εργαλείο &quot;Διαχείριση Φακέλων&quot; (διαθέσιμο από το μενού &quot;Εργαλεία&quot;)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Συνέχεια</xmbtext>
+ </action>
+</tooltips>

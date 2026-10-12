@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Magagamit mo ang mga Quick Tag upang magpatupad ng isang tag sa minsanang pag-click.  I-type ang mga tag sa ibaba na gusto mong magkaroon ng isang-click na access.  Bilang default, ang pangunahing dalawang mga Quick Tag ay ginagamit upang sundan ang mga kamakailan lang na pinatupad na mga tag.  Alisin ang check sa checkbox sa ibaba upang mano-manong itakda ang pangunahing dalawang tag.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>I-autofill ang mga kahong walang laman gamit ang mga karaniwang ginagamit na mga tag</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Ireserba ang unang dalawang pindutan para sa mga tag na kagagamit lang</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Kanselahin</xmbtext>
+ </action>
+</tooltips>

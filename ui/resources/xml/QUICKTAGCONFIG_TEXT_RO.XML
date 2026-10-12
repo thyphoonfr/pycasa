@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Puteţi utiliza funcţia Etichete rapide pentru a aplica etichete cu un singur clic. Scrieţi mai jos nume de etichete la care doriţi să aveţi acces cu un singur clic. În mod prestabilit, primele două etichete rapide din partea superioară sunt utilizate pentru urmărirea etichetelor aplicate recent. Debifaţi caseta de selectare de mai jos pentru a seta manual primele două etichete din partea superioară.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Doresc să fie completate automat casetele goale de mai sus cu etichete utilizate frecvent</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Rezervaţi primele două butoane de sus pentru etichete utilizate recent</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+</tooltips>

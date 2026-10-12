@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Отпреми на YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Наслов:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Опис:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Категорија видео снимка:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Учитава се...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Ознаке:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Ово су кључне речи које се користе да би помогле људима да пронађу ваш видео снимак. (раздвојене размацима)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Учини овај видео снимак јавним</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Видео је ограничен на 10 минута и 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Без дозволе немојте отпремати ТВ емисије, музичке спотове, концерте или рекламе осим уколико у целости не представљају садржај који сте сами осмислили. Да бисте утврдили да ли ваш видео запис крши нечија ауторска права, погледајте страницу са напоменама у вези са ауторским правима, као и смернице за заједницу.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Ако кликнете на „Отпреми видео снимак“,гарантујете да овај видео снимак не крши услове коришћења услуге YouTube и да сте ви власник свих ауторских права на овај видео снимак, односно да сте овлашћени да га отпремите.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Отпремање видео снимка</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Откажи</xmbtext>
+ </stringres>
+</resources>

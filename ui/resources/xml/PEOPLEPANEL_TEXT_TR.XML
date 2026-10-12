@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Ad ekle</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Yüzlerin görüntüleneceği klasörü seçin</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Yoksay</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>El ile kişi ekle</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>İptal</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Picasa, fotoğraflarınızı tararken bulduğu yüzleri kolay adlandırılabilmeleri için otomatik olarak gruplandırır.\n\nBilinmesi gerekenler:\n\nBir kişiyi tanımlamak için, &quot;Ad ekle&quot;yi tıklayın, sonra da kişinin adını yazıp Enter tuşuna basın. Birisini ilk kez adlandırdığınız her seferinde yeni bir Kişi albümü oluşturulur.\n\n(İPUCU: Adlandırırken, kişilerinizin tümüne erişim sahibi olabilmek için Google Hesabınızla oturum açın.)\n\nBir kişiyi yok saymak için, yüz küçük resmindeki &quot;X&quot; düğmesini tıklayın.\n\nÖneriler: Birisini adlandırdıktan sonra Picasa, söz konusu kişi için eşleşen başka yüzler önerebilir. Önerileri görüntülemek ve onaylamak (veya reddetmek) için bir kişinin albümünü tıklayın.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Picasa, fotoğraflarınızı tararken bulduğu yüzleri kolay adlandırılabilmeleri için otomatik olarak gruplandırır.\n\nBilinmesi gerekenler:\n\nBir kişiyi tanımlamak için, &quot;Ad ekle&quot;yi tıklayın, sonra da kişinin adını yazıp Enter tuşuna basın. Birisini ilk kez adlandırdığınız her seferinde yeni bir Kişi albümü oluşturulur.\n\n(İPUCU: Adlandırırken, kişilerinizin tümüne erişim sahibi olabilmek için Google Hesabınızla oturum açın.)\n\nBir kişiyi yok saymak için, yüz küçük resmindeki &quot;X&quot; düğmesini tıklayın.\n\nÖneriler: Birisini adlandırdıktan sonra Picasa, söz konusu kişi için eşleşen başka yüzler önerebilir. Önerileri görüntülemek ve onaylamak (veya reddetmek) için bir kişinin albümünü tıklayın.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Henüz hiç kimse bulunamadı. Yüzler bulunup gruplandıkça Adsız albümde görüntülenecektir. Tarama sırasında ilerleme bilgisi Adsız albüm öğesinde görüntülenir.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Şu anda seçili olan kişiyle görünen Adlandırılmış Kişiler burada listelenecek.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Şu anda seçili olan fotoğraflarda görünen kişiler burada listelenir.</xmbtext>
+ </action>
+</tooltips>

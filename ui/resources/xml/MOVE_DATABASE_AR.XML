@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>نقل قاعدة بيانات</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>يجب إعادة تشغيل بيكاسا حتى تصبح التغييرات سارية المفعول.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>الرجاء ملاحظة: أنه يجب عليك نسخ قاعدة البيانات احتياطيًا قبل تجربة هذه الميزة الاختبارية. لا تنقل قاعدة البيانات مطلقًا إلى محرك أقراص شبكة أو محرك أقراص قابل للإزالة أو محرك أقراص خارجي، وإلا فقد تفقد البيانات.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>موقع قاعدة البيانات الحالية:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>موقع قاعدة البيانات الجديدة:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>تصفَّح...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>افتراضي</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>النقل عند المرة التالية لإعادة التشغيل‬</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="poster/window1.title">
+  <xmbtext>تنظیمات پوستر</xmbtext>
+ </stringres>
+ <stringres id="poster/label2.title">
+  <xmbtext>نکته: اگر نمی‌خواهید عکس خود را کوتاه کنید، آن را به اندازه کاغذ برش دهید.</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup3.title">
+  <xmbtext>اندازه پوستر:</xmbtext>
+ </stringres>
+ <stringres id="poster/item5.title">
+  <xmbtext>200%</xmbtext>
+ </stringres>
+ <stringres id="poster/item6.title">
+  <xmbtext>٪۳۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item7.title">
+  <xmbtext>٪۴۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item8.title">
+  <xmbtext>٪۵۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item9.title">
+  <xmbtext>٪۶۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item10.title">
+  <xmbtext>٪۷۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item11.title">
+  <xmbtext>٪۸۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item12.title">
+  <xmbtext>٪۹۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/item13.title">
+  <xmbtext>٪۱۰۰۰</xmbtext>
+ </stringres>
+ <stringres id="poster/labelgroup14.title">
+  <xmbtext>اندازه کاغذ:</xmbtext>
+ </stringres>
+ <stringres id="poster/overlap.title">
+  <xmbtext>همپوشانی کاشی‌ها</xmbtext>
+ </stringres>
+ <stringres id="poster/button18.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+ <stringres id="poster/button19.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

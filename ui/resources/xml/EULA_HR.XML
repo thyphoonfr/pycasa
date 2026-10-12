@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Prije korištenja usluge Picasa pročitajte licencne odredbe</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Korištenjem usluge Picasa prihvaćate Googleove uvjete pružanja usluge i pravila o privatnosti.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Uvjeti pružanja usluge</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Pravila o privatnosti</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Šalji Googleu anonimne statističke podatke o upotrebi (tu postavku možete poslije u svakom trenutku promijeniti)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Prihvaćam</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Odustani</xmbtext>
+ </stringres>
+</resources>

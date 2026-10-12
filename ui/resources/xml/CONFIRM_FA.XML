@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>پیام</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>دوباره سؤال نشود</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>بله</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>خیر</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

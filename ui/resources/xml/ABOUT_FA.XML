@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>‏درباره Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>همه نام‌های سرویس، محصول، برندها، یا علائم تجاری دیگر متعلق به صاحبان مربوطه آن‌ها است.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>‏این نرم‌افزار تاحدی مبتنی بر کار گروه JPEG مستقل است. این برنامه توسط ایالات متحده و قانون حق‌ نسخه‌برداری بین‌المللی محافظت می‌شود.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>مجوزهای شخص ثالث...</xmbtext>
+ </stringres>
+</resources>

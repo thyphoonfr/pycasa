@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Naloži na spletno mesto YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Naslov:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Opis:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Kategorija videoposnetka:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Nalaganje ...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Oznake:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>S temi ključnimi besedami bodo drugi preprosteje našli vaš videoposnetek. (ločene s presledkom)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Ta videoposnetek naj bo javen</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videoposnetek je omejen na 10 minut in 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Brez dovoljenja ne nalagajte televizijskih oddaj, glasbenih koncertov in reklam, razen v primeru, da so v celoti iz materiala, ki ste ga ustvarili sami. Strani z nasveti glede avtorskih pravic in smernice skupnosti vam pomagajo določiti, ali vaš videoposnetek krši avtorske pravice nekoga drugega.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Če kliknete »Naloži videoposnetek« potrjujete, da ta videoposnetek ne krši pogojev uporabe, ki veljajo za YouTube, in da ste lastnik avtorskih pravic za ta videoposnetek ali da ste pooblaščeni za njegovo nalaganje.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Naloži videoposnetek</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>YouTube にアップロード</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>タイトル:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>説明:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>動画のカテゴリ:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>読み込んでいます...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>タグ:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>動画の検索に役立つキーワード（スペース区切り）。</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>この動画を一般公開</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>動画の制限は 10 分、1 GB です</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>自分で作成したオリジナルコンテンツで権利を完全に所有しない限り、テレビ番組、ミュージック ビデオ、コンサート、CM を許可なくアップロードしないでください。著作権に関するヒントのページやコミュニティ ガイドラインは、動画が他者の著作権を侵害しているかどうかを判断するのに役立ちます。</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>[動画をアップロード] をクリックすると、この動画が YouTube の利用規約に違反していないこと、動画についてすべての著作権を所有しているか著作権所有者から明示的な許可を得てアップロードしていることを明示したことになります。</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>動画をアップロード</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Pindahkan basis data</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Anda perlu memulai ulang Picasa agar perubahan diterapkan.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Perhatikan: Anda sebaiknya membuat salinan cadangan basis data sebelum mencoba fitur eksperimental ini. JANGAN pindahkan basis data ke jaringan, drive yang dapat dilepas atau eksternal, atau datanya mungkin hilang.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Lokasi basis data saat ini:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Lokasi basis data baru:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Default</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Pindahkan saat mulai ulang berikutnya</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

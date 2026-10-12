@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>Експортувати як HTML-сторінку</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>Експорт зображень:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>Оригінальний розмір</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1024 пікселі (для великих моніторів)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 пікселів (для великих веб-сторінок)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 пікселів (для веб-сторінок)</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 пікселів (для електронної пошти)</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>Експортувати відео, використовуючи:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>Перший фрейм</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>Відео повністю</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>Заголовок веб-сторінки:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>Папка:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>Огляд...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>Щоб переглянути приклад, натисніть назву шаблону. Зробивши вибір, натисніть &quot;Експортувати&quot;.</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>Опис шаблону</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>Експорт</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

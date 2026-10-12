@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>حول بيكاسا</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>بيكاسا</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>تعتبر جميع المنتجات الأخرى أو أسماء الخدمات أو العلامات التجارية ملكية خاصة لمالكيها المعنيين.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>‏يعتمد هذا البرنامج جزئيًا على أعمال شركة Independent JPEG Group. ويتمتع هذا البرنامج بحماية قانون حقوق الطبع والنشر في الولايات المتحدة وجميع دول العالم. </xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>تراخيص جهات خارجية...</xmbtext>
+ </stringres>
+</resources>

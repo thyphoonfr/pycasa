@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Sulje</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Tervetuloa sarjan lataukseen</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Tarkista kansioiden ja albumeiden vieressä olevat kentät, joita haluat muokata. Valitse sitten mitä haluat tehdä. Picasa suodattaa ne kohteet, joihin toimintoa ei voi soveltaa. Jos esimerkiksi koko kansio tai albumi on jo verkossa, Picasa ei näytä sitä latausvaihtoehdoissa.</xmbtext>
+ </action>
+</tooltips>

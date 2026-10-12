@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>الرجاء مراجعة بنود الترخيص قبل استخدام بيكاسا</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>‏يعد استخدامك لبيكاسا بمثابة موافقة منك على بنود خدمة Google وسياسة الخصوصية المعمول بها لديها</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>بنود الخدمة</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/ar/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>سياسة الخصوصية</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/ar/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>‏إرسال إحصاءات استخدام إلى Google بدون الكشف عن الهوية (يمكنك متى شئت تغيير هذا الإعداد لاحقًا)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>أوافق</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>إلغاء</xmbtext>
+ </stringres>
+</resources>

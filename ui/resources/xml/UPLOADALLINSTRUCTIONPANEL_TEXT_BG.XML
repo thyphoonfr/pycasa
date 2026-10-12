@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Затваряне</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Добре дошли в груповото качване</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Поставете отметки в квадратчетата до папките и албумите, с които искате да работите. След това изберете какво искате да правите. Picasa ще филтрира елементите, върху които операцията не може да се приложи. Например, ако цяла папка или албум вече е онлайн, Picasa няма да покаже опция за качване.</xmbtext>
+ </action>
+</tooltips>

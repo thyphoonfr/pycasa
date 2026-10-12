@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Lue käyttöoikeussopimuksen ehdot ennen Picasan käytön aloittamista</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Käyttämällä Picasaa hyväksyt Googlen käyttöehdot ja tietosuojakäytännön.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Käyttöehdot</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/fi/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Tietosuojakäytäntö</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/fi/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Lähetä nimettömiä käyttötilastoja Googlelle (Voit myöhemmin muuttaa tätä asetusta.)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Hyväksyn</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

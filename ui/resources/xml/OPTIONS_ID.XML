@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Preferensi</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Opsi</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Umum</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Antarmuka pengguna:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Gunakan efek khusus</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Tampilkan deskripsi alat</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Tampilkan tag bantuan</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Klik sekali untuk keluar dari Tampilan Edit</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>File:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Deteksi duplikat saat mengimpor</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Bersihkan file cache</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Hapus dari disk tanpa mengonfirmasikan</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Hapus dari album tanpa mengonfirmasikan</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Bantu menyempurnakan Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Kirim statistik penggunaan anonim ke Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Privasi...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Pembaruan otomatis:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Perbarui otomatis</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Tanyakan sebelum mengunduh pembaruan</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Jangan periksa pembaruan</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Bahasa:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Default Sistem (Ing-AS)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Saat kamera tersambung, luncurkan:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>tidak ada aplikasi</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Pilih aplikasi di dalam ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Simpan foto hasil impor di:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>Email</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Program email:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Biarkan saya memilih setiap kali mengirim foto</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Gunakan program email standar komputer saya</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Gunakan akun Google saya</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Ukuran untuk banyak foto:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 piksel</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s piksel</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Ukuran untuk foto tunggal:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Sama dengan banyak (1024 piksel)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Sama dengan banyak (%s piksel)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Ukuran asli</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Kirim film sebagai:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Bingkai pertama</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Film utuh</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Format keluaran:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Kirim foto dan teks inline (hanya Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Jenis File</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Tampilkan file JPEG dan:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Format RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Format yang Didukung</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=id&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Film (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Film Quicktime (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Format RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Format yang Didukung</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=id&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Film (.mov, .mpg, .m4v, .3gp, .avi, ...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Rangkai Slide</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Ulangi pemutaran rangkai slide</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Mainkan musik selama pemutaran rangkai slide</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Pilih folder trek musik:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Jelajahi...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Pencetakan</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Ukuran cetak tersedia:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Pratinjau:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Gunakan pratinjau bermutu tinggi (lebih lambat)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Mutu printer:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Kompatibel (resolusi setengah)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Mutu Tinggi (resolusi penuh)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Mutu sampel ulang cetak:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Umum (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Ekstra tajam (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Jaringan</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Nama pengguna proksi:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Sandi proksi:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Mendeteksi otomatis setelan jaringan</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Tingkat log jaringan:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Nonaktifkan Log</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Catat log kesalahan saja</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Informasi log minimum</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Informasi log mendetail</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Catat log semua informasi jaringan</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Log:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Album Web</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Ukuran unggahan default:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Saat menyinkronkan file besar, unggah pratinjau terlebih dahulu</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(disarankan)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>Mutu JPEG:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Jaga mutu gambar asli (membutuhkan memori lebih besar)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Menyinkronkan:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Sinkronkan hanya foto yang berbintang</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Jangan konfirmasi saya untuk setiap sinkronisasi (gunakan setelan di atas)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Tag Nama:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Sertakan dengan unggahan foto</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Tanda air:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Tambahkan tanda air untuk semua unggahan foto.</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Bubuhi foto dengan nama, domain web, atau pemberitahuan hak cipta.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Tag Nama</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Aktifkan deteksi wajah</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Aktifkan Saran:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Ambang saran:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Ambang gugus:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Simpan tag nama pada foto</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Unggah gambar mini dari album ke Google Kontak</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>Oke</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Pridať meno</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Vybrať priečinok na zobrazenie tvárí</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorovať</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Pridať osobu manuálne</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Zrušiť</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Počas toho, ako Picasa skenuje vaše fotky, tváre, ktoré nájde, sa automaticky zoskupujú a uľahčuje sa tak ich pomenovanie.\n\nČo treba vedieť:\n\nAk chcete identifikovať osobu, kliknite na položku &#039;Pridať meno&#039;, napíšte meno osoby a stlačte kláves Enter. Zakaždým, keď niekoho pomenujete po prvýkrát, vytvorí sa nový album v rámci položky Ľudia.\n\n(TIP: Prihláste sa so svojím účtom Google a získajte prístup k všetkým svojím kontaktom počas zadávania mien.)\n\nAk chcete nejakú osobu ignorovať, kliknite na tlačidlo &#039;X&#039; na miniatúre tváre.\n\nNávrhy: Keď niekoho pomenujete, Picasa vám môže navrhnúť ďalšie tváre zodpovedajúce danej osobe. Kliknutím na album osoby môžete zobraziť a potvrdiť (alebo odmietnuť) akékoľvek návrhy.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Počas toho, ako Picasa skenuje vaše fotky, tváre, ktoré nájde, sa automaticky zoskupujú a uľahčuje sa tak ich pomenovanie.\n\nČo treba vedieť:\n\nAk chcete identifikovať osobu, kliknite na položku &#039;Pridať meno&#039;, napíšte meno osoby a stlačte kláves Enter. Zakaždým, keď niekoho pomenujete po prvýkrát, vytvorí sa nový album v rámci položky Ľudia.\n\n(TIP: Prihláste sa so svojím účtom Google a získajte prístup k všetkým svojím kontaktom počas zadávania mien.)\n\nAk chcete nejakú osobu ignorovať, kliknite na tlačidlo &#039;X&#039; na miniatúre tváre.\n\nNávrhy: Keď niekoho pomenujete, Picasa vám môže navrhnúť ďalšie tváre zodpovedajúce danej osobe. Kliknutím na album osoby môžete zobraziť a potvrdiť (alebo odmietnuť) akékoľvek návrhy.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Zatiaľ sa nenašli žiadne osoby. Keď sa nejaké tváre nájdu a zoskupia, zobrazia sa v albume nepomenovaných osôb. Počas prehľadávania sa pri položke albumu nepomenovaných osôb zobrazia informácie o priebehu.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Tu budú uvedené pomenované osoby, ktoré sa nachádzajú na fotografiách s vybratou osobou.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Tu budú uvedené osoby, ktoré sa nachádzajú na aktuálne vybratých fotografiách.</xmbtext>
+ </action>
+</tooltips>

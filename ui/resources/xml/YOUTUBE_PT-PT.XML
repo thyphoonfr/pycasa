@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Carregar para o YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Título:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descrição:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoria de vídeo:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>A carregar...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Etiquetas:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Estas palavras-chave são utilizadas para ajudar as outras pessoas a encontrar o seu vídeo. (separadas por espaços)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Tornar este vídeo público</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>O seu vídeo está limitado a 10 minutos e 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Não carregue programas de TV, vídeos de música, concertos ou anúncios sem autorização, a menos que o conteúdo tenha sido totalmente criado por si. A página Conselhos sobre direitos de autor e as Regras da comunidade poderão ajudá-lo a determinar se o seu vídeo viola os direitos de autor de terceiros.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Ao clicar em &quot;Carregar vídeo&quot;, está a declarar que este vídeo não viola os Termos de Utilização do YouTube e que detém todos os direitos de autor do mesmo ou tem autorização para o carregar.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Carregar vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Cancelar</xmbtext>
+ </stringres>
+</resources>

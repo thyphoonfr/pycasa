@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Vie kansioon</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Vientikohde:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Selaa…</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Kohdekansion nimi:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Säilytä järjestys lisäämällä tiedostonimiin numerot</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Kuvan koko:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Käytä alkuperäistä kokoa</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Muuta kokoon:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>kuvapistettä</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Kuvanlaatu:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Automaattinen</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Normaali</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Enintään</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Vähintään</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Muokattu</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Säilyttää kuvan alkuperäislaadun</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Hyvä koko/laatusuhde</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Erittäin suuri tiedostokoko, yksityiskohdat säilyvät</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Pienin tiedostokoko, laatu heikkenee hieman</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Vie elokuvat käyttämällä:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Ensimmäinen kehys</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Koko elokuva (ei koon muuntamista)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vesileima:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Lisää vesileima</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Leimaa kuviin nimesi, verkkotunnus tai tekijänoikeustiedot.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Vie</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Peruuta</xmbtext>
+ </stringres>
+</resources>

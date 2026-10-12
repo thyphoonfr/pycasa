@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>ชื่อ:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>วันที่:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>วันที่อัตโนมัติ</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>ดนตรี:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>ใช้เพลงสำหรับการนำเสนอสไลด์โชว์และภาพยนตร์:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>เรียกดู...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>สถานที่ถ่าย (ตัวเลือก):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>คำอธิบาย (เลือกได้):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>ตกลง</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

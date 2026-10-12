@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>เกี่ยวกับ Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>ผลิตภัณฑ์ ชื่อบริการ ตราสินค้า หรือเครื่องหมายการค้าอื่นๆ ทั้งหมดเป็นกรรมสิทธิ์ของผู้ที่เป็นเจ้าของ</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>ซอฟต์แวร์นี้มีบางส่วนที่อ้างอิงผลงานของ Independent JPEG Group โปรแกรมนี้ได้รับความคุ้มครองตามกฎหมายลิขสิทธิ์ของสหรัฐอเมริกาและกฎหมายระหว่างประเทศ</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>สัญญาอนุญาตของบุคคลที่สาม...</xmbtext>
+ </stringres>
+</resources>

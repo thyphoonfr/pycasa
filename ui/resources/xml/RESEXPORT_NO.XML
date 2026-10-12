@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Win32Res>
+ <RT_DIALOG>
+  <res resid="#145">
+   <dtitle>
+    <xmbtext>Om Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 435 293)</dlayout>
+   <item itemid="1056" itemtype="Static" layout="rect(0 0 20 20)"/>
+   <item itemid="-1" itemtype="Static" layout="rect(9 171 427 258)">
+    <xmbtext>Inserted from IDS_ABOUT in stringtable</xmbtext>
+   </item>
+   <item itemid="-2" itemtype="Static" layout="rect(9 260 109 268)">
+    <xmbtext>Tredjepartslisenser</xmbtext>
+   </item>
+   <item itemid="1" itemtype="Button" layout="rect(193 272 243 286)">
+    <xmbtext>OK</xmbtext>
+   </item>
+   <item itemid="1086" itemtype="Edit" layout="rect(6 7 429 227)"/>
+  </res>
+  <res resid="#198">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 95)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 74 179 88)">
+    <xmbtext>Avbryt</xmbtext>
+   </item>
+   <item itemid="1164" itemtype="Static" layout="rect(31 7 179 49)">
+    <xmbtext>Picasa komprimerer databasen for å spare diskplass. Dette kan ta noen minutter.</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(31 45 179 62)"/>
+  </res>
+  <res resid="#211">
+   <dtitle>
+    <xmbtext>Picasa</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 186 71)</dlayout>
+   <item itemid="2" itemtype="Button" layout="rect(129 50 179 64)">
+    <xmbtext>Avbryt</xmbtext>
+   </item>
+   <item itemid="1163" itemtype="Static" layout="rect(31 7 179 32)">
+    <xmbtext>Replikere</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 27 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+   <item itemid="1074" itemtype="Static" layout="rect(14 42 123 58)">
+    <xmbtext>Oppdaterer ...</xmbtext>
+   </item>
+  </res>
+  <res resid="#323">
+   <dtitle>
+    <xmbtext>Bruksstatistikk</xmbtext>
+   </dtitle>
+   <dlayout>rect(0 0 276 116)</dlayout>
+   <item itemid="1" itemtype="Button" layout="rect(7 88 161 102)">
+    <xmbtext>Ja, send statistikk</xmbtext>
+   </item>
+   <item itemid="2" itemtype="Button" layout="rect(170 88 269 102)">
+    <xmbtext>Nei takk</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(30 34 269 62)">
+    <xmbtext>Vil du bidra til å gjøre Picasa enda bedre ved å sende anonym bruksstatistikk til Google automatisk?</xmbtext>
+   </item>
+   <item itemid="1316" itemtype="Static" layout="rect(163 69 269 77)">
+    <xmbtext>Personvern</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(37 13 193 21)">
+    <xmbtext>Hjelp oss med å forbedre Picasa</xmbtext>
+   </item>
+   <item itemid="-1" itemtype="Static" layout="rect(7 7 28 27)">
+    <xmbtext>id=105</xmbtext>
+   </item>
+  </res>
+ </RT_DIALOG>
+</Win32Res>

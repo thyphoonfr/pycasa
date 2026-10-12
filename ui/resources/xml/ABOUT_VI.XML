@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Giới thiệu về Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>Tất cả các tên dịch vụ, sản phẩm, nhãn hiệu,hoặc thương hiệu khác đều là tài sản của các chủ sở hữu tương ứng của chúng.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>Phần mềm này dựa một phần vào sản phẩm của Nhóm Independent JPEG. Chương trình này được luật bản quyền quốc tế và Hoa Kỳ bảo vệ.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>Giấy phép bên thứ ba...</xmbtext>
+ </stringres>
+</resources>

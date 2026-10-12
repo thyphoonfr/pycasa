@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>‏یک نسخه قدیمی از Picasa نصب است. آیا می‌خواهید عکسخانه موجود خود را به‌روزرسانی کنید یا رایانهٔ خود را  برای عکس‌ها دوباره جستجو کنید؟</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>لطفاً از گزینه‌های زیر انتخاب کنید:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>به‌روزرسانی عکسخانه کنونی من</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>‏در صورتی که از کلمات کلیدی یا آلبوم‌های سفارشی در Picasa ۱ استفاده می‌کنید و می‌خواهید این موارد در Picasa ۳ بدون تغییر باقی بمانند، این گزینه را انتخاب کنید.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>جستجوی مجدد رایانه من برای عکس‌ها</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>برای یک جستجوی کاملتر در رایانه این گزینه را انتخاب کنید که شامل اطلاعات عکس پیشرفته می‌شود. این گزینه ویرایش‌های فعلی سازمان شما را حفظ می‌کند اما کلمات کلیدی را حفظ نمی‌کند. این جستجو ممکن است چند دقیقه طول بکشد.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>‏جستجوی تصاویر هرگز باعث انتقال یا تهیه رونوشت از فایل‌ها در مکان‌های جدید نمی‌شود. می‌توانید انتخاب کنید کدام پوشه‌ها توسط Picasa و با استفاده از ابزار مدیر پوشه (موجود در منوی ابزار) نمایش داده شود</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>ادامه</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>‏Picasa آماده جستجو برای عکس‌های موجود در رایانه شماست</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>لطفاً از گزینه‌های زیر انتخاب کنید:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>جستجوی کل رایانه من برای عکس‌ها</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>اگر عکس‌های شما در پوشه‌های مختلف در ر ایانه ذخیره شده است، به خصوص  اگر عکس‌های شما در بیش از یک درایو ذخیره شده است، این گزینه را انتخاب کنید..</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>‏فقط جستجوی اسناد، عکس‌ها، دسک‌تاپ و عکسخانه iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>در صورتی که عکس‌های خود را فقط در این پوشه‌ها ذخیره می‌کنید، این گزینه را انتخاب کنید.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>‏جستجوی تصاویر هرگز باعث انتقال یا تهیه رونوشت از فایل‌ها در مکان‌های جدید نمی‌شود. می‌توانید انتخاب کنید کدام پوشه‌ها توسط Picasa و با استفاده از ابزار مدیر پوشه (موجود در منوی ابزار) نمایش داده شود</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>ادامه</xmbtext>
+ </action>
+</tooltips>

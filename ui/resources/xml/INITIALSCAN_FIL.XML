@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Mayroong mas lumang bersyon ng Picasa na naka-install.  Gusto mo bang i-update ang iyong umiiral na library ng larawan o hanapan muli ang iyong computer ng mga larawan?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Pakipili mula sa mga sumusunod na opsyon:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>I-update ang aking umiiral nang picture library</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Piliin ang pagpipiliang ito kung ginamit mo ang mga keyword o custom na mga album sa Picasa 1, at gusto mong mapanatili ito sa Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Hanapan muli ang aking computer para sa mga larawan</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Piliin ang opsyon na ito para sa isang mas kumpletong paghahanap sa iyong computer, na may kabilang na pinalawak na impormasyon ng larawan.  Pananatilihin nito ang iyong mga umiiral na mga edit at pagsasaayos, ngunit hindi nito mapapanatili ang mga keyword.  Maaaring tumagal ang paghahanap na ito nang ilang minuto.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Ang paghahanap ng mga larawan ay hindi gumagalaw o kumukopya ng mga file sa mga bagong lokasyon. Maaari kang pumili kung aling mga folder ang ipapakita ng Picasa sa pamamagitan ng paggamit ng Tagapamahala ng Folder na tool (magagamit mula sa Mga Tool na menu)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Ipagpatuloy</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Handa na ang Picasa para hanapin ang mga larawan sa iyong computer</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Pakipili mula sa mga sumusunod na opsyon:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Hanapan ang buong computer ko ng mga larawan</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Piliin ito kapag may mga larawan kang naka-imbak sa iba’t-ibang mga folder sa iyong computer, lalo na kapag may mga larawan kang naka-imbak sa higit sa iisang hard drive.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Hanapan ang Mga Dokumento, Mga Larawan, ang Desktop, at ang iPhoto Library lamang</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Piliin ang opsyong ito kapag nag-i-imbak ka lang ng iyong mga larawan sa mga folder na ito.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Ang paghahanap sa mga larawan ay hindi naglilipat o kumukopya sa mga file sa bagong mga lokasyon. Maaari mong piliin kung aling mga folder ang ipapakita sa Picasa sa pamamagitan ng paggamit ng Folder Manager tool (magagamit mula sa Mga Tool menu)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Ipagpatuloy</xmbtext>
+ </action>
+</tooltips>

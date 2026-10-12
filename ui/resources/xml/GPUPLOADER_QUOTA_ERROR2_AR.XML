@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>‏نفد تخزين Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>يمكنك الحصول على المزيد من مساحة التخزين حتى يتسنى لك الاستمرار في الاحتفاظ بنسخة احتياطية من صورك الأصلية بالدقة الكاملة. أو يمكنك التبديل إلى الجودة العالية لمساحة التخزين المجانية غير المحدودة: جودة مرئية رائعة بحجم ملف أقل.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>الحصول على مساعدة في اتخاذ القرار</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>الحصول على المزيد من السعة التخزينية</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>التبديل إلى الجودة العالية</xmbtext>
+ </stringres>
+</resources>

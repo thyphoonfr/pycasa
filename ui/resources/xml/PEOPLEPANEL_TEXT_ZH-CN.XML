@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>添加姓名</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>选择要显示头像的文件夹</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>忽略</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>手动添加联系人</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>取消</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Picasa 在扫描照片时，会对找到的脸部图像自动进行分组以便于命名。\n\n注意事项：\n\n要标识某人，请点击“添加姓名”，然后输入此人的姓名并按 Enter。每当您第一次为某人命名时，系统都会创建一个新的人物相册。\n\n（提示：命名时，使用 Google 帐户登录即可获取对您所有联系人的访问权限）。\n\n要忽略某人，请点击脸部缩略图上的“X”按钮。建议：在您命名某人之后，Picasa 可能会建议更多与此人相匹配的脸部图像。点击此人的相册即可查看和确认（或拒绝）所有建议。</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Picasa 在扫描照片时，会对找到的脸部图像自动进行分组以便于命名。\n\n注意事项：\n\n要标识某人，请点击“添加姓名”，然后输入此人的姓名并按 Enter。每当您第一次为某人命名时，系统都会创建一个新的人物相册。\n\n（提示：命名时，使用 Google 帐户登录即可获取对您所有联系人的访问权限）。\n\n要忽略某人，请点击脸部缩略图上的“X”按钮。建议：在您命名某人之后，Picasa 可能会建议更多与此人相匹配的脸部图像。点击此人的相册即可查看和确认（或拒绝）所有建议。</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>尚未找到任何人。找到头像并分组后，这些人会显示在未命名相册中。扫描时，未命名相册的项中会显示进度信息。</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>与当前选定人物一同出现的已命名人物会在此处列出。</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>当前选定的照片中出现的人物会在此处列出。</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>データベースを移動</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>変更を有効にするには、Picasa を再起動する必要があります。</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>注意: この試験的機能をお試しいただく前に、データベースをバックアップしてください。データベースはネットワーク ドライブやリムーバブル ドライブ、外部ドライブに移動しないでください。移動するとデータが失われることがあります。</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>データベースの現在の場所:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>データベースの新しい場所:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>参照...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>デフォルト</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>次回の再起動時に移動する</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

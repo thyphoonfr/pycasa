@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google Fotoğraflar Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Google Drive depolama alanında yer yok</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Orijinal fotoğraflarınızı tam çözünürlükte yedeklemeye devam etmek için daha fazla depolama alanı alın. Dilerseniz, ücretsiz sınırsız depolama alanı için, azaltılmış dosya boyutunda harika görsel kalite sunan yüksek kalitede depolamaya da geçiş yapabilirsiniz.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Karar vermenize yardımcı olalım</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Daha fazla depolama alanı alın</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Yüksek kalitede depolamaya geçiş yapın</xmbtext>
+ </stringres>
+</resources>

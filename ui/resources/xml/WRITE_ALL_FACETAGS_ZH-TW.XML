@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>寫入臉孔標記</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>寫入臉孔或所有圖片可能需要一段時間才能完成。如果記錄功能設為詳細以上層級，network.log 將會包含唯讀檔案相關訊息 (這些檔案無法更新)。建議您在登出狀態下使用這項功能。</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>寫入所選圖片</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>寫入臉孔</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>寫入所有圖片</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

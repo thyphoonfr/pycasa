@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>‏גיבוי של אלבומי Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>‏גיבוי אלבומי Google גרסה %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>‏זכויות יוצרים 2015, Google Inc. כל הזכויות שמורות.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>‏תוכנה זו מבוססת בחלקה על העבודה של Independent JPEG Group. תכנית זו מוגנת על ידי חוקי זכויות היוצרים של ארצות הברית ועל ידי חוקי זכויות יוצרים בינלאומיים.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>אישור</xmbtext>
+ </stringres>
+</resources>

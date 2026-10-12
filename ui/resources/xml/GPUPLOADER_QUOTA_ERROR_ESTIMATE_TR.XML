@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Otomatik Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Depolama alanı bitti</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Kalan Google Drive depolama alanı miktarınızdan daha fazla alan gerektiren klasörler seçtiniz. Daha fazla depolama alanı satın alabilir veya sınırsız sayıda fotoğrafı ve videoyu standart boyutta ücretsiz olarak yedekleyebilirsiniz.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Depolama alanını yeni satın aldıysanız değişikliklerin geçerli olması birkaç dakika sürebilir.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Daha fazla depolama alanı alın...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Standart boyuta geç</xmbtext>
+ </stringres>
+</resources>

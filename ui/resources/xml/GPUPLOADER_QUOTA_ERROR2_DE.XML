@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error2/quota_error2.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_label.title">
+  <xmbtext>Ihr Speicherplatz auf Google Drive ist aufgebraucht.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/error_text.title">
+  <xmbtext>Erwerben Sie zusätzlichen Speicherplatz, um Ihre Originalfotos weiterhin in voller Auflösung zu sichern. Sie können auch zur Option &quot;Hohe Qualität&quot; wechseln und dann kostenlosen unbegrenzten Speicherplatz nutzen. Mit dieser Auswahl erhalten Sie hervorragende Bildqualität bei verringerter Dateigröße.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.title">
+  <xmbtext>Hilfe bei der Entscheidung</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/add_more_storage.title">
+  <xmbtext>Mehr Speicherplatz erwerben</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error2/accept.title">
+  <xmbtext>Zu hoher Qualität wechseln</xmbtext>
+ </stringres>
+</resources>

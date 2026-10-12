@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Auto Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Penyimpanan habis</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Anda telah memilih folder dengan ukuran lebih besar dari sisa ruang penyimpanan di Google Drive. Anda dapat membeli lebih banyak ruang penyimpanan atau mencadangkan foto dan video tanpa batas dengan ukuran standar secara gratis.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Jika Anda hanya membeli penyimpanan, mungkin butuh waktu beberapa menit sampai perubahan diterapkan.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Dapatkan lebih banyak penyimpanan...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Alihkan ke ukuran standar</xmbtext>
+ </stringres>
+</resources>

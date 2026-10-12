@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>Ime:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>Datum:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>Samodejni datum</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>Glasba:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>Uporabi glasbo za diaprojekcijo in prikaz filma:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>Prebrskaj ...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>Kraj posnetka (izbirno):</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>Opis (izbirno):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>V redu</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

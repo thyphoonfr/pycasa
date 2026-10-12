@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Pode utilizar Etiquetas rápidas para aplicar uma etiqueta com um único clique. Escreva abaixo as etiquetas às quais pretende ter acesso com um só clique. Por predefinição, as primeiras duas etiquetas rápidas são utilizadas para localizar etiquetas aplicadas recentemente. Anule a selecção da caixa de verificação abaixo para definir manualmente as primeiras duas etiquetas.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Preencher automaticamente as caixas vazias em cima com etiquetas utilizadas habitualmente</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Reservar os dois botões superiores para etiquetas utilizadas recentemente</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+</tooltips>

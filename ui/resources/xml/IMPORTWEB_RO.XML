@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importaţi albume din Picasa Web Albums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Imaginile din albumele web selectate mai jos vor fi descărcate pe computerul dvs. după ce veţi face clic pe butonul OK. Acestea vor fi organizate automat în dosare în funcţie de numele albumelor.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Aveţi 100 de albume web online.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importaţi toate albumele</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importaţi albumele selectate:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nume</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOTĂ: vor fi descărcate numai imaginile care nu se află deja pe computerul dvs.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Anulați</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>Инсталирана је старија верзија Picasa-е. Да ли желите да ажурирате постојећу библиотеку слика или да поново потражите слике на рачунару?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>Изаберите једну од следећих опција:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>Измени моју постојећу библиотеку слика</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Изаберите ову опцију уколико користите кључне речи или прилагодљиве албуме у Picasa–и 1, а желите да их сачувате у Picasa-и 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>Поново потражи слике на рачунару</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>Одаберите ову опцију за комплетнију претрагу рачунара, која обухвата и проширене информације о слици. Она ће сачувати постојеће измене и организацију, али неће сачувати кључне речи. Ова претрага може да потраје неколико минута.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>Тражење слика никада не премешта нити копира датотеке на нове локације. Можете одабрати директоријуме које Picasa приказује помоћу алатке Управљач директоријумима (доступна је из менија Алатке)</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>Настави</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>Picasa је спремна да потражи слике на рачунару</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>Изаберите једну од следећих опција:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>Потражи слике на целом рачунару</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>Изаберите ову опцију ако имате сачуване слике у разним директоријумима на рачунару, посебно ако су слике сачуване на више хард-дискова.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>Претражи само Документе, Слике, Радну површину и iPhoto библиотеку</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>Одаберите ову опцију само ако чувате слике у овим директоријумима.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>Тражење слика никада не премешта нити копира датотеке на нове локације. Можете да одаберете директоријуме који су приказани у Picasa-и користећи алатку Управљач директоријумима (доступна је из менија Алатке)</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>Настави</xmbtext>
+ </action>
+</tooltips>

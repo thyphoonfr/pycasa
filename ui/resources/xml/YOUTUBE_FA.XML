@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>‏آپلود در YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>عنوان:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>توضیح:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>دسته ویدئو:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>در حال بارگیری...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>نشان‌ها:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>این‌ها کلمات کلیدی هستند که برای کمک به افراد در جهت یافتن ویدئو استفاده می‌شود (با فاصله از یکدیگر جدا شدند)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>این ویدئو عمومی شود</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>ویدیوی شما محدود به ۱۰ دقیقه و ۱ گیگابایت است</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>از آپلود کردن هر گونه نمایش تلویزیونی، نماهنگ، کنسرت‌های موسیقی یا تبلیغات بدون مجوز بپرهیزید، مگر اینکه این موارد از محتوایی تشکیل شده باشند که کاملاً به شما متعلق باشد. صفحه نکات حق نسخه‌برداری و دستورالعمل‌های انجمن به شما در تعیین اینکه آیا ویدئو شما حق نسخه‌برداری فرد دیگری را نقض می‌کند یا خیر، کمک می‌کند.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>‏با کلیک کردن روی &quot;آپلود ویدئو&quot;، نشان می‌دهید که این ویدئو شرایط استفاده YouTube را نقض نمی‌کند و همه حقوق نسخه‌برداری موجود در این ویدئو متعلق به شما است و مجوز آپلود آنرا در دست دارید.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>آپلود کردن ویدئو</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

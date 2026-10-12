@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Backup automat Google+</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Ați epuizat spațiul de stocare</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Ați selectat dosare care ocupă mai mult spațiu decât spațiul disponibil în Google Drive. Puteți să cumpărați mai mult spațiu de stocare sau să faceți backup nelimitat pentru fotografii și videoclipuri la dimensiune standard în mod gratuit.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Dacă tocmai ați achiziționat spațiu de stocare, este posibil ca aplicarea modificărilor să dureze câteva minute.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Cumpărați mai mult spațiu de stocare...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Comutați la dimensiunea standard</xmbtext>
+ </stringres>
+</resources>

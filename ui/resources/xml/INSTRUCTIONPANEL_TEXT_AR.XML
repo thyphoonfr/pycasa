@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>إغلاق</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>مزيد من المعلومات...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>مرحبًا بك في ألبوم الأشخاص &quot;بدون اسم&quot;! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>‏بينما يعمل بيكاسا على مسح صورك ضوئيًا، يتم تلقائيًا تجميع الوجوه التي يعثر عليها وذلك لسهولة التسمية.\n\nأمور يجب معرفتها:\n\nnلتعريف شخص، انقر على &#039;إضافة اسم&#039;ثم اكتب اسم الشخص واضغط على Enter.  وسيتم إنشاء ألبوم أشخاص جديد في كل مرة تسمي فيها شخصًا جديدًا للمرة الأولى.\n\n(نصيحة: سجل الدخول باستخدام حساب Google لإمكانية الدخول إلى جميع جهات اتصال حسابك في Google أثناء التسمية.)\n\nلتجاهل شخص، انقر على زر &#039;X&#039; على صورة الوجه المصغرة.\n\nالاقتراحات: بعد تسمية شخص، قد يقترح بيكاسا وجوهًا إضافية مطابقة لهذا الشخص. انقر على ألبوم الشخص لعرض أية اقتراحات وتأكيدها (أو رفضها).\n\n\n انقر على &#039;مزيد من المعلومات&#039; للاطلاع على معلومات عن هذه الميزة.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>‏بينما يعمل بيكاسا على مسح صورك ضوئيًا، يتم تلقائيًا تجميع الوجوه التي يعثر عليها وذلك لسهولة التسمية.\n\nأمور يجب معرفتها:\n\nnلتعريف شخص، انقر على &#039;إضافة اسم&#039;ثم اكتب اسم الشخص واضغط على Enter.  وسيتم إنشاء ألبوم أشخاص جديد في كل مرة تسمي فيها شخصًا جديدًا للمرة الأولى.\n\n(نصيحة: سجل الدخول باستخدام حساب Google لإمكانية الدخول إلى جميع جهات اتصال حسابك في Google أثناء التسمية.)\n\nلتجاهل شخص، انقر على زر &#039;X&#039; على صورة الوجه المصغرة.\n\nالاقتراحات: بعد تسمية شخص، قد يقترح بيكاسا وجوهًا إضافية مطابقة لهذا الشخص. انقر على ألبوم الشخص لعرض أية اقتراحات وتأكيدها (أو رفضها).\n\n\n انقر على &#039;مزيد من المعلومات&#039; للاطلاع على معلومات عن هذه الميزة.</xmbtext>
+ </action>
+</tooltips>

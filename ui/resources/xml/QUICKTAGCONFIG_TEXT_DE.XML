@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Sie können Schnell-Tags verwenden, um ein Tag mit nur einem Klick anzuwenden. Geben Sie Tags, auf die Sie mit nur einem Klick Zugriff haben möchten, unten ein. Standardmäßig werden die beiden obersten Schnell-Tags verwendet, um kürzlich angewendete Tags nachzuverfolgen. Deaktivieren Sie das Kontrollkästchen im Anschluss, um die beiden obersten Tags manuell festzulegen.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Leere Felder oben automatisch mit häufig verwendeten Tags auffüllen</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Die beiden obersten Schaltflächen für kürzlich verwendete Tags reservieren</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Abbrechen</xmbtext>
+ </action>
+</tooltips>

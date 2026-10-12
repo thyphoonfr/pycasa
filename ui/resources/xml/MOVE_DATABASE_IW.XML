@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>הזז מסד נתונים</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>‏יהיה עליך להפעיל מחדש את Picasa כדי שהשינויים ייכנסו לתוקף.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>שים לב: כדאי שתגבה את מסד הנתונים שלך לפני שתנסה תכונה ניסיונית זו. לעולם על תזיז את מסד הנתונים, לכונן רשת, כונן נשלף או כונן חיצוני, כדי למנוע סכנת אובדן נתונים.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>המיקום הנוכחי של מסד הנתונים:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>המיקום החדש של מסד הנתונים:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>גלוש...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>ברירת מחדל</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>הזז באתחול הבא</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>ביטול</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>‏גיבוי של אלבומי Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>‏נותר שטח אחסון של 1 GB ב-Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>קבל שטח אחסון נוסף כדי להמשיך לגבות את התמונות המקוריות שלך ברזולוציה מלאה. או עבור לאיכות גבוהה לאחסון חינם ללא הגבלה: איכות חזותית מעולה בקבצים קטנים יותר.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>קבל עזרה בהחלטה</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>קבל שטח אחסון נוסף</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>עבור לאיכות גבוהה</xmbtext>
+ </stringres>
+</resources>

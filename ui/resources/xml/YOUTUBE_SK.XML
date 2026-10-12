@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Nahrať na lokalitu YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Názov:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Popis:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Kategória videa:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Načítava sa...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Značky:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Toto sú kľúčové slová, pomocou ktorých môžu používatelia vyhľadať vaše video (oddelené medzerou).</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Zverejniť toto video</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Video je obmedzené na 10 minút a 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Bez povolenia neodovzdávajte žiadne telvízne programy, hudobné ani komerčné videá. To môžete len v prípade, že videá obsahujú iba vami vytvorený obsah. Stránka  Copyright Tips (Tipy o autorskom práve) a Community Guidelines (Smernice komunity) vám pomôžu určiť, či vaše video môže porušiť autoské práva niekoho iného.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Kliknutím na položku „Nahrať video“ vyhlasujete, že toto video neporušuje Zmluvné podmienky služby YouTube a že ste vlastníkom všetkých autorských práv vzťahujúcich sa na toto video alebo máte autorizáciu na jeho nahranie.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Nahrať video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

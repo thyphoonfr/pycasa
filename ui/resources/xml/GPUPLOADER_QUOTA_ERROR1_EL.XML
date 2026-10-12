@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error1/quota_error1.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_label.title">
+  <xmbtext>Απομένει 1 GB αποθηκευτικού χώρου Google Drive</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/error_text.title">
+  <xmbtext>Αποκτήστε περισσότερο αποθηκευτικό χώρο για να συνεχίσετε να δημιουργείτε αντίγραφα ασφαλείας των αρχικών φωτογραφιών σας σε πλήρη ανάλυση. Εναλλακτικά, κάντε εναλλαγή σε υψηλή ποιότητα για απεριόριστο δωρεάν αποθηκευτικό χώρο: υψηλή οπτική ποιότητα σε μικρότερο μέγεθος αρχείου.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.title">
+  <xmbtext>Λάβετε βοήθεια για να αποφασίσετε</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/help_decide_link.url">
+  <xmbtext>https://support.google.com/photos/?p=storage</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/add_more_storage.title">
+  <xmbtext>Λήψη περισσότερου αποθηκευτικού χώρου</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error1/accept.title">
+  <xmbtext>Αλλαγή σε υψηλή ποιότητα</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>‏التحميل التلقائي في +Google</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>نفدت السعة التخزينية</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>‏لقد حددت مجلدات تزيد مساحتها عن السعة التخزينية المتبقية في Google Drive. ويُمكنك إما شراء المزيد من السعة التخزينية، أو إجراء نسخ احتياطي بلا حدود للصور ومقاطع الفيديو بالحجم القياسي مجانًا.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>إذا كنت قد اشتريت سعة تخزينية للتو، فقد يستغرق دخول التغييرات حيز التنفيذ بضع دقائق.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>الحصول على مزيد من السعة التخزينية...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>التبديل إلى الحجم القياسي</xmbtext>
+ </stringres>
+</resources>

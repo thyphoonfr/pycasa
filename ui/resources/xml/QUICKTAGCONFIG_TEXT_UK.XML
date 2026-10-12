@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>Щоб додати тег одним кліком, використовуйте швидкі теги. Нижче введіть теги, до яких хочете мати доступ одним кліком. За умовчанням два верхні швидкі теги зарезервовані під два останні застосовані теги. Зніміть прапорець нижче, щоб ввести два верхні теги вручну.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>Автоматично заповнити пусті поля вище тегами, що використовуються звичайно</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>Зарезервувати 2 верхні кнопки для нещодавно використаних тегів</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>OK</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>Скасувати</xmbtext>
+ </action>
+</tooltips>

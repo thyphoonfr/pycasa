@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Close</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Learn more...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Welcome to the Unnamed people album! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>As Picasa scans your photos, the faces that it finds are automatically grouped for easy naming.\n\nThings to know:\n\nTo identify a person, click &#039;Add a name&#039;, then type in the person&#039;s name and press Enter. A new People album will be created each time you name someone for the first time.\n\n(TIP: Sign in with your Google Account to gain access to all your Google Account contacts while naming.)\n\nTo ignore a person, click the &#039;X&#039; button on the face thumbnail.\n\nSuggestions: After you name someone, Picasa may suggest more matching faces for that person. Click a person&#039;s album to view and confirm (or reject) any suggestions.\n\n\n Click &#039;Learn More&#039; for information about this feature.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>As Picasa scans your photos, the faces that it finds are automatically grouped for easy naming.\n\nThings to know:\n\nTo identify a person, click &#039;Add a name&#039;, then type in the person&#039;s name and press Enter. A new People album will be created each time you name someone for the first time.\n\n(TIP: Sign in with your Google Account to gain access to all your Google Account contacts while naming.)\n\nTo ignore a person, click the &#039;X&#039; button on the face thumbnail.\n\nSuggestions: After you name someone, Picasa may suggest more matching faces for that person. Click a person&#039;s album to view and confirm (or reject) any suggestions.\n\n\n Click &#039;Learn More&#039; for information about this feature.</xmbtext>
+ </action>
+</tooltips>

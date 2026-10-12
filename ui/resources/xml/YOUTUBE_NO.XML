@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Last opp til YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Tittel:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Beskrivelse:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Videokategori:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Laster inn ...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Koder:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Dette er søkeord som brukes for å hjelpe andre med å finne videoen din. (delt med mellomrom)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Gjør denne videoen offentlig</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Videoen er begrenset til 10 minutter og 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Ikke last opp fjernsynsprogrammer, musikkvideoer, konserter eller reklamer uten tillatelse, med mindre de kun består av innhold som du har laget selv. På siden om opphavsrett og i retningslinjene for fellesskapet får du hjelp til å bedømme om din video bryter rettighetene til en annen person.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Hvis du klikker på Last opp video, angir du at denne videoen ikke bryter YouTubes vilkår for bruk, og at du har alle rettigheter til denne videoen eller godkjennelse til å laste den opp.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Last opp video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Avbryt</xmbtext>
+ </stringres>
+</resources>

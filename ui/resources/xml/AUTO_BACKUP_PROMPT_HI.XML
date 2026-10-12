@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google फ़ोटो बैकअप</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>अपनी Picasa फ़ोटो का बैकअप लें</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Google फ़ोटो बैकअप के साथ अपनी फ़ोटो और वीडियो को अपने आप ऑनलाइन सहेजें. आपके आइटम आपके सभी डिवाइस से एक्सेस योग्य रहते हैं और सबकुछ निजी रहता है जब तक कि आप साझा करना न चुनें.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google फ़ोटो बैकअप प्राप्त करें</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>रहने दें</xmbtext>
+ </stringres>
+</resources>

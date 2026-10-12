@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Προσθήκη ονόματος</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Επιλέξτε φάκελο για προβολή προσώπων</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Παράβλεψη</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Προσθήκη ατόμου μη αυτόματα</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Ακύρωση</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Καθώς το Picasa σαρώνει τις φωτογραφίες σας, τα πρόσωπα που εντοπίζει ομαδοποιούνται αυτόματα για εύκολη ονοματοθεσία.\n\nΤι πρέπει να γνωρίζετε:\n\nΓια την ταυτοποίηση κάποιου ατόμου, κάντε κλικ στην επιλογή &quot;Προσθήκη κάποιου ονόματος&quot; και, στη συνέχεια, πληκτρολογήστε το όνομα του αρχείου και πατήστε το πλήκτρο Enter. Κάθε φορά που προσθέτετε το όνομα κάποιου ατόμου για πρώτη φορά, θα δημιουργείται ένα νέο λεύκωμα Ατόμων.\n\n(ΣΥΜΒΟΥΛΗ: Συνδεθείτε με τον Λογαριασμό σας Google για να αποκτήσετε πρόσβαση σε όλες τις επαφές σας κατά τη διαδικασία της ονοματοθεσίας.)\n\nΓια να αγνοήσετε κάποιο άτομο, κάντε κλικ στο κουμπί &quot;X&quot; στη μικρογραφία με το πρόσωπο.\n\nΠροτάσεις: Αφού ονομάσετε κάποιο άτομο, το Picasa ενδέχεται να προτείνει περισσότερα πρόσωπα αντιστοίχισης για το συγκεκριμένο άτομο. Κάντε κλικ στο λεύκωμα κάποιου ατόμου για να προβάλετε και να επιβεβαιώσετε (ή να απορρίψετε) τυχόν προτάσεις.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Καθώς το Picasa σαρώνει τις φωτογραφίες σας, τα πρόσωπα που εντοπίζει ομαδοποιούνται αυτόματα για εύκολη ονοματοθεσία.\n\nΤι πρέπει να γνωρίζετε:\n\nΓια την ταυτοποίηση κάποιου ατόμου, κάντε κλικ στην επιλογή &quot;Προσθήκη κάποιου ονόματος&quot; και, στη συνέχεια, πληκτρολογήστε το όνομα του αρχείου και πατήστε το πλήκτρο Enter.  Κάθε φορά που προσθέτετε το όνομα κάποιου ατόμου για πρώτη φορά, θα δημιουργείται ένα νέο λεύκωμα Ατόμων.\n\n(ΣΥΜΒΟΥΛΗ: Συνδεθείτε με τον Λογαριασμό σας Google για να αποκτήσετε πρόσβαση σε όλες τις επαφές σας κατά τη διαδικασία της ονοματοθεσίας.)\n\nΓια να αγνοήσετε κάποιο άτομο, κάντε κλικ στο κουμπί &quot;X&quot; στη μικρογραφία με το πρόσωπο.\n\nΠροτάσεις: Αφού ονομάσετε κάποιο άτομο, το Picasa ενδέχεται να προτείνει περισσότερα πρόσωπα αντιστοίχισης για το συγκεκριμένο άτομο. Κάντε κλικ στο λεύκωμα κάποιου ατόμου για να προβάλετε και να επιβεβαιώσετε (ή να απορρίψετε) τυχόν προτάσεις.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Δεν έχουν βρεθεί ακόμα άτομα. Καθώς θα γίνεται εντοπισμός και ομαδοποίηση των προσώπων, τα πρόσωπα θα εμφανίζονται στο λεύκωμα Χωρίς όνομα. Κατά τη διάρκεια της σάρωσης, οι πληροφορίες προόδου εμφανίζονται στο αντικείμενο του λευκώματος Χωρίς όνομα.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Τα άτομα με όνομα που εμφανίζονται μαζί με το επιλεγμένο άτομο θα αναφέρονται εδώ.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Τα άτομα που εμφανίζονται στις επιλεγμένες ψηφιακές φωτογραφίες θα αναφέρονται σε αυτήν τη λίστα.</xmbtext>
+ </action>
+</tooltips>

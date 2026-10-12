@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>Luk</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>Få flere oplysninger…</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>Velkommen til det ikke-navngivne personalbum! </xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Når Picasa scanner dine fotos, grupperes de ansigter, der findes, automatisk, så de er nemme at navngive.\n\nTing, du skal vide:\n\nFor at identificere en person skal du klikke på &#039;Tilføj et navn&#039; og derefter indtaste personens navn og trykke på Enter. Der oprettes et nyt Personer-album, hver gang du sætter navn på en person for første gang.\n\n(TIP! Log ind med din Google-konto for at få adgang til alle dine kontaktpersoner på din Google-konto, mens du sætter navn på dem).\n\nVil du ignorere en person, skal du klikke på knappen &#039;X&#039; på miniaturebilledet med ansigtet.\n\nForslag: Når du har sat navn på en person, vil Picasa muligvis foreslå flere ansigter, der passer med den pågældende person. Klik på en persons album for at se og bekræfte (eller afvise) evt. forslag.\n\n\n Klik på &#039;Få flere oplysninger&#039; for at få mere at vide om denne funktion.</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Når Picasa scanner dine fotos, grupperes de ansigter, der findes, automatisk, så de er nemme at navngive.\n\nTing, du skal vide:\n\nFor at identificere en person skal du klikke på &#039;Tilføj et navn&#039; og derefter indtaste personens navn og trykke på Enter. Der oprettes et nyt Personer-album, hver gang du sætter navn på en person for første gang.\n\n(TIP! Log ind med din Google-konto for at få adgang til alle dine kontaktpersoner på din Google-konto, mens du sætter navn på dem).\n\nVil du ignorere en person, skal du klikke på knappen &#039;X&#039; på miniaturebilledet med ansigtet.\n\nForslag: Når du har sat navn på en person, vil Picasa muligvis foreslå flere ansigter, der passer med den pågældende person. Klik på en persons album for at se og bekræfte (eller afvise) evt. forslag.\n\n\n Klik på &#039;Få flere oplysninger&#039; for at få mere at vide om denne funktion.</xmbtext>
+ </action>
+</tooltips>

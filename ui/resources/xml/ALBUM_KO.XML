@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="album/namelabel.title">
+  <xmbtext>이름:</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup4.title">
+  <xmbtext>날짜:</xmbtext>
+ </stringres>
+ <stringres id="album/autodate.title">
+  <xmbtext>자동 날짜</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup8.title">
+  <xmbtext>음악:</xmbtext>
+ </stringres>
+ <stringres id="album/usemusic.title">
+  <xmbtext>슬라이드쇼 및 동영상 프레젠테이션에 음악 사용:</xmbtext>
+ </stringres>
+ <stringres id="album/music.title">
+  <xmbtext>찾아보기...</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup14.title">
+  <xmbtext>촬영 장소(선택사항)</xmbtext>
+ </stringres>
+ <stringres id="album/labelgroup16.title">
+  <xmbtext>설명(선택사항):</xmbtext>
+ </stringres>
+ <stringres id="album/ok.title">
+  <xmbtext>확인</xmbtext>
+ </stringres>
+ <stringres id="album/button20.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

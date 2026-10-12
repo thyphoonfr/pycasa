@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>Стиснення</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa стискає свою базу даних для збереження місця на диску. Це може тривати кілька хвилин.</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>Стиснення...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

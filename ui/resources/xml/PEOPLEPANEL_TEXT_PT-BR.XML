@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Adicionar um nome</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Selecione uma pasta para exibir rostos</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignorar</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Adicionar uma pessoa manualmente</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Cancelar</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Conforme o Picasa processa suas fotos, os rostos encontrados são agrupados automaticamente para facilitar a nomeação.\n\nO que você deve saber:\n\nPara identificar uma pessoa, clique em &quot;Adicionar um nome&quot; e, em seguida, digite o nome da pessoa e pressione Enter. Um novo álbum de Pessoa será criado sempre que você nomear alguém pela primeira vez.\n\nDICA: faça o login na sua Conta do Google para acessar todos os contatos quando estiver nomeando.\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura do rosto.\n\nSugestões: após nomear alguém, o Picasa sugere mais rostos correspondentes para essa pessoa. Clique no álbum da pessoa para ver e confirmar ou rejeitar qualquer sugestão.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Conforme o Picasa processa suas fotos, os rostos encontrados são agrupados automaticamente para facilitar a nomeação.\n\nO que você deve saber:\n\nPara identificar uma pessoa, clique em &quot;Adicionar um nome&quot; e, em seguida, digite o nome da pessoa e pressione Enter. Um novo álbum de Pessoa será criado sempre que você nomear alguém pela primeira vez.\n\nDICA: faça o login na sua Conta do Google para acessar todos os contatos quando estiver nomeando.\n\nPara ignorar uma pessoa, clique no botão &quot;X&quot; na miniatura do rosto.\n\nSugestões: após nomear alguém, o Picasa sugere mais rostos correspondentes para essa pessoa. Clique no álbum da pessoa para ver e confirmar ou rejeitar qualquer sugestão.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Nenhuma pessoa foi encontrada ainda. À medida que os rostos forem encontrados e agrupados, eles aparecerão no álbum Sem nome. Durante a verificação, as informações sobre o andamento do processo são exibidas no item do álbum Sem nome.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>As Pessoas com nomes que aparecem junto com a pessoa selecionada serão listadas aqui.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>As pessoas que aparecem nas fotos selecionadas serão listadas aqui.</xmbtext>
+ </action>
+</tooltips>

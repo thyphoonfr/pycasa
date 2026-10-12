@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>‏لطفاً قبل از نصب Picasa، شرایط مجوز را مطالعه کنید.</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>‏با استفاده از پیکاسا، با شرایط سرویس و خط‌مشی رازداری Google موافقت می‌کنید.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>شرایط سرویس</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>‏خط‎‌مشی رازداری</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/en/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>‏ارسال آمار استفاده ناشناس به Google (بعداً همیشه می‌توانید این تنظیم را تغییر دهید)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>موافقم</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

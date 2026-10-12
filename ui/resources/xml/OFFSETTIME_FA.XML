@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>تنظیم تاریخ عکس</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>تاریخ عکس کنونی:</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>تاریخ عکس جدید:</xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>تنظیم تمام تاریخ‌های عکس بر اساس مقدار</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>تنظیم همه عکس‌ها روی تاریخ و زمان یکسان</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

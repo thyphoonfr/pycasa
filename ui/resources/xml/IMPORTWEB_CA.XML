@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importa àlbums des d&#039;Àlbums web</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Les imatges dels àlbums web seleccionades a continuació es baixaran a l&#039;equip en fer clic al botó D&#039;acord. S&#039;organitzaran automàticament en carpetes basades en els noms dels àlbums.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Tens 100 àlbums web en línia.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importa tots els àlbums</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importa els àlbums seleccionats:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Nom</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(NOTA: Només es baixaran les fotos que no tinguis ja a l&#039;equip)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

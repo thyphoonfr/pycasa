@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Mẫu tin</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Không hỏi lại nữa</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Có</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Không</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Hủy</xmbtext>
+ </stringres>
+</resources>

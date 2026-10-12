@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Veido žymų įrašymas</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Veidų įrašymas arba visų įrašymas gali užtrukti. Jei registravimas yra nustatytas kaip išsamus arba dar platesnis nustatymas, network.log bus nurodyti pranešimai apie tik skaitomus failus, kurių nepavyko atnaujinti. Naudojant šią funkciją rekomenduojama atsijungti.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Pasirinktų įrašymas</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Veidų įrašymas</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Visų įrašymas</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Atšaukti</xmbtext>
+ </stringres>
+</resources>

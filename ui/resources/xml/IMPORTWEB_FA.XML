@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>وارد کردن آلبوم‌ها از آلبوم‌های وب</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>عکس‌های موجود در آلبوم‌های وب که در زیر علامت‌گذاری شده‌اند، پس از از کلیک روی دکمه تأیید در رایانهٔ شما دانلود می‌شوند. آن‌ها به صورت خودکار در پوشه‌ها بر اساس نام‌های آلبوم سازماندهی می‌شوند.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>شما ۱۰۰ آلبوم وب آنلاین دارید.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>وارد کردن همه آلبوم‌ها</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>وارد کردن آلبوم‌های انتخاب شده:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>نام</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>تاریخ</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(توجه: فقط عکس‌هایی که در حال حاضر در رایانهٔ شما وجود ندارند دانلود می‌شوند)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>تأیید</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>لغو</xmbtext>
+ </stringres>
+</resources>

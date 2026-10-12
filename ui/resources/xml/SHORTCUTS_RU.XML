@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shortcuts>
+ <keymap id="0">
+  <!-- New label -->
+  <item srckey="N" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Add File to Picasa -->
+  <item srckey="O" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Import from -->
+  <item srckey="U" dstkey="M" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Open File in Editor -->
+  <item srckey="O" dstkey="" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Rename -->
+  <item srckey="VK_F2" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Export Picture to Folder -->
+  <item srckey="S" dstkey="" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Save a Copy -->
+  <item srckey="S" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Locate on Disk -->
+  <item srckey="VK_RETURN" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Delete from Disk -->
+  <item srckey="VK_DELETE" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Print -->
+  <item srckey="P" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Email -->
+  <item srckey="E" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Order Prints -->
+  <item srckey="H" dstkey="T" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Cut -->
+  <item srckey="X" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Copy -->
+  <item srckey="C" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Paste -->
+  <item srckey="V" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Select All -->
+  <item srckey="A" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Invert Selection -->
+  <item srckey="B" dstkey="I" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Clear Selection -->
+  <item srckey="J" dstkey="D" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Small Thumbnails -->
+  <item srckey="1" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Normal Thumbnails -->
+  <item srckey="2" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Edit View -->
+  <item srckey="3" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Keywords -->
+  <item srckey="R" dstkey="K" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Slideshow -->
+  <item srckey="4" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Timeline -->
+  <item srckey="5" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Print Contact Sheet -->
+  <item srckey="P" dstkey="" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Export as Web Page -->
+  <item srckey="W" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Rotate Clockwise -->
+  <item srckey="G" dstkey="R" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Rotate Counterclockwise -->
+  <item srckey="G" dstkey="R" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Properties -->
+  <item srckey="VK_RETURN" dstkey="" ctrl="0" shift="0" alt="1">
+  </item>
+  <!-- Help Contents and Index -->
+  <item srckey="VK_F1" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Black-and-White -->
+  <item srckey="X" dstkey="B" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- I'm Feeling Lucky -->
+  <item srckey="G" dstkey="E" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Search -->
+  <item srckey="F" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Hold in Tray -->
+  <item srckey="D" dstkey="H" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Flip Horizontal -->
+  <item srckey="H" dstkey="" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Flip Vertical -->
+  <item srckey="V" dstkey="" ctrl="1" shift="1" alt="0">
+  </item>
+  <!-- Move to End of Album -->
+  <item srckey="" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- New Album -->
+  <item srckey="N" dstkey="" ctrl="1" shift="0" alt="0">
+  </item>
+  <!-- Full Screen Mode -->
+  <item srckey="VK_F11" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Select 1st Picture in Album -->
+  <item srckey="VK_HOME" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Select Last Picture in Album -->
+  <item srckey="VK_END" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Pause/Play Movie -->
+  <item srckey="/" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Rewind Movie -->
+  <item srckey="," dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Fast Forward Movie -->
+  <item srckey="." dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Next Picture -->
+  <item srckey="" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Previous Picture -->
+  <item srckey="" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Switch Between Automatic and Manual Modes -->
+  <item srckey="" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+  <!-- Return to Main Library View -->
+  <item srckey="" dstkey="" ctrl="0" shift="0" alt="0">
+  </item>
+ </keymap>
+</shortcuts>

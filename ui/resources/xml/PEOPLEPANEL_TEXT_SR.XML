@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Додај име</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Изаберите директоријум да бисте приказали лица</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Игнориши</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Ручно додај особу</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Откажи</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Док Picasa прегледа слике, лица која проналази се аутоматски групишу ради лакшег додавања имена.\n\nЕво шта треба да знате:\n\nДа бисте идентификовали неку особу, кликните на „Додај име“, па унесите њено име и притисните Enter. Кад год додате име неке особе по први пут, прави се нови албум Људи.\n\n(САВЕТ: Пријавите се помоћу Google налога да бисте имали приступ свим контактима док додајте име.)\n\nДа бисте игнорисали неку особу, кликните на дугме „X“ на сличици лица.\n\nПредлози: Када додате нечије име, Picasa може да предложи још подударних лица за ту особу. Кликните на албум неке особе да бисте прегледали и потврдили (или одбили) предлоге.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Док Picasa прегледа слике, лица која проналази се аутоматски групишу ради лакшег додавања имена.\n\nЕво шта треба да знате:\n\nДа бисте идентификовали неку особу, кликните на „Додај име“, па унесите њено име и притисните Enter. Кад год додате име неке особе по први пут, прави се нови албум Људи.\n\n(САВЕТ: Пријавите се помоћу Google налога да бисте имали приступ свим контактима док додајте име.)\n\nДа бисте игнорисали неку особу, кликните на дугме „X“ на сличици лица.\n\nПредлози: Када додате нечије име, Picasa може да предложи још подударних лица за ту особу. Кликните на албум неке особе да бисте прегледали и потврдили (или одбили) предлоге.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Још увек није пронађена ниједна особа. Када се лица пронађу и групишу, појављују се у албуму „Неименовано“. Информације о току се приликом скенирања појављују у ставци неименованог албума.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Именоване особе које се појављују са тренутно изабраном особом ће бити наведене овде.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Особе које се појављују на тренутно изабраним фотографијама ће бити наведене овде.</xmbtext>
+ </action>
+</tooltips>

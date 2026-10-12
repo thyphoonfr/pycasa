@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>إضافة اسم</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>تحديد مجلد لعرض الوجوه</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>تجاهل</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>إضافة شخص يدويًا</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>إلغاء</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>‏بينما يعمل بيكاسا على مسح صورك ضوئيًا، يتم تلقائيًا تجميع الوجوه التي يعثر عليها وذلك لسهولة التسمية.\n\nأمور يجب معرفتها:\n\nلتعريف شخص، انقر على &#039;إضافة اسم&#039; ثم اكتب اسم الشخص واضغط على Enter. وسيتم إنشاء ألبوم أشخاص جديد في كل مرة تسمي فيها شخصًا جديدًا للمرة الأولى.\n\n(نصيحة: سجل الدخول باستخدام حساب Google لإمكانية الدخول إلى جميع جهات الاتصال أثناء التسمية.)\n\nلتجاهل شخص، انقر على زر &#039;X&#039; على صورة الوجه المصغرة.\n\nالاقتراحات: بعد تسمية شخص، قد يقترح بيكاسا وجوهًا إضافية مطابقة لهذا الشخص. انقر على ألبوم الشخص لعرض أية اقتراحات وتأكيدها (أو رفضها).</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>‏بينما يعمل بيكاسا على مسح صورك ضوئيًا، يتم تلقائيًا تجميع الوجوه التي يعثر عليها وذلك لسهولة التسمية.\n\nأمور يجب معرفتها:\n\nلتعريف شخص، انقر على &#039;إضافة اسم&#039; ثم اكتب اسم الشخص واضغط على Enter. وسيتم إنشاء ألبوم أشخاص جديد في كل مرة تسمي فيها شخصًا جديدًا للمرة الأولى.\n\n(نصيحة: سجل الدخول باستخدام حساب Google لإمكانية الدخول إلى جميع جهات الاتصال أثناء التسمية.)\n\nلتجاهل شخص، انقر على زر &#039;X&#039; على صورة الوجه المصغرة.\n\nالاقتراحات: بعد تسمية شخص، قد يقترح بيكاسا وجوهًا إضافية مطابقة لهذا الشخص. انقر على ألبوم الشخص لعرض أية اقتراحات وتأكيدها (أو رفضها).</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>لم يتم العثور على أي شخص بعد، وبينما يتم البحث عن الوجوه وتجميعها، ستظهر في الألبوم &quot;بدون اسم&quot;. وأثناء البحث، تظهر معلومات التقدم في عنصر الألبوم &quot;بدون اسم&quot;.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>سيتم هنا سرد الأشخاص الذين تمت تسميتهم والذين يظهرون مع الشخص المحدد حاليًا.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>سيتم هنا سرد الأشخاص الذين يظهرون في الصور المحددة حاليًا.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="compacting/window1.title">
+  <xmbtext>压缩</xmbtext>
+ </stringres>
+ <stringres id="compacting/label5.title">
+  <xmbtext>Picasa 正在压缩其数据库以节省磁盘空间。这可能需要几分钟时间。</xmbtext>
+ </stringres>
+ <stringres id="compacting/status.title">
+  <xmbtext>正在压缩...</xmbtext>
+ </stringres>
+ <stringres id="compacting/button10.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

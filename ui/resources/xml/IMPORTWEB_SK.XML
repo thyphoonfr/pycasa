@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Importovať albumy z lokality Webové albumy</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Obrázky na lokalite Webové albumy, ktoré sú začiarknuté nižšie, sa prevezmú do počítača po kliknutí na tlačidlo OK. Automaticky sa usporiadajú do priečinkov na základe názvov albumov.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>Počet vašich online webových albumov je 100.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Importovať všetky albumy</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Importovať vybraté albumy:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Názov</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Dátum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(POZNÁMKA: Prevezmú sa iba obrázky, ktoré sa ešte v počítači nenachádzajú.)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Zrušiť</xmbtext>
+ </stringres>
+</resources>

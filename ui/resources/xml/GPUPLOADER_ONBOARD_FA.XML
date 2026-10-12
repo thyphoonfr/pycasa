@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_onboard/onboard_window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_1.title">
+  <xmbtext>انتخاب منابع پشتیبان‌گیری</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/select_text_2.title">
+  <xmbtext>‏Google Photos به طور خودکار از عکس‌ها و ویدیوهای منابع انتخابی در عکسخانه شما نسخه پشتیبان تهیه می‌کند.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/add_folder_btn.title">
+  <xmbtext>‫افزودن...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/upload_size_label.title">
+  <xmbtext>اندازه عکس</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size.title">
+  <xmbtext>کیفیت بالا (فضای ذخیره‌سازی رایگان نامحدود)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/free_size_desc.title">
+  <xmbtext>کیفیت تصویر عالی در فایل کم‌حجم</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size.title">
+  <xmbtext>اصلی (محدود به فضای ذخیره‌سازی حساب)</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/full_size_desc.title">
+  <xmbtext>وضوح کامل که در سهمیه فضای ذخیره‌سازی شما حساب می‌شود</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/send_to_google.title">
+  <xmbtext>‏با ارسال آمار کاربرد ناشناس، به بهبود Photos کمک کنید.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/more_storage.title">
+  <xmbtext>دریافت فضای ذخیره‌سازی بیشتر...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_onboard/start_btn.title">
+  <xmbtext>شروع پشتیبان‌گیری</xmbtext>
+ </stringres>
+</resources>

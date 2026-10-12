@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_about/window.title">
+  <xmbtext>Cadangan Google Foto</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/version.title">
+  <xmbtext>Cadangan Google Foto versi %1$s</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/trademarks.title">
+  <xmbtext>Hak Cipta 2015, Google Inc. Semua hak dilindungi undang-undang.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/notices.title">
+  <xmbtext>Perangkat lunak ini sebagian didasarkan pada karya Independent JPEG Group. Program ini dilindungi oleh undang-undang hak cipta A.S. dan Internasional.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_about/okbutton.title">
+  <xmbtext>Oke</xmbtext>
+ </stringres>
+</resources>

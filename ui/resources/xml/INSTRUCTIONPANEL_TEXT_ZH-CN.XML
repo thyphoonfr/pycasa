@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="instructionpanel/close" xmbdesc="Label(instructionpanel/close)">
+  <xmbtext>关闭</xmbtext>
+ </action>
+ <action type="Label" target="instructionpanel/learn_more" xmbdesc="Label(instructionpanel/learn_more)">
+  <xmbtext>了解详情...</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/title" xmbdesc="Text1(instructionpanel/title)">
+  <xmbtext>欢迎观看未命名的人物相册！</xmbtext>
+ </action>
+ <action type="Text1" target="instructionpanel/body" xmbdesc="Text1(instructionpanel/body)">
+  <xmbtext>Picasa 在扫描照片时，会对找到的脸部图像自动进行分组以便于命名。\n\n注意事项：\n\n要标识某人，请点击“添加姓名”，然后输入此人的姓名并按 Enter。每当您第一次为某人命名时，系统都会创建一个新的人物相册。\n\n（提示：命名时，使用 Google 帐户登录即可获取对您所有 Google 帐户联系人的访问权限）。\n\n要忽略某人，请点击脸部缩略图上的“X”按钮。建议：在您命名某人之后，Picasa 可能会建议更多与此人相匹配的脸部图像。点击此人的相册即可查看和确认（或拒绝）所有建议。\n\n\n点击“了解详情”以查看更多关于此功能的信息。</xmbtext>
+ </action>
+ <action type="Text2" target="instructionpanel/body" xmbdesc="Text2(instructionpanel/body)">
+  <xmbtext>Picasa 在扫描照片时，会对找到的脸部图像自动进行分组以便于命名。\n\n注意事项：\n\n要标识某人，请点击“添加姓名”，然后输入此人的姓名并按 Enter。每当您第一次为某人命名时，系统都会创建一个新的人物相册。\n\n（提示：命名时，使用 Google 帐户登录即可获取对您所有 Google 帐户联系人的访问权限）。\n\n要忽略某人，请点击脸部缩略图上的“X”按钮。建议：在您命名某人之后，Picasa 可能会建议更多与此人相匹配的脸部图像。点击此人的相册即可查看和确认（或拒绝）所有建议。\n\n\n点击“了解详情”以查看更多关于此功能的信息。</xmbtext>
+ </action>
+</tooltips>

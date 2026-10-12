@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>प्रवेश करें</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>इस फ़ोटो प्रिंटिंग सेवा में सामान्य तौर पर प्रवेश करने के लिए जिस उपयोगकर्ता-नाम और पासवर्ड का आप उपयोग करते हैं वह दर्ज करें.  अगर आपके पास पहले से इस प्रदाता के साथ कोई खाता नहीं है, तो साइन अप करने के लिए &quot;एक खाता बनाएं&quot; पर क्लिक करें.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>ईमेल:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>कोई खाता बनाएं...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>पासवर्ड:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>अपना पासवरड भूल गए?</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>पासवर्ड सहेजें</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>प्रवेश SSL द्वारा सुरक्षित</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>चित्र आकार:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>उच्चतम गुणवत्ता के प्रिंट सुनिश्चित करने के लिए, आपकी छवियों को उपलब्ध सर्वोच्च रिज़ॉल्यूशन का उपयोग करके भेजा जाएगा.</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>एल्बम नाम:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>प्रवेश</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>अभी नहीं</xmbtext>
+ </stringres>
+</resources>

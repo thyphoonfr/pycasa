@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="orderprintsprefs/window1.title">
+  <xmbtext>เข้าสู่ระบบ</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/infotext.title">
+  <xmbtext>ป้อนชื่อผู้ใช้และรหัสผ่านที่ปกติคุณใช้เพื่อล็อกอินเข้าใช้บริการพิมพ์ภาพนี้  หากคุณยัง&#039;ไม่มีบัญชีผู้ใช้กับผู้ให้บริการ ให้คลิกที่ &quot;สร้างบัญชี&quot; เพื่อลงทะเบียน</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/emaillabel.title">
+  <xmbtext>อีเมล:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.title">
+  <xmbtext>สร้างบัญชี...</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/createlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup8.title">
+  <xmbtext>รหัสผ่าน:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.title">
+  <xmbtext>ลืมรหัสผ่านของคุณใช่ไหม</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/forgotlink.url">
+  <xmbtext>http://www.google.com</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/savepassword.title">
+  <xmbtext>บันทึกรหัสผ่าน</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label15.title">
+  <xmbtext>ล็อกอินปลอดภัยด้วย SSL</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup17.title">
+  <xmbtext>ขนาดของรูปภาพ:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/label18.title">
+  <xmbtext>เพื่อให้แน่ใจถึงคุณภาพการพิมพ์ รูปภาพของคุณจะถูกส่งโดยใช้ภาพที่มีคุณภาพสูงสุดเท่าที่เป็นไปได้</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/labelgroup20.title">
+  <xmbtext>ชื่ออัลบั้ม:</xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/accept.title">
+  <xmbtext>ลงชื่อเข้าใช้ </xmbtext>
+ </stringres>
+ <stringres id="orderprintsprefs/button24.title">
+  <xmbtext>ยกเลิก</xmbtext>
+ </stringres>
+</resources>

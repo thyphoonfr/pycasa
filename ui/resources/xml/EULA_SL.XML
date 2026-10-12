@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Pred uporabo Picase preberite licenčne pogoje</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Z uporabo Picase se strinjate z Googlovimi pogoji storitve in pravilnikom o zasebnosti.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Pogoji storitve</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/sl/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Pravilnik o zasebnosti</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/sl/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Googlu pošlji anonimne statistične podatke o uporabi (to nastavitev lahko kadar koli spremenite)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Strinjam se</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

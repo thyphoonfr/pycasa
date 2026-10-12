@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Fotoğraflar Yedekleme</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>Picasa fotoğraflarınızı yedekleyin</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>Google Fotoğraflar Yedekleme ile fotoğraf ve videolarınızı otomatik olarak çevrimiçi kaydedin. Öğeleriniz tüm cihazlarınızdan kolayca erişilebilir durumda olur ve siz paylaşmayı tercih edene kadar hepsi size özel kalır.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>Google Fotoğraflar Yedekleme&#039;yi Al</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>Hayır, Teşekkürler</xmbtext>
+ </stringres>
+</resources>

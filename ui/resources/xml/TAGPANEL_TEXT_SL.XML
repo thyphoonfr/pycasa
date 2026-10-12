@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Tooltip" target="tagpanel/addtag" xmbdesc="Tooltip(tagpanel/addtag)">
+  <xmbtext>Dodaj oznako trenutno izbranim elementom</xmbtext>
+ </action>
+ <action type="Tooltip" target="tagpanel/quick_config" xmbdesc="Tooltip(tagpanel/quick_config)">
+  <xmbtext>Konfiguriraj hitre oznake</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/add_tag_label" xmbdesc="Label(tagpanel/add_tag_label)">
+  <xmbtext>Vnesite oznako, če želite dodati:</xmbtext>
+ </action>
+ <action type="Label" target="tagpanel/quick_label" xmbdesc="Label(tagpanel/quick_label)">
+  <xmbtext>Hitre oznake:</xmbtext>
+ </action>
+</tooltips>

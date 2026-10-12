@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="write_all_facetags/window1.title">
+  <xmbtext>Menulis Tag Wajah</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/label3.title">
+  <xmbtext>Menulis wajah atau menulis semua mungkin butuh waktu lama. Jika pencatatan ditetapkan pada terperinci atau lebih tinggi, network.log akan berisi pesan tentang file hanya baca yang tidak dapat diperbarui. Sebaiknya keluar dari sistem saat menggunakan fitur ini.</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/onlyselection.title">
+  <xmbtext>Tulis yang Dipilih</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allwithfaces.title">
+  <xmbtext>Tulis Wajah</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/allfiles.title">
+  <xmbtext>Tulis Semua</xmbtext>
+ </stringres>
+ <stringres id="write_all_facetags/button8.title">
+  <xmbtext>Batal</xmbtext>
+ </stringres>
+</resources>

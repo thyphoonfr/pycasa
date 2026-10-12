@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Penja a YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Títol:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descripció:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoria de vídeo:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>S’està carregant...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Etiquetes:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Es tracta de paraules clau utilitzades perquè la gent trobi més fàcilment el teu vídeo. (separades per espais)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Publica aquest vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>El vídeo es limita a 10 minuts i a 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>No pugis cap programa de TV, vídeos musicals, concerts ni anuncis sense permís, si no és que es tracta de continguts creats completament per tu. La pàgina de Consells sobre copyright i les Directrius de la comunitat t&#039;ajudaran a determinar si el vídeo incompleix el drets d&#039;autor d&#039;una altra persona.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Si fas clic a &quot;Penja vídeo,&quot; garanteixes que aquest vídeo no viola els Termes i condicions de YouTube&#039; i que disposes de tots els drets d&#039;autor d&#039;aquest vídeo o bé tens autorització per penjar-lo.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Penja el vídeo</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

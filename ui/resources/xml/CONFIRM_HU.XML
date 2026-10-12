@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Üzenet</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Ne kérdezzen újból</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Igen</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Nem</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Mégse</xmbtext>
+ </stringres>
+</resources>

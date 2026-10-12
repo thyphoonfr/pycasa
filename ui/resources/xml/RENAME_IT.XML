@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>Rinomina file</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 file da rinominare.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s file da rinominare.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>Inserisci un nuovo nome per questi file:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>Includi nel nome file:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>Data</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>Risoluzione immagine</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>Esempio:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>Rinomina</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

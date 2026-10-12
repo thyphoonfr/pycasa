@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Datenbank verschieben</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Starten Sie Picasa neu, damit die Änderungen übernommen werden.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Hinweis: Erstellen Sie eine Sicherung Ihrer Datenbank, bevor Sie diese experimentelle Funktion ausprobieren. Achten Sie besonders darauf, Ihre Datenbank nie auf Netz-, Wechsel- oder externe Datenträger zu verschieben, da sonst Daten verloren gehen können.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Aktueller Speicherort der Datenbank:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Neuer Speicherort der Datenbank:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Durchsuchen…</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Standard</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Bei nächstem Neustart verschieben</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Abbrechen</xmbtext>
+ </stringres>
+</resources>

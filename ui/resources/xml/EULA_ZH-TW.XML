@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>使用 Picasa 之前，請先詳閱授權條款</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>使用 Picasa 即表示您同意接受 Google 的《服務條款》和《隱私權政策》。</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>服務條款</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/zh-TW/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>隱私權政策</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/zh-TW/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>傳送匿名使用統計資料給 Google (日後您隨時可以變更這項設定)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>我接受</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

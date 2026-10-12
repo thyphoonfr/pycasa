@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="confirm/message.title">
+  <xmbtext>Сообщение</xmbtext>
+ </stringres>
+ <stringres id="confirm/remember.title">
+  <xmbtext>Больше не спрашивать</xmbtext>
+ </stringres>
+ <stringres id="confirm/yes.title">
+  <xmbtext>Да</xmbtext>
+ </stringres>
+ <stringres id="confirm/no.title">
+  <xmbtext>Нет</xmbtext>
+ </stringres>
+ <stringres id="confirm/cancel.title">
+  <xmbtext>Отмена</xmbtext>
+ </stringres>
+</resources>

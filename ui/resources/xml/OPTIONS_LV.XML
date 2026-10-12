@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Preferences</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Opcijas</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>Vispārīgi</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Lietotāja interfeiss:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Lietot speciālos efektus</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Rādīt rīku padomus</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Rādīt palīdzības atzīmes</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Vienreiz noklikšķināt, lai izietu no rediģēšanas skata</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Faili:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>Importēšanas laikā noteikt dublikātus</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Notīrīt kešatmiņas failus</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Dzēst no diska bez apstiprinājuma</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Noņemt no albuma bez apstiprināšanas</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Palīdziet uzlabot programmu Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Sūtīt anonīmu lietošanas statistiku uzņēmumam Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Konfidencialitāte...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Automātiskie atjauninājumi:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Automātiska atjaunināšana</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Jautāt pirms atjauninājumu lejupielādes</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>Atjauninājumu nemeklēšana</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Valoda:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Sistēmas noklusējums (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Pēc kameras pievienošanas palaist:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>nav lietojumprogrammas</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Izvēlēties lietojumprogrammu programmā Image Capture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Saglabāt importētos attēlus šeit:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>E-pasts</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>E-pasta programma:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Ļaut izvēlēties ikreiz, kad sūtu attēlus</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Datora noklusējuma e-pasta programmas lietošana</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Lietot manu Google kontu</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Vairāku attēlu lielums:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1024 pikseļi</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s pikseļi</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Atsevišķu attēlu lielums:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>Tāpat kā vairāki (1024 pikseļi)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>Tāpat kā vairāki (%s pikseļi)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Sākotnējais lielums</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Sūtīt filmas kā:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Pirmais kadrs</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Visa filma</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Izvades formāts:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Sūtīt iekļautos fotoattēlus un uzrakstus (tikai programmā Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Failu veidi</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Rādīt JPEG failus un:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW formāti</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Atbalstītie formāti</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=lv&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmas (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Quicktime filmas (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>RAW formāti</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Atbalstītie formāti</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=lv&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Filmas (.mov, .mpg, .m4v, .3gp, .avi...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Slaidrāde</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Cikliska slaidrāde</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Slaidrādes demonstrēšanas laikā atskaņot mūzikas ierakstus</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Atlasiet mūzikas ierakstu mapi:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Pārlūkot...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>Drukāšana</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Pieejamie izdruku formāti:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Priekšskatījumi:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Lietot augstas kvalitātes priekšskatījumus (lēnāka darbība)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Printera kvalitāte:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Saderīgs (puse izšķirtspējas)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Augsta kvalitāte (pilna izšķirtspēja)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Izdruku parauga kvalitāte:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>Parasta (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Īpaši ass (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Tīkls</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Starpniekservera lietotājvārds:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Starpniekservera parole:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Automātiski noteikt tīkla iestatījumus</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Tīkla žurnāla līmenis:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Atspējot reģistrēšanu</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Reģistrēt tikai kļūdas</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Minimāla žurnāla informācija</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Detalizēta žurnāla informācija</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Reģistrēt visu tīkla informāciju</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Žurnāls:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Tīmekļa albumi</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Noklusējuma augšupielādes lielums:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Sinhronizējot lielus failus, vispirms augšupielādēt priekšskatījumus</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(ieteicams)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>JPEG kvalitāte:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Saglabāt sākotnējo attēla kvalitāti (aizņem vairāk vietas)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>Sinhronizācija:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Sinhronizēt tikai fotoattēlus, kuri atzīmēti ar zvaigznīti</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>Neapstiprināt katru sinhronizāciju (lietot iepriekš norādītos iestatījumus)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Vārda atzīmes:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Iekļaut kopā ar fotoattēlu augšupielādēm</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Ūdenszīmes:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Pievienot ūdenszīmi visām fotoattēlu augšupielādēm:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Pievienojiet fotoattēliem spiedogu ar savu vārdu, tīmekļa domēnu vai paziņojumu par autortiesībām.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Vārda atzīmes</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Iespējot seju noteikšanu</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Iespējot ieteikumus:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Ieteikumu slieksnis:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Klasteru slieksnis:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Saglabāt fotoattēlā vārda atzīmes</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Augšupielādēt personu albuma sīktēlus pakalpojumā Google Contacts</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>Labi</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Atcelt</xmbtext>
+ </stringres>
+</resources>

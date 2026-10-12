@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>ファイル名を変更</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>1 個のファイルが名前変更のために選択されました。</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>%s 個のファイルが名前変更のために選択されました。</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>これらのファイルの新しい名前を入力してください:</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>ファイル名に含める:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>日付</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>画像の解像度</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>例:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>名前を変更</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

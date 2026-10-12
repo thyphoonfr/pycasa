@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="youtube/window1.title">
+  <xmbtext>Carica in YouTube</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup2.title">
+  <xmbtext>Titolo:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup4.title">
+  <xmbtext>Descrizione:</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup6.title">
+  <xmbtext>Categoria video:</xmbtext>
+ </stringres>
+ <stringres id="youtube/item8.title">
+  <xmbtext>Caricamento in corso...</xmbtext>
+ </stringres>
+ <stringres id="youtube/labelgroup9.title">
+  <xmbtext>Tag:</xmbtext>
+ </stringres>
+ <stringres id="youtube/label10.title">
+  <xmbtext>Queste sono parole chiave usate dagli utenti per trovare il video. (separato da spazi)</xmbtext>
+ </stringres>
+ <stringres id="youtube/public.title">
+  <xmbtext>Rendi questo video pubblico</xmbtext>
+ </stringres>
+ <stringres id="youtube/label14.title">
+  <xmbtext>Il tuo video non può superare 10 minuti e 1 GB</xmbtext>
+ </stringres>
+ <stringres id="youtube/legal.title">
+  <xmbtext>Non caricare programmi televisivi, video e concerti musicali o spot pubblicitari senza l&#039;autorizzazione a meno che non si tratti di contenuto creato completamente da te. La pagina dei suggerimenti relativi al copyright e le linee guida della community ti aiutano a determinare se il tuo video infrange il copyright di qualcuno.</xmbtext>
+ </stringres>
+ <stringres id="youtube/label16.title">
+  <xmbtext>Se fai clic su &quot;Carica video&quot;, confermi che il video non infrange i·Termini·e·condizioni·d&#039;uso·di·YouTube e che disponi dei copyright del video o dell&#039;autorizzazione a caricarlo.</xmbtext>
+ </stringres>
+ <stringres id="youtube/upload.title">
+  <xmbtext>Carica video</xmbtext>
+ </stringres>
+ <stringres id="youtube/button19.title">
+  <xmbtext>Annulla</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="webexport/window1.title">
+  <xmbtext>HTML ページとしてエクスポート</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup2.title">
+  <xmbtext>画像のエクスポート サイズ:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item4.title">
+  <xmbtext>元のサイズ</xmbtext>
+ </stringres>
+ <stringres id="webexport/item5.title">
+  <xmbtext>1,024 ピクセル（大型モニタ用）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item6.title">
+  <xmbtext>800 ピクセル（大きなウェブページ用）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item7.title">
+  <xmbtext>640 ピクセル（ウェブページ用）</xmbtext>
+ </stringres>
+ <stringres id="webexport/item8.title">
+  <xmbtext>320 ピクセル（メール用）</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup9.title">
+  <xmbtext>次の方法でムービーをエクスポート:</xmbtext>
+ </stringres>
+ <stringres id="webexport/item11.title">
+  <xmbtext>最初のフレーム</xmbtext>
+ </stringres>
+ <stringres id="webexport/item12.title">
+  <xmbtext>ムービー全体</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup13.title">
+  <xmbtext>ウェブページのタイトル:</xmbtext>
+ </stringres>
+ <stringres id="webexport/labelgroup15.title">
+  <xmbtext>フォルダ:</xmbtext>
+ </stringres>
+ <stringres id="webexport/changeloc.title">
+  <xmbtext>参照...</xmbtext>
+ </stringres>
+ <stringres id="webexport/label20.title">
+  <xmbtext>テンプレート名をクリックしてサンプルを表示します。選択後、[エクスポート] をクリックします。</xmbtext>
+ </stringres>
+ <stringres id="webexport/templateinfo.title">
+  <xmbtext>テンプレートの説明</xmbtext>
+ </stringres>
+ <stringres id="webexport/button29.title">
+  <xmbtext>エクスポート</xmbtext>
+ </stringres>
+ <stringres id="webexport/button30.title">
+  <xmbtext>キャンセル</xmbtext>
+ </stringres>
+</resources>

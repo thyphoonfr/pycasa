@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Izvozi v mapo</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Mesto za izvoz:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Prebrskaj ...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Ime izvožene mape:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Imenom datotek dodajte številke, da ohranite vrstni red.</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Velikost slike:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Uporabi izvirno velikost</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Spremeni velikost na:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>slikovne pike</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Kakovost slike:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Samodejno</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Navadno</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Največ</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Najmanj</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Po meri</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Ohrani izvirno kakovost slike</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Dobro ravnovesje med kakovostjo in velikostjo</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Zelo velika datoteka, ohrani natančne podrobnosti</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Najmanjša velikost datoteke, nekaj izgube kakovosti</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Za izvoz filmov uporabi:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Prva sličica</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Celotni film (brez sprememb velikosti)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Vodni žig:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Dodaj vodni žig</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Fotografijam dodajte žig s svojim imenom, spletno domeno ali z obvestilom o avtorskih pravicah.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Izvozi</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Prekliči</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="auto_backup_prompt/window.title">
+  <xmbtext>Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel1.title">
+  <xmbtext>‏پشتیبان‌گیری عکس‌هایتان در Picasa</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/welcomelabel2.title">
+  <xmbtext>‏با Google Photos Backup، به طور خودکار عکس‌ها و ویدیوهایتان را آنلاین ذخیره کنید. موارد شما از همه دستگاه‌هایتان قابل دسترسی است و همه چیز خصوصی باقی می‌ماند مگر اینکه خودتان بخواهید آنها را به اشتراک بگذارید.</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/yesbutton.title">
+  <xmbtext>‏دریافت Google Photos Backup</xmbtext>
+ </stringres>
+ <stringres id="auto_backup_prompt/ignorebutton.title">
+  <xmbtext>خیر سپاسگزارم</xmbtext>
+ </stringres>
+</resources>

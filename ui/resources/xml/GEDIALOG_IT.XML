@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>Se selezioni il luogo in cui hai scattato la foto, puoi aggiungere un&#039;etichetta geografica alla foto. Posiziona il mirino, quindi fai clic sul pulsante &quot;Etichetta geografica&quot;.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>Etichetta geografica</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>Tag geogr. per tutto</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>Completato</xmbtext>
+ </action>
+</tooltips>

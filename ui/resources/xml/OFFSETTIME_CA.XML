@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="offsettime/window1.title">
+  <xmbtext>Ajusta la data de la foto</xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup5.title">
+  <xmbtext>Data de la foto actual: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/labelgroup9.title">
+  <xmbtext>Nova data de foto: </xmbtext>
+ </stringres>
+ <stringres id="offsettime/relative.title">
+  <xmbtext>Ajusta totes les dates de la foto per la quantitat</xmbtext>
+ </stringres>
+ <stringres id="offsettime/absolute.title">
+  <xmbtext>Defineix totes les fotos a la mateixa data i hora</xmbtext>
+ </stringres>
+ <stringres id="offsettime/ok.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="offsettime/button18.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>파일 이름 바꾸기</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>이름을 바꿀 파일이 1개 선택되었습니다.</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>이름을 바꿀 파일이 %s개 선택되었습니다.</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>다음 파일의 새 이름을 입력하세요.</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>파일 이름에 포함:</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>날짜</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>이미지 해상도</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>예:</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>이름 바꾸기</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>취소</xmbtext>
+ </stringres>
+</resources>

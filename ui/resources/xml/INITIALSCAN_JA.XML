@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>古いバージョンの Picasa がインストールされています。既存の画像ライブラリを更新しますか、それともパソコンから画像を検索しますか？</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>次のオプションから選択してください:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>既存の画像ライブラリを更新</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>Picasa 1 でキーワードまたはカスタム アルバムを使用していて、Picasa 3 に保存したい場合、このオプションを選択してください。</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>コンピュータの画像を再検索</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>コンピュータを、画像詳細情報も含めて、より完全に検索するには、このオプションを選択してください。既存の編集や構成は保存されますが、キーワードは保存されません。検索には数分かかります。</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>画像を検索しても、ファイルが新しい場所に移動されたり、コピーされたりすることはありません。Picasa にどのフォルダを表示するかは、フォルダ マネージャ（[ツール] メニューからアクセス）で変更できます。</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>続行</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>パソコンの画像を検索する準備ができました</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>次のオプションから選択してください:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>コンピュータ全体の画像を検索</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>コンピュータ内の複数のフォルダに画像が保存されている場合、特に複数のハード ドライブに保存してある場合は、このオプションを選択してください。</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>書類、ピクチャ、デスクトップ、iPhoto ライブラリのみを検索します</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>これらのフォルダにのみ画像を保存する場合に、このオプションを選択してください。</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>画像を検索しても、ファイルが新しい場所に移動されたり、コピーされたりすることはありません。Picasa にどのフォルダを表示するかは、フォルダ マネージャ（[ツール] メニューからアクセス）で変更できます。</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>続行</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Automatische back-up</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Geen opslagruimte meer</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Je hebt mappen geselecteerd die meer ruimte innemen dan je resterende Google Drive Opslag. Je kunt meer opslagruimte kopen of gratis back-ups van foto&#039;s en video&#039;s maken op standaardgrootte.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>Als je net opslagruimte hebt gekocht, kan het enkele minuten duren voordat de wijzigingen van kracht worden.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Meer opslagruimte kopen...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Overschakelen naar standaardgrootte</xmbtext>
+ </stringres>
+</resources>

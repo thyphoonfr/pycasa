@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text1" target="initialscan/text1" xmbdesc="Text1(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2" xmbdesc="Text1(initialscan/text2)">
+  <xmbtext>‏במחשב מותקנת גרסה ישנה יותר של Picasa. האם ברצונך לעדכן את ספריית התמונות הקיימת או לבצע חיפוש חוזר של תמונות במחשב?</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text2a" xmbdesc="Text1(initialscan/text2a)">
+  <xmbtext>בחר בין האפשרויות הבאות:</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3" xmbdesc="Text1(initialscan/text3)">
+  <xmbtext>עדכן את ספריית התצלומים הקיימת של</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text3a" xmbdesc="Text1(initialscan/text3a)">
+  <xmbtext>‏בחר באפשרות זו אם אתה משתמש במילות מפתח או באלבומים מותאמים אישית ב-Picasa 1 וברצונך לשמר אותם ב-Picasa 3.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4" xmbdesc="Text1(initialscan/text4)">
+  <xmbtext>חפש תמונות במחשב שלי שוב</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text4a" xmbdesc="Text1(initialscan/text4a)">
+  <xmbtext>בחר באפשרות זו כדי לבצע במחשב סריקה מלאה יותר, הכוללת מידע מורחב על תמונות. הפעולה תשמר את העריכות הקיימות והסדר הקיים, אך לא את מילות המפתח. הפעולה עשויה להימשך מספר דקות.</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/text5" xmbdesc="Text1(initialscan/text5)">
+  <xmbtext>‏חיפוש התמונות לעולם לא מעביר או מעתיק קבצים למיקומים חדשים. באמצעות הכלי &#039;מנהל התיקיות&#039; שבתפריט &#039;כלים&#039;, תוכל לבחור אילו תיקיות יוצגו על ידי Picasa</xmbtext>
+ </action>
+ <action type="Text1" target="initialscan/ok-label" xmbdesc="Text1(initialscan/ok-label)">
+  <xmbtext>המשך</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text1" xmbdesc="Text2(initialscan/text1)">
+  <xmbtext>Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2" xmbdesc="Text2(initialscan/text2)">
+  <xmbtext>‏Picasa מוכן לסרוק את המחשב בחיפוש אחר תמונות</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text2a" xmbdesc="Text2(initialscan/text2a)">
+  <xmbtext>בחר בין האפשרויות הבאות:</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4" xmbdesc="Text2(initialscan/text4)">
+  <xmbtext>חפש תמונות בכל המחשב שלי</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text4a" xmbdesc="Text2(initialscan/text4a)">
+  <xmbtext>בחר באפשרות זו אם תמונותיך שמורות במספר תיקיות במחשב (בייחוד אם הן שמורות ביותר מכונן קשיח אחד).</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3" xmbdesc="Text2(initialscan/text3)">
+  <xmbtext>‏חפש רק במסמכים, בתמונות, בשולחן העבודה ובספריית iPhoto</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text3a" xmbdesc="Text2(initialscan/text3a)">
+  <xmbtext>בחר באפשרות זו רק אם אתה שומר את תמונותיך בתיקיות אלה.</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/text5" xmbdesc="Text2(initialscan/text5)">
+  <xmbtext>‏חיפוש של תמונות לעולם אינו מעביר או מעתיק קבצים למיקומים חדשים. באמצעות הכלי &#039;מנהל התיקיות&#039; שבתפריט &#039;כלים&#039;, תוכל לבחור אילו תיקיות יוצגו על ידי Picasa</xmbtext>
+ </action>
+ <action type="Text2" target="initialscan/ok-label" xmbdesc="Text2(initialscan/ok-label)">
+  <xmbtext>המשך</xmbtext>
+ </action>
+</tooltips>

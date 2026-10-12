@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="importweb/window1.title">
+  <xmbtext>Albums importeren uit Webalbums</xmbtext>
+ </stringres>
+ <stringres id="importweb/label2.title">
+  <xmbtext>Afbeeldingen in de webalbums die hieronder zijn aangevinkt, worden naar uw computer gedownload wanneer u op OK klikt. Ze worden automatisch georganiseerd in mappen op basis van de albumnamen.</xmbtext>
+ </stringres>
+ <stringres id="importweb/albumcount.title">
+  <xmbtext>U heeft 100 online webalbums.</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio5.title">
+  <xmbtext>Alle albums importeren</xmbtext>
+ </stringres>
+ <stringres id="importweb/radio6.title">
+  <xmbtext>Geselecteerde albums importeren:</xmbtext>
+ </stringres>
+ <stringres id="importweb/column12.title">
+  <xmbtext>Naam</xmbtext>
+ </stringres>
+ <stringres id="importweb/column13.title">
+  <xmbtext>Datum</xmbtext>
+ </stringres>
+ <stringres id="importweb/label14.title">
+  <xmbtext>(OPMERKING: alleen afbeeldingen die zich nog niet op uw computer bevinden, worden gedownload)</xmbtext>
+ </stringres>
+ <stringres id="importweb/ok.title">
+  <xmbtext>OK</xmbtext>
+ </stringres>
+ <stringres id="importweb/button17.title">
+  <xmbtext>Annuleren</xmbtext>
+ </stringres>
+</resources>

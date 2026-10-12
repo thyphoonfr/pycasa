@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Fermer</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Bienvenue dans la fonction de transfert groupé</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Cochez les cases associées aux dossiers et aux albums sur lesquels vous souhaitez travailler. Sélectionnez ensuite les tâches à effectuer. Picasa filtre les éléments qui ne sont pas concernés par cette opération. Ainsi, si un dossier ou un album entier est déjà en ligne, Picasa ne l&#039;affiche pas comme pouvant être importé.</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Adăugaţi un nume</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Selectaţi un dosar pentru a afişa chipuri</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignoraţi</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Adăugaţi manual o persoană</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Anulați</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>Pe măsură ce Picasa îți scanează fotografiile, chipurile găsite sunt grupate automat pentru a fi denumite cu ușurință.\n\nDe știut:\n\npentru a identifica o persoană, dă clic pe „Adaugă un nume”, apoi introdu numele persoanei și apasă pe Enter.  De fiecare dată când denumești o persoană pentru prima dată, se va crea un nou album Persoane.\n\n(SFAT: conectează-te la Contul Google pentru a obține acces la toate persoanele de contact atunci când denumești persoane.)\n\nPentru a ignora o persoană, dă clic pe butonul „X” de pe miniatura chipului.\n\nSugestii: după ce ai denumit o persoană, Picasa îți poate sugera pentru persoana respectivă mai multe chipuri care corespund. Dă clic pe albumul unei persoane ca să vezi și să confirmi (sau să respingi) sugestiile.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>Pe măsură ce Picasa îți scanează fotografiile, chipurile găsite sunt grupate automat pentru a fi denumite cu ușurință.\n\nDe știut:\n\npentru a identifica o persoană, dă clic pe „Adaugă un nume”, apoi introdu numele persoanei și apasă pe Enter.  De fiecare dată când denumești o persoană pentru prima dată, se va crea un nou album Persoane.\n\n(SFAT: conectează-te la Contul Google pentru a obține acces la toate persoanele de contact atunci când denumești persoane.)\n\nPentru a ignora o persoană, dă clic pe butonul „X” de pe miniatura chipului.\n\nSugestii: după ce ai denumit o persoană, Picasa îți poate sugera pentru persoana respectivă mai multe chipuri care corespund. Dă clic pe albumul unei persoane ca să vezi și să confirmi (sau să respingi) sugestiile.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>Nu a fost găsită încă nicio persoană. Pe măsură ce chipurile sunt găsite şi grupate, acestea apar în albumul Persoane nedenumite. În timpul scanării, în elementul din albumul Persoane nedenumite apar informaţii despre progres.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Persoanele denumite care apar împreună cu persoana selectată în prezent vor fi afişate aici.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>Persoanele din fotografiile selectate în prezent vor apărea aici.</xmbtext>
+ </action>
+</tooltips>

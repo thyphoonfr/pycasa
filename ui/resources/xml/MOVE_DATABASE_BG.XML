@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="move_database/window1.title">
+  <xmbtext>Преместване на базата от данни</xmbtext>
+ </stringres>
+ <stringres id="move_database/label3.title">
+  <xmbtext>Трябва да рестартирате Picasa, за да влязат промените в сила.</xmbtext>
+ </stringres>
+ <stringres id="move_database/label5.title">
+  <xmbtext>Моля, обърнете внимание: Трябва да създадете резервно копие на базата си от данни, преди да изпробвате тази експериментална функция.  НИКОГА не премествайте базата от данни върху мрежово, сменяемо или външно устройство, за да не загубите данни.</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup6.title">
+  <xmbtext>Текущо местоположение на базата от данни:</xmbtext>
+ </stringres>
+ <stringres id="move_database/labelgroup9.title">
+  <xmbtext>Ново местоположение на базата от данни:</xmbtext>
+ </stringres>
+ <stringres id="move_database/changeloc.title">
+  <xmbtext>Преглед...</xmbtext>
+ </stringres>
+ <stringres id="move_database/defaultloc.title">
+  <xmbtext>Стандартно</xmbtext>
+ </stringres>
+ <stringres id="move_database/move.title">
+  <xmbtext>Преместване при следващото рестартиране</xmbtext>
+ </stringres>
+ <stringres id="move_database/button16.title">
+  <xmbtext>Отказ</xmbtext>
+ </stringres>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>‏גיבוי אוטומטי של Google+‎</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>שטח האחסון נגמר</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>‏בחרת תיקיות המכילות יותר מקום מאשר שטח האחסון שנותר לך ב-Google Drive. ניתן לרכוש שטח אחסון נוסף או לבצע גיבוי לכמות בלתי מוגבלת של תמונות וסרטונים בגודל רגיל ללא תשלום.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>אם רכשת את האחסון זה עתה, ייתכן שיחלפו כמה דקות עד שהשינויים ייכנסו לתוקף.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>קבל עוד שטח אחסון...</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>עבור לגודל רגיל</xmbtext>
+ </stringres>
+</resources>

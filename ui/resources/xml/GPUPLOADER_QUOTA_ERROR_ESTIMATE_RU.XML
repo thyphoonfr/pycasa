@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="gpuploader_quota_error_estimate/quota_error2.title">
+  <xmbtext>Google+ Автозагрузка</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_label.title">
+  <xmbtext>Закончилось свободное место</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/estimate_error_text.title">
+  <xmbtext>Размер выбранных папок превышает объем свободного пространства на Google Диске. Вы можете приобрести дополнительное пространство или переключиться на стандартный размер. Фотографии и видео стандартного размера можно хранить бесплатно и без ограничений.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/error_note.title">
+  <xmbtext>После покупки дополнительного пространства подождите несколько минут, пока изменения вступят в силу.</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/add_more_storage.title">
+  <xmbtext>Приобрести дополнительное пространство</xmbtext>
+ </stringres>
+ <stringres id="gpuploader_quota_error_estimate/accept.title">
+  <xmbtext>Переключиться на стандартный размер</xmbtext>
+ </stringres>
+</resources>

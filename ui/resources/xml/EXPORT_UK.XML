@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="export/window1.title">
+  <xmbtext>Експорт у папку</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup2.title">
+  <xmbtext>Розташування експорту:</xmbtext>
+ </stringres>
+ <stringres id="export/changeloc.title">
+  <xmbtext>Огляд...</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup6.title">
+  <xmbtext>Назва папки, що експортується:</xmbtext>
+ </stringres>
+ <stringres id="export/addnumbers.title">
+  <xmbtext>Додавати цифри до назв файлів, щоб зберегти порядок</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup9.title">
+  <xmbtext>Розмір зображення:</xmbtext>
+ </stringres>
+ <stringres id="export/radio11.title">
+  <xmbtext>Використовувати оригінальний розмір</xmbtext>
+ </stringres>
+ <stringres id="export/radio12.title">
+  <xmbtext>Змінити розмір на:</xmbtext>
+ </stringres>
+ <stringres id="export/bind17.list">
+  <xmbtext>320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="export/label18.title">
+  <xmbtext>пікс.</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup20.title">
+  <xmbtext>Якість зображення:</xmbtext>
+ </stringres>
+ <stringres id="export/item23.title">
+  <xmbtext>Автоматично</xmbtext>
+ </stringres>
+ <stringres id="export/item24.title">
+  <xmbtext>Звичайна</xmbtext>
+ </stringres>
+ <stringres id="export/item25.title">
+  <xmbtext>Максимальна</xmbtext>
+ </stringres>
+ <stringres id="export/item26.title">
+  <xmbtext>Мінімальна</xmbtext>
+ </stringres>
+ <stringres id="export/item27.title">
+  <xmbtext>Спеціальний</xmbtext>
+ </stringres>
+ <stringres id="export/label30.title">
+  <xmbtext>Зберігає якість оригінального зображення</xmbtext>
+ </stringres>
+ <stringres id="export/label31.title">
+  <xmbtext>Оптимальний баланс якості та розміру</xmbtext>
+ </stringres>
+ <stringres id="export/label32.title">
+  <xmbtext>Дуже великий розмір файлу; збереження дрібних деталей</xmbtext>
+ </stringres>
+ <stringres id="export/label33.title">
+  <xmbtext>Найменший розмір файлу, певна втрата якості</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup35.title">
+  <xmbtext>Експортувати відео, використовуючи:</xmbtext>
+ </stringres>
+ <stringres id="export/radio37.title">
+  <xmbtext>Перший кадр</xmbtext>
+ </stringres>
+ <stringres id="export/radio38.title">
+  <xmbtext>Відео повністю (без зміни розміру)</xmbtext>
+ </stringres>
+ <stringres id="export/labelgroup39.title">
+  <xmbtext>Водяний знак:</xmbtext>
+ </stringres>
+ <stringres id="export/usewatermark.title">
+  <xmbtext>Додати водяний знак</xmbtext>
+ </stringres>
+ <stringres id="export/label44.title">
+  <xmbtext>Додавайте до фотографій своє ім’я, веб-домен чи сповіщення про авторське право.</xmbtext>
+ </stringres>
+ <stringres id="export/export.title">
+  <xmbtext>Експорт</xmbtext>
+ </stringres>
+ <stringres id="export/button47.title">
+  <xmbtext>Скасувати</xmbtext>
+ </stringres>
+</resources>

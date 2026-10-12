@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="rename/window1.title">
+  <xmbtext>重命名文件</xmbtext>
+ </stringres>
+ <stringres id="rename/label2.title">
+  <xmbtext>已选定 1 个要重命名的文件。</xmbtext>
+ </stringres>
+ <stringres id="rename/bind3.format">
+  <xmbtext>已选定 %s 个要重命名的文件。</xmbtext>
+ </stringres>
+ <stringres id="rename/label5.title">
+  <xmbtext>请输入这些文件的新名称：</xmbtext>
+ </stringres>
+ <stringres id="rename/labelgroup8.title">
+  <xmbtext>将以下信息加到文件名中：</xmbtext>
+ </stringres>
+ <stringres id="rename/date.title">
+  <xmbtext>日期</xmbtext>
+ </stringres>
+ <stringres id="rename/size.title">
+  <xmbtext>图像分辨率</xmbtext>
+ </stringres>
+ <stringres id="rename/sample.title">
+  <xmbtext>示例：</xmbtext>
+ </stringres>
+ <stringres id="rename/rename.title">
+  <xmbtext>重命名</xmbtext>
+ </stringres>
+ <stringres id="rename/button14.title">
+  <xmbtext>取消</xmbtext>
+ </stringres>
+</resources>

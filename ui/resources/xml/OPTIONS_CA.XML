@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="options/window1.mac_title">
+  <xmbtext>Preferències</xmbtext>
+ </stringres>
+ <stringres id="options/window1.win_title">
+  <xmbtext>Opcions</xmbtext>
+ </stringres>
+ <stringres id="options/tab3.title">
+  <xmbtext>General</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup4.title">
+  <xmbtext>Interfície d&#039;usuari:</xmbtext>
+ </stringres>
+ <stringres id="options/UITransitions.title">
+  <xmbtext>Utilitza efectes especials</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Mostra&#039;n la descripció</xmbtext>
+ </stringres>
+ <stringres id="options/ShowTooltips.title">
+  <xmbtext>Mostra les etiquetes d&#039;ajuda</xmbtext>
+ </stringres>
+ <stringres id="options/SingleClickExit.title">
+  <xmbtext>Fes un sol clic per sortir de la visualització de modificació</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup10.title">
+  <xmbtext>Fitxers:</xmbtext>
+ </stringres>
+ <stringres id="options/autoexclude.title">
+  <xmbtext>S&#039;han detectat duplicats en importar</xmbtext>
+ </stringres>
+ <stringres id="options/disposepreviews.title">
+  <xmbtext>Neteja els fitxers de la memòria cau</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmDeleteFromDisk.title">
+  <xmbtext>Suprimeix del disc sense confirmació</xmbtext>
+ </stringres>
+ <stringres id="options/DoNotConfirmRemoveFromAlbum.title">
+  <xmbtext>Elimina de l&#039;àlbum sense confirmació</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup16.title">
+  <xmbtext>Ajuda&#039;ns a millorar Picasa:</xmbtext>
+ </stringres>
+ <stringres id="options/usagestats.title">
+  <xmbtext>Envia estadístiques d&#039;ús anònimes a Google</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.title">
+  <xmbtext>Privadesa...</xmbtext>
+ </stringres>
+ <stringres id="options/privacy.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?answer=139492</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup20.title">
+  <xmbtext>Actualitzacions automàtiques:</xmbtext>
+ </stringres>
+ <stringres id="options/item22.title">
+  <xmbtext>Actualitza automàticament</xmbtext>
+ </stringres>
+ <stringres id="options/item23.title">
+  <xmbtext>Demana autorització abans de descarregar actualitzacions</xmbtext>
+ </stringres>
+ <stringres id="options/item24.title">
+  <xmbtext>No comprovis si hi ha actualitzacions</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup25.title">
+  <xmbtext>Idioma:</xmbtext>
+ </stringres>
+ <stringres id="options/item27.title">
+  <xmbtext>Opció predeterminada del sistema (en-US)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup28.title">
+  <xmbtext>Quan la càmera estigui connectada, inicia:</xmbtext>
+ </stringres>
+ <stringres id="options/item30.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="options/item31.title">
+  <xmbtext>sense aplicació</xmbtext>
+ </stringres>
+ <stringres id="options/item32.title">
+  <xmbtext>-</xmbtext>
+ </stringres>
+ <stringres id="options/item33.title">
+  <xmbtext>Tria una aplicació a ImageCapture...</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup34.title">
+  <xmbtext>Desa les imatges importades a:</xmbtext>
+ </stringres>
+ <stringres id="options/importdest.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="options/tab36.title">
+  <xmbtext>Correu electrònic</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup38.title">
+  <xmbtext>Programa de correu electrònic:</xmbtext>
+ </stringres>
+ <stringres id="options/radio40.title">
+  <xmbtext>Deixa’m triar cada cop que enviï fotos</xmbtext>
+ </stringres>
+ <stringres id="options/defaultmail.title">
+  <xmbtext>Utilitza el programa de correu electrònic predeterminat del meu equip</xmbtext>
+ </stringres>
+ <stringres id="options/radio42.title">
+  <xmbtext>Utilitza el meu compte de Google</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup43.title">
+  <xmbtext>Mida per a diverses fotos:</xmbtext>
+ </stringres>
+ <stringres id="options/label46.title">
+  <xmbtext>1.024 píxels</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.format">
+  <xmbtext>%s píxels</xmbtext>
+ </stringres>
+ <stringres id="options/bind47.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup48.title">
+  <xmbtext>Mida per a les imatges individuals:</xmbtext>
+ </stringres>
+ <stringres id="options/radio50.title">
+  <xmbtext>El mateix que diversos (1.024 píxels)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.format">
+  <xmbtext>El mateix que diversos (%s píxels)</xmbtext>
+ </stringres>
+ <stringres id="options/bind51.list">
+  <xmbtext>160|320|480|640|800|1024|1200|1600</xmbtext>
+ </stringres>
+ <stringres id="options/radio52.title">
+  <xmbtext>Mida original</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup53.title">
+  <xmbtext>Envia les pel·lícules com a:</xmbtext>
+ </stringres>
+ <stringres id="options/radio55.title">
+  <xmbtext>Primer marc</xmbtext>
+ </stringres>
+ <stringres id="options/radio56.title">
+  <xmbtext>Tota la pel·lícula</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup57.title">
+  <xmbtext>Format de sortida:</xmbtext>
+ </stringres>
+ <stringres id="options/UseHTMLMailer.title">
+  <xmbtext>Envia fotos i captures en línia (només Outlook)</xmbtext>
+ </stringres>
+ <stringres id="options/tab59.title">
+  <xmbtext>Tipus de fitxers</xmbtext>
+ </stringres>
+ <stringres id="options/label61.title">
+  <xmbtext>Mostra fitxers JPEG i:</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.BMP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.GIF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.PNG</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.TGA</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.TIF, .TIFF</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.WEBP</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.PSD (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Formats RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label73.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link75.title">
+  <xmbtext>Formats compatibles</xmbtext>
+ </stringres>
+ <stringres id="options/link75.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label77.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Pel·lícules (.AVI, .MPG, .ASF, .WMV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportQuicktime.title">
+  <xmbtext>Pel·lícules de Quicktime (.MOV)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportGIF.title">
+  <xmbtext>.gif</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPNG.title">
+  <xmbtext>.png</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTIF.title">
+  <xmbtext>.tif, .tiff</xmbtext>
+ </stringres>
+ <stringres id="options/SupportWEBP.title">
+  <xmbtext>.webp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportBMP.title">
+  <xmbtext>.bmp</xmbtext>
+ </stringres>
+ <stringres id="options/SupportTGA.title">
+  <xmbtext>.tga</xmbtext>
+ </stringres>
+ <stringres id="options/SupportPSD.title">
+  <xmbtext>.psd (Photoshop)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportRAW.title">
+  <xmbtext>Formats RAW</xmbtext>
+ </stringres>
+ <stringres id="options/label91.title">
+  <xmbtext>(</xmbtext>
+ </stringres>
+ <stringres id="options/link93.title">
+  <xmbtext>Formats compatibles</xmbtext>
+ </stringres>
+ <stringres id="options/link93.url">
+  <xmbtext>http://picasa.google.com/support/bin/answer.py?hl=en&amp;answer=15625</xmbtext>
+ </stringres>
+ <stringres id="options/label95.title">
+  <xmbtext>)</xmbtext>
+ </stringres>
+ <stringres id="options/SupportMovies.title">
+  <xmbtext>Pel·lícules (.mov, .mpg, .m4v, .3gp, .avi,...)</xmbtext>
+ </stringres>
+ <stringres id="options/tab97.title">
+  <xmbtext>Presentació de diapositives</xmbtext>
+ </stringres>
+ <stringres id="options/LoopSlideshow.title">
+  <xmbtext>Presentació en bucle</xmbtext>
+ </stringres>
+ <stringres id="options/PlayMP3Tracks.title">
+  <xmbtext>Reprodueix pistes de música durant la presentació de diapositives</xmbtext>
+ </stringres>
+ <stringres id="options/label104.title">
+  <xmbtext>Selecciona una carpeta de pistes de música:</xmbtext>
+ </stringres>
+ <stringres id="options/MP3SlideshowPath.title">
+  <xmbtext>Navega...</xmbtext>
+ </stringres>
+ <stringres id="options/tab106.title">
+  <xmbtext>S&#039;està imprimint</xmbtext>
+ </stringres>
+ <stringres id="options/label107.title">
+  <xmbtext>Mides d&#039;impressió disponibles:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup118.title">
+  <xmbtext>Visualitzacions prèvies:</xmbtext>
+ </stringres>
+ <stringres id="options/PrintProxyPreview.title">
+  <xmbtext>Utilitzaprevisualitzacionsd&#039;alta qualitat (més lent)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup120.title">
+  <xmbtext>Qualitat de la impressora:</xmbtext>
+ </stringres>
+ <stringres id="options/radio122.title">
+  <xmbtext>Compatible (resolució mitjana)</xmbtext>
+ </stringres>
+ <stringres id="options/radio123.title">
+  <xmbtext>Qualitat alta (resolució completa)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup124.title">
+  <xmbtext>Qualitat de la nova mostra de la impressora:</xmbtext>
+ </stringres>
+ <stringres id="options/radio126.title">
+  <xmbtext>General (Lanczos-3)</xmbtext>
+ </stringres>
+ <stringres id="options/radio127.title">
+  <xmbtext>Nitidesa extra (Lanczos-8)</xmbtext>
+ </stringres>
+ <stringres id="options/tab128.title">
+  <xmbtext>Xarxa</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup130.title">
+  <xmbtext>Nom d&#039;usuari del servidor intermediari:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup132.title">
+  <xmbtext>Contrasenya del servidor intermediari:</xmbtext>
+ </stringres>
+ <stringres id="options/autoproxy.title">
+  <xmbtext>Detecta automàticament la configuració de la xarxa</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup135.title">
+  <xmbtext>Nivell de registre a la xarxa:</xmbtext>
+ </stringres>
+ <stringres id="options/item137.title">
+  <xmbtext>Desactiva l&#039;inici de sessió</xmbtext>
+ </stringres>
+ <stringres id="options/item138.title">
+  <xmbtext>Només errors de registre</xmbtext>
+ </stringres>
+ <stringres id="options/item139.title">
+  <xmbtext>Informació de registre mínima</xmbtext>
+ </stringres>
+ <stringres id="options/item140.title">
+  <xmbtext>Informació de registre detallada</xmbtext>
+ </stringres>
+ <stringres id="options/item141.title">
+  <xmbtext>Registra tota la informació de xarxa</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup142.title">
+  <xmbtext>Registre:</xmbtext>
+ </stringres>
+ <stringres id="options/web_albums_tab.title">
+  <xmbtext>Àlbums web</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup145.title">
+  <xmbtext>Mida predeterminada de càrrega:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStriped.title">
+  <xmbtext>Quan se sincronitzin fitxers grans, penja lesprevisualitzacionsprimer</xmbtext>
+ </stringres>
+ <stringres id="options/label153.title">
+  <xmbtext>(opció recomanada)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup154.title">
+  <xmbtext>Qualitat JPEG:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAUseHiQualityJPEG.title">
+  <xmbtext>Conserva la qualitat d&#039;imatge original (utilitza més emmagatzematge)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup158.title">
+  <xmbtext>S&#039;està sincronitzant:</xmbtext>
+ </stringres>
+ <stringres id="options/PWAStarred.title">
+  <xmbtext>Sincronitza només fotos destacades</xmbtext>
+ </stringres>
+ <stringres id="options/confirmsync::disable.title">
+  <xmbtext>No confirmis cada sincronització (utilitza la configuració anterior)</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup161.title">
+  <xmbtext>Etiquetes de nom:</xmbtext>
+ </stringres>
+ <stringres id="options/enablefruploads.title">
+  <xmbtext>Inclou amb les càrregues de fotos</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup163.title">
+  <xmbtext>Filigranes:</xmbtext>
+ </stringres>
+ <stringres id="options/haswatermark.title">
+  <xmbtext>Afegeix una marca d&#039;aigua a totes les fotos carregades:</xmbtext>
+ </stringres>
+ <stringres id="options/label168.title">
+  <xmbtext>Marca les fotos amb el teu nom, amb un domini web o bé amb un avís de copyright.</xmbtext>
+ </stringres>
+ <stringres id="options/tab169.title">
+  <xmbtext>Etiquetes de nom</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacedetection.title">
+  <xmbtext>Activa la detecció de cares</xmbtext>
+ </stringres>
+ <stringres id="options/enablefacesuggestions.title">
+  <xmbtext>Activa els suggeriments:</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup176.title">
+  <xmbtext>Llindar del suggeriment:</xmbtext>
+ </stringres>
+ <stringres id="options/label179.title">
+  <xmbtext>facethresh0</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind180.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/labelgroup181.title">
+  <xmbtext>Llindar del clúster:</xmbtext>
+ </stringres>
+ <stringres id="options/label184.title">
+  <xmbtext>facethresh1</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.format">
+  <xmbtext>%s</xmbtext>
+ </stringres>
+ <stringres id="options/bind185.list">
+  <xmbtext>50|55|60|65|70|75|80|85|90|95</xmbtext>
+ </stringres>
+ <stringres id="options/persistfacetofile.title">
+  <xmbtext>Emmagatzema les etiquetes de nom a la foto</xmbtext>
+ </stringres>
+ <stringres id="options/uploadcontactphotos.title">
+  <xmbtext>Penja les miniatures d&#039;àlbums d&#039;usuaris a Contactes de Google</xmbtext>
+ </stringres>
+ <stringres id="options/button189.title">
+  <xmbtext>D&#039;acord</xmbtext>
+ </stringres>
+ <stringres id="options/button190.title">
+  <xmbtext>Cancel·la</xmbtext>
+ </stringres>
+</resources>

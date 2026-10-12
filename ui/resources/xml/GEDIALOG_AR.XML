@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="gedialog/instr" xmbdesc="Text(gedialog/instr)">
+  <xmbtext>أضف علامة جغرافية للصورة من خلال الانتقال إلى الموقع الذي أخذت منه الصورة. ضع المؤشر المتقاطع ثم اضغط على الزر &quot;إضافة علامة جغرافية&quot;.</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tag" xmbdesc="Label(gedialog/tag)">
+  <xmbtext>علامة جغرافية</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/tagall" xmbdesc="Label(gedialog/tagall)">
+  <xmbtext>إضافة علامات جغرافية للكل</xmbtext>
+ </action>
+ <action type="Label" target="gedialog/done" xmbdesc="Label(gedialog/done)">
+  <xmbtext>تم</xmbtext>
+ </action>
+</tooltips>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="peoplepanel/addname" xmbdesc="Label(peoplepanel/addname)">
+  <xmbtext>Add a name</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/status_label" xmbdesc="Label(peoplepanel/status_label)">
+  <xmbtext>Select a folder to display faces</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/ignore" xmbdesc="Label(peoplepanel/ignore)">
+  <xmbtext>Ignore</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_add" xmbdesc="Label(peoplepanel/manual_add)">
+  <xmbtext>Add a person manually</xmbtext>
+ </action>
+ <action type="Label" target="peoplepanel/manual_cancel" xmbdesc="Label(peoplepanel/manual_cancel)">
+  <xmbtext>Cancel</xmbtext>
+ </action>
+ <action type="Text1" target="peoplepanel/instructions" xmbdesc="Text1(peoplepanel/instructions)">
+  <xmbtext>As Picasa scans your photos, the faces that it finds are automatically grouped for easy naming.\n\nThings to know:\n\nTo identify a person, click &#039;Add a name&#039;, then type in the person&#039;s name and press Enter. A new People album will be created each time you name someone for the first time.\n\n(TIP: Sign in with your Google Account to gain access to all your contacts while naming.)\n\nTo ignore a person, click the &#039;X&#039; button on the face thumbnail.\n\nSuggestions: After you name someone, Picasa may suggest more matching faces for that person. Click a person&#039;s album to view and confirm (or reject) any suggestions.</xmbtext>
+ </action>
+ <action type="Text2" target="peoplepanel/instructions" xmbdesc="Text2(peoplepanel/instructions)">
+  <xmbtext>As Picasa scans your photos, the faces that it finds are automatically grouped for easy naming.\n\nThings to know:\n\nTo identify a person, click &#039;Add a name&#039;, then type in the person&#039;s name and press Enter. A new People album will be created each time you name someone for the first time.\n\n(TIP: Sign in with your Google Account to gain access to all your contacts while naming.)\n\nTo ignore a person, click the &#039;X&#039; button on the face thumbnail.\n\nSuggestions: After you name someone, Picasa may suggest more matching faces for that person. Click a person&#039;s album to view and confirm (or reject) any suggestions.</xmbtext>
+ </action>
+ <action type="Text3" target="peoplepanel/instructions" xmbdesc="Text3(peoplepanel/instructions)">
+  <xmbtext>No people have been found yet. As faces are found and grouped, they will appear in the Unnamed album. While scanning, progress information appears in the Unnamed album item.</xmbtext>
+ </action>
+ <action type="Text4" target="peoplepanel/instructions" xmbdesc="Text4(peoplepanel/instructions)">
+  <xmbtext>Named People who appear with the currently selected person will be listed here.</xmbtext>
+ </action>
+ <action type="Text5" target="peoplepanel/instructions" xmbdesc="Text5(peoplepanel/instructions)">
+  <xmbtext>People who appear in the currently selected photos will be listed here.</xmbtext>
+ </action>
+</tooltips>

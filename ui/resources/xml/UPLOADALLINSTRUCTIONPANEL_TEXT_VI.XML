@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Label" target="uploadallinstructionpanel/close" xmbdesc="Label(uploadallinstructionpanel/close)">
+  <xmbtext>Đóng</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/title" xmbdesc="Text1(uploadallinstructionpanel/title)">
+  <xmbtext>Chào mừng bạn đến với tải lên hàng loạt</xmbtext>
+ </action>
+ <action type="Text1" target="uploadallinstructionpanel/body" xmbdesc="Text1(uploadallinstructionpanel/body)">
+  <xmbtext>Chọn hộp bên cạnh các thư mục và album bạn muốn làm việc. Sau đó, chọn thao tác bạn muốn thực hiện. Picasa sẽ lọc các mục mà thao tác này không áp dụng. Ví dụ: nếu toàn bộ thư mục hoặc album đã trực tuyến, Picasa sẽ không hiển thị tùy chọn tải lên.</xmbtext>
+ </action>
+</tooltips>

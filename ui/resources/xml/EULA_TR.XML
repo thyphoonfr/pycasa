@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="eula/window.title">
+  <xmbtext>Picasa&#039;yı kullanmadan önce lütfen lisans şartlarını inceleyin</xmbtext>
+ </stringres>
+ <stringres id="eula/label2.title">
+  <xmbtext>Picasa&#039;yı kullanarak Google Hizmet Şartları&#039;nı ve Gizlilik Politikası&#039;nı kabul etmiş olursunuz.</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.title">
+  <xmbtext>Hizmet Şartları</xmbtext>
+ </stringres>
+ <stringres id="eula/toslink.url">
+  <xmbtext>https://www.google.com/intl/tr/policies/terms/</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.title">
+  <xmbtext>Gizlilik Politikası</xmbtext>
+ </stringres>
+ <stringres id="eula/privacylink.url">
+  <xmbtext>https://www.google.com/intl/tr/policies/privacy/</xmbtext>
+ </stringres>
+ <stringres id="eula/sendstats.title">
+  <xmbtext>Google&#039;a anonim kullanım istatistikleri gönder (Bu ayarı daha sonra dilediğiniz zaman değiştirebilirsiniz)</xmbtext>
+ </stringres>
+ <stringres id="eula/ok.title">
+  <xmbtext>Kabul Et</xmbtext>
+ </stringres>
+ <stringres id="eula/button9.title">
+  <xmbtext>İptal</xmbtext>
+ </stringres>
+</resources>

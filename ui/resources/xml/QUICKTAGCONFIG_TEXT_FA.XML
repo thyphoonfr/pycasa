@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tooltips>
+ <action type="Text" target="quicktagconfig/instructions" xmbdesc="Text(quicktagconfig/instructions)">
+  <xmbtext>شما می‌توانید از &quot;نشان‌های سریع&quot; برای اعمال یک نشان با یک کلیک استفاده کنید. نشان‌هایی را که می‌خواهید با یک کلیک به آن‌ها دسترسی پیدا کنید، در زیر تایپ کنید. به طور پیش‌فرض، از دو &quot;نشان سریع&quot; بالا برای ردیابی نشان‌های اعمال شده استفاده می‌شود. برای تنظیم دستی دو نشان بالا علامت کادر تأیید زیر را بردارید.</xmbtext>
+ </action>
+ <action type="Text" target="quicktagconfig/autofill_label" xmbdesc="Text(quicktagconfig/autofill_label)">
+  <xmbtext>تکمیل خودکار کادرهای خالی بالا با نشان‌هایی که معمولاً استفاده می‌شوند</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/recent_checkbox_label" xmbdesc="Label(quicktagconfig/recent_checkbox_label)">
+  <xmbtext>رزرو دو دکمه بالا برای نشان‌هایی که اخیراً استفاده شده است</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/ok-label" xmbdesc="Label(quicktagconfig/ok-label)">
+  <xmbtext>تأیید</xmbtext>
+ </action>
+ <action type="Label" target="quicktagconfig/cancel-label" xmbdesc="Label(quicktagconfig/cancel-label)">
+  <xmbtext>لغو</xmbtext>
+ </action>
+</tooltips>

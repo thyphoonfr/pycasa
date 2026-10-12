@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+ <stringres id="about/window1.title">
+  <xmbtext>Picasa 정보</xmbtext>
+ </stringres>
+ <stringres id="about/appname.title">
+  <xmbtext>Picasa</xmbtext>
+ </stringres>
+ <stringres id="about/trademarks.title">
+  <xmbtext>기타 모든 제품, 서비스 이름, 브랜드 또는 상표의 소유권은 각 소유자에게 있습니다.</xmbtext>
+ </stringres>
+ <stringres id="about/notices.title">
+  <xmbtext>이 소프트웨어는 부분적으로 Independent JPEG Group의 작업에 기반을 두고 있습니다. 이 프로그램은 미국 및 국제 저작권법의 보호를 받습니다.</xmbtext>
+ </stringres>
+ <stringres id="about/licenses.title">
+  <xmbtext>타사 라이선스...</xmbtext>
+ </stringres>
+</resources>
