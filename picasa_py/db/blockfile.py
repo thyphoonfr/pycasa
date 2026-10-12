@@ -90,6 +90,12 @@ class BlockIndexFile:
             for i in range(count)
         ]
 
+    def append_entry(self, entry: BlockEntry) -> None:
+        """Ajoute une nouvelle entrée d'index dans les 3 vecteurs."""
+        self.checksums.append(entry.checksum)
+        self.offsets.append(entry.offset)
+        self.sizes_and_blocks.append(entry.raw_size_block)
+
     @classmethod
     def from_entries(cls, entries: List[BlockEntry], active_block: int = 0) -> BlockIndexFile:
         checksums = [e.checksum for e in entries]

@@ -58,7 +58,7 @@ class PicasaMenuBuilder:
         # 1. &File
         menu_file = mb.addMenu("&File")
         self._add_action(menu_file, "Add &File to Picasa...", "ID_FILE_OPEN", self.win.action_add_file if hasattr(self.win, "action_add_file") else None)
-        self._add_action(menu_file, "Add &Folder to Picasa...", "ID_TOOLS_INCLUDEEXCLUDEFOLDERS")
+        self._add_action(menu_file, "Add &Folder to Picasa...", "ID_TOOLS_INCLUDEEXCLUDEFOLDERS", self.win.action_folder_manager if hasattr(self.win, "action_folder_manager") else None)
         self._add_action(menu_file, "&Import From...", "ID_FILE_IMPORTPICTURE")
         self._add_action(menu_file, "&New Album...", "ID_FILE_NEWLABEL")
         menu_file.addSeparator()
@@ -121,7 +121,7 @@ class PicasaMenuBuilder:
         menu_tools = mb.addMenu("&Tools")
         self._add_action(menu_tools, "&Options...", "ID_TOOLS_OPTIONS", self.win.action_options if hasattr(self.win, "action_options") else None)
         self._add_action(menu_tools, "Adjust &Date and Time...", "ID_TOOLS_ADJUST_TIMESTAMP")
-        self._add_action(menu_tools, "&Folder Manager...", "ID_TOOLS_INCLUDEEXCLUDEFOLDERS")
+        self._add_action(menu_tools, "&Folder Manager...", "ID_TOOLS_INCLUDEEXCLUDEFOLDERS", self.win.action_folder_manager if hasattr(self.win, "action_folder_manager") else None)
         self._add_action(menu_tools, "&Move Database...", "ID_MOVE_DATABASE")
 
         # 8. &Help

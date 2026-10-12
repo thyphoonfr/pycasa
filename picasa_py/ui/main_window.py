@@ -26,6 +26,9 @@ from picasa_py.ui.thumbnail_view import PicasaThumbnailView
 from picasa_py.ui.photo_tray import PicasaPhotoTray
 from picasa_py.ui.right_drawer import PicasaRightDrawer
 from picasa_py.ui.one_up_view import PicasaOneUpView
+from picasa_py.ui.folder_manager import PicasaFolderManagerDialog
+from picasa_py.scanner.watcher import PicasaFolderWatcher
+from picasa_py.scanner.scanner import BackgroundScanWorker
 from picasa_py.db.database import PicasaDatabase
 
 
@@ -41,6 +44,8 @@ class PicasaMainWindow(QMainWindow):
         super().__init__(parent)
         self.style = PicasaStyle.load()
         self.res_mgr = PicasaResourceManager.get()
+        self.watcher: Optional[PicasaFolderWatcher] = None
+        self.scan_worker: Optional[BackgroundScanWorker] = None
 
         self.setWindowTitle("Picasa 3")
         self.setWindowIcon(self.res_mgr.get_icon(105))
@@ -146,6 +151,15 @@ class PicasaMainWindow(QMainWindow):
             self.thumb_view.set_database(self.db)
             count = len(self.db.index)
             self.status_bar.showMessage(f"Base de données chargée : {count} photos indexées")
+
+            # Surveillance en temps réel des répertoires (debounce 500 ms, Ref: 0x00704F20)
+            self.watcher = PicasaFolderWatcher(self.db, self)
+            self.watcher.scan_requested.connect(self._on_watcher_scan_requested)
+
+            # Analyse initiale en arrière-plan des dossiers surveillés
+            watched = [p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")]
+            if watched:
+                self._start_background_scan(watched)
         except Exception as e:
             self.status_bar.showMessage(f"Mode sans base active : {e}")
 
@@ -272,3 +286,58 @@ class PicasaMainWindow(QMainWindow):
     def action_about(self) -> None:
         about_text = self.res_mgr.get_string(298, "Picasa 3 Re-implementation in Python")
         QMessageBox.about(self, "À propos de Picasa", f"Picasa 3 (Python Edition)\n\n{about_text}")
+
+    # --- Gestionnaire de dossiers & Auto-indexation en arrière-plan ---
+
+    def action_folder_manager(self) -> None:
+        """Ouvre la boîte de dialogue Folder Manager (foldermgr)."""
+        if not self.db:
+            QMessageBox.warning(self, "Gestionnaire de dossiers", "Aucune base de données active.")
+            return
+
+        dlg = PicasaFolderManagerDialog(self.db, self)
+        dlg.folders_updated.connect(self._on_folders_updated)
+        dlg.exec()
+
+    def _on_folders_updated(self, newly_watched: List[str]) -> None:
+        """Réagit à la mise à jour des dossiers dans Folder Manager."""
+        if self.watcher:
+            self.watcher.reload_from_database()
+        if newly_watched:
+            self.status_bar.showMessage(f"Dossiers mis à jour. Lancement de l'indexation de {len(newly_watched)} dossier(s)...")
+            self._start_background_scan(newly_watched)
+
+    def _on_watcher_scan_requested(self, paths: List[str]) -> None:
+        """Déclenché par le watcher après le debounce de 500 ms."""
+        self.status_bar.showMessage(f"Modification détectée dans {len(paths)} dossier(s)...")
+        self._start_background_scan(paths)
+
+    def _start_background_scan(self, folder_paths: List[str]) -> None:
+        """Lance l'indexation en arrière-plan sans bloquer l'interface."""
+        if not self.db or not folder_paths:
+            return
+        if self.scan_worker and self.scan_worker.isRunning():
+            return
+
+        self.scan_worker = BackgroundScanWorker(self.db, folder_paths, self)
+        self.scan_worker.progress.connect(self._on_scan_progress)
+        self.scan_worker.finished.connect(self._on_scan_finished)
+        self.scan_worker.start()
+
+    def _on_scan_progress(self, current: int, total: int, fname: str) -> None:
+        self.status_bar.showMessage(f"Indexation en arrière-plan : {current}/{total} — {fname}")
+
+    def _on_scan_finished(self, total_added: int) -> None:
+        if total_added > 0 and self.db:
+            self.library_tree.populate_from_database(self.db)
+            self.thumb_view.set_database(self.db)
+            self.status_bar.showMessage(f"Indexation terminée : {total_added} nouvelle(s) photo(s) ajoutée(s)")
+        else:
+            self.status_bar.showMessage("Indexation terminée : photothèque à jour")
+
+    def closeEvent(self, event) -> None:
+        if self.scan_worker and self.scan_worker.isRunning():
+            self.scan_worker.cancel()
+            self.scan_worker.wait(1000)
+        super().closeEvent(event)
+

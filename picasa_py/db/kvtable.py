@@ -30,6 +30,27 @@ class KeyValueTableFile:
     def mapping(self) -> Dict[str, str]:
         return dict(self.pairs)
 
+    def get(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        for k, v in self.pairs:
+            if k == key:
+                return v
+        return default
+
+    def set(self, key: str, value: str) -> None:
+        for i, (k, _) in enumerate(self.pairs):
+            if k == key:
+                self.pairs[i] = (key, str(value))
+                return
+        self.pairs.append((key, str(value)))
+
+    def remove(self, key: str) -> bool:
+        for i, (k, _) in enumerate(self.pairs):
+            if k == key:
+                del self.pairs[i]
+                return True
+        return False
+
+
     @classmethod
     def from_bytes(cls, data: bytes, encoding: str = "utf-8") -> KeyValueTableFile:
         if len(data) < 8:
