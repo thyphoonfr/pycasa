@@ -41,6 +41,7 @@ class PicasaDatabase:
         self.pmps: Dict[str, PmpFile] = {}
         self.block_indices: Dict[str, BlockIndexFile] = {}
         self.block_containers: Dict[str, BlockContainerFile] = {}
+        self._face_manager: Optional[Any] = None
 
     @classmethod
     def open_default(cls) -> PicasaDatabase:
@@ -111,6 +112,13 @@ class PicasaDatabase:
     @property
     def search_index(self) -> Optional[WordHashFile]:
         return self.wordhash
+
+    @property
+    def face_manager(self) -> Any:
+        if self._face_manager is None:
+            from picasa_py.faces.face_manager import PicasaFaceManager
+            self._face_manager = PicasaFaceManager(self)
+        return self._face_manager
 
     def search(self, word: str) -> List[int]:
         if not self.wordhash:

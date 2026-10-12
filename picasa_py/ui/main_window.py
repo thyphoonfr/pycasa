@@ -200,6 +200,11 @@ class PicasaMainWindow(QMainWindow):
         if target_type == "folder":
             self.thumb_view.filter_by_folder(key)
             self.status_bar.showMessage(f"Dossier sélectionné : {display_name}")
+        elif target_type == "person":
+            person = self.db.face_manager.get_person(key) if self.db and self.db.face_manager else None
+            indices = person.photo_indices if person else []
+            self.thumb_view.filter_by_person(key, display_name, indices)
+            self.status_bar.showMessage(f"Personne : {display_name} ({len(indices)} photos)")
         else:
             self.thumb_view.filter_by_folder(None)
             self.status_bar.showMessage(f"Sélection : {display_name}")

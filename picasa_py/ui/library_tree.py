@@ -159,30 +159,20 @@ class PicasaLibraryTree(QWidget):
                         "name": name,
                     })
 
-        # 4. Contacts / Visages (cat == 8 dans albumdata ou contacts.xml)
-        if ad_names and ad_cats:
-            names = ad_names.records
-            cats = ad_cats.records
-            for i in range(len(names)):
-                if cats[i] == 8:
-                    name = names[i]
-                    item = QTreeWidgetItem(self.cat_people)
-                    item.setText(0, name)
-                    item.setIcon(0, self.res_mgr.get_icon(159))
-                    item.setData(0, Qt.ItemDataRole.UserRole, {
-                        "type": "person",
-                        "key": name,
-                        "name": name,
-                    })
-        elif db.contacts:
-            for cid, contact in sorted(db.contacts.contacts.items(), key=lambda x: x[1].name):
+        # 4. Contacts / Visages (PeoplePanel / FaceCluster, Ref: 0x008AAD76)
+        people = db.face_manager.get_people()
+        for person in people:
+            if person.photo_count > 0:
                 item = QTreeWidgetItem(self.cat_people)
-                item.setText(0, contact.name)
-                item.setIcon(0, self.res_mgr.get_icon(159))
+                item.setText(0, f"{person.name} ({person.photo_count})")
+                if person.avatar_pixmap and not person.avatar_pixmap.isNull():
+                    item.setIcon(0, QIcon(person.avatar_pixmap))
+                else:
+                    item.setIcon(0, self.res_mgr.get_icon(159))
                 item.setData(0, Qt.ItemDataRole.UserRole, {
                     "type": "person",
-                    "key": cid,
-                    "name": contact.name,
+                    "key": person.contact_id,
+                    "name": person.name,
                 })
 
     def _on_item_clicked(self, item: QTreeWidgetItem, column: int) -> None:

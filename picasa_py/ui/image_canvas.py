@@ -9,12 +9,12 @@ Ref: AGENTS.md §4 bis (Fonctionnement identique: zoom, pan, molette)
 from __future__ import annotations
 import math
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Any
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt, QRect, QRectF, QPoint, QPointF, Signal
 from PySide6.QtGui import (
     QPainter, QColor, QPixmap, QImage, QMouseEvent, QWheelEvent,
-    QPaintEvent, QResizeEvent, QCursor, QPen
+    QPaintEvent, QResizeEvent, QCursor, QPen, QFont
 )
 from PIL import Image
 
@@ -53,6 +53,11 @@ class PicasaImageCanvas(QWidget):
         # État d'interaction souris (pan/drag)
         self._is_dragging: bool = False
         self._last_mouse_pos: QPoint = QPoint(0, 0)
+
+        # Balises de visages (Face Tags, Ref: 0x008AAD76)
+        self.face_rects: List[Any] = []
+        self.show_face_tags: bool = True
+        self.hovered_face_idx: int = -1
 
         # Curseur Main (Hand tool: cursor_7.cur)
         self._pan_cursor = self.res_mgr.get_cursor(7)
@@ -165,6 +170,55 @@ class PicasaImageCanvas(QWidget):
         # Dessin de l'image
         painter.drawPixmap(target_rect, self._display_pixmap, QRectF(self._display_pixmap.rect()))
 
+        # Dessin des balises de visages (Face Tags, Ref: 0x008AAD76, 0x009B9290)
+        if self.show_face_tags and self.face_rects:
+            self._draw_face_tags(painter, target_rect)
+
+    def set_face_rects(self, rects: List[Any]) -> None:
+        self.face_rects = rects
+        self.hovered_face_idx = -1
+        self.update()
+
+    def set_show_face_tags(self, show: bool) -> None:
+        self.show_face_tags = show
+        self.update()
+
+    def _draw_face_tags(self, painter: QPainter, target_rect: QRectF) -> None:
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        for i, fr in enumerate(self.face_rects):
+            fx = target_rect.x() + fr.left * target_rect.width()
+            fy = target_rect.y() + fr.top * target_rect.height()
+            fw = fr.width * target_rect.width()
+            fh = fr.height * target_rect.height()
+
+            rect_box = QRectF(fx, fy, fw, fh)
+            is_hovered = (i == self.hovered_face_idx)
+
+            # Cadre rectangulaire aux coins arrondis
+            pen_color = QColor(0, 200, 255, 230) if is_hovered else QColor(255, 255, 255, 200)
+            pen = QPen(pen_color, 2.0 if is_hovered else 1.5)
+            painter.setPen(pen)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawRoundedRect(rect_box, 3, 3)
+
+            # Étiquette avec nom de la personne
+            name_text = fr.contact_name or "Personne"
+            painter.setFont(QFont("Tahoma", 9, QFont.Weight.Bold))
+            fm = painter.fontMetrics()
+            tw = fm.horizontalAdvance(name_text)
+            badge_w = tw + 16
+            badge_h = 22
+            badge_x = fx + (fw - badge_w) / 2.0
+            badge_y = fy + fh + 4
+
+            badge_rect = QRectF(badge_x, badge_y, badge_w, badge_h)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(20, 24, 30, 210))
+            painter.drawRoundedRect(badge_rect, 4, 4)
+
+            painter.setPen(QColor("#FFFFFF"))
+            painter.drawText(badge_rect, Qt.AlignmentFlag.AlignCenter, name_text)
+
     def wheelEvent(self, event: QWheelEvent) -> None:
         delta = event.angleDelta().y()
         if delta > 0:
@@ -186,6 +240,28 @@ class PicasaImageCanvas(QWidget):
             self.pan_offset += QPointF(delta.x(), delta.y())
             self.fit_to_window = False
             self.update()
+        elif self.show_face_tags and self.face_rects and self._display_pixmap:
+            # Survol des visages pour mise en surbrillance
+            scale = self._get_fit_scale() if self.fit_to_window else self.zoom_level
+            draw_w = self._display_pixmap.width() * scale
+            draw_h = self._display_pixmap.height() * scale
+            cx = (self.width() - draw_w) / 2.0 + self.pan_offset.x()
+            cy = (self.height() - draw_h) / 2.0 + self.pan_offset.y()
+            t_rect = QRectF(cx, cy, draw_w, draw_h)
+
+            prev_hovered = self.hovered_face_idx
+            self.hovered_face_idx = -1
+            pos = event.position()
+            for i, fr in enumerate(self.face_rects):
+                fx = t_rect.x() + fr.left * t_rect.width()
+                fy = t_rect.y() + fr.top * t_rect.height()
+                fw = fr.width * t_rect.width()
+                fh = fr.height * t_rect.height()
+                if QRectF(fx, fy, fw, fh).contains(pos):
+                    self.hovered_face_idx = i
+                    break
+            if prev_hovered != self.hovered_face_idx:
+                self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:

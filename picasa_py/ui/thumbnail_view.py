@@ -213,6 +213,30 @@ class PicasaThumbnailView(QWidget):
         self.update()
         self.selection_changed.emit(list(self.selected_indices))
 
+    def filter_by_person(self, contact_id: str, person_name: str, db_indices: List[int]) -> None:
+        """
+        Filtre la vue pour afficher toutes les photos associées à une personne.
+        Crée une section d'album dédiée avec l'en-tête de la personne.
+        """
+        self.current_folder_filter = f"person:{contact_id}"
+        item_indices = [i for i, item in enumerate(self.items) if item.index in db_indices]
+
+        person_sec = AlbumSection(
+            name=person_name,
+            folder_path=f"person:{contact_id}",
+            date_str="Personnes",
+            item_indices=item_indices
+        )
+
+        self.visible_sections = [person_sec]
+        self.filtered_indices = item_indices
+        self.selected_indices.clear()
+        self.scroll_y = 0
+        self.scrollbar.set_value(0)
+        self._recompute_layout()
+        self.update()
+        self.selection_changed.emit(list(self.selected_indices))
+
     def set_thumb_size(self, size: int) -> None:
         self.thumb_base_size = max(64, min(320, size))
         self._recompute_layout()

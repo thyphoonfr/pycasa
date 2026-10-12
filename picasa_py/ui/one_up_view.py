@@ -153,7 +153,20 @@ class PicasaOneUpView(QWidget):
         self.btn_fit.clicked.connect(self.canvas.reset_zoom_to_fit)
         layout.addWidget(self.btn_fit)
 
+        layout.addSpacing(10)
+
+        # Bouton Affichage des balises de visages (Ref: 0x008AAD76)
+        self.btn_toggle_faces = QPushButton("Visages (On)")
+        self.btn_toggle_faces.setCheckable(True)
+        self.btn_toggle_faces.setChecked(True)
+        self.btn_toggle_faces.toggled.connect(self._on_toggle_face_tags)
+        layout.addWidget(self.btn_toggle_faces)
+
         return bar
+
+    def _on_toggle_face_tags(self, checked: bool) -> None:
+        self.btn_toggle_faces.setText("Visages (On)" if checked else "Visages (Off)")
+        self.canvas.set_show_face_tags(checked)
 
     def open_photo(self, db: PicasaDatabase, index: int, available_indices: List[int]) -> None:
         self.db = db
@@ -161,6 +174,10 @@ class PicasaOneUpView(QWidget):
         self.available_indices = available_indices
         self._history.clear()
         self._history_idx = -1
+
+        # Charger les balises de visages associées à cette photo
+        faces = db.face_manager.get_faces_for_photo(index)
+        self.canvas.set_face_rects(faces)
 
         if index < 0 or index >= len(db.index):
             return
