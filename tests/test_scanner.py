@@ -166,6 +166,8 @@ def test_folder_manager_dialog(temp_picasa_env, qapp):
     dlg = PicasaFolderManagerDialog(db)
     assert dlg.windowTitle() != ""
     assert dlg.watched_list.count() >= 1
+    assert dlg.tree_view.header().stretchLastSection() is True
+    assert not dlg.tree_view.isColumnHidden(0)
 
     # Tester la modification d'un dossier
     target = str(photos_dir.resolve())

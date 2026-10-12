@@ -102,3 +102,29 @@ Ce document décrit le fonctionnement et l'architecture du mode visualiseur/édi
   - **Survol adaptatif** : curseur flèches multidirectionnelles (`SizeAllCursor`) sur le cadre, main pointée (`PointingHandCursor`) sur la miniature, main ouverte (`cursor_7.cur`) sur le canvas.
   - **Visibilité intelligente** : s'affiche automatiquement dès que le zoom dépasse la taille de la fenêtre (`is_zoomed_in()`), et s'estompe en mode Ajuster.
 
+---
+
+## 7. Barre Supérieure et Modes de Comparaison Côte à Côte (« Two-Up »)
+
+- **Identification dans le binaire** :
+  - `TwoUp` (`picasa3.exe @ 0x0088E578`) : orchestrateur du mode double affichage.
+  - `TwoUpAB` (`picasa3.exe @ 0x0088E588`) : mode comparaison de deux photos distinctes.
+  - `TwoUpAA` (`picasa3.exe @ 0x0088E59C`) : mode comparaison avant/après de la même photo.
+  - `TwoUpEditConflictDialog` (`picasa3.exe @ 0x009353AC`) : dialogue de résolution de conflit.
+
+- **Disposition de la Barre Supérieure (`viewer_top_bar`)** :
+  - Hauteur : 40 px, fond gris sombre `#202226` avec bordure inférieure nette.
+  - Gauche : Bouton `[◀ Bibliothèque]` (Échap/Entrée), boutons de transport `[◀]` et `[▶]`, et intitulé `Photo X sur Y • Nom_Fichier`.
+  - Droite : Sélecteur segmenté de comparaison à trois boutons exclusifs :
+    - `[ A ]` : Vue unique normale (One-Up standard).
+    - `[ A | B ]` : Comparaison de deux photos différentes côte à côte.
+      - Volet gauche : Photo A (actuelle).
+      - Volet droit : Photo B (suivante ou sélectionnée).
+      - Clic sur un volet active ce volet (badge bleu).
+      - Les flèches `◀` et `▶` font défiler la photo du volet actif pour naviguer parmi d'autres clichés sans perdre la référence !
+    - `[ A | A ]` : Comparaison avant/après de la même photo.
+      - Volet gauche : Photo originale brute sans aucune retouche (`Originale (Avant)`).
+      - Volet droit : Photo avec l'ensemble des retouches et filtres actifs (`Retouchée (Après)`).
+      - Zoom et pan synchronisés à 100% : le déplacement et le zoom à la molette s'appliquent à l'identique sur les deux moitiés pour observer les détails au pixel près.
+
+

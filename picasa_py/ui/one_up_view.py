@@ -1,9 +1,10 @@
 """
-One-Up View Component for PyCasa (Single Photo Viewer & Editor).
-Assembles the Edit Panel, Image Canvas, and Transport Controls.
+One-Up & Two-Up View Component for PyCasa (Single & Dual Photo Viewer & Editor).
+Assembles the Edit Panel, Image Canvas, Viewer Top Bar, and Transport Controls.
 
 Ref: picasa3.exe @ OneUp, AVOneUpUI, editoneup
-Ref: AGENTS.md §4 bis (Mode visualiseur/retouche fidèle)
+Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
+Ref: AGENTS.md §4 bis (Mode visualiseur/retouche fidèle, barre supérieure et comparaison A B|A A|A)
 """
 
 from __future__ import annotations
@@ -12,7 +13,8 @@ import io
 from pathlib import Path
 from typing import List, Optional, Tuple
 from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSlider, QFrame
+    QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSlider, QFrame,
+    QButtonGroup
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QImage
@@ -26,10 +28,11 @@ from picasa_py.ui.image_processor import PicasaImageProcessor
 from picasa_py.db.database import PicasaDatabase
 
 
-# Ref: picasa3.exe @ OneUp
+# Ref: picasa3.exe @ OneUp, TwoUp
 class PicasaOneUpView(QWidget):
     """
-    Vue d'édition d'une image unique (« One-Up View ») avec retouche et navigation.
+    Vue d'édition d'une image unique (« One-Up View ») ou comparaison (« Two-Up View »)
+    avec barre de contrôle supérieure, retouche, comparaison A B|A A|A et navigation.
     """
     back_to_library_requested = Signal()
     photo_modified = Signal(int, dict)
@@ -41,11 +44,13 @@ class PicasaOneUpView(QWidget):
 
         self.db: Optional[PicasaDatabase] = None
         self.current_index: int = -1
+        self.secondary_index: int = -1
         self.available_indices: List[int] = []
 
         # Historique de retouche pour Annuler/Rétablir
         self._history: List[Image.Image] = []
         self._history_idx: int = -1
+        self._original_pil_img: Optional[Image.Image] = None
 
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -59,13 +64,18 @@ class PicasaOneUpView(QWidget):
         self.edit_panel.redo_action.connect(self._on_redo)
         main_layout.addWidget(self.edit_panel)
 
-        # 2. Zone droite (Canvas + barre inférieure de transport)
+        # 2. Zone droite (Barre supérieure + Canvas + barre inférieure de transport)
         right_container = QWidget()
         right_layout = QVBoxLayout(right_container)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(0)
 
+        # Barre supérieure de navigation et de comparaison (Ref: TwoUp, TwoUpAB, TwoUpAA)
+        self.viewer_top_bar = self._create_viewer_top_bar()
+        right_layout.addWidget(self.viewer_top_bar)
+
         self.canvas = PicasaImageCanvas(self.style, self)
+        self.canvas.active_pane_changed.connect(self._on_active_pane_changed)
         right_layout.addWidget(self.canvas, 1)
 
         # 3. Barre inférieure de commandes de transport
@@ -73,6 +83,106 @@ class PicasaOneUpView(QWidget):
         right_layout.addWidget(self.transport_bar)
 
         main_layout.addWidget(right_container, 1)
+
+    def _create_viewer_top_bar(self) -> QWidget:
+        """
+        Barre supérieure du visualiseur Picasa 3 contenant la navigation d'image
+        et le sélecteur de comparaison côte à côte [A] [A | B] [A | A].
+        Ref: picasa3.exe @ TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
+        """
+        bar = QWidget()
+        bar.setFixedHeight(40)
+        bar.setStyleSheet("""
+            QWidget {
+                background-color: #202226;
+                border-bottom: 1px solid #141517;
+            }
+            QPushButton {
+                background-color: #32353B;
+                color: #DDDDDD;
+                border: 1px solid #43474F;
+                border-radius: 3px;
+                padding: 4px 10px;
+                font-size: 11px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #40444B;
+                color: #FFFFFF;
+                border-color: #555B66;
+            }
+            QPushButton:pressed {
+                background-color: #202225;
+            }
+            QPushButton:checked {
+                background-color: #25648B;
+                color: #FFFFFF;
+                border: 1px solid #3399FF;
+            }
+            QLabel {
+                color: #CCCCCC;
+                font-size: 11px;
+            }
+        """)
+        layout = QHBoxLayout(bar)
+        layout.setContentsMargins(12, 4, 12, 4)
+        layout.setSpacing(8)
+
+        # 1. Bouton Retour à la bibliothèque
+        self.btn_top_back = QPushButton("◀ Bibliothèque")
+        self.btn_top_back.setToolTip("Revenir à la bibliothèque (Échap ou Entrée)")
+        self.btn_top_back.clicked.connect(self.back_to_library_requested.emit)
+        layout.addWidget(self.btn_top_back)
+
+        layout.addSpacing(6)
+
+        # 2. Boutons de navigation précédente / suivante
+        self.btn_top_prev = QPushButton("◀")
+        self.btn_top_prev.setFixedWidth(28)
+        self.btn_top_prev.setToolTip("Photo précédente (Flèche Gauche)")
+        self.btn_top_prev.clicked.connect(self.navigate_previous)
+        layout.addWidget(self.btn_top_prev)
+
+        self.btn_top_next = QPushButton("▶")
+        self.btn_top_next.setFixedWidth(28)
+        self.btn_top_next.setToolTip("Photo suivante (Flèche Droite)")
+        self.btn_top_next.clicked.connect(self.navigate_next)
+        layout.addWidget(self.btn_top_next)
+
+        # 3. Libellé d'informations de la photo en cours
+        self.lbl_top_info = QLabel("")
+        self.lbl_top_info.setStyleSheet("color: #E2E2E2; font-weight: bold; padding-left: 6px;")
+        layout.addWidget(self.lbl_top_info)
+
+        layout.addStretch(1)
+
+        # 4. Groupe de boutons de comparaison côte à côte (Ref: picasa3.exe @ TwoUp, TwoUpAB, TwoUpAA)
+        layout.addWidget(QLabel("Affichage :"))
+
+        self.btn_mode_a = QPushButton("A")
+        self.btn_mode_a.setCheckable(True)
+        self.btn_mode_a.setChecked(True)
+        self.btn_mode_a.setToolTip("Vue unique standard (A)")
+
+        self.btn_mode_ab = QPushButton("A | B")
+        self.btn_mode_ab.setCheckable(True)
+        self.btn_mode_ab.setToolTip("Comparer deux photos différentes côte à côte (A | B)")
+
+        self.btn_mode_aa = QPushButton("A | A")
+        self.btn_mode_aa.setCheckable(True)
+        self.btn_mode_aa.setToolTip("Comparer la photo originale et la version retouchée côte à côte (A | A)")
+
+        self.mode_btn_group = QButtonGroup(bar)
+        self.mode_btn_group.addButton(self.btn_mode_a, 0)
+        self.mode_btn_group.addButton(self.btn_mode_ab, 1)
+        self.mode_btn_group.addButton(self.btn_mode_aa, 2)
+        self.mode_btn_group.idClicked.connect(self._on_view_mode_changed)
+
+        layout.addWidget(self.btn_mode_a)
+        layout.addWidget(self.btn_mode_ab)
+        layout.addWidget(self.btn_mode_aa)
+
+        return bar
 
     def _create_transport_bar(self) -> QWidget:
         bar = QWidget()
@@ -176,24 +286,38 @@ class PicasaOneUpView(QWidget):
         self.btn_toggle_faces.setText("Visages (On)" if checked else "Visages (Off)")
         self.canvas.set_show_face_tags(checked)
 
-    def open_photo(self, db: PicasaDatabase, index: int, available_indices: List[int]) -> None:
-        self.db = db
-        self.current_index = index
-        self.available_indices = available_indices
-        self._history.clear()
-        self._history_idx = -1
+    def _on_view_mode_changed(self, mode_id: int) -> None:
+        """
+        Bascule entre les modes de comparaison :
+        0: A (vue simple)
+        1: A | B (2 photos côte à côte)
+        2: A | A (avant / après retouches)
+        Ref: picasa3.exe @ TwoUpAB, TwoUpAA
+        """
+        if mode_id == 0:
+            self.canvas.set_view_mode("A")
+        elif mode_id == 1:
+            self.canvas.set_view_mode("A_B")
+            self._load_secondary_photo()
+        elif mode_id == 2:
+            self.canvas.set_view_mode("A_A")
+            if self._original_pil_img:
+                orig_pix = self._pil_to_pixmap(self._original_pil_img)
+                self.canvas.set_original_pixmap(orig_pix)
 
-        # Charger les balises de visages associées à cette photo
-        faces = db.face_manager.get_faces_for_photo(index)
-        self.canvas.set_face_rects(faces)
+        self._update_top_bar_info()
 
-        if index < 0 or index >= len(db.index):
-            return
+    def _on_active_pane_changed(self, pane: str) -> None:
+        self._update_top_bar_info()
 
-        full_path = db.get_media_full_path(index)
+    def _load_pil_image_at_index(self, index: int) -> Optional[Image.Image]:
+        """Charge une image PIL haute résolution depuis le disque ou le cache."""
+        if self.db is None or index < 0 or index >= len(self.db.index):
+            return None
+
+        full_path = self.db.get_media_full_path(index)
         pil_img: Optional[Image.Image] = None
 
-        # 1. Chargement de l'image originale haute résolution sur disque
         if full_path and os.path.exists(full_path):
             try:
                 with Image.open(full_path) as raw_img:
@@ -204,38 +328,124 @@ class PicasaOneUpView(QWidget):
             except Exception:
                 pass
 
-        # 2. Si introuvable (disque déconnecté), repli sur previews puis thumbs
         if pil_img is None:
             for sz in ("preview", "large", "medium", "small"):
-                raw_thumb = db.load_thumbnail(index, size=sz)
+                raw_thumb = self.db.load_thumbnail(index, size=sz)
                 if raw_thumb:
-                    import io
                     try:
                         pil_img = Image.open(io.BytesIO(raw_thumb)).convert("RGB")
                         break
                     except Exception:
                         pass
 
+        return pil_img
+
+    def _pil_to_pixmap(self, img: Image.Image) -> QPixmap:
+        """Convertit une image PIL en QPixmap optimisé."""
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=95)
+        qimg = QImage()
+        qimg.loadFromData(buf.getvalue(), "JPEG")
+        return QPixmap.fromImage(qimg)
+
+    def open_photo(self, db: PicasaDatabase, index: int, available_indices: List[int]) -> None:
+        self.db = db
+        self.current_index = index
+        self.available_indices = available_indices
+        self._history.clear()
+        self._history_idx = -1
+
+        faces = db.face_manager.get_faces_for_photo(index)
+        self.canvas.set_face_rects(faces)
+
+        if index < 0 or index >= len(db.index):
+            return
+
+        pil_img = self._load_pil_image_at_index(index)
         if pil_img:
+            self._original_pil_img = pil_img.copy()
             self._history = [pil_img.copy()]
             self._history_idx = 0
             self._display_current_history()
+
+            orig_pix = self._pil_to_pixmap(self._original_pil_img)
+            self.canvas.set_original_pixmap(orig_pix)
+
+        filename = os.path.basename(db.index[index].path)
+        self.canvas.main_title = filename
+
+        # Si en mode A|B, charger automatiquement la photo secondaire
+        if self.canvas.view_mode == "A_B":
+            self._load_secondary_photo()
+
+        self._update_top_bar_info()
+
+    def _load_secondary_photo(self) -> None:
+        """Charge la photo B pour le mode de comparaison A | B."""
+        if not self.available_indices or self.db is None:
+            return
+
+        # Par défaut, sélectionner la photo suivante dans la liste
+        if (
+            self.secondary_index < 0
+            or self.secondary_index not in self.available_indices
+            or self.secondary_index == self.current_index
+        ):
+            try:
+                curr_pos = self.available_indices.index(self.current_index)
+                sec_pos = (curr_pos + 1) % len(self.available_indices)
+                self.secondary_index = self.available_indices[sec_pos]
+            except ValueError:
+                self.secondary_index = self.available_indices[0]
+
+        sec_img = self._load_pil_image_at_index(self.secondary_index)
+        if sec_img:
+            sec_pix = self._pil_to_pixmap(sec_img)
+            sec_filename = os.path.basename(self.db.index[self.secondary_index].path)
+            self.canvas.set_secondary_pixmap(sec_pix, sec_filename)
+        else:
+            self.canvas.set_secondary_pixmap(None, "Aucune")
+
+        self._update_top_bar_info()
+
+    def _update_top_bar_info(self) -> None:
+        """Met à jour l'intitulé informatif de la photo dans la barre supérieure."""
+        if self.db is None or self.current_index < 0:
+            self.lbl_top_info.setText("")
+            return
+
+        total = len(self.available_indices)
+        curr_pos = -1
+        try:
+            curr_pos = self.available_indices.index(self.current_index)
+        except ValueError:
+            pass
+
+        filename = os.path.basename(self.db.index[self.current_index].path) if self.current_index < len(self.db.index) else ""
+
+        if self.canvas.view_mode == "A":
+            pos_str = f"Photo {curr_pos + 1} sur {total}" if curr_pos >= 0 else ""
+            self.lbl_top_info.setText(f"{pos_str}  •  {filename}")
+        elif self.canvas.view_mode == "A_B":
+            sec_name = self.canvas.secondary_title
+            active_info = " (Active)" if self.canvas.active_pane == "B" else ""
+            self.lbl_top_info.setText(f"Comparaison A | B  •  Photo A: {filename}  vs  Photo B: {sec_name}{active_info}")
+        elif self.canvas.view_mode == "A_A":
+            self.lbl_top_info.setText(f"Comparaison A | A  •  Originale (Avant) vs Retouchée (Après) — {filename}")
 
     def _display_current_history(self) -> None:
         if self._history_idx < 0 or self._history_idx >= len(self._history):
             return
 
         img = self._history[self._history_idx]
-        # Convertir PIL -> QImage -> QPixmap
-        import io
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=95)
-        qimg = QImage()
-        qimg.loadFromData(buf.getvalue(), "JPEG")
-        self.canvas.set_pixmap_direct(QPixmap.fromImage(qimg))
+        pix = self._pil_to_pixmap(img)
+        self.canvas.set_pixmap_direct(pix)
+
+        if self._original_pil_img:
+            orig_pix = self._pil_to_pixmap(self._original_pil_img)
+            self.canvas.set_original_pixmap(orig_pix)
 
     def _push_history(self, img: Image.Image) -> None:
-        # Tronquer si on a annulé des actions
         self._history = self._history[: self._history_idx + 1]
         self._history.append(img.copy())
         self._history_idx = len(self._history) - 1
@@ -282,6 +492,19 @@ class PicasaOneUpView(QWidget):
     def navigate_previous(self) -> None:
         if not self.available_indices or self.db is None:
             return
+
+        # En mode A|B, si le volet B est actif, on fait défiler la photo B
+        if self.canvas.view_mode == "A_B" and self.canvas.active_pane == "B":
+            try:
+                curr_pos = self.available_indices.index(self.secondary_index)
+                if curr_pos > 0:
+                    self.secondary_index = self.available_indices[curr_pos - 1]
+                    self._load_secondary_photo()
+            except ValueError:
+                pass
+            return
+
+        # En mode A ou A|A, faire défiler la photo principale
         try:
             curr_pos = self.available_indices.index(self.current_index)
             if curr_pos > 0:
@@ -293,6 +516,19 @@ class PicasaOneUpView(QWidget):
     def navigate_next(self) -> None:
         if not self.available_indices or self.db is None:
             return
+
+        # En mode A|B, si le volet B est actif, on fait défiler la photo B
+        if self.canvas.view_mode == "A_B" and self.canvas.active_pane == "B":
+            try:
+                curr_pos = self.available_indices.index(self.secondary_index)
+                if curr_pos < len(self.available_indices) - 1:
+                    self.secondary_index = self.available_indices[curr_pos + 1]
+                    self._load_secondary_photo()
+            except ValueError:
+                pass
+            return
+
+        # En mode A ou A|A, faire défiler la photo principale
         try:
             curr_pos = self.available_indices.index(self.current_index)
             if curr_pos < len(self.available_indices) - 1:
@@ -308,5 +544,13 @@ class PicasaOneUpView(QWidget):
             self.navigate_next()
         elif event.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.back_to_library_requested.emit()
+        elif event.key() == Qt.Key.Key_A:
+            # Raccourci A pour basculer en mode A simple
+            self.mode_btn_group.button(0).setChecked(True)
+            self._on_view_mode_changed(0)
+        elif event.key() == Qt.Key.Key_B:
+            # Raccourci B pour basculer en mode A|B
+            self.mode_btn_group.button(1).setChecked(True)
+            self._on_view_mode_changed(1)
         else:
             super().keyPressEvent(event)

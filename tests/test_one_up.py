@@ -222,3 +222,64 @@ def test_image_canvas_loupe_and_anchored_zoom(qapp):
     assert canvas.pan_offset == QPointF(0, 0)
     assert canvas.is_zoomed_in() is False
 
+
+def test_one_up_top_bar_and_comparison_modes(qapp, sample_image):
+    """
+    Test de la barre supérieure One-Up / Two-Up et des modes de comparaison
+    côte à côte A, A|B, A|A.
+    Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
+    """
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.db.thumbindex import ThumbIndexFile, ThumbIndexRecord
+
+    db = PicasaDatabase()
+    ti = ThumbIndexFile()
+    rec_folder = ThumbIndexRecord(path="C:/Photos", ft1=0, ft2=0, size=0, type=1, flags=0, parent_idx=-1)
+    ti.records.append(rec_folder)
+    rec1 = ThumbIndexRecord(path="Photo1.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0)
+    rec2 = ThumbIndexRecord(path="Photo2.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0)
+    rec3 = ThumbIndexRecord(path="Photo3.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0)
+    ti.records.extend([rec1, rec2, rec3])
+    db.thumbindex = ti
+
+    view = PicasaOneUpView()
+    view.resize(1000, 700)
+
+    # 1. Barre supérieure présente et initialisée
+    assert view.viewer_top_bar is not None
+    assert view.btn_top_prev is not None
+    assert view.btn_top_next is not None
+    assert view.btn_mode_a.isChecked()
+
+    # 2. Ouvrir la photo 1
+    view._history = [sample_image.copy()]
+    view._history_idx = 0
+    view._original_pil_img = sample_image.copy()
+    view.db = db
+    view.current_index = 1
+    view.available_indices = [1, 2, 3]
+    view._update_top_bar_info()
+    assert "Photo 1 sur 3" in view.lbl_top_info.text()
+
+    # 3. Basculer en mode A|B (Comparer 2 photos)
+    view.mode_btn_group.button(1).click()
+    assert view.canvas.view_mode == "A_B"
+    assert "Comparaison A | B" in view.lbl_top_info.text()
+
+    # Navigation en mode A|B sur le volet B
+    view.canvas.active_pane = "B"
+    view.secondary_index = 2
+    view.navigate_next()
+    assert view.secondary_index == 3
+
+    # 4. Basculer en mode A|A (Avant / Après)
+    view.mode_btn_group.button(2).click()
+    assert view.canvas.view_mode == "A_A"
+    assert "Comparaison A | A" in view.lbl_top_info.text()
+
+    # 5. Revenir en mode A (Vue simple)
+    view.mode_btn_group.button(0).click()
+    assert view.canvas.view_mode == "A"
+    assert "Photo 1 sur 3" in view.lbl_top_info.text()
+
+

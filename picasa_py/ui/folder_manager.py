@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QTreeView, QFileSystemModel, QRadioButton, QButtonGroup,
     QCheckBox, QListWidget, QGroupBox, QSplitter, QMessageBox,
-    QWidget
+    QWidget, QHeaderView
 )
 from PySide6.QtGui import QFont, QColor, QStandardItemModel, QStandardItem
 
@@ -146,13 +146,35 @@ class PicasaFolderManagerDialog(QDialog):
             }
             QTreeView {
                 background-color: #FFFFFF;
+                color: #111111;
                 border: 1px solid #B0B0B0;
                 selection-background-color: #3399FF;
                 selection-color: #FFFFFF;
+                font-size: 12px;
+            }
+            QTreeView::item {
+                color: #111111;
+                height: 22px;
+            }
+            QTreeView::item:selected {
+                background-color: #3399FF;
+                color: #FFFFFF;
             }
             QListWidget {
                 background-color: #FFFFFF;
+                color: #111111;
                 border: 1px solid #B0B0B0;
+                selection-background-color: #3399FF;
+                selection-color: #FFFFFF;
+                font-size: 11px;
+            }
+            QListWidget::item {
+                color: #111111;
+                padding: 4px 6px;
+            }
+            QListWidget::item:selected {
+                background-color: #3399FF;
+                color: #FFFFFF;
             }
             QPushButton {
                 background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F5F5F5, stop:1 #E0E0E0);
@@ -173,6 +195,7 @@ class PicasaFolderManagerDialog(QDialog):
             QRadioButton {
                 spacing: 8px;
                 font-weight: normal;
+                color: #222222;
             }
             QRadioButton::indicator {
                 width: 14px;
@@ -203,10 +226,12 @@ class PicasaFolderManagerDialog(QDialog):
 
         self.tree_view = QTreeView(left_widget)
         self.tree_view.setModel(self.fs_model)
-        # N'afficher que la colonne du nom de dossier
+        # N'afficher que la colonne du nom de dossier avec étirement complet
         for col in range(1, 4):
             self.tree_view.hideColumn(col)
         self.tree_view.setHeaderHidden(True)
+        self.tree_view.header().setStretchLastSection(True)
+        self.tree_view.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.tree_view.clicked.connect(self._on_tree_item_clicked)
         left_layout.addWidget(self.tree_view)
 
@@ -303,6 +328,40 @@ class PicasaFolderManagerDialog(QDialog):
         # Initialisation de la liste des dossiers surveillés
         self._refresh_watched_list()
         self._update_radio_states()
+        self._auto_expand_initial_paths()
+
+    def _auto_expand_initial_paths(self) -> None:
+        """Déplie automatiquement les dossiers pertinents (Images, Documents, dossiers surveillés)."""
+        from PySide6.QtCore import QTimer
+
+        def _do_expand():
+            targets = []
+            for p in list(self.folder_settings.keys()):
+                if os.path.exists(p):
+                    targets.append(p)
+            user_pic = os.path.expanduser("~/Pictures")
+            if os.path.exists(user_pic):
+                targets.append(user_pic)
+            user_doc = os.path.expanduser("~/Documents")
+            if os.path.exists(user_doc):
+                targets.append(user_doc)
+
+            for target in targets:
+                idx = self.fs_model.index(target)
+                if idx.isValid():
+                    p_idx = idx
+                    while p_idx.isValid():
+                        self.tree_view.expand(p_idx)
+                        p_idx = p_idx.parent()
+
+            if targets:
+                first_idx = self.fs_model.index(targets[0])
+                if first_idx.isValid():
+                    self.tree_view.setCurrentIndex(first_idx)
+                    self.tree_view.scrollTo(first_idx)
+                    self._on_tree_item_clicked(first_idx)
+
+        QTimer.singleShot(200, _do_expand)
 
     def _refresh_watched_list(self) -> None:
         """Met à jour la liste des dossiers surveillés affichés à droite."""

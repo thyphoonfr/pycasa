@@ -1,13 +1,15 @@
 """
-High-Resolution Interactive Image Canvas for PyCasa One-Up View.
+High-Resolution Interactive Image Canvas for PyCasa One-Up & Two-Up Views.
 Supports smooth zooming, panning, rotation, and non-destructive preview.
-Includes Picasa's signature Loupe Navigator with interactive orange viewfinder frame.
+Includes Picasa's signature Loupe Navigator with interactive orange viewfinder frame,
+and Side-by-Side Dual Comparison Modes (A, A|B, A|A).
 
 Ref: picasa3.exe @ OneUp, AVOneUpUI (0x0094355C)
+Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
 Ref: picasa3.exe @ CLoupeNode (0x00942AE4), CLoupeMaker (0x00942AC8)
 Ref: picasa3.exe @ PanHandler (0x0093F3A8)
 Ref: picasa3.exe @ thumbui/loupe (0x0088F9C4)
-Ref: AGENTS.md §4 bis (Fonctionnement identique: zoom, pan, molette, navigateur de cadrage)
+Ref: AGENTS.md §4 bis (Fonctionnement identique: zoom, pan, molette, comparaison A B|A A|A)
 """
 
 from __future__ import annotations
@@ -26,16 +28,17 @@ from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.style import PicasaStyle
 
 
-# Ref: picasa3.exe @ OneUp (0x0094355C)
+# Ref: picasa3.exe @ OneUp (0x0094355C), TwoUp (0x0088E588)
 class PicasaImageCanvas(QWidget):
     """
     Zone d'affichage haute résolution d'une photo avec zoom continu ancré,
-    panoramique (pan) fluide, balises de visages, et navigateur Loupe d'ensemble
-    avec rectangle de cadrage interactif orange.
+    panoramique (pan) fluide, balises de visages, navigateur Loupe de cadrage,
+    et modes de comparaison côte-à-côte (A, A|B, A|A).
     """
     zoom_changed = Signal(float)
     navigate_prev = Signal()
     navigate_next = Signal()
+    active_pane_changed = Signal(str)  # "A" ou "B"
 
     def __init__(self, style: Optional[PicasaStyle] = None, parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -48,6 +51,14 @@ class PicasaImageCanvas(QWidget):
         self.image_path: Optional[str] = None
         self._raw_pixmap: Optional[QPixmap] = None
         self._display_pixmap: Optional[QPixmap] = None
+
+        # Modes de comparaison côte-à-côte (Ref: picasa3.exe @ TwoUp, TwoUpAB, TwoUpAA)
+        self.view_mode: str = "A"  # "A" (vue unique), "A_B" (2 photos), "A_A" (avant/après)
+        self._original_pixmap: Optional[QPixmap] = None
+        self._secondary_pixmap: Optional[QPixmap] = None
+        self.main_title: str = "Photo A"
+        self.secondary_title: str = "Photo B"
+        self.active_pane: str = "A"  # "A" ou "B"
 
         # Paramètres de vue
         self.zoom_level: float = 1.0  # 1.0 = 100% échelle 1:1
@@ -119,6 +130,31 @@ class PicasaImageCanvas(QWidget):
 
     def rotate_counterclockwise(self) -> None:
         self.set_rotation(self.rotation_degrees - 90)
+
+    def set_view_mode(self, mode: str) -> None:
+        """
+        Définit le mode d'affichage :
+        - "A" : Vue unique normale (One-Up)
+        - "A_B" : Comparaison de deux photos différentes côte à côte (Two-Up A|B)
+        - "A_A" : Comparaison avant/après de la même photo côte à côte (Two-Up A|A)
+        Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
+        """
+        if mode in ("A", "A_B", "A_A"):
+            self.view_mode = mode
+            self.update()
+
+    def set_original_pixmap(self, pixmap: Optional[QPixmap]) -> None:
+        """Enregistre la photo originale non retouchée pour le mode A|A."""
+        self._original_pixmap = pixmap
+        if self.view_mode == "A_A":
+            self.update()
+
+    def set_secondary_pixmap(self, pixmap: Optional[QPixmap], title: str = "Photo B") -> None:
+        """Définit la photo secondaire pour le mode de comparaison A|B."""
+        self._secondary_pixmap = pixmap
+        self.secondary_title = title
+        if self.view_mode == "A_B":
+            self.update()
 
     def _update_display_pixmap(self) -> None:
         if self._raw_pixmap is None or self._raw_pixmap.isNull():
@@ -228,7 +264,6 @@ class PicasaImageCanvas(QWidget):
         clamped_zoom = max(0.1, min(6.0, new_zoom))
         fit_scale = self._get_fit_scale()
 
-        # Si l'utilisateur dézoome en-deçà de la vue ajustée, réinitialiser proprement au Fit
         if clamped_zoom <= fit_scale * 0.98:
             self.reset_zoom_to_fit()
             return
@@ -238,7 +273,6 @@ class PicasaImageCanvas(QWidget):
         cx_old = (self.width() - draw_w_old) / 2.0 + self.pan_offset.x()
         cy_old = (self.height() - draw_h_old) / 2.0 + self.pan_offset.y()
 
-        # Coordonnées normalisées [0..1] du point sous la souris
         u = (anchor.x() - cx_old) / draw_w_old if draw_w_old > 0 else 0.5
         v = (anchor.y() - cy_old) / draw_h_old if draw_h_old > 0 else 0.5
         u = max(0.0, min(1.0, u))
@@ -297,7 +331,6 @@ class PicasaImageCanvas(QWidget):
         self._nav_card_rect = QRectF(card_x, card_y, card_w, card_h)
         self._nav_img_rect = QRectF(card_x + pad, card_y + pad, nw, nh)
 
-        # Calcul de la zone visible en coordonnées normalisées [0..1]
         scale = self.get_current_scale()
         draw_w = img_w * scale
         draw_h = img_h * scale
@@ -330,8 +363,16 @@ class PicasaImageCanvas(QWidget):
         # Fond neutre sombre Picasa (#1A1A1A)
         painter.fillRect(self.rect(), QColor(0x1A, 0x1A, 0x1A))
 
+        if self.view_mode in ("A_B", "A_A"):
+            self._paint_two_up(painter)
+        else:
+            self._paint_one_up(painter)
+
+    def _paint_one_up(self, painter: QPainter) -> None:
+        """Rendu standard en vue unique (One-Up)."""
         if self._display_pixmap is None or self._display_pixmap.isNull():
             painter.setPen(QColor("#888888"))
+            painter.setFont(QFont("Segoe UI", 12))
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Impossible de charger l'image")
             return
 
@@ -358,6 +399,90 @@ class PicasaImageCanvas(QWidget):
         # Dessin du navigateur Loupe d'ensemble (Ref: 0x00942AE4)
         self._update_loupe_geometry()
         self._draw_overview_navigator(painter)
+
+    def _paint_two_up(self, painter: QPainter) -> None:
+        """
+        Rendu en mode comparaison côte à côte (Two-Up A|B ou A|A).
+        Ref: picasa3.exe @ TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
+        """
+        w, h = float(self.width()), float(self.height())
+        half_w = (w - 2.0) / 2.0
+        left_rect = QRectF(0, 0, half_w, h)
+        right_rect = QRectF(half_w + 2.0, 0, half_w, h)
+
+        # Séparateur vertical central
+        painter.fillRect(QRectF(half_w, 0, 2, h), QColor(20, 22, 26))
+
+        if self.view_mode == "A_A":
+            img_left = self._original_pixmap if self._original_pixmap else self._display_pixmap
+            img_right = self._display_pixmap
+            badge_left = "Originale (Avant)"
+            badge_right = "Retouchée (Après)"
+            act_left = False
+            act_right = False
+        else:  # "A_B"
+            img_left = self._display_pixmap
+            img_right = self._secondary_pixmap
+            badge_left = f"Photo A : {self.main_title}"
+            badge_right = f"Photo B : {self.secondary_title}"
+            act_left = (self.active_pane == "A")
+            act_right = (self.active_pane == "B")
+
+        self._draw_pane_content(painter, left_rect, img_left, badge_left, act_left, False)
+        self._draw_pane_content(painter, right_rect, img_right, badge_right, act_right, (self.view_mode == "A_A"))
+
+    def _draw_pane_content(
+        self, painter: QPainter, pane_rect: QRectF,
+        pix: Optional[QPixmap], badge_text: str, is_active: bool, is_modified_style: bool
+    ) -> None:
+        """Dessine une photo et son étiquette dans un volet de comparaison."""
+        if pix is None or pix.isNull():
+            painter.setPen(QColor("#777777"))
+            painter.setFont(QFont("Segoe UI", 11))
+            painter.drawText(pane_rect, Qt.AlignmentFlag.AlignCenter, "Aucune photo sélectionnée")
+        else:
+            # Calcul du ratio adapté au demi-panneau
+            scale_x = (pane_rect.width() - 20.0) / pix.width()
+            scale_y = (pane_rect.height() - 20.0) / pix.height()
+            fit_scale = min(scale_x, scale_y)
+            scale = fit_scale if self.fit_to_window else (self.zoom_level * fit_scale)
+
+            dw = pix.width() * scale
+            dh = pix.height() * scale
+            cx = pane_rect.x() + (pane_rect.width() - dw) / 2.0 + self.pan_offset.x()
+            cy = pane_rect.y() + (pane_rect.height() - dh) / 2.0 + self.pan_offset.y()
+            t_rect = QRectF(cx, cy, dw, dh)
+
+            painter.save()
+            painter.setClipRect(pane_rect)
+
+            # Ombre portée
+            painter.fillRect(t_rect.translated(3, 3), QColor(0, 0, 0, 90))
+            # Image haute résolution
+            painter.drawPixmap(t_rect, pix, QRectF(pix.rect()))
+            painter.restore()
+
+        # Badge pill en haut à gauche du volet
+        painter.save()
+        painter.setFont(QFont("Segoe UI", 9, QFont.Weight.Bold))
+        fm = painter.fontMetrics()
+        tw = fm.horizontalAdvance(badge_text)
+        b_rect = QRectF(pane_rect.x() + 14, pane_rect.y() + 14, tw + 20, 24)
+
+        if is_active:
+            painter.setBrush(QColor(37, 100, 139, 235))
+            painter.setPen(QPen(QColor(51, 153, 255, 230), 1.5))
+        elif is_modified_style:
+            painter.setBrush(QColor(230, 115, 0, 230))
+            painter.setPen(QPen(QColor(255, 160, 40, 230), 1.2))
+        else:
+            painter.setBrush(QColor(24, 26, 30, 210))
+            painter.setPen(QPen(QColor(65, 70, 80, 190), 1.0))
+
+        painter.drawRoundedRect(b_rect, 4.0, 4.0)
+        painter.setPen(QColor("#FFFFFF"))
+        painter.drawText(b_rect, Qt.AlignmentFlag.AlignCenter, badge_text)
+        painter.restore()
 
     def _draw_overview_navigator(self, painter: QPainter) -> None:
         """
@@ -442,14 +567,12 @@ class PicasaImageCanvas(QWidget):
             rect_box = QRectF(fx, fy, fw, fh)
             is_hovered = (i == self.hovered_face_idx)
 
-            # Cadre rectangulaire aux coins arrondis
             pen_color = QColor(0, 200, 255, 230) if is_hovered else QColor(255, 255, 255, 200)
             pen = QPen(pen_color, 2.0 if is_hovered else 1.5)
             painter.setPen(pen)
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawRoundedRect(rect_box, 3, 3)
 
-            # Étiquette avec nom de la personne
             name_text = fr.contact_name or "Personne"
             painter.setFont(QFont("Tahoma", 9, QFont.Weight.Bold))
             fm = painter.fontMetrics()
@@ -480,7 +603,17 @@ class PicasaImageCanvas(QWidget):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             pos = event.position()
-            # 1. Interaction avec la Loupe si active
+
+            # 1. Sélection de volet en mode comparaison A|B
+            if self.view_mode == "A_B":
+                half_w = (self.width() - 2.0) / 2.0
+                new_pane = "A" if pos.x() < half_w else "B"
+                if self.active_pane != new_pane:
+                    self.active_pane = new_pane
+                    self.active_pane_changed.emit(new_pane)
+                    self.update()
+
+            # 2. Interaction avec la Loupe si active
             if self.is_zoomed_in() and self.show_loupe_navigator and self._nav_card_rect.contains(pos):
                 if self._nav_img_rect.contains(pos):
                     if self._vbox_rect.contains(pos):
@@ -492,7 +625,7 @@ class PicasaImageCanvas(QWidget):
                         self._last_nav_drag_pos = pos
                 return
 
-            # 2. Panoramique sur le canvas principal
+            # 3. Panoramique sur le canvas
             self._is_dragging = True
             self._last_mouse_pos = event.pos()
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
@@ -589,7 +722,6 @@ class PicasaImageCanvas(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             pos = event.position()
             if self.fit_to_window:
-                # Double-clic zoome sur le point cliqué à 100% ou 200%
                 fit_scale = self._get_fit_scale()
                 target_zoom = 1.0 if fit_scale < 0.8 else max(1.5, fit_scale * 2.0)
                 self.set_zoom_anchored(target_zoom, pos)
@@ -601,7 +733,6 @@ class PicasaImageCanvas(QWidget):
         self._clamp_pan_offset()
 
     def keyPressEvent(self, event) -> None:
-        # Laisser remonter les touches de transport (Gauche/Droite/Échap/Entrée) au parent OneUpView
         if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
             event.ignore()
         else:
