@@ -68,12 +68,18 @@ python tools/build_executable.py
 
 ---
 
-### 4. Compilation multi-OS automatisée via GitHub Actions
+### 4. Compilation et Publication Multi-OS Automatisée via GitHub Releases (`v*`)
 
-Un workflow CI complet est fourni dans [`.github/workflows/build_executables.yml`](../.github/workflows/build_executables.yml). Il compile simultanément sur les 3 systèmes d'exploitation (`windows-latest`, `macos-latest`, `ubuntu-latest`) et publie les 3 artefacts prêts à l'emploi :
-- `PyCasa-Windows-x64` (`PyCasa.exe`)
-- `PyCasa-macOS-App` (`PyCasa.app.zip`)
-- `PyCasa-Linux-x64` (`PyCasa`, `PyCasa.png`, `PyCasa.desktop`)
+Un workflow CI/CD complet est fourni dans [`.github/workflows/build_executables.yml`](../.github/workflows/build_executables.yml). Il compile simultanément sur les 3 systèmes d'exploitation (`windows-latest`, `macos-latest`, `ubuntu-latest`) et, dès qu'un tag de version `v*` (ex. `v3.9.150.281`) est poussé sur GitHub, publie automatiquement une **GitHub Release** contenant les **3 versions prêtes à l'emploi** :
+- 🪟 **Windows (64 bits)** : `PyCasa-<version>-Windows-x64.zip` (`PyCasa/PyCasa.exe`, `PyCasa/PyCasa.ico`, `PyCasa/LISEZMOI.txt`)
+- 🍎 **macOS (App Bundle)** : `PyCasa-<version>-macOS.zip` (`PyCasa.app` avec icône `.icns` Retina)
+- 🐧 **Linux (x86_64)** : `PyCasa-<version>-Linux-x64.tar.gz` (`PyCasa`, `PyCasa.png`, `PyCasa.desktop`)
+
+Pour publier automatiquement une nouvelle Release multi-OS (Windows + macOS + Linux) sur GitHub :
+```bash
+git tag -a v3.9.150.282 -m "Release PyCasa v3.9.150.282"
+git push origin v3.9.150.282
+```
 
 ---
 ---
@@ -137,9 +143,15 @@ python tools/build_executable.py
 
 ---
 
-### 4. Automated Cross-Platform Builds via GitHub Actions
+### 4. Automated Multi-OS Builds & GitHub Releases (`v*`)
 
-A multi-OS GitHub Actions workflow is provided in [`.github/workflows/build_executables.yml`](../.github/workflows/build_executables.yml). It builds on `windows-latest`, `macos-latest`, and `ubuntu-latest` in parallel and uploads three ready-to-run artifacts:
-- `PyCasa-Windows-x64` (`PyCasa.exe`)
-- `PyCasa-macOS-App` (`PyCasa.app.zip`)
-- `PyCasa-Linux-x64` (`PyCasa`, `PyCasa.png`, `PyCasa.desktop`)
+A complete multi-OS CI/CD workflow is provided in [`.github/workflows/build_executables.yml`](../.github/workflows/build_executables.yml). It builds on `windows-latest`, `macos-latest`, and `ubuntu-latest` in parallel and, whenever a version tag `v*` (e.g., `v3.9.150.281`) is pushed to GitHub, automatically creates a **GitHub Release** attaching all **3 ready-to-run OS packages**:
+- 🪟 **Windows (64-bit)**: `PyCasa-<version>-Windows-x64.zip` (`PyCasa/PyCasa.exe`, `PyCasa/PyCasa.ico`, `PyCasa/LISEZMOI.txt`)
+- 🍎 **macOS (App Bundle)**: `PyCasa-<version>-macOS.zip` (`PyCasa.app` with Retina `.icns` icon)
+- 🐧 **Linux (x86_64)**: `PyCasa-<version>-Linux-x64.tar.gz` (`PyCasa`, `PyCasa.png`, `PyCasa.desktop`)
+
+To trigger an automated multi-OS GitHub Release (Windows + macOS + Linux):
+```bash
+git tag -a v3.9.150.282 -m "Release PyCasa v3.9.150.282"
+git push origin v3.9.150.282
+```

@@ -125,9 +125,11 @@ pip install pyinstaller
 python tools/build_executable.py
 ```
 
-- **Windows**: `dist/PyCasa/PyCasa.exe`
-- **macOS**: `dist/PyCasa.app`
-- **Linux**: `dist/PyCasa/PyCasa` + `dist/PyCasa/PyCasa.desktop`
+- **Windows**: `dist/PyCasa/PyCasa.exe` (`PyCasa-<version>-Windows-x64.zip`)
+- **macOS**: `dist/PyCasa.app` (`PyCasa-<version>-macOS.zip`)
+- **Linux**: `dist/PyCasa/PyCasa` + `dist/PyCasa/PyCasa.desktop` (`PyCasa-<version>-Linux-x64.tar.gz`)
+
+Pre-built standalone releases for **Windows (64-bit)**, **macOS**, and **Linux (x86_64)** are available directly on the **[GitHub Releases page](https://github.com/thyphoonfr/pycasa/releases)**. Pushing a `v*` tag (`git tag v3.9.150.x && git push origin v3.9.150.x`) automatically builds and publishes all three OS packages to GitHub Releases.
 
 See **[`docs/packaging_executables.md`](docs/packaging_executables.md)** for full details.
 
@@ -202,6 +204,8 @@ python tools/build_executable.py
 ```
 
 Consultez **[`docs/packaging_executables.md`](docs/packaging_executables.md)** pour la documentation complète par système d'exploitation.
+
+Les exécutables pré-compilés pour **Windows (64 bits)**, **macOS** et **Linux (x86_64)** sont téléchargeables directement sur la page **[GitHub Releases](https://github.com/thyphoonfr/pycasa/releases)**. Tout tag `v*` poussé sur GitHub (`git tag v3.9.150.x && git push origin v3.9.150.x`) compile et publie automatiquement les 3 versions dans GitHub Releases.
 
 ## Tests et photos publiques de test
 
