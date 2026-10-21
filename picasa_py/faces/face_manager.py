@@ -1,9 +1,12 @@
 """
-Gestionnaire des visages et personnes de Picasa (PeoplePanel / FaceCluster / CFaceManager).
-
+FR : Gestionnaire des visages et personnes de Picasa (`PeoplePanel` / `FaceCluster` / `CFaceManager`).
 Regroupe les visages détectés par contact, gère l'extraction des avatars,
-la correspondance entre la base PMP (imagedata_facerect, personalbumid)
-et les fichiers .picasa.ini, et permet le filtrage dans la bibliothèque.
+la correspondance entre la base PMP (`imagedata_facerect`, `personalbumid`)
+et les fichiers `.picasa.ini`, et permet le filtrage dans la bibliothèque.
+EN: Picasa Face and People Manager (`PeoplePanel` / `FaceCluster` / `CFaceManager`).
+Groups detected faces by contact, manages avatar extraction, synchronizes
+PMP database tables (`imagedata_facerect`, `personalbumid`) with `.picasa.ini`
+files, and provides people filtering in the photo library.
 
 Ref: picasa3.exe @ 0x008AAD76, 0x008C1F34 (FaceSyncer)
 Ref: picasa3.exe @ 0x009B9190 (rect64 decoder)
@@ -15,23 +18,70 @@ Ref: contacts/contacts.xml
 from __future__ import annotations
 import io
 import os
+import secrets
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Callable
 
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageOps
+from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QPixmap, QIcon
 
+
 from picasa_py.db.database import PicasaDatabase
+from picasa_py.db.contacts import Contact, ContactsFile
+from picasa_py.faces.detector import (
+    PicasaFaceDetector,
+    FR_SUGGESTION_THRESHOLD,
+    FR_SUGGESTION_SINGLE_THRESHOLD,
+    FR_SORT_THRESHOLD,
+)
 from picasa_py.faces.facerect import FaceRect, decode_rect64_string, encode_rect64_string
 from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-from picasa_py.ini.model import IniSection, IniEntry
+from picasa_py.ini.model import IniSection, IniEntry, FaceItem
+
+
+# Ref: picasa3.exe @ 0x0092C2F0 (FUN_0092c2f0 -> FaceRectOverlap)
+# Ghidra project: ghidra/picasa3.gpr
+def _face_overlap(f1: FaceRect, f2: FaceRect) -> float:
+    """
+    FR : Calcule le recouvrement géométrique entre deux rectangles de visages.
+    EN: Compute geometric overlap ratio between two face bounding rectangles.
+    """
+    ix1 = max(f1.left, f2.left)
+    iy1 = max(f1.top, f2.top)
+    ix2 = min(f1.right, f2.right)
+    iy2 = min(f1.bottom, f2.bottom)
+    if ix2 <= ix1 or iy2 <= iy1:
+        return 0.0
+    intersection = (ix2 - ix1) * (iy2 - iy1)
+    a1 = f1.width * f1.height
+    a2 = f2.width * f2.height
+    denom = min(a1, a2)
+    return (intersection / denom) if denom > 0 else 0.0
+
+
+@dataclass
+class FaceSuggestion:
+    """
+    FR : Proposition de visage détecté mais non confirmé pour une personne donnée.
+    EN: Suggested (unconfirmed) detected face for a given person/contact.
+    Ref: picasa3.exe @ 0x0048AA80 (FRSuggestionThreshold), 0x00880B94 (suggestionpersonalbumid)
+    """
+    contact_id: str
+    contact_name: str
+    photo_path: str
+    face_rect: FaceRect
+    similarity: float
+    db_idx: Optional[int] = None
 
 
 @dataclass
 class PersonCluster:
     """
-    Regroupement d'une personne identifiée dans Picasa avec ses clichés et son avatar.
+    FR : Regroupement d'une personne identifiée dans Picasa avec ses clichés, son avatar et ses gabarits `vqc_Cue`.
+    EN: Cluster representing an identified person in Picasa with their photos, avatar, and `vqc_Cue` templates.
     """
     contact_id: str
     name: str
@@ -40,34 +90,69 @@ class PersonCluster:
     face_rects_by_photo: Dict[int, List[FaceRect]] = field(default_factory=dict)
     primary_face_rect: Optional[FaceRect] = None
     avatar_pixmap: Optional[QPixmap] = None
+    feature_vector: Optional[np.ndarray] = None  # FR : Gabarit vqc_Cue 2000-D principal / EN: Primary 2000-D vqc_Cue template
+    feature_vectors: List[np.ndarray] = field(default_factory=list)  # FR : Tous les gabarits 2000-D / EN: All 2000-D templates
+    cover_photo_path: Optional[str] = None
 
     @property
     def photo_count(self) -> int:
-        return len(self.photo_indices)
+        """
+        FR : Nombre total de photos associées à cette personne.
+        EN: Total number of photos associated with this person.
+        """
+        return max(len(self.photo_indices), len(self.photo_paths))
 
 
 class PicasaFaceManager:
     """
-    Moteur unifié de détection, regroupement et affichage des visages Picasa.
+    FR : Moteur unifié de détection, regroupement et affichage des visages Picasa.
+    EN: Unified engine for Picasa face detection, clustering, and people management.
     """
 
     def __init__(self, db: PicasaDatabase):
         self.db = db
+        self.detector = PicasaFaceDetector.get()
         self.people: Dict[str, PersonCluster] = {}  # contact_id -> PersonCluster
         self.photo_to_faces: Dict[int, List[FaceRect]] = {}  # db_idx -> List[FaceRect]
+        self.suggestions: Dict[str, List[FaceSuggestion]] = {}  # contact_id -> List[FaceSuggestion]
+        self.unnamed_faces: List[Tuple[Optional[int], str, FaceRect]] = []  # (db_idx, photo_path, FaceRect)
+        self.on_people_changed_callbacks: List[Callable[[], None]] = []
+        self._face_feature_cache: Dict[Tuple[Optional[int], float, float], np.ndarray] = {}
+        self._avatar_cache: Dict[Tuple[Any, ...], QPixmap] = {}
+        self._scanned_photo_indices: Set[int] = set()
         self._load_all_faces()
 
+
+    def notify_people_changed(self) -> None:
+        """
+        FR : Notifie l'ensemble des composants d'interface (`CAlbumListUI`, grille, tiroirs)
+        qu'une personne ou un visage a été ajouté, renommé, réassigné ou supprimé.
+        EN: Notify all UI components (`CAlbumListUI`, thumbnail grid, drawers) that a person
+        or face has been added, renamed, reassigned, or removed.
+        Ref: picasa3.exe @ 0x008AAD76 (NOTIFY_PEOPLE_CHANGED)
+        """
+        for cb in list(self.on_people_changed_callbacks):
+            try:
+                cb()
+            except Exception:
+                pass
+
     def _load_all_faces(self) -> None:
-        """Charge l'ensemble des personnes et visages depuis la base et les .ini."""
+        """
+        FR : Charge l'ensemble des personnes et visages depuis la base PMP et les fichiers `.picasa.ini`.
+        EN: Load all people and face rectangles from the PMP database and `.picasa.ini` files.
+        """
         contact_id_to_name: Dict[str, str] = {}
         album_idx_to_contact_id: Dict[int, str] = {}
 
-        # 1. Lecture de contacts.xml
+        # FR : 1. Lecture de contacts.xml
+        # EN: 1. Read contacts.xml
         if self.db.contacts:
             for c in self.db.contacts.contacts:
                 contact_id_to_name[c.id.lower()] = c.name
 
-        # 2. Lecture de albumdata (cat == 8 pour les albums de personnes)
+        # FR : 2. Lecture de albumdata (cat == 8 pour les albums de personnes)
+        # EN: 2. Read albumdata (cat == 8 for Person albums)
         ad_names = self.db.pmps.get("albumdata_name")
         ad_cats = self.db.pmps.get("albumdata_category")
         ad_cids = self.db.pmps.get("albumdata_albumcontactids")
@@ -76,65 +161,312 @@ class PicasaFaceManager:
             for i in range(len(ad_names.records)):
                 if ad_cats.records[i] == 8:
                     pname = ad_names.records[i]
+                    # FR : Album 0 dans Picasa 3 est réservé aux visages sans nom (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
+                    # EN: Album 0 in Picasa 3 is reserved for unnamed faces (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
+                    if i == 0 or pname.strip().lower() in ("sans nom", "unnamed"):
+                        continue
                     cid_hex = ""
                     if ad_cids and i < len(ad_cids.records) and ad_cids.records[i]:
                         cid_num = ad_cids.records[i]
-                        cid_hex = f"{cid_num:016x}"
+                        cid_unpadded = f"{cid_num:x}"
+                        cid_padded = f"{cid_num:016x}"
+                        if cid_unpadded in contact_id_to_name:
+                            cid_hex = cid_unpadded
+                        elif cid_padded in contact_id_to_name:
+                            cid_hex = cid_padded
+                        else:
+                            cid_hex = cid_unpadded
                         album_idx_to_contact_id[i] = cid_hex
 
                     if not cid_hex:
-                        cid_hex = f"pers_{i:04d}"
+                        # FR : Chercher aussi par nom dans contact_id_to_name avant d'utiliser un ID synthétique
+                        # EN: Also search by name in contact_id_to_name before falling back to a synthetic ID
+                        for existing_cid, existing_name in contact_id_to_name.items():
+                            if existing_name.strip().lower() == pname.strip().lower():
+                                cid_hex = existing_cid
+                                break
+                        if not cid_hex:
+                            cid_hex = f"{i:016x}"
                         album_idx_to_contact_id[i] = cid_hex
 
                     if cid_hex not in contact_id_to_name:
                         contact_id_to_name[cid_hex] = pname
 
-        # Initialiser les clusters de personnes
+        # FR : Initialiser les clusters de personnes
+        # EN: Initialize person clusters
         for cid, name in contact_id_to_name.items():
             self.people[cid] = PersonCluster(contact_id=cid, name=name)
 
-        # 3. Association depuis imagedata_personalbumid & imagedata_facerect
-        pmp_personalbum = self.db.pmps.get("imagedata_personalbumid")
+        # FR : 3. Association depuis imagedata_facerect, imagedata_personalbumid, imagedata_suggestionpersonalbumid
+        # EN: 3. Link from imagedata_facerect, imagedata_personalbumid, imagedata_suggestionpersonalbumid
         pmp_facerect = self.db.pmps.get("imagedata_facerect")
+        pmp_personalbum = self.db.pmps.get("imagedata_personalbumid")
+        pmp_suggestion = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+        pmp_parecs = self.db.pmps.get("imagedata_personalbumrecs")
 
-        if pmp_personalbum:
+        folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+
+        # FR : Construire la table parent_photo_idx -> [child_1001_indices]
+        # Dans picasa3.exe, lorsqu'une photo possède des sous-enregistrements de visages (type == 1001),
+        # imagedata_facerect[parent_idx] stocke la boîte englobante d'union de tous les visages de la photo
+        # et non un visage individuel. Chaque visage individuel est porté par son enregistrement 1001.
+        # EN: Build parent_photo_idx -> [child_1001_indices] map.
+        # In picasa3.exe, when a photo has child face records (type == 1001),
+        # imagedata_facerect[parent_idx] stores the union bounding box of all faces on that photo
+        # rather than an individual face. Each individual face is represented by its type 1001 record.
+        # Ref: picasa3.exe @ 0x008AAD76, 0x009B93F0
+        self._parent_to_1001: Dict[int, List[int]] = {}
+        for i, r in enumerate(self.db.index):
+            if r.type == 1001 and 0 <= r.parent_idx < len(self.db.index):
+                self._parent_to_1001.setdefault(r.parent_idx, []).append(i)
+
+        def _get_photo_path(idx: int) -> str:
+            if idx < len(self.db.index):
+                r = self.db.index[idx]
+                if r.type == 1001 and 0 <= r.parent_idx < len(self.db.index):
+                    pr = self.db.index[r.parent_idx]
+                    fdir = folders_map.get(pr.parent_idx, "")
+                    return os.path.join(fdir, pr.path)
+                fdir = folders_map.get(r.parent_idx, "")
+                return os.path.join(fdir, r.path)
+            return ""
+
+        if pmp_facerect:
+            for db_idx, rect_val in enumerate(pmp_facerect.records):
+                is_face_rec = bool(self.db and getattr(self.db, "is_face_record", lambda i: False)(db_idx))
+                if rect_val:
+                    self._scanned_photo_indices.add(db_idx)
+                    if is_face_rec:
+                        parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+                        if parent_photo_idx is not None and parent_photo_idx >= 0:
+                            self._scanned_photo_indices.add(parent_photo_idx)
+                if not rect_val or rect_val <= 1:
+                    continue
+
+                # FR : Ignorer la boîte englobante d'union sur l'enregistrement photo parent s'il a des enfants 1001
+                # EN: Skip the union bounding box on the parent photo record when it has type 1001 face children
+                if not is_face_rec and db_idx in self._parent_to_1001:
+                    continue
+
+                alb_idx = pmp_personalbum.records[db_idx] if pmp_personalbum and db_idx < len(pmp_personalbum.records) else 0
+                sug_idx = pmp_suggestion.records[db_idx] if pmp_suggestion and db_idx < len(pmp_suggestion.records) else 0
+                parecs_idx = pmp_parecs.records[db_idx] if pmp_parecs and db_idx < len(pmp_parecs.records) else 0
+
+                photo_path = _get_photo_path(db_idx)
+
+                # FR : Priorité 1 : Visage attribué à une personne connue
+                # EN: Priority 1: Face assigned to a known person
+                assigned_alb_idx = alb_idx if alb_idx in album_idx_to_contact_id else (parecs_idx if parecs_idx in album_idx_to_contact_id else 0)
+                if assigned_alb_idx and assigned_alb_idx in album_idx_to_contact_id:
+                    cid = album_idx_to_contact_id[assigned_alb_idx]
+                    cluster = self.people.get(cid)
+                    if cluster:
+                        fr = FaceRect.from_uint64(rect_val, contact_id=cid, contact_name=cluster.name)
+                        if db_idx not in cluster.photo_indices:
+                            cluster.photo_indices.append(db_idx)
+                        if photo_path and photo_path not in cluster.photo_paths:
+                            cluster.photo_paths.append(photo_path)
+                        self.photo_to_faces.setdefault(db_idx, []).append(fr)
+                        cluster.face_rects_by_photo.setdefault(db_idx, []).append(fr)
+                        if is_face_rec:
+                            parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+                            if parent_photo_idx is not None and parent_photo_idx >= 0:
+                                self.photo_to_faces.setdefault(parent_photo_idx, []).append(fr)
+                                cluster.face_rects_by_photo.setdefault(parent_photo_idx, []).append(fr)
+                        if cluster.primary_face_rect is None:
+                            cluster.primary_face_rect = fr
+                elif sug_idx and sug_idx in album_idx_to_contact_id:
+                    # FR : Priorité 2 : Suggestion de visage pour une personne (Ref: 0x00880B94 suggestionpersonalbumid)
+                    # EN: Priority 2: Face suggestion for a person (Ref: 0x00880B94 suggestionpersonalbumid)
+                    cid = album_idx_to_contact_id[sug_idx]
+                    cluster = self.people.get(cid)
+                    cname = cluster.name if cluster else cid
+                    fr = FaceRect.from_uint64(rect_val, contact_id="", contact_name=f"? {cname}")
+                    sug = FaceSuggestion(
+                        contact_id=cid,
+                        contact_name=cname,
+                        photo_path=photo_path,
+                        face_rect=fr,
+                        similarity=0.85,
+                        db_idx=db_idx,
+                    )
+                    self.suggestions.setdefault(cid, []).append(sug)
+                    self.photo_to_faces.setdefault(db_idx, []).append(fr)
+                    if is_face_rec:
+                        parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+                        if parent_photo_idx is not None and parent_photo_idx >= 0:
+                            self.photo_to_faces.setdefault(parent_photo_idx, []).append(fr)
+                else:
+                    # FR : Priorité 3 : Visage sans nom (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
+                    # EN: Priority 3: Unnamed face (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
+                    fr_unnamed = FaceRect.from_uint64(rect_val, contact_id="", contact_name=None)
+                    self.unnamed_faces.append((db_idx, photo_path, fr_unnamed))
+                    self.photo_to_faces.setdefault(db_idx, []).append(fr_unnamed)
+                    if is_face_rec:
+                        parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+                        if parent_photo_idx is not None and parent_photo_idx >= 0:
+                            self.photo_to_faces.setdefault(parent_photo_idx, []).append(fr_unnamed)
+
+        elif pmp_personalbum:
+            # FR : Fallback si imagedata_facerect est absent
+            # EN: Fallback if imagedata_facerect is missing
             for db_idx, alb_idx in enumerate(pmp_personalbum.records):
                 if alb_idx and alb_idx in album_idx_to_contact_id:
                     cid = album_idx_to_contact_id[alb_idx]
                     cluster = self.people.get(cid)
-                    if cluster:
-                        if db_idx not in cluster.photo_indices:
-                            cluster.photo_indices.append(db_idx)
+                    if cluster and db_idx not in cluster.photo_indices:
+                        cluster.photo_indices.append(db_idx)
 
-                        # Récupérer les coordonnées rect64 si disponibles
-                        if pmp_facerect and db_idx < len(pmp_facerect.records):
-                            rect_val = pmp_facerect.records[db_idx]
-                            if rect_val:
-                                fr = FaceRect.from_uint64(rect_val, contact_id=cid, contact_name=cluster.name)
-                                self.photo_to_faces.setdefault(db_idx, []).append(fr)
-                                cluster.face_rects_by_photo.setdefault(db_idx, []).append(fr)
-                                if cluster.primary_face_rect is None:
-                                    cluster.primary_face_rect = fr
-
-        # 4. Association depuis les fichiers .picasa.ini sur disque
+        # FR : 4. Association depuis les fichiers .picasa.ini sur disque
+        # EN: 4. Link from on-disk .picasa.ini files
         self._scan_ini_faces(contact_id_to_name)
 
-        # 5. Génération des avatars
+        # FR : 5. Génération des avatars
+        # EN: 5. Avatar generation
         self._generate_avatars()
 
+        # FR : 6. Restauration des couvertures personnalisées (Ref: ID_SETPEOPLEALBUMCOVER @ 0x008AF20B)
+        # EN: 6. Restore custom person album covers (Ref: ID_SETPEOPLEALBUMCOVER @ 0x008AF20B)
+        try:
+            for cid, cluster in self.people.items():
+                saved_path = None
+                saved_rect64 = None
+                if self.db and getattr(self.db, "contacts", None):
+                    c_obj = self.db.contacts.get(cid)
+                    if c_obj and c_obj.extra_attrs:
+                        saved_path = c_obj.extra_attrs.get("cover_photo_path")
+                        saved_rect64 = c_obj.extra_attrs.get("cover_rect64")
+                if (not saved_path or not saved_rect64) and self.db and getattr(self.db, "repository", None):
+                    saved_path = self.db.repository.get(f"PeopleCovers/{cid}/photo_path")
+                    saved_rect64 = self.db.repository.get(f"PeopleCovers/{cid}/rect64")
+                if saved_path and saved_rect64 and os.path.exists(str(saved_path)):
+                    fr = FaceRect.from_rect64(str(saved_rect64), contact_id=cid, contact_name=cluster.name)
+                    cluster.primary_face_rect = fr
+                    cluster.cover_photo_path = str(saved_path)
+                    try:
+                        img = self._open_photo_for_face_crop(str(saved_path), fr, 64)
+                        if img is not None:
+                            aspect_img = (img.width / float(img.height)) if img.height > 0 else 1.0
+                            disp_fr = fr.project_for_photo_ini(str(saved_path), aspect_ratio=aspect_img, db=self.db)
+                            cluster.avatar_pixmap = disp_fr.crop_avatar(img, avatar_size=64, circular=True)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+    def _find_matching_1001_child(self, parent_db_idx: Optional[int], target_fr: FaceRect) -> Optional[int]:
+        """
+        FR : Cherche parmi les sous-enregistrements de visages (`type == 1001`) d'une photo parente
+        celui dont le rectangle `facerect` correspond à `target_fr`.
+        EN: Search among a parent photo's face sub-records (`type == 1001`) for the one whose
+        `facerect` matches `target_fr`.
+        Ref: picasa3.exe @ 0x008AAD76, 0x009B93F0
+        """
+        if parent_db_idx is None or parent_db_idx < 0 or not self.db:
+            return None
+        parent_map = getattr(self, "_parent_to_1001", None)
+        if parent_map is None:
+            parent_map = {}
+            for i, r in enumerate(self.db.index):
+                if r.type == 1001 and 0 <= r.parent_idx < len(self.db.index):
+                    parent_map.setdefault(r.parent_idx, []).append(i)
+            self._parent_to_1001 = parent_map
+
+        children = parent_map.get(parent_db_idx)
+        if not children:
+            return None
+
+        pmp_facerect = self.db.pmps.get("imagedata_facerect")
+        best_child: Optional[int] = None
+        best_ov = 0.45
+        for c_idx in children:
+            c_faces = self.photo_to_faces.get(c_idx)
+            if c_faces:
+                ov = _face_overlap(c_faces[0], target_fr)
+                if ov >= best_ov:
+                    best_ov = ov
+                    best_child = c_idx
+            elif pmp_facerect and c_idx < len(pmp_facerect.records):
+                rval = pmp_facerect.records[c_idx]
+                if rval and rval > 1:
+                    c_fr = FaceRect.from_uint64(rval)
+                    ov = _face_overlap(c_fr, target_fr)
+                    if ov >= best_ov:
+                        best_ov = ov
+                        best_child = c_idx
+        return best_child
+
+    def _get_or_create_1001_child(self, parent_db_idx: Optional[int], face_rect: FaceRect) -> Optional[int]:
+        """
+        FR : Trouve ou crée un sous-enregistrement de visage (`type == 1001`) dans `thumbindex.db`
+        et aligne les tables `imagedata_*` en enregistrant le `rect64` uint64 dans `imagedata_facerect.pmp`.
+        EN: Find or create a child face record (`type == 1001`) in `thumbindex.db` and align
+        `imagedata_*` tables, storing the uint64 `rect64` in `imagedata_facerect.pmp`.
+        Ref: picasa3.exe @ 0x0072BA00, 0x008AAD76, 0x009B93F0
+        """
+        if parent_db_idx is None or parent_db_idx < 0 or not self.db:
+            return None
+        existing_child = self._find_matching_1001_child(parent_db_idx, face_rect)
+        if existing_child is not None:
+            pmp_fr = self.db.pmps.get("imagedata_facerect")
+            if pmp_fr is not None:
+                while len(pmp_fr.records) <= existing_child:
+                    pmp_fr.records.append(0)
+                pmp_fr.records[existing_child] = face_rect.to_uint64()
+            return existing_child
+
+        if getattr(self.db, "thumbindex", None) is None or parent_db_idx >= len(self.db.index):
+            return None
+
+        from picasa_py.db.thumbindex import ThumbIndexRecord
+
+        child_idx = len(self.db.index)
+        self.db.index.append(
+            ThumbIndexRecord(
+                path="",
+                parent_idx=parent_db_idx,
+                type=1001,
+                flags_hi=1,
+                flags_lo=0,
+            )
+        )
+        if hasattr(self.db, "_align_imagedata_tables"):
+            self.db._align_imagedata_tables(child_idx)
+        pmp_fr = self.db.pmps.get("imagedata_facerect")
+        if pmp_fr is not None:
+            while len(pmp_fr.records) <= child_idx:
+                pmp_fr.records.append(0)
+            pmp_fr.records[child_idx] = face_rect.to_uint64()
+
+        parent_map = getattr(self, "_parent_to_1001", None)
+        if parent_map is not None:
+            parent_map.setdefault(parent_db_idx, []).append(child_idx)
+        try:
+            parent_path = self.db.get_media_full_path(parent_db_idx) or ""
+            if parent_path and os.path.exists(parent_path):
+                self._write_face_record_thumbnails(child_idx, face_rect, photo_path=parent_path)
+        except Exception:
+            pass
+        return child_idx
+
     def _scan_ini_faces(self, contact_id_to_name: Dict[str, str]) -> None:
-        """Parcourt les fichiers .picasa.ini pour extraire les balises faces=."""
-        # Indexer les photos de la base par (dossier_norm, filename_lower)
+        """
+        FR : Parcourt les fichiers `.picasa.ini` pour extraire les balises `faces=`.
+        EN: Scan `.picasa.ini` files to extract `faces=` tags.
+        """
+        # FR : Indexer les photos de la base par (dossier_norm, filename_lower)
+        # EN: Index database photos by (normalized_folder, filename_lower)
         folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
         path_to_idx: Dict[Tuple[str, str], int] = {}
 
         for i, r in enumerate(self.db.index):
-            if r.type != 1:
+            if r.type not in (1, 1001):
                 fpath = folders_map.get(r.parent_idx, "")
                 norm_d = fpath.replace("/", "\\").rstrip("\\").lower()
                 path_to_idx[(norm_d, r.path.lower())] = i
 
-        # Trouver tous les dossiers de photos indexés
+        # FR : Trouver tous les dossiers de photos indexés
+        # EN: Collect all indexed photo directories
         indexed_dirs = set(norm_d for norm_d, _ in path_to_idx.keys())
         for dpath in indexed_dirs:
             ini_file = os.path.join(dpath, ".picasa.ini")
@@ -144,20 +476,28 @@ class PicasaFaceManager:
                 continue
 
             try:
-                doc = PicasaIniParser.parse_file(target_ini)
-                # Lire d'éventuels contacts locaux dans [Contacts2]
+                doc = self.db.get_parsed_ini(target_ini) if (self.db and hasattr(self.db, "get_parsed_ini")) else PicasaIniParser.parse_file(target_ini)
+                if not doc:
+                    continue
+                # FR : Lire d'éventuels contacts locaux dans [Contacts2]
+                # EN: Read local contacts from [Contacts2] if present
                 sec_c2 = doc.get_section("Contacts2")
                 if sec_c2:
                     for entry in sec_c2.entries:
                         if entry.key and entry.value:
-                            k = entry.key
+                            k = entry.key.strip().lower()
+                            k_unpadded = k.lstrip("0") or "0"
+                            k_padded = k.zfill(16)
                             val = entry.value
                             cname = val.split(";")[0].strip() if ";" in val else val.strip()
-                            if cname and k.lower() not in contact_id_to_name:
-                                contact_id_to_name[k.lower()] = cname
-                                self.people[k.lower()] = PersonCluster(contact_id=k.lower(), name=cname)
+                            if cname:
+                                if k in contact_id_to_name or k_unpadded in contact_id_to_name or k_padded in contact_id_to_name:
+                                    continue
+                                contact_id_to_name[k] = cname
+                                self.people[k] = PersonCluster(contact_id=k, name=cname)
 
-                # Lire les faces de chaque image
+                # FR : Lire les faces de chaque image
+                # EN: Read face rectangles for each image section
                 for sec in doc.sections:
                     sec_name = sec.name
                     if sec_name.lower() in ("contacts2", "picasa", "encoding"):
@@ -166,10 +506,13 @@ class PicasaFaceManager:
                     if not faces_entry:
                         continue
 
-                    db_idx = path_to_idx.get((dpath.lower(), sec_name.lower()))
+                    photo_db_idx = path_to_idx.get((dpath.lower(), sec_name.lower()))
+                    if photo_db_idx is not None:
+                        self._scanned_photo_indices.add(photo_db_idx)
                     full_file_path = os.path.join(dpath, sec_name)
 
-                    # Parser "rect64(xxx),cid;rect64(yyy),cid2"
+                    # FR : Parser "rect64(xxx),cid;rect64(yyy),cid2"
+                    # EN: Parse "rect64(xxx),cid;rect64(yyy),cid2"
                     parts = faces_entry.split(";")
                     for p in parts:
                         p = p.strip()
@@ -178,6 +521,46 @@ class PicasaFaceManager:
                         r64_part, cid_part = p.split(",", 1)
                         cid_clean = cid_part.strip().lower()
 
+                        # FR : Visage sans nom ou non assigné (Ref: CThumbDB::unknownfacealbum)
+                        # EN: Unnamed or unassigned face (Ref: CThumbDB::unknownfacealbum)
+                        if not cid_clean or cid_clean in ("unknown", "unnamed", "0", "ffffffffffffffff"):
+                            fr_unnamed = FaceRect.from_rect64(r64_part, contact_id="", contact_name=None)
+                            child_1001 = self._find_matching_1001_child(photo_db_idx, fr_unnamed)
+                            eff_idx = child_1001 if child_1001 is not None else photo_db_idx
+                            # FR : Si ce visage est déjà nommé ou suggéré dans la base PMP (via son 1001), ne pas le ré-ajouter en sans-nom
+                            # EN: If this face is already named or suggested in the PMP DB (via its 1001 record), do not re-add as unnamed
+                            if eff_idx is not None and any(
+                                ef.contact_id or (ef.contact_name and ef.contact_name.startswith("? "))
+                                for ef in self.photo_to_faces.get(eff_idx, [])
+                                if _face_overlap(ef, fr_unnamed) >= 0.45
+                            ):
+                                continue
+                            already_present = any(
+                                ((u_idx is not None and eff_idx is not None and u_idx == eff_idx) or
+                                 (u_path and full_file_path and os.path.normpath(u_path).lower() == os.path.normpath(full_file_path).lower()))
+                                and _face_overlap(u_fr, fr_unnamed) >= 0.45
+                                for u_idx, u_path, u_fr in self.unnamed_faces
+                            )
+                            if not already_present:
+                                self.unnamed_faces.append((eff_idx, full_file_path, fr_unnamed))
+                            if eff_idx is not None:
+                                existing_eff = self.photo_to_faces.setdefault(eff_idx, [])
+                                if not any(_face_overlap(ef, fr_unnamed) >= 0.45 for ef in existing_eff):
+                                    existing_eff.append(fr_unnamed)
+                            if photo_db_idx is not None and photo_db_idx != eff_idx:
+                                existing_parent = self.photo_to_faces.setdefault(photo_db_idx, [])
+                                if not any(_face_overlap(ef, fr_unnamed) >= 0.45 for ef in existing_parent):
+                                    existing_parent.append(fr_unnamed)
+                            continue
+
+                        if cid_clean not in contact_id_to_name:
+                            cid_unpadded = cid_clean.lstrip("0") or "0"
+                            cid_padded = cid_clean.zfill(16)
+                            if cid_unpadded in contact_id_to_name:
+                                cid_clean = cid_unpadded
+                            elif cid_padded in contact_id_to_name:
+                                cid_clean = cid_padded
+
                         cname = contact_id_to_name.get(cid_clean, cid_clean)
                         cluster = self.people.get(cid_clean)
                         if not cluster:
@@ -185,91 +568,2189 @@ class PicasaFaceManager:
                             self.people[cid_clean] = cluster
 
                         fr = FaceRect.from_rect64(r64_part, contact_id=cid_clean, contact_name=cname)
+                        child_1001 = self._find_matching_1001_child(photo_db_idx, fr)
+                        eff_idx = child_1001 if child_1001 is not None else photo_db_idx
 
-                        if db_idx is not None:
-                            if db_idx not in cluster.photo_indices:
-                                cluster.photo_indices.append(db_idx)
-                            self.photo_to_faces.setdefault(db_idx, []).append(fr)
-                            cluster.face_rects_by_photo.setdefault(db_idx, []).append(fr)
-                            if cluster.primary_face_rect is None:
-                                cluster.primary_face_rect = fr
+                        if eff_idx is not None:
+                            if eff_idx not in cluster.photo_indices:
+                                cluster.photo_indices.append(eff_idx)
+                            existing_eff = self.photo_to_faces.setdefault(eff_idx, [])
+                            matched_ef = False
+                            for ef in existing_eff:
+                                if _face_overlap(ef, fr) >= 0.45:
+                                    ef.contact_id = cid_clean
+                                    ef.contact_name = cname
+                                    matched_ef = True
+                            if not matched_ef:
+                                existing_eff.append(fr)
+                            c_eff = cluster.face_rects_by_photo.setdefault(eff_idx, [])
+                            if not any(_face_overlap(ef, fr) >= 0.45 for ef in c_eff):
+                                c_eff.append(fr)
+
+                        if photo_db_idx is not None and photo_db_idx != eff_idx:
+                            existing_parent = self.photo_to_faces.setdefault(photo_db_idx, [])
+                            matched_parent_ef = False
+                            for ef in existing_parent:
+                                if _face_overlap(ef, fr) >= 0.45:
+                                    ef.contact_id = cid_clean
+                                    ef.contact_name = cname
+                                    matched_parent_ef = True
+                            if not matched_parent_ef:
+                                existing_parent.append(fr)
+                            c_parent = cluster.face_rects_by_photo.setdefault(photo_db_idx, [])
+                            if not any(_face_overlap(ef, fr) >= 0.45 for ef in c_parent):
+                                c_parent.append(fr)
+
+                        # FR : Retirer tout visage correspondant de unnamed_faces et suggestions
+                        # EN: Remove any matching face from unnamed_faces and suggestions
+                        norm_full = os.path.normpath(full_file_path).lower() if full_file_path else ""
+                        self.unnamed_faces = [
+                            (u_idx, u_path, u_fr)
+                            for (u_idx, u_path, u_fr) in self.unnamed_faces
+                            if not (
+                                (
+                                    (u_idx is not None and u_idx in (eff_idx, photo_db_idx))
+                                    or (u_path and norm_full and os.path.normpath(u_path).lower() == norm_full)
+                                )
+                                and _face_overlap(u_fr, fr) >= 0.45
+                            )
+                        ]
+                        for s_cid in list(self.suggestions.keys()):
+                            self.suggestions[s_cid] = [
+                                s
+                                for s in self.suggestions[s_cid]
+                                if not (
+                                    (
+                                        (s.db_idx is not None and s.db_idx in (eff_idx, photo_db_idx))
+                                        or (s.photo_path and norm_full and os.path.normpath(s.photo_path).lower() == norm_full)
+                                    )
+                                    and _face_overlap(s.face_rect, fr) >= 0.45
+                                )
+                            ]
+
+                        if cluster.primary_face_rect is None:
+                            cluster.primary_face_rect = fr
 
                         if full_file_path not in cluster.photo_paths:
                             cluster.photo_paths.append(full_file_path)
             except Exception:
                 pass
 
+    @staticmethod
+    def _open_photo_for_face_crop(
+        photo_path: str,
+        face_rect: FaceRect,
+        target_size: int = 64,
+    ) -> Optional[Image.Image]:
+        """
+        FR : Ouvre une photo sur disque pour en extraire un visage avec une résolution optimale.
+        Calcule le facteur `draft()` proportionnellement à la taille relative du visage afin que
+        le visage découpé possède toujours au moins `2 * max(target_size, 256)` pixels de côté,
+        tout en appliquant l'orientation EXIF et les transformations `.picasa.ini`.
+        EN: Open an on-disk photo to crop a face at optimal resolution.
+        Scales the `draft()` target inversely by the normalized face size so the cropped face
+        always retains at least `2 * max(target_size, 256)` pixels per side, while applying
+        EXIF orientation and `.picasa.ini` non-destructive transformations.
+        Ref: picasa3.exe @ 0x009B93F0, 0x00896F74
+        """
+        if not photo_path or not os.path.exists(photo_path):
+            return None
+        try:
+            with Image.open(photo_path) as raw_img:
+                # FR : Lire l'orientation EXIF avant draft() car draft() peut réinitialiser les métadonnées
+                # EN: Read EXIF orientation before draft() since draft() may strip metadata
+                exif_orient = 1
+                try:
+                    exif = raw_img.getexif()
+                    if exif:
+                        exif_orient = int(exif.get(0x0112, 1) or 1)
+                except Exception:
+                    exif_orient = 1
+
+                min_frac = max(0.02, min(face_rect.width, face_rect.height))
+                req_full = int(max(target_size * 2, 256) / min_frac)
+                if req_full < min(raw_img.size) and exif_orient <= 1:
+                    raw_img.draft("RGB", (req_full, req_full))
+
+                if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                    raw_img = raw_img.convert("RGBA")
+                try:
+                    pil_img = ImageOps.exif_transpose(raw_img)
+                except Exception:
+                    pil_img = raw_img
+                if pil_img.mode not in ("RGB", "RGBA"):
+                    pil_img = pil_img.convert("RGB")
+                else:
+                    pil_img = pil_img.copy()
+
+                # FR : Appliquer les transformations géométriques .picasa.ini (crop, rotate, tilt)
+                # EN: Apply .picasa.ini geometric transformations (crop, rotate, tilt)
+                parent_dir = os.path.dirname(photo_path)
+                ini_path = os.path.join(parent_dir, ".picasa.ini")
+                if not os.path.exists(ini_path):
+                    ini_path = os.path.join(parent_dir, "Picasa.ini")
+                if os.path.exists(ini_path):
+                    try:
+                        doc = PicasaIniParser.parse_file(ini_path)
+                        base_name = os.path.basename(photo_path)
+                        crop_hex = doc.get_crop(base_name)
+                        if crop_hex:
+                            cl, ct, cr, cb = decode_rect64_string(crop_hex)
+                            w, h = pil_img.size
+                            crop_box = (
+                                max(0, min(w - 1, int(round(cl * w)))),
+                                max(0, min(h - 1, int(round(ct * h)))),
+                                max(1, min(w, int(round(cr * w)))),
+                                max(1, min(h, int(round(cb * h)))),
+                            )
+                            if crop_box[2] > crop_box[0] and crop_box[3] > crop_box[1]:
+                                pil_img = pil_img.crop(crop_box)
+                        rot = (doc.get_rotate(base_name) or 0) % 4
+                        if rot == 1:
+                            pil_img = pil_img.rotate(270, expand=True)
+                        elif rot == 2:
+                            pil_img = pil_img.rotate(180, expand=True)
+                        elif rot == 3:
+                            pil_img = pil_img.rotate(90, expand=True)
+                        tilt = doc.get_tilt(base_name) or 0.0
+                        if abs(tilt) >= 0.01:
+                            from picasa_py.ui.image_processor import PicasaImageProcessor
+                            pil_img = PicasaImageProcessor.straighten(pil_img, tilt)
+                    except Exception:
+                        pass
+                return pil_img
+        except Exception:
+            return None
+
+    def _write_face_record_thumbnails(
+        self,
+        face_rec_idx: int,
+        face_rect: FaceRect,
+        photo_path: str = "",
+        source_img: Optional[Image.Image] = None,
+    ) -> bool:
+        """
+        FR : Génère et écrit dans les conteneurs `CBlockFile` les vignettes portrait 5:6 d'un sous-enregistrement
+        de visage (`type == 1001`) conformément à `FUN_00424CA0` / `FUN_00425210` (`0x004258D1..0x00425B6C`) :
+        - `thumbs` (`small`) : `120x144` (`0x78 x 0x90`), qualité JPEG `90`
+        - `thumbs2` (`medium`) : `60x72` (`0x3C x 0x48`), qualité JPEG `90`
+        - `bigthumbs` (`large`) : `240x288` (`0xF0 x 0x120`), qualité JPEG `90`
+        EN: Generate and write into `CBlockFile` containers the 5:6 portrait thumbnails for a face sub-record
+        (`type == 1001`) matching `FUN_00424CA0` / `FUN_00425210` (`0x004258D1..0x00425B6C`):
+        - `thumbs` (`small`): `120x144` (`0x78 x 0x90`), JPEG quality `90`
+        - `thumbs2` (`medium`): `60x72` (`0x3C x 0x48`), JPEG quality `90`
+        - `bigthumbs` (`large`): `240x288` (`0xF0 x 0x120`), JPEG quality `90`
+        Ref: picasa3.exe @ 0x00424CA0, 0x00425210 (0x004258D1..0x00425B6C), 0x009B93F0
+        """
+        if not self.db or face_rec_idx is None or face_rec_idx < 0:
+            return False
+        if not photo_path:
+            try:
+                photo_path = self.db.get_media_full_path(face_rec_idx) or ""
+            except Exception:
+                photo_path = ""
+        pil_img = source_img
+        if pil_img is None and photo_path and os.path.exists(photo_path):
+            pil_img = self._open_photo_for_face_crop(photo_path, face_rect, target_size=288)
+        if pil_img is None or pil_img.width <= 0 or pil_img.height <= 0:
+            return False
+        try:
+            aspect_img = pil_img.width / float(pil_img.height)
+            disp_fr = face_rect.project_for_photo_ini(photo_path, aspect_ratio=aspect_img, db=self.db)
+            cbox = disp_fr.to_pixel_bbox(pil_img.width, pil_img.height)
+            face_crop = pil_img.crop(cbox)
+            if face_crop.mode != "RGB":
+                face_crop = face_crop.convert("RGB")
+
+            def _enc(tw: int, th: int) -> bytes:
+                sub = face_crop.resize((tw, th), Image.Resampling.BILINEAR)
+                buf = io.BytesIO()
+                sub.save(buf, format="JPEG", quality=90)
+                return buf.getvalue()
+
+            b_idx = getattr(self.db, "block_indices", {})
+            if "thumbs" in b_idx:
+                self.db.add_thumbnail(face_rec_idx, _enc(120, 144), size="small")
+            if "thumbs2" in b_idx:
+                self.db.add_thumbnail(face_rec_idx, _enc(60, 72), size="medium")
+            if "bigthumbs" in b_idx:
+                self.db.add_thumbnail(face_rec_idx, _enc(240, 288), size="large")
+            return True
+        except Exception:
+            return False
+
     def _generate_avatars(self) -> None:
-        """Génère l'avatar circulaire pour chaque personne."""
+        """
+        FR : Génère rapidement les avatars depuis `bigthumbs_0.db` / `thumbs_0.db` et charge les gabarits `vqc_Cue` depuis `facetemplatesV2_0.db`.
+        EN: Quickly generate avatars from `bigthumbs_0.db` / `thumbs_0.db` and load `vqc_Cue` templates from `facetemplatesV2_0.db`.
+        Ref: picasa3.exe @ 0x009B93F0, 0x008AAD76
+        """
+        from PySide6.QtGui import QGuiApplication
+        has_gui = QGuiApplication.instance() is not None
+        has_templates_db = bool(self.db and hasattr(self.db, "get_face_template"))
         for cid, cluster in self.people.items():
-            if not cluster.photo_indices and not cluster.photo_paths:
+            if not cluster.photo_indices:
                 continue
+
+            # FR : Charger les gabarits vqc_Cue 2000-D (Red.dll / facetemplatesV2_0.db) de cette personne
+            # EN: Load 2000-D vqc_Cue templates (Red.dll / facetemplatesV2_0.db) for this person
+            if has_templates_db and not cluster.feature_vectors:
+                for p_idx in cluster.photo_indices:
+                    tpl_vec = self.db.get_face_template(p_idx)
+                    if tpl_vec is not None:
+                        cluster.feature_vectors.append(tpl_vec)
+                if cluster.feature_vectors and cluster.feature_vector is None:
+                    cluster.feature_vector = cluster.feature_vectors[0]
 
             fr = cluster.primary_face_rect
-            if not fr:
+            if not fr or not has_gui:
                 continue
 
-            # Tentative de découpe depuis la miniature thumbs_0.db (très rapide)
-            avatar_created = False
-            if cluster.photo_indices:
-                first_idx = cluster.photo_indices[0]
-                thumb_jpeg = self.db.get_thumbnail(first_idx)
-                if thumb_jpeg:
+            # FR : Découpe depuis la miniature de visage pré-découpée (type 1001 dans bigthumbs_0.db 240x288 ou thumbs_0.db 120x144)
+            # ou depuis la photo originale sur disque si l'enregistrement est une photo complète (type != 1001).
+            # EN: Render from the pre-cropped face thumbnail (type 1001 in bigthumbs_0.db 240x288 or thumbs_0.db 120x144)
+            # or crop from the on-disk original photo when the record is a full photo (type != 1001).
+            first_idx = cluster.photo_indices[0]
+            first_path = cluster.photo_paths[0] if cluster.photo_paths else ""
+            if self.db:
+                is_face_rec = bool(getattr(self.db, "is_face_record", lambda i: False)(first_idx))
+                if is_face_rec:
+                    thumb_jpeg = (
+                        self.db.get_thumbnail(first_idx, size="large")
+                        or self.db.get_thumbnail(first_idx, size="small")
+                    )
+                    if thumb_jpeg:
+                        try:
+                            with Image.open(io.BytesIO(thumb_jpeg)) as img:
+                                cluster.avatar_pixmap = FaceRect.to_avatar_pixmap(img, avatar_size=64, circular=True)
+                                if cluster.feature_vector is None:
+                                    fv = PicasaFaceDetector.get().compute_face_feature(img)
+                                    if fv is not None:
+                                        cluster.feature_vector = fv
+                                        cluster.feature_vectors.append(fv)
+                        except Exception:
+                            pass
+                else:
+                    pix = self.get_face_avatar(first_path, fr, db_idx=first_idx, size=64, circular=True)
+                    if pix and not pix.isNull():
+                        cluster.avatar_pixmap = pix
+
+    def get_person_avatar(self, contact_id: str, size: int = 64, circular: bool = True) -> Optional[QPixmap]:
+        """
+        FR : Récupère ou génère à la volée l'avatar pour un contact à la résolution demandée.
+        EN: Retrieve or generate on-the-fly the avatar for a contact at the requested resolution.
+        Ref: picasa3.exe @ 0x009B93F0, 0x008AAD76
+        """
+        from PySide6.QtGui import QGuiApplication
+        if QGuiApplication.instance() is None:
+            return None
+        cluster = self.people.get(contact_id.lower())
+        if not cluster:
+            return None
+        if size == 64 and circular and cluster.avatar_pixmap and not cluster.avatar_pixmap.isNull():
+            return cluster.avatar_pixmap
+
+        fr = cluster.primary_face_rect
+        if not fr:
+            for flist in cluster.face_rects_by_photo.values():
+                if flist:
+                    fr = flist[0]
+                    cluster.primary_face_rect = fr
+                    break
+
+        if not fr and cluster.photo_paths:
+            for ppath in cluster.photo_paths:
+                ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
+                doc = self.db.get_parsed_ini(ini_path) if (self.db and hasattr(self.db, "get_parsed_ini")) else None
+                if not doc and os.path.exists(ini_path):
                     try:
-                        with Image.open(io.BytesIO(thumb_jpeg)) as img:
-                            cluster.avatar_pixmap = fr.crop_avatar(img, avatar_size=64, circular=True)
-                            avatar_created = True
+                        doc = PicasaIniParser.parse_file(ini_path)
+                    except Exception:
+                        pass
+                if doc:
+                    faces = doc.get_faces(os.path.basename(ppath))
+                    for item in faces:
+                        if item.contact_id.lower() == contact_id.lower():
+                            fr = FaceRect.from_rect64(f"rect64({item.rect64})", contact_id=contact_id, contact_name=cluster.name)
+                            cluster.primary_face_rect = fr
+                            break
+                if fr:
+                    break
+
+        if not fr:
+            return None
+
+        # FR : 1. Tenter depuis la couverture personnalisée si définie
+        # EN: 1. Try from custom cover photo if set
+        if cluster.cover_photo_path and os.path.exists(cluster.cover_photo_path):
+            pil_img = self._open_photo_for_face_crop(cluster.cover_photo_path, fr, size)
+            if pil_img is not None:
+                try:
+                    aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
+                    disp_fr = fr.project_for_photo_ini(cluster.cover_photo_path, aspect_ratio=aspect_img, db=self.db)
+                    pix = disp_fr.crop_avatar(pil_img, avatar_size=size, circular=circular)
+                    if size == 64 and circular:
+                        cluster.avatar_pixmap = pix
+                    return pix
+                except Exception:
+                    pass
+
+        # FR : 2. Tenter via get_face_avatar sur le premier enregistrement du cluster (1001 haute résolution ou photo originale)
+        # EN: 2. Try via get_face_avatar on the first cluster record (high-res 1001 thumbnail or original photo)
+        if cluster.photo_indices and self.db:
+            first_idx = cluster.photo_indices[0]
+            first_path = cluster.photo_paths[0] if cluster.photo_paths else ""
+            pix = self.get_face_avatar(first_path, fr, db_idx=first_idx, size=size, circular=circular)
+            if pix and not pix.isNull():
+                if size == 64 and circular:
+                    cluster.avatar_pixmap = pix
+                return pix
+
+        # FR : 3. Tenter depuis le fichier original sur disque
+        # EN: 3. Try from original file on disk
+        for ppath in cluster.photo_paths:
+            if os.path.exists(ppath):
+                pil_img = self._open_photo_for_face_crop(ppath, fr, size)
+                if pil_img is not None:
+                    try:
+                        aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
+                        disp_fr = fr.project_for_photo_ini(ppath, aspect_ratio=aspect_img, db=self.db)
+                        pix = disp_fr.crop_avatar(pil_img, avatar_size=size, circular=circular)
+                        if size == 64 and circular:
+                            cluster.avatar_pixmap = pix
+                        return pix
                     except Exception:
                         pass
 
-            # Si miniature non disponible, tenter depuis le fichier original sur disque
-            if not avatar_created and cluster.photo_paths:
-                first_path = cluster.photo_paths[0]
-                if os.path.exists(first_path):
+        return None
+
+    def set_person_album_cover(self, contact_id: str, photo_path: str, face_rect: FaceRect) -> bool:
+        """
+        FR : Définit explicitement le visage choisi comme couverture / miniature de l'album de personne (`ID_SETPEOPLEALBUMCOVER`).
+        EN: Explicitly set the selected face as the cover / thumbnail of the person album (`ID_SETPEOPLEALBUMCOVER`).
+        Ref: picasa3.exe @ PplAlbumPhoto::ID_SETPEOPLEALBUMCOVER (0x008AF20B), CThumbUI::UpdateAlbumCover (0x0088F08C)
+        """
+        cid = contact_id.lower()
+        cluster = self.people.get(cid)
+        if not cluster:
+            return False
+
+        cluster.primary_face_rect = face_rect
+        cluster.cover_photo_path = photo_path
+
+        # FR : Recréer immédiatement l'avatar circulaire
+        # EN: Immediately recreate the circular avatar
+        from PySide6.QtGui import QGuiApplication
+        if QGuiApplication.instance() is not None:
+            from picasa_py.ui.image_processor import PicasaImageProcessor
+            img = None
+            if photo_path and os.path.exists(photo_path):
+                try:
+                    img = PicasaImageProcessor.load_transformed_image(photo_path)
+                except Exception:
+                    pass
+            if img is not None:
+                aspect_img = (img.width / float(img.height)) if img.height > 0 else 1.0
+                disp_fr = face_rect.project_for_photo_ini(photo_path, aspect_ratio=aspect_img, db=self.db)
+                cluster.avatar_pixmap = disp_fr.crop_avatar(img, avatar_size=64, circular=True)
+                crop_box = disp_fr.to_pixel_bbox(img.width, img.height)
+                sub = img.crop(crop_box)
+                cluster.feature_vector = PicasaFaceDetector.get().compute_face_feature(sub)
+
+        # FR : Sauvegarde persistante dans contacts.xml / repository.dat (sans QSettings tiers)
+        # EN: Persistent storage in contacts.xml / repository.dat (without third-party QSettings)
+        try:
+            r64_str = face_rect.to_rect64()
+            if self.db and getattr(self.db, "contacts", None):
+                c_obj = self.db.contacts.get(cid)
+                if c_obj:
+                    c_obj.extra_attrs["cover_photo_path"] = photo_path
+                    c_obj.extra_attrs["cover_rect64"] = r64_str
+                if getattr(self.db, "contacts_dir", None):
+                    self.db.contacts.save(str(self.db.contacts_dir / "contacts.xml"))
+            if self.db and getattr(self.db, "repository", None):
+                self.db.repository.set(f"PeopleCovers/{cid}/photo_path", photo_path)
+                self.db.repository.set(f"PeopleCovers/{cid}/rect64", r64_str)
+        except Exception:
+            pass
+
+        self.notify_people_changed()
+        return True
+
+    def get_face_avatar(
+        self,
+        photo_path: str,
+        face_rect: FaceRect,
+        db_idx: Optional[int] = None,
+        size: int = 64,
+        circular: bool = True
+    ) -> Optional[QPixmap]:
+        """
+        FR : Génère ou découpe un avatar haute résolution pour un visage donné :
+        - Si l'enregistrement est un visage `type == 1001` (ou possède un enfant `1001` correspondant),
+          utilise en priorité la vignette de visage haute résolution `bigthumbs_0.db` (`240x288`, `size="large"`)
+          puis `thumbs_0.db` (`120x144`, `size="small"`), ou découpe depuis l'original sur disque si `size > 288`.
+        - Si l'enregistrement est une photo entière (`type != 1001`), découpe le visage depuis la photo originale
+          haute résolution sur disque (et non depuis la miniature `144x108` de la photo entière !).
+        EN: Generate or crop a high-resolution avatar for a given face:
+        - When the record is a `type == 1001` face sub-record (or has a matching `1001` child),
+          uses the high-resolution `bigthumbs_0.db` (`240x288`, `size="large"`) face thumbnail first,
+          then `thumbs_0.db` (`120x144`, `size="small"`), or crops from the on-disk original if `size > 288`.
+        - When the record is a full photo (`type != 1001`), crops the face from the high-resolution
+          original photo on disk (never from the tiny `144x108` whole-photo thumbnail unless the file is missing).
+        Ref: picasa3.exe @ 0x009B93F0, 0x00896F74, 0x0057A4F0
+        """
+        from PySide6.QtGui import QGuiApplication
+        if QGuiApplication.instance() is None:
+            return None
+
+        face_rec_idx: Optional[int] = None
+        parent_photo_idx: Optional[int] = None
+        if db_idx is not None and db_idx >= 0 and self.db:
+            if getattr(self.db, "is_face_record", lambda i: False)(db_idx):
+                face_rec_idx = db_idx
+                parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+            else:
+                parent_photo_idx = db_idx
+                face_rec_idx = self._find_matching_1001_child(db_idx, face_rect)
+
+        if not photo_path and parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
+            try:
+                photo_path = self.db.get_media_full_path(parent_photo_idx) or ""
+            except Exception:
+                photo_path = ""
+
+        has_geo_edits = False
+        geo_sig = (0, "", 0.0)
+        if photo_path and os.path.exists(photo_path):
+            parent_dir = os.path.dirname(photo_path)
+            ini_p = os.path.join(parent_dir, ".picasa.ini")
+            if not os.path.exists(ini_p):
+                ini_p = os.path.join(parent_dir, "Picasa.ini")
+            if os.path.exists(ini_p):
+                try:
+                    doc = self.db.get_parsed_ini(ini_p) if (self.db and hasattr(self.db, "get_parsed_ini")) else PicasaIniParser.parse_file(ini_p)
+                    if doc is not None:
+                        bname = os.path.basename(photo_path)
+                        rot_v = (doc.get_rotate(bname) or 0) % 4
+                        crop_v = doc.get_crop(bname) or ""
+                        tilt_v = round(float(doc.get_tilt(bname) or 0.0), 3)
+                        geo_sig = (rot_v, crop_v, tilt_v)
+                        has_geo_edits = bool(rot_v != 0 or crop_v or abs(tilt_v) >= 0.01)
+                except Exception:
+                    pass
+
+        cache_key = (db_idx, photo_path, round(face_rect.left, 4), round(face_rect.top, 4), size, circular, geo_sig)
+        if cache_key in self._avatar_cache:
+            return self._avatar_cache[cache_key]
+
+        # FR : 1. Si l'on dispose d'un sous-enregistrement de visage (type == 1001) et que la photo n'a pas
+        # de transformation géométrique non répercutée, utiliser bigthumbs_0.db (240x288) ou thumbs_0.db (120x144).
+        # EN: 1. When a face sub-record (type == 1001) is available and no unapplied geometric edit is active,
+        # use bigthumbs_0.db (240x288) or thumbs_0.db (120x144).
+        if face_rec_idx is not None and self.db and (not has_geo_edits or not (photo_path and os.path.exists(photo_path))):
+            thumb_jpeg = (
+                self.db.get_thumbnail(face_rec_idx, size="large")
+                or self.db.get_thumbnail(face_rec_idx, size="small")
+            )
+            if thumb_jpeg:
+                try:
+                    with Image.open(io.BytesIO(thumb_jpeg)) as img:
+                        if size <= max(img.size) or not (photo_path and os.path.exists(photo_path)):
+                            pix = FaceRect.to_avatar_pixmap(img, avatar_size=size, circular=circular)
+                            if pix and not pix.isNull():
+                                self._avatar_cache[cache_key] = pix
+                                return pix
+                except Exception:
+                    pass
+
+        # FR : 2. Découpage haute résolution depuis le fichier photo original sur disque (avec projection .picasa.ini)
+        # EN: 2. High-resolution crop from the original photo file on disk (with .picasa.ini projection)
+        if photo_path and os.path.exists(photo_path):
+            pil_img = self._open_photo_for_face_crop(photo_path, face_rect, size)
+            if pil_img is not None:
+                try:
+                    aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
+                    disp_fr = face_rect.project_for_photo_ini(photo_path, aspect_ratio=aspect_img, db=self.db)
+                    pix = disp_fr.crop_avatar(pil_img, avatar_size=size, circular=circular)
+                    if pix and not pix.isNull():
+                        self._avatar_cache[cache_key] = pix
+                        return pix
+                except Exception:
+                    pass
+
+        # FR : 3. Repli (uniquement si le fichier original sur disque est introuvable) :
+        # essayer previews_0.db puis bigthumbs_0.db puis thumbs_0.db de la photo parente
+        # EN: 3. Fallback (only when the original on-disk file is missing):
+        # try previews_0.db, then bigthumbs_0.db, then thumbs_0.db of the parent photo
+        if parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
+            for sz in ("preview", "large", "small"):
+                raw_parent = (
+                    self.db.load_thumbnail(parent_photo_idx, size=sz)
+                    if hasattr(self.db, "load_thumbnail")
+                    else self.db.get_thumbnail(parent_photo_idx, size=sz)
+                )
+                if raw_parent:
                     try:
-                        with Image.open(first_path) as img:
-                            cluster.avatar_pixmap = fr.crop_avatar(img, avatar_size=64, circular=True)
-                            avatar_created = True
+                        with Image.open(io.BytesIO(raw_parent)) as img:
+                            aspect_img = (img.width / float(img.height)) if img.height > 0 else 1.0
+                            disp_fr = face_rect.project_for_photo_ini(photo_path, aspect_ratio=aspect_img, db=self.db)
+                            pix = disp_fr.crop_avatar(img, avatar_size=size, circular=circular)
+                            if pix and not pix.isNull():
+                                self._avatar_cache[cache_key] = pix
+                                return pix
                     except Exception:
                         pass
+
+        return None
+
+    def cluster_unnamed_faces(
+        self,
+        threshold: float = 0.65,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+        unnamed_subset: Optional[List[Tuple[Optional[int], str, FaceRect]]] = None
+    ) -> List[List[Tuple[Optional[int], str, FaceRect]]]:
+        """
+        FR : Regroupe les visages sans nom similaires en grappes (`clusters`).
+        Utilise les gabarits faciaux Neven FaceSDK précalculés dans `facetemplatesV2_0.db`
+        et un calcul matriciel vectorisé ultra-rapide (5–20 ms).
+        EN: Group similar unnamed faces into clusters.
+        Uses pre-computed Neven FaceSDK face templates from `facetemplatesV2_0.db`
+        and fast vectorized matrix multiplication (5–20 ms).
+        Ref: picasa3.exe @ unknownfaceheaderpanel/cluster, 0x00881CC0, FRSortThreshold (0x00881CC2)
+        """
+        target_unnamed = unnamed_subset if unnamed_subset is not None else self.unnamed_faces
+        if not target_unnamed:
+            return []
+
+        features: List[Optional[np.ndarray]] = []
+        total = len(target_unnamed)
+        has_templates_db = bool(self.db and hasattr(self.db, "get_face_template"))
+
+        for i, (db_idx, ppath, fr) in enumerate(target_unnamed):
+            cache_key = (db_idx, round(fr.left, 4), round(fr.top, 4))
+            feat = self._face_feature_cache.get(cache_key)
+
+            if feat is None:
+                # FR : 1. Priorité absolue : gabarit précalculé Neven FaceSDK dans facetemplatesV2_0.db (Ref: 0x00415790, 0x0064D1B6)
+                # EN: 1. Highest priority: pre-computed Neven FaceSDK template in facetemplatesV2_0.db (Ref: 0x00415790, 0x0064D1B6)
+                if db_idx is not None and has_templates_db:
+                    feat = self.db.get_face_template(db_idx)
+
+                # FR : 2. Fallback rapide depuis la miniature (uniquement si facetemplatesV2 n'existe pas du tout dans la base)
+                # EN: 2. Fast fallback from thumbnail (only when facetemplatesV2 is absent from the database)
+                if feat is None and not has_templates_db:
+                    if db_idx is not None and self.db:
+                        raw_thumb = self.db.get_thumbnail(db_idx, size="small")
+                        if raw_thumb:
+                            try:
+                                with Image.open(io.BytesIO(raw_thumb)) as t_img:
+                                    box = fr.to_pixel_bbox(t_img.width, t_img.height)
+                                    feat = PicasaFaceDetector.get().compute_face_feature(t_img.crop(box))
+                            except Exception:
+                                pass
+
+                if feat is not None:
+                    self._face_feature_cache[cache_key] = feat
+
+            features.append(feat)
+            if progress_callback and (i % 100 == 0 or i == total - 1):
+                try:
+                    progress_callback(i + 1, total)
+                except Exception:
+                    pass
+
+        # FR : Calcul vectorisé matriciel ultra-rapide (O(N) vs O(N^2))
+        # EN: Ultra-fast vectorized matrix similarity calculation (O(N) vs O(N^2))
+        valid_indices = [idx for idx, f in enumerate(features) if f is not None]
+        if not valid_indices:
+            return [[f] for f in target_unnamed]
+
+        mat = np.array([features[idx] for idx in valid_indices], dtype=np.float32)
+        if mat.shape[1] == 2000:
+            # Ref: Red.dll @ 0x10100A10 (vqc_Relator::sim : sim_factor=13.5, sim_delta=-0.45, logistic_map=1)
+            dots = np.dot(mat, mat.T)
+            lin = np.clip(13.5 * dots - 0.45, -30.0, 30.0)
+            sim_mat = 1.0 / (1.0 + np.exp(-lin))
+            effective_threshold = threshold
+        else:
+            mat_c = mat - mat.mean(axis=1, keepdims=True)
+            norms_c = np.linalg.norm(mat_c, axis=1, keepdims=True)
+            norms_c[norms_c == 0] = 1.0
+            mat_c = mat_c / norms_c
+            sim_mat = np.dot(mat_c, mat_c.T)
+            # Ref: picasa3.exe @ FRSortThreshold (0x00881CC2) - default 0.28 pour vecteurs centrés / for centered vectors
+            effective_threshold = 0.28 if mat.shape[1] >= 512 else threshold
+
+        visited = [False] * len(valid_indices)
+        clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
+
+        for i in range(len(valid_indices)):
+            if visited[i]:
+                continue
+            curr_cluster = [target_unnamed[valid_indices[i]]]
+            visited[i] = True
+            matches = np.where((~np.array(visited)) & (sim_mat[i] >= effective_threshold))[0]
+            for m in matches:
+                curr_cluster.append(target_unnamed[valid_indices[m]])
+                visited[m] = True
+            clusters.append(curr_cluster)
+
+        # FR : Ajouter les visages sans signature calculable comme visages isolés
+        # EN: Append faces without a computable feature vector as singleton clusters
+        for idx, f in enumerate(features):
+            if f is None:
+                clusters.append([target_unnamed[idx]])
+
+        clusters.sort(key=lambda c: len(c), reverse=True)
+        return clusters
+
+    def name_cluster(self, cluster: List[Tuple[Optional[int], str, FaceRect]], name: str) -> None:
+        """
+        FR : Attribue un nom à tous les visages d'un cluster d'un seul coup.
+        EN: Assign a name to all faces in a cluster at once.
+        Ref: picasa3.exe @ unknownfaceheaderpanel/addname
+        """
+        for db_idx, ppath, fr in cluster:
+            self.add_face(ppath, fr, name, db_idx=db_idx)
 
     def get_people(self) -> List[PersonCluster]:
-        """Renvoie la liste des personnes triées par nombre de photos décroissant."""
+        """
+        FR : Renvoie la liste des personnes triées par nombre de photos décroissant.
+        EN: Return the list of people sorted by descending photo count.
+        """
         return sorted(self.people.values(), key=lambda p: (p.photo_count, p.name), reverse=True)
 
     def get_person(self, contact_id: str) -> Optional[PersonCluster]:
+        """
+        FR : Récupère le `PersonCluster` correspondant à `contact_id`.
+        EN: Return the `PersonCluster` matching `contact_id`.
+        """
         return self.people.get(contact_id.lower())
 
-    def get_faces_for_photo(self, db_idx: int) -> List[FaceRect]:
-        return self.photo_to_faces.get(db_idx, [])
+    def get_faces_for_photo(self, db_idx: int, photo_path: Optional[str] = None) -> List[FaceRect]:
+        """
+        FR : Renvoie l'ensemble des rectangles de visages associés à la photo `db_idx` (ou `photo_path`).
+             Si `db_idx` est un sous-enregistrement de visage (`type == 1001`), remonte à la photo parente
+             afin de renvoyer tous les visages présents sur cette photo (`PeoplePanel::InThisPhoto`).
+        EN: Return all face rectangles associated with photo `db_idx` (or `photo_path`).
+            If `db_idx` is a face sub-record (`type == 1001`), resolves to the parent photo
+            so all faces on that photo are returned (`PeoplePanel::InThisPhoto`).
+        Ref: picasa3.exe @ 0x008AAD76 (PeoplePanel::InThisPhoto)
+        """
+        target_idx = db_idx
+        if self.db and target_idx is not None and target_idx >= 0 and getattr(self.db, "is_face_record", lambda i: False)(target_idx):
+            parent_idx = self.db.get_face_parent_photo_idx(target_idx)
+            if parent_idx is not None and parent_idx >= 0:
+                target_idx = parent_idx
+
+        if target_idx is not None and target_idx >= 0:
+            if target_idx in self.photo_to_faces and self.photo_to_faces[target_idx]:
+                return self.photo_to_faces[target_idx]
+            children = getattr(self, "_parent_to_1001", {}).get(target_idx, [])
+            if children:
+                collected: List[FaceRect] = []
+                for c_idx in children:
+                    for fr in self.photo_to_faces.get(c_idx, []):
+                        if not any(_face_overlap(ef, fr) >= 0.45 for ef in collected):
+                            collected.append(fr)
+                if collected:
+                    self.photo_to_faces[target_idx] = collected
+                    return collected
+
+        if db_idx is not None and db_idx in self.photo_to_faces and self.photo_to_faces[db_idx]:
+            return self.photo_to_faces[db_idx]
+
+        if photo_path and self.db and hasattr(self.db, "find_media_index_by_path"):
+            found_idx = self.db.find_media_index_by_path(photo_path)
+            if found_idx is not None and found_idx >= 0 and found_idx in self.photo_to_faces and self.photo_to_faces[found_idx]:
+                return self.photo_to_faces[found_idx]
+
+        if photo_path:
+            norm_target = os.path.normpath(photo_path).lower()
+            matched_unnamed = [
+                fr for (_, u_path, fr) in self.unnamed_faces
+                if u_path and os.path.normpath(u_path).lower() == norm_target
+            ]
+            if matched_unnamed:
+                return matched_unnamed
+
+        return []
+
+    def detect_faces_for_photo(
+        self,
+        photo_path: str | int | Path,
+        db_idx: Optional[int | str | Path] = None,
+        auto_suggest: bool = True,
+        persist_ini: bool = False,
+    ) -> List[FaceRect]:
+        """
+        FR : Détecte automatiquement les visages sur une photo via `CFaceDetector` / `BgFaceDetectThread`.
+        Si de nouveaux visages sont détectés, crée les enregistrements enfants `type == 1001`
+        dans `thumbindex.db`, stocke les coordonnées dans `imagedata_facerect.pmp`, enregistre
+        les signatures `vqc_Cue` dans `facetemplatesV2` et recherche des correspondances
+        avec les contacts existants pour générer des suggestions.
+        Si 0 visage n'est détecté, marque l'image parente avec `imagedata_facerect = 1`.
+        EN: Automatically detect faces in a photo via `CFaceDetector` / `BgFaceDetectThread`.
+        When new faces are detected, creates child `type == 1001` records in `thumbindex.db`,
+        stores rects in `imagedata_facerect.pmp`, writes `vqc_Cue` templates into `facetemplatesV2`,
+        and matches them against existing contacts to generate suggestions.
+        If 0 faces are detected, marks the parent photo with `imagedata_facerect = 1`.
+        Ref: picasa3.exe @ 0x0072BA00, 0x0087ECD6 (BgFaceDetectThread), 0x00881CC0 (FRSuggestionThreshold)
+        """
+        if isinstance(photo_path, int):
+            if isinstance(db_idx, (str, Path)):
+                photo_path, db_idx = str(db_idx), photo_path
+            else:
+                db_idx = photo_path
+                photo_path = (self.db.get_media_full_path(db_idx) or "") if self.db else ""
+        else:
+            photo_path = str(photo_path or "")
+            if isinstance(db_idx, (str, Path)):
+                db_idx = None
+
+        if (db_idx is None or db_idx < 0) and self.db and photo_path:
+            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+            fname_lower = os.path.basename(photo_path).lower()
+            for i, r in enumerate(self.db.index):
+                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                    fpath = folders_map.get(r.parent_idx, "")
+                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                        db_idx = i
+                        break
+
+        if db_idx is not None:
+            self._scanned_photo_indices.add(db_idx)
+
+        if not photo_path or not os.path.exists(photo_path):
+            return self.get_faces_for_photo(db_idx) if db_idx is not None else []
+
+        existing: List[FaceRect] = list(self.get_faces_for_photo(db_idx)) if db_idx is not None else []
+
+        # Ref: picasa3.exe @ 0x00881690 (frexclude=1 dans [Picasa] de .picasa.ini)
+        parent_dir = os.path.dirname(photo_path)
+        for ini_name in (".picasa.ini", "Picasa.ini"):
+            ini_p = os.path.join(parent_dir, ini_name)
+            if os.path.exists(ini_p):
+                doc = self.db.get_parsed_ini(ini_p) if (self.db and hasattr(self.db, "get_parsed_ini")) else None
+                if doc is None:
+                    try:
+                        doc = PicasaIniParser.parse_file(ini_p)
+                    except Exception:
+                        doc = None
+                if doc is not None:
+                    sec_p = doc.get_section("Picasa")
+                    if sec_p and (sec_p.get("frexclude") or "").strip().lower() in ("1", "yes", "true"):
+                        return existing
+
+        detector = getattr(self, "detector", None) or PicasaFaceDetector.get()
+        detected: list[Any] = []
+        if hasattr(detector, "detect_faces_in_file"):
+            res = detector.detect_faces_in_file(photo_path)
+            if isinstance(res, list):
+                detected = res
+            elif hasattr(detector, "detect_faces_in_image"):
+                res2 = detector.detect_faces_in_image(photo_path)
+                if isinstance(res2, list):
+                    detected = res2
+        elif hasattr(detector, "detect_faces_in_image"):
+            res = detector.detect_faces_in_image(photo_path)
+            if isinstance(res, list):
+                detected = res
+        elif hasattr(detector, "detect_faces"):
+            res = detector.detect_faces(photo_path)
+            if isinstance(res, list):
+                detected = res
+
+        if not detected:
+            # Ref: picasa3.exe @ 0x0072BA00 (imagedata_facerect = 1 pour photo analysée avec 0 visage)
+            if db_idx is not None and db_idx >= 0 and self.db:
+                pmp_fr = self.db.pmps.get("imagedata_facerect")
+                if pmp_fr is not None:
+                    while len(pmp_fr.records) <= db_idx:
+                        pmp_fr.records.append(0)
+                    if pmp_fr.records[db_idx] == 0:
+                        pmp_fr.records[db_idx] = 1
+            return existing
+
+        # FR : Ouvrir l'image uniquement si un gabarit n'a pas déjà été extrait par Red.dll / PurePythonRedEngine
+        # EN: Open the image only if a template was not already extracted by Red.dll / PurePythonRedEngine
+        pil_img: Optional[Image.Image] = None
+
+        new_faces_added = False
+        newly_detected_rects: List[FaceRect] = []
+        for df_raw in detected:
+            if isinstance(df_raw, FaceRect):
+                df = df_raw
+            elif hasattr(df_raw, "rect") and isinstance(getattr(df_raw, "rect"), FaceRect):
+                df = getattr(df_raw, "rect")
+            elif hasattr(df_raw, "face_rect") and isinstance(getattr(df_raw, "face_rect"), FaceRect):
+                df = getattr(df_raw, "face_rect")
+            else:
+                df = FaceRect(
+                    left=float(getattr(df_raw, "left", getattr(df_raw, "left_norm", 0.2))),
+                    top=float(getattr(df_raw, "top", getattr(df_raw, "top_norm", 0.2))),
+                    right=float(getattr(df_raw, "right", getattr(df_raw, "right_norm", 0.8))),
+                    bottom=float(getattr(df_raw, "bottom", getattr(df_raw, "bottom_norm", 0.8))),
+                )
+            template_blob = (
+                getattr(df, "template_blob", None)
+                or getattr(df_raw, "template_blob", None)
+                or getattr(df_raw, "cue_blob_1044", None)
+                or getattr(df_raw, "template", None)
+            )
+            if template_blob is not None:
+                df.template_blob = template_blob  # type: ignore[attr-defined]
+            if getattr(df, "feature_vector", None) is None and getattr(df_raw, "feature_vector", None) is not None:
+                df.feature_vector = getattr(df_raw, "feature_vector")
+
+            # FR : Vérifier si ce visage correspond déjà à un visage existant (recouvrement >= 0.35)
+            # EN: Check whether this face already overlaps an existing face (overlap >= 0.35)
+            if any(_face_overlap(df, ef) >= 0.35 for ef in existing):
+                continue
+
+            child_idx: Optional[int] = None
+            if db_idx is not None and db_idx >= 0 and self.db:
+                child_idx = self._get_or_create_1001_child(db_idx, df)
+                if child_idx is not None:
+                    self.photo_to_faces.setdefault(child_idx, [df])
+                    if isinstance(template_blob, (bytes, bytearray)) and len(template_blob) > 0 and hasattr(self.db, "add_face_template"):
+                        self.db.add_face_template(child_idx, bytes(template_blob))
+
+            # FR : Récupérer le gabarit vqc_Cue 2000-D extrait par Red.dll (vt[14]) / PurePythonRedEngine
+            # EN: Retrieve the 2000-D vqc_Cue template extracted by Red.dll (vt[14]) / PurePythonRedEngine
+            feat: Optional[Any] = getattr(df, "feature_vector", None)
+            if feat is None and isinstance(template_blob, (bytes, bytearray)) and len(template_blob) == 1044:
+                feat = PicasaFaceDetector.cue_blob_to_feature_vector(bytes(template_blob))
+                if feat is not None:
+                    df.feature_vector = feat
+            if feat is None and child_idx is not None and self.db and hasattr(self.db, "get_face_template"):
+                feat = self.db.get_face_template(child_idx)
+            if feat is None and db_idx is not None and self.db and hasattr(self.db, "get_face_template"):
+                feat = self.db.get_face_template(db_idx)
+
+            if feat is None and auto_suggest and self.people:
+                try:
+                    if pil_img is None:
+                        from picasa_py.ui.image_processor import PicasaImageProcessor
+                        pil_img = PicasaImageProcessor.load_transformed_image(photo_path)
+                    if pil_img is not None:
+                        cbox = df.to_pixel_bbox(pil_img.width, pil_img.height)
+                        sub = pil_img.crop(cbox)
+                        feat = PicasaFaceDetector.get().compute_face_feature(sub)
+                except Exception:
+                    pass
+
+            if feat is not None:
+                cache_key = (db_idx, round(df.left, 4), round(df.top, 4))
+                self._face_feature_cache[cache_key] = feat
+
+            # FR : Visage non répertorié : tentative d'identification / suggestion via vqc_Relator::sim
+            # EN: Unlisted face: attempt identification / suggestion via vqc_Relator::sim
+            # Ref: picasa3.exe @ 0x0048AA80..0x0048AE80 :
+            # - FRSuggestionSingleThreshold = 0.90 (90%) si le contact n'a qu'1 seule photo confirmée / if 1 confirmed photo
+            # - FRSuggestionThreshold = 0.65 (65%) si le contact a >= 2 photos confirmées / if >= 2 confirmed photos
+            matched_cluster: Optional[PersonCluster] = None
+            best_similarity: float = -1.0
+
+            if feat is not None and auto_suggest and self.people:
+                detector = PicasaFaceDetector.get()
+                for cluster in self.people.values():
+                    ref_vecs = cluster.feature_vectors if cluster.feature_vectors else (
+                        [cluster.feature_vector] if cluster.feature_vector is not None else []
+                    )
+                    if not ref_vecs:
+                        continue
+                    cluster_best = max(detector.compare_face_features(feat, rv) for rv in ref_vecs)
+                    req_thresh = (
+                        FR_SUGGESTION_SINGLE_THRESHOLD
+                        if cluster.photo_count <= 1
+                        else FR_SUGGESTION_THRESHOLD
+                    )
+                    if cluster_best >= req_thresh and cluster_best > best_similarity:
+                        best_similarity = cluster_best
+                        matched_cluster = cluster
+
+            if matched_cluster is not None:
+                df.contact_id = ""
+                df.contact_name = f"? {matched_cluster.name}"
+                sug = FaceSuggestion(
+                    contact_id=matched_cluster.contact_id,
+                    contact_name=matched_cluster.name,
+                    photo_path=photo_path,
+                    face_rect=df,
+                    similarity=best_similarity,
+                    db_idx=db_idx
+                )
+                self.suggestions.setdefault(matched_cluster.contact_id, []).append(sug)
+            else:
+                df.contact_id = ""
+                df.contact_name = None  # FR : Visage sans nom / EN: Unnamed face (Ref: CThumbDB::unknownfacealbum)
+                self.unnamed_faces.append((db_idx, photo_path, df))
+
+            existing.append(df)
+            newly_detected_rects.append(df)
+            new_faces_added = True
+
+        if pil_img:
+            try:
+                pil_img.close()
+            except Exception:
+                pass
+
+        if db_idx is not None and new_faces_added:
+            self.photo_to_faces[db_idx] = existing
+
+        if persist_ini and new_faces_added:
+            try:
+                fname = os.path.basename(photo_path)
+                def _persist_detected_faces(doc: PicasaIniDocument, section_name: str) -> None:
+                    sec = doc.get_or_create_section(section_name)
+                    curr = sec.get("faces") or ""
+                    items = [p.strip() for p in curr.split(";") if p.strip()]
+                    for ndf in newly_detected_rects:
+                        r64 = ndf.to_rect64()
+                        tok = f"{r64},0"
+                        if not any(r64 in it for it in items):
+                            items.append(tok)
+                    if items:
+                        sec.set("faces", ";".join(items))
+                if self.db and hasattr(self.db, "update_photo_ini"):
+                    self.db.update_photo_ini(photo_path, _persist_detected_faces)
+            except Exception:
+                pass
+
+        return existing
+
+
+    def _get_or_create_person_album_id(self, contact_id: str, contact_name: str) -> Optional[int]:
+        """
+        FR : Trouve ou crée l'album de personne (category == 8) dans les tables albumdata_*
+        en préservant l'alignement strict de toutes les colonnes albumdata_*.
+        EN: Find or create the person album (category == 8) in albumdata_* tables
+        while strictly preserving row alignment across all albumdata_* columns.
+        Ref: picasa3.exe @ 0x008AAD76 (albumdata_category == 8, albumdata_albumcontactids)
+        """
+        if not self.db:
+            return None
+        ad_names = self.db.pmps.get("albumdata_name")
+        ad_cats = self.db.pmps.get("albumdata_category")
+        if ad_names is None or ad_cats is None:
+            return None
+
+        ad_cids = self.db.pmps.get("albumdata_albumcontactids")
+        cid_int: Optional[int] = None
+        try:
+            cid_int = int(contact_id.strip(), 16) & 0xFFFFFFFFFFFFFFFF
+        except Exception:
+            cid_int = None
+
+        clean_lower = contact_name.strip().lower()
+        for i in range(len(ad_names.records)):
+            if i < len(ad_cats.records) and ad_cats.records[i] == 8:
+                if i == 0:
+                    continue
+                if ad_cids is not None and i < len(ad_cids.records) and cid_int is not None and ad_cids.records[i] == cid_int:
+                    return i
+                if str(ad_names.records[i] or "").strip().lower() == clean_lower:
+                    return i
+
+        albumdata_tables = {
+            stem: pmp
+            for stem, pmp in self.db.pmps.items()
+            if stem.startswith("albumdata_")
+        }
+        base_len = len(ad_names.records)
+        for pmp in albumdata_tables.values():
+            def_val = pmp.default_value()
+            while len(pmp.records) < base_len:
+                pmp.records.append(def_val)
+
+        if len(ad_names.records) == 0:
+            for stem, pmp in albumdata_tables.items():
+                if stem == "albumdata_name":
+                    pmp.records.append("Default")
+                elif stem == "albumdata_category":
+                    pmp.records.append(0)
+                else:
+                    pmp.records.append(pmp.default_value())
+
+        new_alb_idx = len(ad_names.records)
+        for stem, pmp in albumdata_tables.items():
+            if stem == "albumdata_name":
+                pmp.records.append(contact_name.strip())
+            elif stem == "albumdata_category":
+                pmp.records.append(8)
+            elif stem == "albumdata_albumcontactids":
+                pmp.records.append(cid_int if cid_int is not None else 0)
+            else:
+                pmp.records.append(pmp.default_value())
+        return new_alb_idx
+
+    def add_face(
+        self,
+        photo_path: str | int,
+        face_rect: FaceRect,
+        contact_name: str | PersonCluster = "",
+        contact_id: Optional[str | PersonCluster] = None,
+        db_idx: Optional[int] = None,
+        source_image: Optional[Image.Image] = None,
+    ) -> FaceRect:
+        """
+        FR : Associe un visage à une personne, crée ou met à jour le contact,
+        synchronise les tables PMP (`imagedata_personalbumid`, `imagedata_suggestionpersonalbumid`, `albumdata_*`)
+        et enregistre les modifications de manière bit-exacte dans le fichier `.picasa.ini`.
+        EN: Associate a face with a person, create or update the contact,
+        synchronize PMP tables (`imagedata_personalbumid`, `imagedata_suggestionpersonalbumid`, `albumdata_*`),
+        and save changes bit-exactly into the `.picasa.ini` file.
+        Ref: picasa3.exe @ 0x008A1034 (peoplepanel/manual_add_editbox), 0x0068BABA
+        """
+        if isinstance(photo_path, int):
+            if db_idx is None:
+                db_idx = photo_path
+            photo_path = ""
+        else:
+            photo_path = str(photo_path or "")
+
+        if isinstance(face_rect, (tuple, list)) and len(face_rect) >= 4:
+            face_rect = FaceRect(
+                left=float(face_rect[0]),
+                top=float(face_rect[1]),
+                right=float(face_rect[2]),
+                bottom=float(face_rect[3]),
+            )
+
+        if isinstance(contact_name, PersonCluster):
+            if not contact_id:
+                contact_id = contact_name.contact_id
+            contact_name = contact_name.name
+        if isinstance(contact_id, PersonCluster):
+            if not contact_name:
+                contact_name = contact_id.name
+            contact_id = contact_id.contact_id
+
+        if not contact_id and getattr(face_rect, "contact_id", None):
+            raw_cid = face_rect.contact_id
+            if isinstance(raw_cid, PersonCluster):
+                if not contact_name:
+                    contact_name = raw_cid.name
+                contact_id = raw_cid.contact_id
+            elif str(raw_cid).strip().lower() not in ("", "0", "ffffffffffffffff", "unknown", "unnamed"):
+                contact_id = str(raw_cid).strip().lower()
+
+        clean_name = str(contact_name or "").strip()
+        if not clean_name and getattr(face_rect, "contact_name", None):
+            clean_name = str(face_rect.contact_name).lstrip("? ").strip()
+        if not clean_name and contact_id and str(contact_id).lower() in self.people:
+            clean_name = self.people[str(contact_id).lower()].name
+        if not clean_name:
+            clean_name = "Sans nom"
+
+        # FR : Résoudre ou créer le contact_id (format hex 16 caractères de Picasa)
+        # EN: Resolve or generate the contact_id (Picasa 16-char hex format)
+        if not contact_id:
+            for c in self.people.values():
+                if c.name.strip().lower() == clean_name.lower():
+                    contact_id = c.contact_id
+                    break
+            if not contact_id:
+                contact_id = secrets.token_hex(8)
+        else:
+            contact_id = str(contact_id).strip().lower()
+
+        face_rect.contact_id = contact_id
+        face_rect.contact_name = clean_name
+
+        # FR : Mettre à jour le cluster en mémoire
+        # EN: Update in-memory person cluster
+        cluster = self.people.get(contact_id)
+        if not cluster:
+            cluster = PersonCluster(contact_id=contact_id, name=clean_name)
+            self.people[contact_id] = cluster
+
+        if (db_idx is None or db_idx < 0) and self.db and photo_path:
+            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+            fname_lower = os.path.basename(photo_path).lower()
+            for i, r in enumerate(self.db.index):
+                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                    fpath = folders_map.get(r.parent_idx, "")
+                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                        db_idx = i
+                        break
+
+        parent_photo_idx: Optional[int] = None
+        face_rec_idx: Optional[int] = None
+        is_input_1001 = False
+        if db_idx is not None and db_idx >= 0 and self.db:
+            if getattr(self.db, "is_face_record", lambda i: False)(db_idx):
+                is_input_1001 = True
+                face_rec_idx = db_idx
+                parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+            else:
+                parent_photo_idx = db_idx
+                face_rec_idx = self._get_or_create_1001_child(parent_photo_idx, face_rect)
+        elif db_idx is not None and db_idx >= 0:
+            parent_photo_idx = db_idx
+
+        if not photo_path and parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
+            try:
+                photo_path = self.db.get_media_full_path(parent_photo_idx) or ""
+            except Exception:
+                photo_path = ""
+
+        eff_idx = face_rec_idx if face_rec_idx is not None else parent_photo_idx
+        face_rect.record_index = face_rec_idx
+        cluster_idx = face_rec_idx if is_input_1001 else (parent_photo_idx if parent_photo_idx is not None else face_rec_idx)
+        if cluster_idx is not None and cluster_idx not in cluster.photo_indices:
+            cluster.photo_indices.append(cluster_idx)
+        if photo_path and photo_path not in cluster.photo_paths:
+            cluster.photo_paths.append(photo_path)
+
+        for target_idx in (face_rec_idx, parent_photo_idx):
+            if target_idx is None:
+                continue
+            flist = cluster.face_rects_by_photo.setdefault(target_idx, [])
+            replaced_c = False
+            for i, f in enumerate(flist):
+                if _face_overlap(f, face_rect) >= 0.45:
+                    f.contact_id = contact_id
+                    f.contact_name = clean_name
+                    flist[i] = face_rect
+                    replaced_c = True
+                    break
+            if not replaced_c:
+                flist.append(face_rect)
+
+            pflist = self.photo_to_faces.setdefault(target_idx, [])
+            replaced_p = False
+            for i, f in enumerate(pflist):
+                if _face_overlap(f, face_rect) >= 0.45:
+                    f.contact_id = contact_id
+                    f.contact_name = clean_name
+                    pflist[i] = face_rect
+                    replaced_p = True
+                    break
+            if not replaced_p:
+                pflist.append(face_rect)
+
+        # FR : Ajouter le gabarit vqc_Cue 2000-D au cluster s'il est disponible
+        # EN: Append the 2000-D vqc_Cue template to the cluster if available
+        fv = getattr(face_rect, "feature_vector", None)
+        if fv is None:
+            fv = self._face_feature_cache.get((eff_idx, round(face_rect.left, 4), round(face_rect.top, 4)))
+        if fv is None and eff_idx is not None and self.db and hasattr(self.db, "get_face_template"):
+            fv = self.db.get_face_template(eff_idx)
+        if fv is not None:
+            cluster.feature_vectors.append(fv)
+            if cluster.feature_vector is None:
+                cluster.feature_vector = fv
+
+        # FR : Générer l'avatar si manquant ou mis à jour
+        # EN: Generate avatar if missing or updated
+        if cluster.primary_face_rect is None or cluster.avatar_pixmap is None:
+            cluster.primary_face_rect = face_rect
+            from PySide6.QtGui import QGuiApplication
+            if QGuiApplication.instance() is not None:
+                pimg = source_image
+                if pimg is None and photo_path and os.path.exists(photo_path):
+                    from picasa_py.ui.image_processor import PicasaImageProcessor
+                    pimg = PicasaImageProcessor.load_transformed_image(photo_path)
+                if pimg is not None:
+                    try:
+                        aspect_p = (pimg.width / float(pimg.height)) if pimg.height > 0 else 1.0
+                        disp_fr = face_rect.project_for_photo_ini(photo_path, aspect_ratio=aspect_p, db=self.db)
+                        cluster.avatar_pixmap = disp_fr.crop_avatar(pimg, avatar_size=64, circular=True)
+                        if cluster.feature_vector is None:
+                            cbox = disp_fr.to_pixel_bbox(pimg.width, pimg.height)
+                            fv_crop = PicasaFaceDetector.get().compute_face_feature(pimg.crop(cbox))
+                            if fv_crop is not None:
+                                cluster.feature_vector = fv_crop
+                                cluster.feature_vectors.append(fv_crop)
+                    except Exception:
+                        pass
+
+        # FR : Retirer des visages sans nom et des suggestions
+        # EN: Remove from unnamed faces and pending suggestions
+        norm_photo = os.path.normpath(photo_path).lower() if photo_path else ""
+        target_indices = {idx for idx in (face_rec_idx, parent_photo_idx, db_idx) if idx is not None}
+        self.unnamed_faces = [
+            (i, p, f) for (i, p, f) in self.unnamed_faces
+            if not (
+                (
+                    (i is not None and i in target_indices)
+                    or (p and norm_photo and os.path.normpath(p).lower() == norm_photo)
+                )
+                and _face_overlap(f, face_rect) >= 0.45
+            )
+        ]
+        for cid in list(self.suggestions.keys()):
+            self.suggestions[cid] = [
+                s for s in self.suggestions[cid]
+                if not (
+                    (
+                        (s.db_idx is not None and s.db_idx in target_indices)
+                        or (s.photo_path and norm_photo and os.path.normpath(s.photo_path).lower() == norm_photo)
+                    )
+                    and _face_overlap(s.face_rect, face_rect) >= 0.45
+                )
+            ]
+
+        # FR : Synchroniser imagedata_personalbumid et imagedata_suggestionpersonalbumid
+        # EN: Synchronize imagedata_personalbumid and imagedata_suggestionpersonalbumid
+        if self.db:
+            pmp_pa = self.db.pmps.get("imagedata_personalbumid")
+            pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+            pa_target_idx = face_rec_idx if face_rec_idx is not None else parent_photo_idx
+            if pa_target_idx is not None and pmp_pa is not None and contact_id not in ("", "0", "ffffffffffffffff", "unknown", "unnamed"):
+                alb_idx = self._get_or_create_person_album_id(contact_id, clean_name)
+                if alb_idx is not None:
+                    while len(pmp_pa.records) <= pa_target_idx:
+                        pmp_pa.records.append(0)
+                    pmp_pa.records[pa_target_idx] = alb_idx
+            if pmp_sug is not None:
+                for t_idx in target_indices:
+                    if 0 <= t_idx < len(pmp_sug.records):
+                        pmp_sug.records[t_idx] = 0
+
+        # FR : Écriture bit-exacte dans le .picasa.ini
+        # EN: Bit-exact write to .picasa.ini
+        if photo_path:
+            parent_dir = os.path.dirname(photo_path)
+            fname = os.path.basename(photo_path)
+            ini_path = os.path.join(parent_dir, ".picasa.ini")
+
+            doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+
+            sec_c2 = doc.get_or_create_section("Contacts2")
+            sec_c2.set(contact_id, f"{clean_name};;")
+
+            r64_clean = face_rect.to_rect64()[7:-1]
+            faces = doc.get_faces(fname)
+            found = False
+            for idx, item in enumerate(faces):
+                try:
+                    item_fr = FaceRect.from_rect64(f"rect64({item.rect64})")
+                    if _face_overlap(item_fr, face_rect) >= 0.45 or item.rect64.lower() == r64_clean.lower():
+                        faces[idx] = FaceItem(rect64=r64_clean, contact_id=contact_id)
+                        found = True
+                        break
+                except Exception:
+                    pass
+            if not found:
+                faces.append(FaceItem(rect64=r64_clean, contact_id=contact_id))
+
+            doc.set_faces(fname, faces)
+            doc.write_file(ini_path)
+            if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                self.db.invalidate_ini_cache(ini_path)
+
+        # FR : Synchroniser contacts.xml pour la base globale Picasa
+        # EN: Synchronize contacts.xml for the global Picasa database
+        if self.db:
+            if getattr(self.db, "contacts", None) is None:
+                self.db.contacts = ContactsFile()
+            found_c = False
+            for c in self.db.contacts.contacts:
+                if c.id.lower() == contact_id.lower():
+                    found_c = True
+                    break
+            if not found_c:
+                self.db.contacts.contacts.append(Contact(id=contact_id, name=clean_name))
+                if getattr(self.db, "contacts_dir", None):
+                    try:
+                        self.db.contacts_dir.mkdir(parents=True, exist_ok=True)
+                        (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
+                    except Exception:
+                        pass
+
+        self.notify_people_changed()
+        return face_rect
+
+    def reassign_face(
+        self,
+        photo_path: str,
+        old_face_rect: FaceRect,
+        new_contact_name: str,
+        new_contact_id: Optional[str] = None,
+        db_idx: Optional[int] = None,
+        source_image: Optional[Image.Image] = None,
+        source_contact_id: Optional[str] = None,
+    ) -> FaceRect:
+        """
+        FR : Réassigne un visage existant à une autre personne ou renomme la personne.
+        EN: Reassign an existing face to another person or rename the person.
+        Ref: picasa3.exe @ peoplepanel/addname, peopleautocomplete (0x008A15D0)
+        """
+        if (db_idx is None or db_idx < 0) and self.db and photo_path:
+            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+            fname_lower = os.path.basename(photo_path).lower()
+            for i, r in enumerate(self.db.index):
+                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                    fpath = folders_map.get(r.parent_idx, "")
+                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                        db_idx = i
+                        break
+
+        old_cid = old_face_rect.contact_id or source_contact_id
+        old_cluster = self.get_person(old_cid) if old_cid else None
+
+        if old_cluster:
+            # FR : 1. Retirer le visage de old_cluster.face_rects_by_photo
+            # EN: 1. Remove face from old_cluster.face_rects_by_photo
+            matching_keys = []
+            for k, flist in list(old_cluster.face_rects_by_photo.items()):
+                new_flist = [f for f in flist if _face_overlap(f, old_face_rect) < 0.45]
+                if len(new_flist) != len(flist):
+                    if new_flist:
+                        old_cluster.face_rects_by_photo[k] = new_flist
+                    else:
+                        del old_cluster.face_rects_by_photo[k]
+                        matching_keys.append(k)
+
+            for k in matching_keys:
+                if isinstance(k, int) and k in old_cluster.photo_indices:
+                    old_cluster.photo_indices.remove(k)
+            if db_idx is not None and db_idx not in old_cluster.face_rects_by_photo:
+                if db_idx in old_cluster.photo_indices:
+                    old_cluster.photo_indices.remove(db_idx)
+
+            # FR : 2. Vérifier s'il reste d'autres visages appartenant à old_cluster pour CETTE photo
+            # EN: 2. Check if any other faces belonging to old_cluster remain on THIS photo
+            has_other_for_this_photo = False
+            if db_idx is not None and db_idx in old_cluster.face_rects_by_photo:
+                has_other_for_this_photo = True
+
+            norm_p = os.path.normpath(photo_path).lower() if photo_path else ""
+            if not has_other_for_this_photo and norm_p:
+                old_cluster.photo_paths = [
+                    p for p in old_cluster.photo_paths
+                    if os.path.normpath(p).lower() != norm_p
+                ]
+                if db_idx is not None and db_idx in old_cluster.photo_indices:
+                    old_cluster.photo_indices = [idx for idx in old_cluster.photo_indices if idx != db_idx]
+
+            # FR : 3. Avatar de l'ancien cluster si c'était ce visage
+            # EN: 3. Update old cluster's primary avatar if it used this face
+            if old_cluster.primary_face_rect and _face_overlap(old_cluster.primary_face_rect, old_face_rect) >= 0.45:
+                all_remaining = []
+                for fl in old_cluster.face_rects_by_photo.values():
+                    all_remaining.extend(fl)
+                if all_remaining:
+                    old_cluster.primary_face_rect = all_remaining[0]
+                else:
+                    old_cluster.primary_face_rect = None
+                    old_cluster.avatar_pixmap = None
+
+        new_fr = FaceRect(
+            left=old_face_rect.left,
+            top=old_face_rect.top,
+            right=old_face_rect.right,
+            bottom=old_face_rect.bottom
+        )
+        return self.add_face(
+            photo_path, new_fr, new_contact_name, new_contact_id, db_idx, source_image=source_image
+        )
+
+    def remove_face(
+        self,
+        photo_path: str,
+        face_rect: FaceRect,
+        db_idx: Optional[int] = None
+    ) -> None:
+        """
+        FR : Supprime / ignore un visage d'une photo et synchronise le fichier `.picasa.ini` et les tables PMP.
+        EN: Remove / ignore a face from a photo and synchronize the `.picasa.ini` file and PMP tables.
+        Ref: picasa3.exe @ peoplepanel::ignore, removesel (0x00896FA8)
+        """
+        if (db_idx is None or db_idx < 0) and self.db and photo_path:
+            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+            fname_lower = os.path.basename(photo_path).lower()
+            for i, r in enumerate(self.db.index):
+                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                    fpath = folders_map.get(r.parent_idx, "")
+                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                        db_idx = i
+                        break
+
+        parent_photo_idx: Optional[int] = None
+        face_rec_idx: Optional[int] = None
+        if db_idx is not None and db_idx >= 0 and self.db:
+            if getattr(self.db, "is_face_record", lambda i: False)(db_idx):
+                face_rec_idx = db_idx
+                parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+            else:
+                parent_photo_idx = db_idx
+                face_rec_idx = self._find_matching_1001_child(parent_photo_idx, face_rect)
+        elif db_idx is not None and db_idx >= 0:
+            parent_photo_idx = db_idx
+
+        if not photo_path and parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
+            try:
+                photo_path = self.db.get_media_full_path(parent_photo_idx) or ""
+            except Exception:
+                photo_path = ""
+
+        target_indices = {idx for idx in (face_rec_idx, parent_photo_idx, db_idx) if idx is not None}
+        for t_idx in target_indices:
+            if t_idx in self.photo_to_faces:
+                self.photo_to_faces[t_idx] = [
+                    f for f in self.photo_to_faces[t_idx]
+                    if _face_overlap(f, face_rect) < 0.45
+                ]
+
+        norm_photo = os.path.normpath(photo_path).lower() if photo_path else ""
+        cid = (face_rect.contact_id or "").lower()
+        clusters_to_check = [self.people[cid]] if (cid and cid in self.people) else list(self.people.values())
+        for c in clusters_to_check:
+            removed_any = False
+            for t_idx in target_indices:
+                if t_idx in c.face_rects_by_photo:
+                    prev_len = len(c.face_rects_by_photo[t_idx])
+                    c.face_rects_by_photo[t_idx] = [
+                        f for f in c.face_rects_by_photo[t_idx]
+                        if _face_overlap(f, face_rect) < 0.45
+                    ]
+                    if len(c.face_rects_by_photo[t_idx]) != prev_len:
+                        removed_any = True
+                    if not c.face_rects_by_photo[t_idx]:
+                        del c.face_rects_by_photo[t_idx]
+                        if t_idx in c.photo_indices:
+                            c.photo_indices.remove(t_idx)
+
+            if removed_any or c.contact_id == cid:
+                # FR : Ne retirer photo_path de c.photo_paths que s'il ne reste plus aucun visage de cette personne sur cette photo
+                # EN: Only remove photo_path from c.photo_paths if no other faces of this person remain on this photo
+                sibling_1001 = set(getattr(self, "_parent_to_1001", {}).get(parent_photo_idx, [])) if parent_photo_idx is not None else set()
+                all_photo_keys = target_indices | sibling_1001
+                still_has_face_on_photo = any(
+                    bool(c.face_rects_by_photo.get(k)) for k in all_photo_keys
+                )
+                if not still_has_face_on_photo and norm_photo:
+                    c.photo_paths = [
+                        p for p in c.photo_paths
+                        if os.path.normpath(p).lower() != norm_photo
+                    ]
+
+        self.unnamed_faces = [
+            (i, p, f) for (i, p, f) in self.unnamed_faces
+            if not (
+                (
+                    (i is not None and i in target_indices)
+                    or (p and norm_photo and os.path.normpath(p).lower() == norm_photo)
+                )
+                and _face_overlap(f, face_rect) >= 0.45
+            )
+        ]
+        for scid in list(self.suggestions.keys()):
+            self.suggestions[scid] = [
+                s for s in self.suggestions[scid]
+                if not (
+                    (
+                        (s.db_idx is not None and s.db_idx in target_indices)
+                        or (s.photo_path and norm_photo and os.path.normpath(s.photo_path).lower() == norm_photo)
+                    )
+                    and _face_overlap(s.face_rect, face_rect) >= 0.45
+                )
+            ]
+
+        if self.db and face_rec_idx is not None:
+            for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
+                pmp = self.db.pmps.get(col_name)
+                if pmp is not None and 0 <= face_rec_idx < len(pmp.records):
+                    pmp.records[face_rec_idx] = 0
+
+        # FR : Mise à jour du .picasa.ini
+        # EN: Update .picasa.ini
+        if photo_path:
+            parent_dir = os.path.dirname(photo_path)
+            fname = os.path.basename(photo_path)
+            ini_path = os.path.join(parent_dir, ".picasa.ini")
+
+            if os.path.exists(ini_path):
+                doc = PicasaIniParser.parse_file(ini_path)
+                faces = doc.get_faces(fname)
+                rem_hex = face_rect.to_rect64()[7:-1].lower()
+                new_faces: List[FaceItem] = []
+                for item in faces:
+                    if item.rect64.lower() == rem_hex:
+                        continue
+                    try:
+                        item_fr = FaceRect.from_rect64(f"rect64({item.rect64})")
+                        if _face_overlap(item_fr, face_rect) >= 0.45:
+                            continue
+                    except Exception:
+                        pass
+                    new_faces.append(item)
+
+                doc.set_faces(fname, new_faces)
+                doc.write_file(ini_path)
+                if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                    self.db.invalidate_ini_cache(ini_path)
+        self.notify_people_changed()
+
+    def create_person(self, name: str) -> PersonCluster:
+        """
+        FR : Crée une nouvelle personne/contact dans Picasa.
+        EN: Create a new person/contact in Picasa.
+        Ref: picasa3.exe @ 0x008AAD76, contactmgr.fen
+        """
+        cid = secrets.token_hex(8)
+        clean_name = name.strip()
+        cluster = PersonCluster(contact_id=cid, name=clean_name)
+        self.people[cid] = cluster
+
+        if self.db:
+            if getattr(self.db, "contacts", None) is None:
+                self.db.contacts = ContactsFile()
+            self.db.contacts.contacts.append(Contact(id=cid, name=clean_name))
+            if getattr(self.db, "contacts_dir", None):
+                try:
+                    self.db.contacts_dir.mkdir(parents=True, exist_ok=True)
+                    (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
+                except Exception:
+                    pass
+
+        self.notify_people_changed()
+        return cluster
+
+    def add_person(self, name: str, email: str = "", display: str = "") -> str:
+        """
+        FR : Crée une personne et retourne son identifiant hexadécimal `contact_id`.
+        EN: Creates a person and returns their hexadecimal `contact_id`.
+        Ref: picasa3.exe @ 0x008AAD76, contactmgr.fen
+        """
+        cluster = self.create_person(name)
+        return cluster.contact_id
+
+    def rename_person(self, contact_id: str | PersonCluster, new_name: str) -> bool:
+        """
+        FR : Renomme une personne existante (ou la fusionne si une autre personne porte déjà ce nom)
+        et synchronise les `FaceRect`, `albumdata_name.pmp`, `contacts.xml` et `.picasa.ini`.
+        EN: Rename an existing person (or merge if another person already has that name)
+        and synchronize `FaceRect` objects, `albumdata_name.pmp`, `contacts.xml`, and `.picasa.ini`.
+        Ref: picasa3.exe @ 0x008AAD76, contactmgr.fen
+        """
+        cid = (contact_id.contact_id if isinstance(contact_id, PersonCluster) else str(contact_id)).lower()
+        cluster = self.people.get(cid)
+        clean_new = new_name.strip()
+        if not cluster or not clean_new:
+            return False
+
+        old_name = cluster.name
+        existing_target: Optional[PersonCluster] = None
+        for other in self.people.values():
+            if other.contact_id != cid and other.name.strip().lower() == clean_new.lower():
+                existing_target = other
+                break
+
+        if existing_target is not None:
+            target_cid = existing_target.contact_id
+            for p_idx in cluster.photo_indices:
+                if p_idx not in existing_target.photo_indices:
+                    existing_target.photo_indices.append(p_idx)
+            for ppath in cluster.photo_paths:
+                if ppath not in existing_target.photo_paths:
+                    existing_target.photo_paths.append(ppath)
+            for k, flist in cluster.face_rects_by_photo.items():
+                t_flist = existing_target.face_rects_by_photo.setdefault(k, [])
+                for fr in flist:
+                    fr.contact_id = target_cid
+                    fr.contact_name = existing_target.name
+                    if not any(_face_overlap(ef, fr) >= 0.45 for ef in t_flist):
+                        t_flist.append(fr)
+            for flist in self.photo_to_faces.values():
+                for fr in flist:
+                    if (fr.contact_id or "").lower() == cid:
+                        fr.contact_id = target_cid
+                        fr.contact_name = existing_target.name
+            for fv in cluster.feature_vectors:
+                existing_target.feature_vectors.append(fv)
+            if existing_target.feature_vector is None and cluster.feature_vector is not None:
+                existing_target.feature_vector = cluster.feature_vector
+            if existing_target.primary_face_rect is None and cluster.primary_face_rect is not None:
+                existing_target.primary_face_rect = cluster.primary_face_rect
+                existing_target.avatar_pixmap = cluster.avatar_pixmap
+
+            old_sugs = self.suggestions.pop(cid, [])
+            if old_sugs:
+                t_sugs = self.suggestions.setdefault(target_cid, [])
+                for s in old_sugs:
+                    s.contact_id = target_cid
+                    s.contact_name = existing_target.name
+                    s.face_rect.contact_name = f"? {existing_target.name}"
+                    t_sugs.append(s)
+
+            for ppath in list(cluster.photo_paths):
+                if not ppath:
+                    continue
+                ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
+                if os.path.exists(ini_path):
+                    try:
+                        doc = PicasaIniParser.parse_file(ini_path)
+                        sec_c2 = doc.get_or_create_section("Contacts2")
+                        sec_c2.remove(cid)
+                        sec_c2.set(target_cid, f"{existing_target.name};;")
+                        fname = os.path.basename(ppath)
+                        faces = doc.get_faces(fname)
+                        changed_f = False
+                        for item in faces:
+                            if item.contact_id.lower() == cid:
+                                item.contact_id = target_cid
+                                changed_f = True
+                        if changed_f:
+                            doc.set_faces(fname, faces)
+                        doc.write_file(ini_path)
+                        if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                            self.db.invalidate_ini_cache(ini_path)
+                    except Exception:
+                        pass
+
+            del self.people[cid]
+            if self.db and getattr(self.db, "contacts", None):
+                self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() != cid]
+                if getattr(self.db, "contacts_dir", None):
+                    try:
+                        (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
+                    except Exception:
+                        pass
+            self.notify_people_changed()
+            return True
+
+        cluster.name = clean_new
+        for flist in cluster.face_rects_by_photo.values():
+            for fr in flist:
+                fr.contact_name = clean_new
+        for flist in self.photo_to_faces.values():
+            for fr in flist:
+                if (fr.contact_id or "").lower() == cid:
+                    fr.contact_name = clean_new
+        for s in self.suggestions.get(cid, []):
+            s.contact_name = clean_new
+            s.face_rect.contact_name = f"? {clean_new}"
+
+        if self.db:
+            ad_names = self.db.pmps.get("albumdata_name")
+            ad_cats = self.db.pmps.get("albumdata_category")
+            ad_cids = self.db.pmps.get("albumdata_albumcontactids")
+            cid_int: Optional[int] = None
+            try:
+                cid_int = int(cid, 16) & 0xFFFFFFFFFFFFFFFF
+            except Exception:
+                cid_int = None
+            if ad_names is not None and ad_cats is not None:
+                for i in range(len(ad_names.records)):
+                    if i < len(ad_cats.records) and ad_cats.records[i] == 8 and i > 0:
+                        if (ad_cids is not None and i < len(ad_cids.records) and cid_int is not None and ad_cids.records[i] == cid_int) or (
+                            str(ad_names.records[i] or "").strip().lower() == old_name.strip().lower()
+                        ):
+                            ad_names.records[i] = clean_new
+
+        updated_inis: Set[str] = set()
+        for ppath in cluster.photo_paths:
+            if not ppath:
+                continue
+            ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
+            if ini_path in updated_inis or not os.path.exists(ini_path):
+                continue
+            updated_inis.add(ini_path)
+            try:
+                doc = PicasaIniParser.parse_file(ini_path)
+                sec_c2 = doc.get_or_create_section("Contacts2")
+                sec_c2.set(cid, f"{clean_new};;")
+                doc.write_file(ini_path)
+                if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                    self.db.invalidate_ini_cache(ini_path)
+            except Exception:
+                pass
+
+        if self.db and getattr(self.db, "contacts", None):
+            for c in self.db.contacts.contacts:
+                if c.id.lower() == cid:
+                    c.name = clean_new
+                    break
+            if getattr(self.db, "contacts_dir", None):
+                try:
+                    (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
+                except Exception:
+                    pass
+
+        self.notify_people_changed()
+        return True
+
+    def delete_person(self, contact_id: str | PersonCluster) -> bool:
+        """
+        FR : Supprime une personne et ses associations, remet ses visages en sans-nom (`unnamed_faces`),
+        et nettoie `suggestions`, `.picasa.ini`, `imagedata_personalbumid` et `contacts.xml`.
+        EN: Delete a person and their associations, return their faces to `unnamed_faces`,
+        and clean up `suggestions`, `.picasa.ini`, `imagedata_personalbumid`, and `contacts.xml`.
+        Ref: picasa3.exe @ 0x008AAD76, contactmgr.fen
+        """
+        cid = (contact_id.contact_id if isinstance(contact_id, PersonCluster) else str(contact_id)).lower()
+        cluster = self.people.pop(cid, None)
+        popped_sugs = self.suggestions.pop(cid, [])
+
+        for s in popped_sugs:
+            s.face_rect.contact_id = ""
+            s.face_rect.contact_name = None
+            already_u = any(
+                ((u_idx is not None and s.db_idx is not None and u_idx == s.db_idx) or (u_path and s.photo_path and os.path.normpath(u_path).lower() == os.path.normpath(s.photo_path).lower()))
+                and _face_overlap(u_fr, s.face_rect) >= 0.45
+                for u_idx, u_path, u_fr in self.unnamed_faces
+            )
+            if not already_u:
+                self.unnamed_faces.append((s.db_idx, s.photo_path, s.face_rect))
+
+        parent_to_1001 = getattr(self, "_parent_to_1001", {})
+        for p_idx, flist in list(self.photo_to_faces.items()):
+            for fr in flist:
+                if (fr.contact_id or "").lower() == cid:
+                    fr.contact_id = ""
+                    fr.contact_name = None
+                    is_parent_with_children = (
+                        self.db is not None
+                        and not getattr(self.db, "is_face_record", lambda i: False)(p_idx)
+                        and p_idx in parent_to_1001
+                    )
+                    if not is_parent_with_children:
+                        ppath = ""
+                        if self.db:
+                            try:
+                                ppath = self.db.get_media_full_path(p_idx) or ""
+                            except Exception:
+                                ppath = ""
+                        if not ppath and cluster and cluster.photo_paths:
+                            ppath = cluster.photo_paths[0]
+                        already_u = any(
+                            ((u_idx is not None and u_idx == p_idx) or (u_path and ppath and os.path.normpath(u_path).lower() == os.path.normpath(ppath).lower()))
+                            and _face_overlap(u_fr, fr) >= 0.45
+                            for u_idx, u_path, u_fr in self.unnamed_faces
+                        )
+                        if not already_u:
+                            self.unnamed_faces.append((p_idx, ppath, fr))
+
+        if cluster:
+            for ppath in list(cluster.photo_paths):
+                if not ppath:
+                    continue
+                ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
+                if not os.path.exists(ini_path):
+                    continue
+                try:
+                    doc = PicasaIniParser.parse_file(ini_path)
+                    sec_c2 = doc.get_section("Contacts2")
+                    if sec_c2:
+                        sec_c2.remove(cid)
+                    fname = os.path.basename(ppath)
+                    faces = doc.get_faces(fname)
+                    remaining = [item for item in faces if item.contact_id.lower() != cid]
+                    if len(remaining) != len(faces):
+                        doc.set_faces(fname, remaining)
+                    doc.write_file(ini_path)
+                    if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                        self.db.invalidate_ini_cache(ini_path)
+                except Exception:
+                    pass
+
+        if self.db:
+            ad_names = self.db.pmps.get("albumdata_name")
+            ad_cats = self.db.pmps.get("albumdata_category")
+            ad_cids = self.db.pmps.get("albumdata_albumcontactids")
+            matching_alb_ids: Set[int] = set()
+            cid_int: Optional[int] = None
+            try:
+                cid_int = int(cid, 16) & 0xFFFFFFFFFFFFFFFF
+            except Exception:
+                cid_int = None
+            if ad_names is not None and ad_cats is not None:
+                for i in range(len(ad_names.records)):
+                    if i < len(ad_cats.records) and ad_cats.records[i] == 8 and i > 0:
+                        if (ad_cids is not None and i < len(ad_cids.records) and cid_int is not None and ad_cids.records[i] == cid_int) or (
+                            cluster and str(ad_names.records[i] or "").strip().lower() == cluster.name.strip().lower()
+                        ):
+                            matching_alb_ids.add(i)
+
+            for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
+                pmp = self.db.pmps.get(col_name)
+                if pmp is not None:
+                    if cluster:
+                        for p_idx in cluster.photo_indices:
+                            if 0 <= p_idx < len(pmp.records):
+                                pmp.records[p_idx] = 0
+                    if matching_alb_ids:
+                        for r_idx, val in enumerate(pmp.records):
+                            if val in matching_alb_ids:
+                                pmp.records[r_idx] = 0
+
+        if self.db and getattr(self.db, "contacts", None):
+            self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() != cid]
+            if getattr(self.db, "contacts_dir", None):
+                try:
+                    (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
+                except Exception:
+                    pass
+
+        self.notify_people_changed()
+        return True
+
+    def get_suggestions(self, contact_id: str | PersonCluster) -> List[FaceSuggestion]:
+        """
+        FR : Renvoie la liste des visages suggérés pour un contact.
+        EN: Return the list of suggested faces for a contact.
+        """
+        cid = (contact_id.contact_id if isinstance(contact_id, PersonCluster) else str(contact_id)).lower()
+        return self.suggestions.get(cid, [])
+
+    def get_all_suggestions(self) -> List[FaceSuggestion]:
+        """
+        FR : Renvoie l'ensemble des suggestions en attente de validation.
+        EN: Return all pending face suggestions awaiting confirmation.
+        """
+        res: List[FaceSuggestion] = []
+        for sugs in self.suggestions.values():
+            res.extend(sugs)
+        return res
+
+    def confirm_suggestion(self, suggestion: FaceSuggestion) -> FaceRect:
+        """
+        FR : Valide une suggestion de visage et l'assigne définitivement au contact.
+        EN: Confirm a face suggestion and permanently assign it to the contact.
+        Ref: picasa3.exe @ peoplepanel/suggestion_yes, confirmsug (0x00896F74)
+        """
+        fr = self.add_face(
+            suggestion.photo_path,
+            suggestion.face_rect,
+            suggestion.contact_name,
+            contact_id=suggestion.contact_id,
+            db_idx=suggestion.db_idx
+        )
+        cid = suggestion.contact_id.lower()
+        if cid in self.suggestions:
+            self.suggestions[cid] = [s for s in self.suggestions[cid] if s is not suggestion]
+        return fr
+
+    def reject_suggestion(self, suggestion: FaceSuggestion) -> None:
+        """
+        FR : Rejette une suggestion de visage (le visage redevient sans nom dans `unnamed_faces`
+        et `imagedata_suggestionpersonalbumid` est remis à `0`).
+        EN: Reject a face suggestion (the face returns to `unnamed_faces` as unnamed
+        and `imagedata_suggestionpersonalbumid` is reset to `0`).
+        Ref: picasa3.exe @ peoplepanel/suggestion_no (0x008A13D8)
+        """
+        cid = suggestion.contact_id.lower()
+        if cid in self.suggestions:
+            self.suggestions[cid] = [s for s in self.suggestions[cid] if s is not suggestion]
+
+        db_idx = suggestion.db_idx
+        parent_photo_idx: Optional[int] = None
+        face_rec_idx: Optional[int] = None
+        if db_idx is not None and db_idx >= 0 and self.db:
+            if getattr(self.db, "is_face_record", lambda i: False)(db_idx):
+                face_rec_idx = db_idx
+                parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+            else:
+                parent_photo_idx = db_idx
+                face_rec_idx = self._find_matching_1001_child(parent_photo_idx, suggestion.face_rect)
+        elif db_idx is not None and db_idx >= 0:
+            parent_photo_idx = db_idx
+
+        suggestion.face_rect.contact_id = ""
+        suggestion.face_rect.contact_name = None
+
+        for t_idx in {idx for idx in (db_idx, face_rec_idx, parent_photo_idx) if idx is not None}:
+            for ef in self.photo_to_faces.get(t_idx, []):
+                if _face_overlap(ef, suggestion.face_rect) >= 0.45:
+                    ef.contact_id = ""
+                    ef.contact_name = None
+
+        eff_idx = face_rec_idx if face_rec_idx is not None else parent_photo_idx
+        norm_p = os.path.normpath(suggestion.photo_path).lower() if suggestion.photo_path else ""
+        already_unnamed = any(
+            (
+                (u_idx is not None and eff_idx is not None and u_idx == eff_idx)
+                or (u_path and norm_p and os.path.normpath(u_path).lower() == norm_p)
+            )
+            and _face_overlap(u_fr, suggestion.face_rect) >= 0.45
+            for u_idx, u_path, u_fr in self.unnamed_faces
+        )
+        if not already_unnamed:
+            self.unnamed_faces.append((eff_idx, suggestion.photo_path, suggestion.face_rect))
+
+        if self.db:
+            pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+            if pmp_sug is not None:
+                for t_idx in {idx for idx in (face_rec_idx, db_idx) if idx is not None}:
+                    if 0 <= t_idx < len(pmp_sug.records):
+                        pmp_sug.records[t_idx] = 0
+
+        self.notify_people_changed()
+
+    def confirm_all_suggestions(self, contact_id: str | PersonCluster) -> int:
+        """
+        FR : Valide d'un seul clic toutes les suggestions en attente pour un contact.
+        EN: Confirm all pending suggestions for a contact in a single action.
+        Ref: picasa3.exe @ confirmsug (0x00896F74 - 'Tout confirmer')
+        """
+        cid = (contact_id.contact_id if isinstance(contact_id, PersonCluster) else str(contact_id)).lower()
+        sugs = list(self.suggestions.get(cid, []))
+        count = 0
+        for s in sugs:
+            self.confirm_suggestion(s)
+            count += 1
+        return count
 
     def save_face_tag(self, file_path: str, face_rect: FaceRect, contact_id: str, contact_name: str) -> None:
         """
-        Enregistre une nouvelle balise de visage dans le .picasa.ini correspondant.
+        FR : Méthode de compatibilité descendante pour l'enregistrement d'un tag de visage.
+        EN: Backward-compatibility helper to save a face tag.
         """
-        parent_dir = os.path.dirname(file_path)
-        fname = os.path.basename(file_path)
-        ini_path = os.path.join(parent_dir, ".picasa.ini")
+        self.add_face(file_path, face_rect, contact_name, contact_id=contact_id)
 
-        doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+    def get_unscanned_photos(
+        self,
+        folder_paths: Optional[List[str]] = None,
+        is_cancelled: Optional[Callable[[], bool]] = None,
+    ) -> List[Tuple[int, str]]:
+        """
+        FR : Renvoie la liste des photos `(db_idx, photo_path)` qui n'ont pas encore été analysées
+        par le moteur de détection des visages (`BgFaceDetectThread`), en excluant :
+        - les dossiers (`type == 1`),
+        - les vidéos (`type == 0x20`),
+        - les enregistrements enfants de visages (`type == 1001`),
+        - les dossiers marqués `frexclude=1` dans `[Picasa]` de `.picasa.ini`.
+        EN: Return the list of photos `(db_idx, photo_path)` not yet scanned by the face
+        detection engine (`BgFaceDetectThread`), excluding:
+        - folders (`type == 1`),
+        - videos (`type == 0x20`),
+        - child face records (`type == 1001`),
+        - folders marked `frexclude=1` in `[Picasa]` of `.picasa.ini`.
 
-        # 1. Enregistrement dans [Contacts2]
-        sec_c2 = doc.get_or_create_section("Contacts2")
-        sec_c2.set(contact_id, f"{contact_name};;")
+        Ref: picasa3.exe @ 0x0087ECD6 (BgFaceDetectThread), 0x00881690 (frexclude=1)
+        """
+        if not self.db:
+            return []
 
-        # 2. Enregistrement sous [filename]
-        sec_img = doc.get_or_create_section(fname)
-        curr_faces = sec_img.get("faces", "")
-        new_face_str = f"{face_rect.to_rect64()},{contact_id}"
+        folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+        allowed_folders_norm: Optional[Set[str]] = None
+        if folder_paths:
+            allowed_folders_norm = {
+                os.path.abspath(p).replace("/", "\\").rstrip("\\").lower()
+                for p in folder_paths if p
+            }
 
-        if curr_faces:
-            # Remplacer ou ajouter
-            faces_list = [f.strip() for f in curr_faces.split(";") if f.strip()]
-            faces_list.append(new_face_str)
-            sec_img.set("faces", ";".join(faces_list))
+        excluded_dirs_cache: Dict[str, bool] = {}
+
+        def _is_folder_frexcluded(dpath: str) -> bool:
+            norm_d = dpath.replace("/", "\\").rstrip("\\").lower()
+            if norm_d in excluded_dirs_cache:
+                return excluded_dirs_cache[norm_d]
+            res = False
+            for ini_name in (".picasa.ini", "Picasa.ini"):
+                ini_p = os.path.join(dpath, ini_name)
+                if os.path.exists(ini_p):
+                    doc = self.db.get_parsed_ini(ini_p) if hasattr(self.db, "get_parsed_ini") else None
+                    if doc is None:
+                        try:
+                            doc = PicasaIniParser.parse_file(ini_p)
+                        except Exception:
+                            doc = None
+                    if doc is not None:
+                        sec_p = doc.get_section("Picasa")
+                        if sec_p and (sec_p.get("frexclude") or "").strip().lower() in ("1", "yes", "true"):
+                            res = True
+                            break
+            excluded_dirs_cache[norm_d] = res
+            return res
+
+        candidates: List[Tuple[int, str]] = []
+        for idx, rec in enumerate(self.db.index):
+            if is_cancelled and is_cancelled():
+                break
+            if rec.type in (1, 0x20, 1001):
+                continue
+            if idx in self._scanned_photo_indices or idx in self.photo_to_faces:
+                continue
+
+            fdir = folders_map.get(rec.parent_idx, "")
+            if not fdir:
+                continue
+
+            norm_fdir = os.path.abspath(fdir).replace("/", "\\").rstrip("\\").lower()
+            if allowed_folders_norm is not None:
+                if not any(norm_fdir == af or norm_fdir.startswith(af + "\\") for af in allowed_folders_norm):
+                    continue
+
+            if _is_folder_frexcluded(fdir):
+                self._scanned_photo_indices.add(idx)
+                continue
+
+            full_path = os.path.join(fdir, rec.path)
+            if os.path.exists(full_path):
+                candidates.append((idx, full_path))
+
+        return candidates
+
+    def _sync_faces_to_ini(self, photo_idx_or_path: int | str | Path) -> None:
+        """
+        FR : Synchronise les visages d'une photo (et les contacts associés dans `[Contacts2]`)
+        vers le fichier `.picasa.ini` du dossier parent.
+        EN: Synchronize a photo's faces (and associated contacts in `[Contacts2]`)
+        into the parent folder's `.picasa.ini` file.
+        Ref: picasa3.exe @ 0x008C1F34 (FaceSyncer), 0x0068BABA
+        """
+        db_idx: Optional[int] = None
+        photo_path: str = ""
+        if isinstance(photo_idx_or_path, int):
+            db_idx = photo_idx_or_path
+            if self.db:
+                photo_path = self.db.get_media_full_path(db_idx) or ""
         else:
-            sec_img.set("faces", new_face_str)
+            photo_path = str(photo_idx_or_path or "")
+            if self.db and photo_path:
+                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                fname_lower = os.path.basename(photo_path).lower()
+                for i, r in enumerate(self.db.index):
+                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                        fpath = folders_map.get(r.parent_idx, "")
+                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                            db_idx = i
+                            break
+        if not photo_path:
+            return
+        parent_dir = os.path.dirname(photo_path)
+        fname = os.path.basename(photo_path)
+        ini_path = os.path.join(parent_dir, ".picasa.ini")
+        doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+        faces_list = self.get_faces_for_photo(db_idx) if db_idx is not None else []
+        sec_c2 = doc.get_or_create_section("Contacts2")
+        items: List[FaceItem] = []
+        for fr in faces_list:
+            cid = (fr.contact_id or "").strip().lower() or "ffffffffffffffff"
+            if cid not in ("", "0", "ffffffffffffffff", "unknown", "unnamed"):
+                cname = (fr.contact_name or "").lstrip("? ").strip()
+                if not cname and cid in self.people:
+                    cname = self.people[cid].name
+                if cname:
+                    sec_c2.set(cid, f"{cname};;")
+            r64_clean = fr.to_rect64()[7:-1]
+            items.append(FaceItem(rect64=r64_clean, contact_id=cid))
+        doc.set_faces(fname, items)
+        doc.write_file(ini_path)
+        if self.db and hasattr(self.db, "invalidate_ini_cache"):
+            self.db.invalidate_ini_cache(ini_path)
 
-        # Sauvegarder .picasa.ini bit-exact
-        with open(ini_path, "w", encoding="utf-8", newline="\r\n") as f:
-            f.write(doc.to_ini_string())
+
+# Ref: picasa3.exe @ 0x0087ECD6 (BgFaceDetectThread), 0x0093B9CE (CFaceDetector), 0x008C1F34 (FaceSyncer)
+# Ghidra project: ghidra/picasa3.gpr
+class BackgroundFaceDetectionWorker(QThread):
+    """
+    FR : Worker thread d'arrière-plan (`BgFaceDetectThread`) exécutant la détection automatique
+    des visages (`CFaceDetector`) et le rapprochement/suggestion de contacts (`FaceSyncer`)
+    sur les photos indexées non encore analysées, sans jamais bloquer le thread UI.
+    EN: Background worker thread (`BgFaceDetectThread`) running automatic face detection
+    (`CFaceDetector`) and contact matching/suggestion (`FaceSyncer`) on unscanned indexed
+    photos without blocking the UI thread.
+
+    Ref: picasa3.exe @ 0x0087ECD6 (BgFaceDetectThread)
+    Ref: picasa3.exe @ 0x0093B9CE (CFaceDetector)
+    Ref: picasa3.exe @ 0x008C1F34 (FaceSyncer)
+    Ref: picasa3.exe @ 0x00881CC0 (FRSuggestionThreshold)
+    Ref: picasa3.exe @ 0x008AAD76 (NOTIFY_PEOPLE_CHANGED)
+    """
+
+    progress = Signal(int, int, str)        # (current, total, filename)
+    faces_detected = Signal(int, str, int)  # (db_idx, photo_path, new_face_count)
+    people_updated = Signal()               # FR : Émis périodiquement / EN: Emitted periodically when new faces are found
+    finished = Signal(int)                  # (total_new_faces_detected)
+
+    def __init__(
+        self,
+        db: PicasaDatabase,
+        folder_paths: Optional[List[str]] = None,
+        persist_ini: bool = True,
+        parent=None,
+    ):
+        super().__init__(parent)
+        self.db = db
+        self.folder_paths = folder_paths
+        self.persist_ini = persist_ini
+        self._is_cancelled = False
+
+    def cancel(self) -> None:
+        """
+        FR : Demande l'arrêt du thread de détection en arrière-plan.
+        EN: Request termination of the background detection thread.
+        """
+        self._is_cancelled = True
+
+    def __del__(self) -> None:
+        try:
+            self._is_cancelled = True
+            if self.isRunning():
+                self.wait(2000)
+        except Exception:
+            pass
+
+
+    def run(self) -> None:
+        """
+        FR : Boucle principale d'analyse faciale en arrière-plan (`BgFaceDetectThread`).
+        EN: Main background face detection loop (`BgFaceDetectThread`).
+        """
+        if not self.db or not getattr(self.db, "face_manager", None):
+            self.finished.emit(0)
+            return
+
+        fm: PicasaFaceManager = self.db.face_manager
+        candidates = fm.get_unscanned_photos(
+            folder_paths=self.folder_paths,
+            is_cancelled=lambda: self._is_cancelled,
+        )
+
+        total = len(candidates)
+        if total == 0:
+            self.finished.emit(0)
+            return
+
+        total_detected = 0
+        pending_ui_notify = 0
+
+        for i, (db_idx, photo_path) in enumerate(candidates):
+            if self._is_cancelled:
+                break
+
+            fname = os.path.basename(photo_path)
+            self.progress.emit(i + 1, total, fname)
+
+            before_count = len(fm.get_faces_for_photo(db_idx))
+            try:
+                after_faces = fm.detect_faces_for_photo(
+                    photo_path,
+                    db_idx=db_idx,
+                    auto_suggest=True,
+                    persist_ini=self.persist_ini,
+                )
+                added = max(0, len(after_faces) - before_count)
+                if added > 0:
+                    total_detected += added
+                    pending_ui_notify += added
+                    self.faces_detected.emit(db_idx, photo_path, added)
+                    if pending_ui_notify >= 3:
+                        pending_ui_notify = 0
+                        self.people_updated.emit()
+            except Exception:
+                pass
+
+        if total_detected > 0:
+            self.people_updated.emit()
+
+        self.finished.emit(total_detected)
+
+
+FaceManager = PicasaFaceManager
+
+
