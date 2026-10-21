@@ -23,6 +23,7 @@ import os
 import struct
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Set
 import numpy as np
@@ -299,7 +300,21 @@ class PicasaDatabase:
         self.block_containers: Dict[str, BlockContainerFile] = {}
         self.block_containers_by_block: Dict[Tuple[str, int], BlockContainerFile] = {}
         self._face_manager: Optional[Any] = None
-        self._ini_cache: Dict[str, Tuple[float, Any]] = {}
+        self._ini_cache: Dict[str, Tuple[float, float, Any]] = {}
+        self._path_index_cache: Dict[str, int] = {}
+        self._folder_index_cache: Dict[str, int] = {}
+        self._folder_idx_to_norms: Dict[int, Tuple[str, str]] = {}
+        self._path_index_version: int = -1
+        self._path_index_ti_id: int = 0
+        self._parent_to_face_children: Dict[int, List[int]] = {}
+        self._parent_to_face_children_len: int = -1
+        self._albums_cache: Optional[List[Dict[str, Any]]] = None
+        self._albums_cache_sig: Optional[Tuple[int, int]] = None
+        self._starred_cache: Optional[List[str]] = None
+        self._starred_cache_sig: Optional[int] = None
+        self._thumb_save_timer: Optional[threading.Timer] = None
+        self._min_aligned_idx: int = -1
+        self._aligned_pmp_count: int = 0
 
     @property
     def block_files(self) -> Dict[str, _BlockFileHandle]:
@@ -398,6 +413,11 @@ class PicasaDatabase:
         # 6. contacts.xml (FR: Carnet de contacts / EN: Contacts address book)
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
             self.contacts = ContactsFile.from_xml((self.contacts_dir / "contacts.xml").read_text(encoding="utf-8"))
+
+        self._invalidate_path_index_cache()
+        self._albums_cache = None
+        self._starred_cache = None
+        self._min_aligned_idx = -1
 
     @classmethod
     def resolve_database_dirs(
@@ -583,16 +603,29 @@ class PicasaDatabase:
         EN: Reads and caches a .picasa.ini file tree to avoid redundant disk reads.
         Ref: AGENTS.md §4 ter (Performances - Réduction des I/O disque).
         """
-        if not ini_path or not os.path.exists(ini_path):
+        if not ini_path:
+            return None
+        key = os.path.normcase(os.path.abspath(ini_path))
+        now = time.monotonic()
+        cached = self._ini_cache.get(key)
+        if cached is not None and len(cached) == 3:
+            c_mtime, last_check, c_doc = cached
+            if now - last_check < 2.0:
+                return c_doc
+        else:
+            c_mtime, c_doc = (-2.0, None)
+
+        if not os.path.exists(ini_path):
+            self._ini_cache[key] = (-1.0, now, None)
             return None
         try:
             mtime = os.path.getmtime(ini_path)
-            cached = self._ini_cache.get(ini_path)
-            if cached and cached[0] == mtime:
-                return cached[1]
+            if cached is not None and c_mtime == mtime:
+                self._ini_cache[key] = (mtime, now, c_doc)
+                return c_doc
             from picasa_py.ini.parser import PicasaIniParser
             doc = PicasaIniParser.parse_file(ini_path)
-            self._ini_cache[ini_path] = (mtime, doc)
+            self._ini_cache[key] = (mtime, now, doc)
             return doc
         except Exception:
             return None
@@ -603,28 +636,148 @@ class PicasaDatabase:
         EN: Invalidates the INI cache entry when modified on disk.
         """
         if ini_path:
+            key = os.path.normcase(os.path.abspath(ini_path))
+            self._ini_cache.pop(key, None)
             self._ini_cache.pop(ini_path, None)
         else:
             self._ini_cache.clear()
+        self._albums_cache = None
+        self._starred_cache = None
+
+    def _invalidate_path_index_cache(self) -> None:
+        """
+        FR: Invalide les index O(1) de chemins et d'enregistrements de visages enfants.
+        EN: Invalidates the O(1) path and child face record lookup caches.
+        """
+        self._path_index_version = -1
+        self._parent_to_face_children_len = -1
+
+    def _index_single_record_into_cache(self, idx: int, r: ThumbIndexRecord) -> None:
+        """
+        FR: Insère un enregistrement de thumbindex.db dans les caches O(1) de dossiers, médias et visages.
+        EN: Inserts a thumbindex.db record into the O(1) folder, media, and face lookup caches.
+        """
+        if r.type == 1:
+            raw_norm = r.path.replace("/", "\\").rstrip("\\").lower()
+            host_p = _to_host_path(r.path)
+            abs_norm = os.path.abspath(host_p).replace("/", "\\").rstrip("\\").lower() if host_p else raw_norm
+            self._folder_idx_to_norms[idx] = (raw_norm, abs_norm)
+            self._folder_index_cache.setdefault(raw_norm, idx)
+            self._folder_index_cache.setdefault(abs_norm, idx)
+        elif r.type in MEDIA_RECORD_TYPES:
+            fn_low = r.path.lower()
+            norms = self._folder_idx_to_norms.get(r.parent_idx)
+            if norms is None and self.thumbindex and 0 <= r.parent_idx < len(self.thumbindex.records):
+                pr = self.thumbindex.records[r.parent_idx]
+                if pr.type == 1:
+                    raw_n = pr.path.replace("/", "\\").rstrip("\\").lower()
+                    host_p = _to_host_path(pr.path)
+                    abs_n = os.path.abspath(host_p).replace("/", "\\").rstrip("\\").lower() if host_p else raw_n
+                    norms = (raw_n, abs_n)
+                    self._folder_idx_to_norms[r.parent_idx] = norms
+            if norms is not None:
+                raw_n, abs_n = norms
+                k_raw = f"{raw_n}\\{fn_low}"
+                k_abs = f"{abs_n}\\{fn_low}"
+                prev_raw = self._path_index_cache.get(k_raw)
+                if prev_raw is None or (
+                    self.thumbindex
+                    and 0 <= prev_raw < len(self.thumbindex.records)
+                    and self.thumbindex.records[prev_raw].type not in MEDIA_RECORD_TYPES
+                ):
+                    self._path_index_cache[k_raw] = idx
+                prev_abs = self._path_index_cache.get(k_abs)
+                if prev_abs is None or (
+                    self.thumbindex
+                    and 0 <= prev_abs < len(self.thumbindex.records)
+                    and self.thumbindex.records[prev_abs].type not in MEDIA_RECORD_TYPES
+                ):
+                    self._path_index_cache[k_abs] = idx
+        elif r.type == 1001 and r.parent_idx >= 0:
+            children = self._parent_to_face_children.setdefault(r.parent_idx, [])
+            if idx not in children:
+                children.append(idx)
+
+    def _ensure_path_index_cache(self) -> None:
+        """
+        FR: Maintient à jour l'index O(1) des chemins et des visages enfants en fonction de thumbindex.records.
+        EN: Keeps the O(1) path and child face index synchronized with thumbindex.records.
+        """
+        if not self.thumbindex:
+            self._path_index_cache.clear()
+            self._folder_index_cache.clear()
+            self._folder_idx_to_norms.clear()
+            self._parent_to_face_children.clear()
+            self._path_index_version = 0
+            self._parent_to_face_children_len = 0
+            return
+
+        recs = self.thumbindex.records
+        curr_len = len(recs)
+        ti_id = id(self.thumbindex)
+
+        if self._path_index_version < 0 or self._path_index_ti_id != ti_id or curr_len < self._path_index_version:
+            self._path_index_cache.clear()
+            self._folder_index_cache.clear()
+            self._folder_idx_to_norms.clear()
+            self._parent_to_face_children.clear()
+            for i, r in enumerate(recs):
+                if r.type == 1:
+                    self._index_single_record_into_cache(i, r)
+            for i, r in enumerate(recs):
+                if r.type != 1:
+                    self._index_single_record_into_cache(i, r)
+            self._path_index_version = curr_len
+            self._parent_to_face_children_len = curr_len
+            self._path_index_ti_id = ti_id
+        elif curr_len > self._path_index_version:
+            for i in range(self._path_index_version, curr_len):
+                self._index_single_record_into_cache(i, recs[i])
+            self._path_index_version = curr_len
+            self._parent_to_face_children_len = curr_len
+
+    def _get_face_children(self, parent_idx: int) -> List[int]:
+        """
+        FR: Retourne en O(1) la liste des sous-enregistrements de visages (type == 1001) d'une photo parente.
+        EN: Returns in O(1) the list of child face sub-records (type == 1001) for a parent photo.
+        """
+        self._ensure_path_index_cache()
+        if not self.thumbindex:
+            return []
+        recs = self.thumbindex.records
+        return [
+            c_idx
+            for c_idx in self._parent_to_face_children.get(parent_idx, [])
+            if 0 <= c_idx < len(recs) and recs[c_idx].type == 1001 and recs[c_idx].parent_idx == parent_idx
+        ]
 
     def find_photo_index(self, photo_path: str) -> Optional[int]:
         """
-        FR: Retrouve l'indice d'une photo dans thumbindex.db à partir de son chemin complet.
-        EN: Finds a photo's record index in thumbindex.db from its full file path.
+        FR: Retrouve en O(1) l'indice d'une photo dans thumbindex.db à partir de son chemin complet.
+        EN: Finds in O(1) a photo's record index in thumbindex.db from its full file path.
         """
         if not self.thumbindex or not photo_path:
             return None
-        norm_dir = os.path.dirname(os.path.abspath(photo_path)).replace("/", "\\").rstrip("\\").lower()
+        self._ensure_path_index_cache()
         fname_lower = os.path.basename(photo_path).lower()
-        folders_map = {
-            i: r.path.replace("/", "\\").rstrip("\\").lower()
-            for i, r in enumerate(self.thumbindex.records)
-            if r.type == 1
-        }
-        for i, r in enumerate(self.thumbindex.records):
-            if r.type in MEDIA_RECORD_TYPES and r.path.lower() == fname_lower:
-                if folders_map.get(r.parent_idx, "") == norm_dir:
-                    return i
+        abs_dir = os.path.dirname(os.path.abspath(photo_path)).replace("/", "\\").rstrip("\\").lower()
+        raw_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+
+        for cand_dir in (abs_dir, raw_dir):
+            key = f"{cand_dir}\\{fname_lower}"
+            idx = self._path_index_cache.get(key)
+            if idx is not None and 0 <= idx < len(self.thumbindex.records):
+                rec = self.thumbindex.records[idx]
+                if rec.type in MEDIA_RECORD_TYPES and rec.path.lower() == fname_lower:
+                    return idx
+                # FR: Enregistrement modifié/supprimé en place -> reconstruire le cache / EN: Record mutated in-place -> rebuild cache
+                self._invalidate_path_index_cache()
+                self._ensure_path_index_cache()
+                idx2 = self._path_index_cache.get(key)
+                if idx2 is not None and 0 <= idx2 < len(self.thumbindex.records):
+                    rec2 = self.thumbindex.records[idx2]
+                    if rec2.type in MEDIA_RECORD_TYPES and rec2.path.lower() == fname_lower:
+                        return idx2
         return None
 
     find_media_index_by_path = find_photo_index
@@ -956,12 +1109,15 @@ class PicasaDatabase:
         EN: Sets the starred status (star=yes) on the photo (or the parent photo of a 1001 face record).
         Ref: picasa3.exe @ 0x0068B800 ("star=yes\r\n")
         """
+        self._starred_cache = None
         eff_idx = self._resolve_photo_record_index(idx)
         if eff_idx is None:
             return False
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            return self.update_photo_ini(full_path, lambda doc, fn: doc.set_starred(fn, bool(starred)))
+            res = self.update_photo_ini(full_path, lambda doc, fn: doc.set_starred(fn, bool(starred)))
+            self._starred_cache = None
+            return res
         return False
 
     def get_caption(self, idx: int) -> str:
@@ -1129,17 +1285,20 @@ class PicasaDatabase:
         facerect_pmp = self.pmps.get("imagedata_facerect")
         personalbumid_pmp = self.pmps.get("imagedata_personalbumid")
         suggestion_pmp = self.pmps.get("imagedata_suggestionpersonalbumid")
-        for child_idx, child_rec in enumerate(self.thumbindex.records):
-            if child_rec.type == 1001 and child_rec.parent_idx == rec_idx:
-                child_rec.mark_deleted()
-                child_rec.mod_time = 0.0
-                child_rec.version = 0
-                if facerect_pmp is not None and child_idx < len(facerect_pmp.records):
-                    facerect_pmp.records[child_idx] = 0
-                if personalbumid_pmp is not None and child_idx < len(personalbumid_pmp.records):
-                    personalbumid_pmp.records[child_idx] = 0
-                if suggestion_pmp is not None and child_idx < len(suggestion_pmp.records):
-                    suggestion_pmp.records[child_idx] = 0
+        for child_idx in self._get_face_children(rec_idx):
+            child_rec = self.thumbindex.records[child_idx]
+            child_rec.mark_deleted()
+            child_rec.mod_time = 0.0
+            child_rec.version = 0
+            if facerect_pmp is not None and child_idx < len(facerect_pmp.records):
+                facerect_pmp.records[child_idx] = 0
+            if personalbumid_pmp is not None and child_idx < len(personalbumid_pmp.records):
+                personalbumid_pmp.records[child_idx] = 0
+            if suggestion_pmp is not None and child_idx < len(suggestion_pmp.records):
+                suggestion_pmp.records[child_idx] = 0
+        self._invalidate_path_index_cache()
+        self._albums_cache = None
+        self._starred_cache = None
 
         if facerect_pmp is not None and rec_idx < len(facerect_pmp.records):
             facerect_pmp.records[rec_idx] = 0
@@ -1237,6 +1396,9 @@ class PicasaDatabase:
             self.thumbindex.records[rec_idx].parent_idx = new_parent_idx
             self.thumbindex.records[rec_idx].path = fname
 
+        self._invalidate_path_index_cache()
+        self._albums_cache = None
+        self._starred_cache = None
         return True
 
     def update_photo_ini(self, photo_path: str, mutator: Any) -> bool:
@@ -1308,12 +1470,22 @@ class PicasaDatabase:
         EN: Retrieves all virtual albums (from PMP tables and .album:<uid> sections in .picasa.ini files).
         Ref: picasa3.exe @ albumdata_category.pmp (cat=0), 0x00732160, 0x008AAD76
         """
-        albums: Dict[str, Dict[str, Any]] = {}
-
-        # 1. Albums dans les tables PMP (cat == 0 dans albumdata_category)
         ad_names = self.pmps.get("albumdata_name")
         ad_cats = self.pmps.get("albumdata_category")
         ad_tokens = self.pmps.get("albumdata_token")
+        curr_sig = (
+            len(ad_names.records) if ad_names else 0,
+            len(self.thumbindex.records) if self.thumbindex else 0,
+        )
+        if self._albums_cache is not None and self._albums_cache_sig == curr_sig:
+            return [
+                dict(a, photo_paths=list(a["photo_paths"]), photo_indices=list(a["photo_indices"]))
+                for a in self._albums_cache
+            ]
+
+        albums: Dict[str, Dict[str, Any]] = {}
+
+        # 1. Albums dans les tables PMP (cat == 0 dans albumdata_category)
         if ad_names and ad_cats:
             names = ad_names.records
             cats = ad_cats.records
@@ -1341,19 +1513,13 @@ class PicasaDatabase:
 
         # 2. Albums définis dans les fichiers .picasa.ini des dossiers surveillés
         watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
-        photo_idx_map: Dict[Tuple[str, str], int] = {}
+        self._ensure_path_index_cache()
         if self.thumbindex:
-            folders_map = {i: _to_host_path(r.path.rstrip("\\/")) for i, r in enumerate(self.thumbindex.records) if r.type == 1}
-            for idx, r in enumerate(self.thumbindex.records):
+            for r in self.thumbindex.records:
                 if r.type == 1:
                     p = _to_host_path(r.path.rstrip("\\/"))
                     if os.path.isdir(p) and p not in watched:
                         watched.append(p)
-                elif r.type in MEDIA_RECORD_TYPES:
-                    fdir = folders_map.get(r.parent_idx, "")
-                    if fdir:
-                        norm_fdir = os.path.abspath(fdir).replace("/", "\\").rstrip("\\").lower()
-                        photo_idx_map[(norm_fdir, r.path.lower())] = idx
 
         for w in watched:
             ini_p = os.path.join(w, ".picasa.ini")
@@ -1398,7 +1564,7 @@ class PicasaDatabase:
                         continue
                     alb_tokens = [x.strip() for x in alb_str.split(",") if x.strip()]
                     photo_full_path = os.path.join(w, sec.name)
-                    rec_idx = photo_idx_map.get((norm_w, sec.name.lower()))
+                    rec_idx = self._path_index_cache.get(f"{norm_w}\\{sec.name.lower()}")
                     for t in alb_tokens:
                         tok = t.strip()
                         if tok.startswith("]album:") or tok.startswith(".album:"):
@@ -1424,7 +1590,13 @@ class PicasaDatabase:
             except Exception:
                 pass
 
-        return list(albums.values())
+        res_list = list(albums.values())
+        self._albums_cache = [
+            dict(a, photo_paths=list(a["photo_paths"]), photo_indices=list(a["photo_indices"]))
+            for a in res_list
+        ]
+        self._albums_cache_sig = curr_sig
+        return res_list
 
     def get_starred_photo_paths(self) -> List[str]:
         """
@@ -1432,6 +1604,10 @@ class PicasaDatabase:
         EN: Retrieves all full file paths of photos marked as starred (star=yes).
         Ref: picasa3.exe @ CThumbDB::starredphotos (0x0088F6FC, 0x0068B800)
         """
+        curr_sig = len(self.thumbindex.records) if self.thumbindex else 0
+        if self._starred_cache is not None and self._starred_cache_sig == curr_sig:
+            return list(self._starred_cache)
+
         starred_paths: List[str] = []
         watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
         if self.thumbindex:
@@ -1455,6 +1631,8 @@ class PicasaDatabase:
                                 starred_paths.append(photo_full_path)
                 except Exception:
                     pass
+        self._starred_cache = list(starred_paths)
+        self._starred_cache_sig = curr_sig
         return starred_paths
 
     def delete_album(self, album_token: str) -> bool:
@@ -1559,6 +1737,7 @@ class PicasaDatabase:
                         except Exception:
                             pass
 
+        self._albums_cache = None
         return deleted
 
     def rename_album(self, album_token: str, new_name: str) -> bool:
@@ -1622,6 +1801,7 @@ class PicasaDatabase:
                             ad_names.records[i] = new_name
                             renamed = True
 
+        self._albums_cache = None
         return renamed
 
     def get_watched_folders(self) -> Dict[str, str]:
@@ -1657,6 +1837,8 @@ class PicasaDatabase:
         if not self.repository:
             self.repository = KeyValueTableFile()
         self.repository.set(norm_path, str(status))
+        self._albums_cache = None
+        self._starred_cache = None
 
     def get_media_full_path(self, index: int) -> Optional[str]:
         """
@@ -2073,15 +2255,32 @@ class PicasaDatabase:
         EN: Aligns all imagedata_*.pmp columns and *_index.db files up to target_idx inclusive.
         Ref: picasa3.exe @ 0x00415790 (decomp_dir_scanner_ctor.c)
         """
+        if target_idx < 0:
+            return
+        pmp_w = self.pmps.get("imagedata_width")
+        t_idx = self.block_indices.get("thumbs")
+        if (
+            target_idx <= self._min_aligned_idx
+            and len(self.pmps) == self._aligned_pmp_count
+            and (pmp_w is None or len(pmp_w.records) > target_idx)
+            and (t_idx is None or t_idx.record_count > target_idx)
+        ):
+            return
         for name, pmp in self.pmps.items():
             if name.startswith("imagedata_"):
-                def_val = pmp.default_value()
-                while len(pmp.records) <= target_idx:
-                    pmp.records.append(def_val)
+                missing = target_idx + 1 - len(pmp.records)
+                if missing > 0:
+                    def_val = pmp.default_value()
+                    pmp.records.extend([def_val] * missing)
         for prefix, idx_file in self.block_indices.items():
             if prefix in ("thumbs", "thumbs2", "bigthumbs", "previews", "facetemplatesV2"):
-                while idx_file.record_count <= target_idx:
-                    idx_file.append_entry(BlockEntry())
+                missing = target_idx + 1 - idx_file.record_count
+                if missing > 0:
+                    idx_file.checksums.extend([0] * missing)
+                    idx_file.offsets.extend([0] * missing)
+                    idx_file.sizes_and_blocks.extend([0] * missing)
+        self._min_aligned_idx = target_idx
+        self._aligned_pmp_count = len(self.pmps)
 
     def get_or_create_folder_index(self, folder_path: str) -> int:
         """
@@ -2094,9 +2293,18 @@ class PicasaDatabase:
         if not self.thumbindex:
             self.thumbindex = ThumbIndexFile()
 
+        self._ensure_path_index_cache()
         norm = folder_path.replace("/", "\\").rstrip("\\") + "\\"
+        norm_key = norm.rstrip("\\").lower()
+        cached_idx = self._folder_index_cache.get(norm_key)
+        if cached_idx is not None and 0 <= cached_idx < len(self.thumbindex.records):
+            rec = self.thumbindex.records[cached_idx]
+            if rec.type == 1 and rec.path.lower() == norm.lower():
+                return cached_idx
+
         for idx, rec in enumerate(self.thumbindex.records):
             if rec.type == 1 and rec.path.lower() == norm.lower():
+                self._folder_index_cache[norm_key] = idx
                 return idx
 
         ft = 0
@@ -2118,6 +2326,9 @@ class PicasaDatabase:
         )
         self.thumbindex.records.append(new_rec)
         new_idx = len(self.thumbindex.records) - 1
+        self._index_single_record_into_cache(new_idx, new_rec)
+        self._path_index_version = len(self.thumbindex.records)
+        self._parent_to_face_children_len = len(self.thumbindex.records)
         self._align_imagedata_tables(new_idx)
         return new_idx
 
@@ -2158,6 +2369,9 @@ class PicasaDatabase:
         )
         self.thumbindex.records.append(new_rec)
         new_idx = len(self.thumbindex.records) - 1
+        self._index_single_record_into_cache(new_idx, new_rec)
+        self._path_index_version = len(self.thumbindex.records)
+        self._parent_to_face_children_len = len(self.thumbindex.records)
         self._align_imagedata_tables(new_idx)
         return new_idx
 
@@ -2313,14 +2527,12 @@ class PicasaDatabase:
 
                 # 6. Sous-enregistrements de visages enfants (type == 1001, Ref: FUN_00425210 @ 0x004258D1..0x00425B6C)
                 if self.thumbindex is not None:
-                    child_face_indices = [
-                        c_idx
-                        for c_idx, c_rec in enumerate(self.thumbindex.records)
-                        if c_rec.type == 1001 and c_rec.parent_idx == resolved_idx
-                    ]
+                    child_face_indices = self._get_face_children(resolved_idx)
+                    fm = self._face_manager
+                    full_path = self.get_media_full_path(resolved_idx) or ""
                     if child_face_indices:
-                        fm = getattr(self, "face_manager", None)
-                        full_path = self.get_media_full_path(resolved_idx) or ""
+                        if fm is None:
+                            fm = getattr(self, "face_manager", None)
                         pmp_fr = self.pmps.get("imagedata_facerect")
                         from picasa_py.faces.facerect import FaceRect
                         for c_idx in child_face_indices:
@@ -2337,8 +2549,15 @@ class PicasaDatabase:
                                 fm._write_face_record_thumbnails(
                                     c_idx, fr_obj, photo_path=full_path, source_img=rgb_img
                                 )
-                        if fm is not None and hasattr(fm, "_avatar_cache"):
-                            fm._avatar_cache.clear()
+                    if fm is not None and hasattr(fm, "_avatar_cache") and fm._avatar_cache:
+                        affected_indices = {resolved_idx, *child_face_indices}
+                        norm_p = os.path.normcase(os.path.abspath(full_path)) if full_path else ""
+                        for k in list(fm._avatar_cache.keys()):
+                            if isinstance(k, tuple) and len(k) >= 2:
+                                if k[0] in affected_indices:
+                                    fm._avatar_cache.pop(k, None)
+                                elif isinstance(k[1], str) and k[1] and norm_p and os.path.normcase(os.path.abspath(k[1])) == norm_p:
+                                    fm._avatar_cache.pop(k, None)
 
                 if not hasattr(self, "_updated_thumb_indices") or not isinstance(self._updated_thumb_indices, set):
                     self._updated_thumb_indices = set()
@@ -2349,6 +2568,36 @@ class PicasaDatabase:
             return True
         except Exception:
             return False
+
+    # Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470 (deferred CBlockFile index/thumb flush)
+    def schedule_save_thumbnails(self, delay_ms: int = 1500) -> None:
+        """
+        FR: Planifie en arrière-plan une écriture différée et coalescée de `save_thumbnails_only`
+        afin de ne jamais bloquer le thread GUI lors d'une séquence de retouche rapide.
+        EN: Schedules a coalesced background call to `save_thumbnails_only` so the GUI thread
+        is never blocked during rapid interactive editing.
+        Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470
+        """
+        with self._lock:
+            if self._thumb_save_timer is not None:
+                try:
+                    self._thumb_save_timer.cancel()
+                except Exception:
+                    pass
+                self._thumb_save_timer = None
+
+            def _flush_worker() -> None:
+                with self._lock:
+                    self._thumb_save_timer = None
+                try:
+                    self.save_thumbnails_only()
+                except Exception:
+                    pass
+
+            timer = threading.Timer(max(0.05, float(delay_ms) / 1000.0), _flush_worker)
+            timer.daemon = True
+            self._thumb_save_timer = timer
+            timer.start()
 
     def update_photo_thumbnails_from_disk(
         self,
@@ -2399,9 +2648,22 @@ class PicasaDatabase:
         def _atomic_write(target: Path, data: bytes) -> None:
             tmp = target.with_suffix(target.suffix + ".tmp")
             tmp.write_bytes(data)
-            os.replace(str(tmp), str(target))
+            try:
+                os.replace(str(tmp), str(target))
+            except PermissionError:
+                try:
+                    target.write_bytes(data)
+                finally:
+                    tmp.unlink(missing_ok=True)
 
         with self._lock:
+            if self._thumb_save_timer is not None:
+                try:
+                    self._thumb_save_timer.cancel()
+                except Exception:
+                    pass
+                self._thumb_save_timer = None
+
             if self.thumbindex is not None:
                 if len(self.thumbindex.records) > 0:
                     self._align_imagedata_tables(len(self.thumbindex.records) - 1)
@@ -2411,13 +2673,13 @@ class PicasaDatabase:
             saved_containers: Set[Tuple[str, int]] = set()
             for (prefix, block_num), container in self.block_containers_by_block.items():
                 if prefix in thumb_prefixes:
-                    _atomic_write(self.db3_dir / f"{prefix}_{block_num}.db", container.to_bytes())
+                    container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
                     saved_containers.add((prefix, block_num))
 
             for prefix in thumb_prefixes:
                 container = self.block_containers.get(prefix)
                 if container is not None and (prefix, 0) not in saved_containers:
-                    _atomic_write(self.db3_dir / f"{prefix}_0.db", container.to_bytes())
+                    container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
                 idx_file = self.block_indices.get(prefix)
                 if idx_file is not None:
                     _atomic_write(self.db3_dir / f"{prefix}_index.db", idx_file.to_bytes())
@@ -2476,9 +2738,22 @@ class PicasaDatabase:
         def _atomic_write(target: Path, data: bytes) -> None:
             tmp = target.with_suffix(target.suffix + ".tmp")
             tmp.write_bytes(data)
-            os.replace(str(tmp), str(target))
+            try:
+                os.replace(str(tmp), str(target))
+            except PermissionError:
+                try:
+                    target.write_bytes(data)
+                finally:
+                    tmp.unlink(missing_ok=True)
 
         # 1. thumbindex.db
+        if self._thumb_save_timer is not None:
+            try:
+                self._thumb_save_timer.cancel()
+            except Exception:
+                pass
+            self._thumb_save_timer = None
+
         if self.thumbindex is not None:
             if len(self.thumbindex.records) > 0:
                 self._align_imagedata_tables(len(self.thumbindex.records) - 1)
@@ -2487,12 +2762,12 @@ class PicasaDatabase:
         # 2. BlockFiles (thumbs_0.db, thumbs_1.db, thumbs_index.db, etc.)
         saved_containers: Set[Tuple[str, int]] = set()
         for (prefix, block_num), container in self.block_containers_by_block.items():
-            _atomic_write(self.db3_dir / f"{prefix}_{block_num}.db", container.to_bytes())
+            container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
             saved_containers.add((prefix, block_num))
 
         for prefix, container in self.block_containers.items():
             if (prefix, 0) not in saved_containers:
-                _atomic_write(self.db3_dir / f"{prefix}_0.db", container.to_bytes())
+                container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
 
         for prefix, idx_file in self.block_indices.items():
             _atomic_write(self.db3_dir / f"{prefix}_index.db", idx_file.to_bytes())
@@ -2610,6 +2885,7 @@ class PicasaDatabase:
                             pass
                 new_entries.append(BlockEntry())
 
+            new_container._fully_dirty = True
             new_idx = BlockIndexFile.from_entries(new_entries, active_block=0)
             self.block_containers[prefix] = new_container
             self.block_containers_by_block[(prefix, 0)] = new_container

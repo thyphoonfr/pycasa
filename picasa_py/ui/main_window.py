@@ -683,17 +683,32 @@ class PicasaMainWindow(QMainWindow):
             paths_set = {p.replace("\\", "/").lower() for p in target_album.get("photo_paths", [])}
 
         matching = []
+        folder_ini_cache: dict = {}
         for i, item in enumerate(self.thumb_view.items):
             norm_item_p = item.path.replace("\\", "/").lower()
             if norm_item_p in paths_set:
                 matching.append(i)
                 continue
 
-            ini_p = os.path.join(item.folder_path, ".picasa.ini")
-            if os.path.exists(ini_p):
+            fp = item.folder_path
+            if fp not in folder_ini_cache:
+                doc = None
+                if fp:
+                    ini_p = os.path.join(fp, ".picasa.ini")
+                    if self.db is not None and hasattr(self.db, "get_parsed_ini"):
+                        doc = self.db.get_parsed_ini(ini_p)
+                        if doc is None:
+                            doc = self.db.get_parsed_ini(os.path.join(fp, "Picasa.ini"))
+                    elif os.path.exists(ini_p):
+                        try:
+                            from picasa_py.ini.parser import PicasaIniParser
+                            doc = PicasaIniParser.parse_file(ini_p)
+                        except Exception:
+                            doc = None
+                folder_ini_cache[fp] = doc
+            doc = folder_ini_cache[fp]
+            if doc:
                 try:
-                    from picasa_py.ini.parser import PicasaIniParser
-                    doc = PicasaIniParser.parse_file(ini_p)
                     sec = doc.get_section(item.filename)
                     if sec:
                         albs = sec.get("albums")
@@ -1228,6 +1243,7 @@ class PicasaMainWindow(QMainWindow):
 
         for p in paths:
             self._update_photo_ini(p, _apply_effects)
+            self.thumb_view.invalidate_item(p)
 
         # Si l'image ouverte dans one_up_view est modifiée, rafraîchir son affichage
         if self.stack.currentWidget() == self.one_up_view and self.one_up_view.current_photo_path in paths:
@@ -1239,6 +1255,8 @@ class PicasaMainWindow(QMainWindow):
             )
 
         self.thumb_view._pixmap_cache.clear()
+        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
+            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         self.status_bar.showMessage(f"Effets appliqués à {len(paths)} photo(s) (Ctrl+Shift+V).")
 
@@ -1426,12 +1444,17 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
-        if self.db is not None and hasattr(self.db, "save_thumbnails_only"):
-            self.db.save_thumbnails_only()
+        if self.db is not None:
+            if hasattr(self.db, "schedule_save_thumbnails"):
+                self.db.schedule_save_thumbnails(1500)
+            elif hasattr(self.db, "save_thumbnails_only"):
+                self.db.save_thumbnails_only()
         if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
             self.one_up_view.filmstrip.clear_cache()
 
         self.thumb_view._pixmap_cache.clear()
+        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
+            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         if self.right_drawer.isVisible():
             self._on_selection_changed(list(self.thumb_view.selected_indices))
@@ -1472,12 +1495,17 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
-        if self.db is not None and hasattr(self.db, "save_thumbnails_only"):
-            self.db.save_thumbnails_only()
+        if self.db is not None:
+            if hasattr(self.db, "schedule_save_thumbnails"):
+                self.db.schedule_save_thumbnails(1500)
+            elif hasattr(self.db, "save_thumbnails_only"):
+                self.db.save_thumbnails_only()
         if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
             self.one_up_view.filmstrip.clear_cache()
 
         self.thumb_view._pixmap_cache.clear()
+        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
+            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         if self.right_drawer.isVisible():
             self._on_selection_changed(list(self.thumb_view.selected_indices))
@@ -1541,8 +1569,11 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
-        if self.db is not None and hasattr(self.db, "save_thumbnails_only"):
-            self.db.save_thumbnails_only()
+        if self.db is not None:
+            if hasattr(self.db, "schedule_save_thumbnails"):
+                self.db.schedule_save_thumbnails(1500)
+            elif hasattr(self.db, "save_thumbnails_only"):
+                self.db.save_thumbnails_only()
         if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
             self.one_up_view.filmstrip.clear_cache()
 
@@ -3066,18 +3097,38 @@ class PicasaMainWindow(QMainWindow):
                     return self.thumb_view.items[idx].filename.lower()
                 return ""
         elif criterion == "date":
+            pmp_dates = (
+                self.db.pmps.get("imagedata_date").values
+                if (self.db is not None and hasattr(self.db, "pmps") and "imagedata_date" in self.db.pmps)
+                else None
+            )
             def _sort_key(idx: int):
                 if 0 <= idx < len(self.thumb_view.items):
                     it = self.thumb_view.items[idx]
+                    if pmp_dates is not None and 0 <= it.index < len(pmp_dates) and pmp_dates[it.index]:
+                        try:
+                            return float(pmp_dates[it.index])
+                        except Exception:
+                            pass
                     try:
                         return os.path.getmtime(it.path) if it.path else 0
                     except Exception:
                         return 0
                 return 0
         elif criterion == "size":
+            pmp_sizes = (
+                self.db.pmps.get("imagedata_filesize").values
+                if (self.db is not None and hasattr(self.db, "pmps") and "imagedata_filesize" in self.db.pmps)
+                else None
+            )
             def _sort_key(idx: int):
                 if 0 <= idx < len(self.thumb_view.items):
                     it = self.thumb_view.items[idx]
+                    if pmp_sizes is not None and 0 <= it.index < len(pmp_sizes) and pmp_sizes[it.index]:
+                        try:
+                            return int(pmp_sizes[it.index])
+                        except Exception:
+                            pass
                     try:
                         return os.path.getsize(it.path) if it.path else 0
                     except Exception:

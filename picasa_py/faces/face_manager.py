@@ -19,13 +19,14 @@ from __future__ import annotations
 import io
 import os
 import secrets
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Callable
 
 import numpy as np
 from PIL import Image, ImageOps
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, Qt
 from PySide6.QtGui import QPixmap, QIcon
 
 
@@ -339,18 +340,10 @@ class PicasaFaceManager:
                 if (not saved_path or not saved_rect64) and self.db and getattr(self.db, "repository", None):
                     saved_path = self.db.repository.get(f"PeopleCovers/{cid}/photo_path")
                     saved_rect64 = self.db.repository.get(f"PeopleCovers/{cid}/rect64")
-                if saved_path and saved_rect64 and os.path.exists(str(saved_path)):
+                if saved_path and saved_rect64:
                     fr = FaceRect.from_rect64(str(saved_rect64), contact_id=cid, contact_name=cluster.name)
                     cluster.primary_face_rect = fr
                     cluster.cover_photo_path = str(saved_path)
-                    try:
-                        img = self._open_photo_for_face_crop(str(saved_path), fr, 64)
-                        if img is not None:
-                            aspect_img = (img.width / float(img.height)) if img.height > 0 else 1.0
-                            disp_fr = fr.project_for_photo_ini(str(saved_path), aspect_ratio=aspect_img, db=self.db)
-                            cluster.avatar_pixmap = disp_fr.crop_avatar(img, avatar_size=64, circular=True)
-                    except Exception:
-                        pass
         except Exception:
             pass
 
@@ -396,7 +389,12 @@ class PicasaFaceManager:
                         best_child = c_idx
         return best_child
 
-    def _get_or_create_1001_child(self, parent_db_idx: Optional[int], face_rect: FaceRect) -> Optional[int]:
+    def _get_or_create_1001_child(
+        self,
+        parent_db_idx: Optional[int],
+        face_rect: FaceRect,
+        source_img: Optional[Image.Image] = None,
+    ) -> Optional[int]:
         """
         FR : Trouve ou crée un sous-enregistrement de visage (`type == 1001`) dans `thumbindex.db`
         et aligne les tables `imagedata_*` en enregistrant le `rect64` uint64 dans `imagedata_facerect.pmp`.
@@ -443,8 +441,10 @@ class PicasaFaceManager:
             parent_map.setdefault(parent_db_idx, []).append(child_idx)
         try:
             parent_path = self.db.get_media_full_path(parent_db_idx) or ""
-            if parent_path and os.path.exists(parent_path):
-                self._write_face_record_thumbnails(child_idx, face_rect, photo_path=parent_path)
+            if source_img is not None or (parent_path and os.path.exists(parent_path)):
+                self._write_face_record_thumbnails(
+                    child_idx, face_rect, photo_path=parent_path, source_img=source_img
+                )
         except Exception:
             pass
         return child_idx
@@ -781,74 +781,62 @@ class PicasaFaceManager:
 
     def _generate_avatars(self) -> None:
         """
-        FR : Génère rapidement les avatars depuis `bigthumbs_0.db` / `thumbs_0.db` et charge les gabarits `vqc_Cue` depuis `facetemplatesV2_0.db`.
-        EN: Quickly generate avatars from `bigthumbs_0.db` / `thumbs_0.db` and load `vqc_Cue` templates from `facetemplatesV2_0.db`.
+        FR : Charge en mémoire les gabarits `vqc_Cue` depuis `facetemplatesV2_0.db` sans bloquer
+        le thread UI par le décodage synchrone d'images ou de réseaux de neurones au démarrage.
+        Les `cluster.avatar_pixmap` sont générés paresseusement à la demande dans `get_person_avatar`.
+        EN: Loads `vqc_Cue` templates from `facetemplatesV2_0.db` in memory without blocking
+        the UI thread with synchronous image decoding or neural network inference at startup.
+        `cluster.avatar_pixmap` objects are generated lazily on demand in `get_person_avatar`.
         Ref: picasa3.exe @ 0x009B93F0, 0x008AAD76
         """
-        from PySide6.QtGui import QGuiApplication
-        has_gui = QGuiApplication.instance() is not None
         has_templates_db = bool(self.db and hasattr(self.db, "get_face_template"))
+        if not has_templates_db:
+            return
         for cid, cluster in self.people.items():
-            if not cluster.photo_indices:
+            if not cluster.photo_indices or cluster.feature_vectors:
                 continue
-
-            # FR : Charger les gabarits vqc_Cue 2000-D (Red.dll / facetemplatesV2_0.db) de cette personne
-            # EN: Load 2000-D vqc_Cue templates (Red.dll / facetemplatesV2_0.db) for this person
-            if has_templates_db and not cluster.feature_vectors:
-                for p_idx in cluster.photo_indices:
-                    tpl_vec = self.db.get_face_template(p_idx)
-                    if tpl_vec is not None:
-                        cluster.feature_vectors.append(tpl_vec)
-                if cluster.feature_vectors and cluster.feature_vector is None:
-                    cluster.feature_vector = cluster.feature_vectors[0]
-
-            fr = cluster.primary_face_rect
-            if not fr or not has_gui:
-                continue
-
-            # FR : Découpe depuis la miniature de visage pré-découpée (type 1001 dans bigthumbs_0.db 240x288 ou thumbs_0.db 120x144)
-            # ou depuis la photo originale sur disque si l'enregistrement est une photo complète (type != 1001).
-            # EN: Render from the pre-cropped face thumbnail (type 1001 in bigthumbs_0.db 240x288 or thumbs_0.db 120x144)
-            # or crop from the on-disk original photo when the record is a full photo (type != 1001).
-            first_idx = cluster.photo_indices[0]
-            first_path = cluster.photo_paths[0] if cluster.photo_paths else ""
-            if self.db:
-                is_face_rec = bool(getattr(self.db, "is_face_record", lambda i: False)(first_idx))
-                if is_face_rec:
-                    thumb_jpeg = (
-                        self.db.get_thumbnail(first_idx, size="large")
-                        or self.db.get_thumbnail(first_idx, size="small")
-                    )
-                    if thumb_jpeg:
-                        try:
-                            with Image.open(io.BytesIO(thumb_jpeg)) as img:
-                                cluster.avatar_pixmap = FaceRect.to_avatar_pixmap(img, avatar_size=64, circular=True)
-                                if cluster.feature_vector is None:
-                                    fv = PicasaFaceDetector.get().compute_face_feature(img)
-                                    if fv is not None:
-                                        cluster.feature_vector = fv
-                                        cluster.feature_vectors.append(fv)
-                        except Exception:
-                            pass
-                else:
-                    pix = self.get_face_avatar(first_path, fr, db_idx=first_idx, size=64, circular=True)
-                    if pix and not pix.isNull():
-                        cluster.avatar_pixmap = pix
+            for p_idx in cluster.photo_indices:
+                tpl_vec = self.db.get_face_template(p_idx)
+                if tpl_vec is not None:
+                    cluster.feature_vectors.append(tpl_vec)
+            if cluster.feature_vectors and cluster.feature_vector is None:
+                cluster.feature_vector = cluster.feature_vectors[0]
 
     def get_person_avatar(self, contact_id: str, size: int = 64, circular: bool = True) -> Optional[QPixmap]:
         """
         FR : Récupère ou génère à la volée l'avatar pour un contact à la résolution demandée.
+        Réutilise et redimensionne `cluster.avatar_pixmap` (64x64) pour les tailles inférieures
+        ou différentes afin d'éviter toute relecture de la base ou du disque.
         EN: Retrieve or generate on-the-fly the avatar for a contact at the requested resolution.
+        Reuses and scales `cluster.avatar_pixmap` (64x64) for other requested sizes to avoid
+        redundant database or disk reads.
         Ref: picasa3.exe @ 0x009B93F0, 0x008AAD76
         """
         from PySide6.QtGui import QGuiApplication
         if QGuiApplication.instance() is None:
             return None
-        cluster = self.people.get(contact_id.lower())
+        cid = contact_id.lower()
+        cluster = self.people.get(cid)
         if not cluster:
             return None
-        if size == 64 and circular and cluster.avatar_pixmap and not cluster.avatar_pixmap.isNull():
-            return cluster.avatar_pixmap
+
+        cache_key = ("person_avatar", cid, size, circular)
+        if cache_key in self._avatar_cache:
+            return self._avatar_cache[cache_key]
+
+        if circular and cluster.avatar_pixmap and not cluster.avatar_pixmap.isNull():
+            if size == 64:
+                self._avatar_cache[cache_key] = cluster.avatar_pixmap
+                return cluster.avatar_pixmap
+            if size < 64:
+                scaled = cluster.avatar_pixmap.scaled(
+                    size,
+                    size,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                self._avatar_cache[cache_key] = scaled
+                return scaled
 
         fr = cluster.primary_face_rect
         if not fr:
@@ -870,7 +858,7 @@ class PicasaFaceManager:
                 if doc:
                     faces = doc.get_faces(os.path.basename(ppath))
                     for item in faces:
-                        if item.contact_id.lower() == contact_id.lower():
+                        if item.contact_id.lower() == cid:
                             fr = FaceRect.from_rect64(f"rect64({item.rect64})", contact_id=contact_id, contact_name=cluster.name)
                             cluster.primary_face_rect = fr
                             break
@@ -880,47 +868,88 @@ class PicasaFaceManager:
         if not fr:
             return None
 
-        # FR : 1. Tenter depuis la couverture personnalisée si définie
-        # EN: 1. Try from custom cover photo if set
-        if cluster.cover_photo_path and os.path.exists(cluster.cover_photo_path):
-            pil_img = self._open_photo_for_face_crop(cluster.cover_photo_path, fr, size)
-            if pil_img is not None:
-                try:
-                    aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
-                    disp_fr = fr.project_for_photo_ini(cluster.cover_photo_path, aspect_ratio=aspect_img, db=self.db)
-                    pix = disp_fr.crop_avatar(pil_img, avatar_size=size, circular=circular)
-                    if size == 64 and circular:
-                        cluster.avatar_pixmap = pix
-                    return pix
-                except Exception:
-                    pass
+        target_gen_size = 64 if (circular and size <= 64) else size
+        gen_pix: Optional[QPixmap] = None
 
-        # FR : 2. Tenter via get_face_avatar sur le premier enregistrement du cluster (1001 haute résolution ou photo originale)
-        # EN: 2. Try via get_face_avatar on the first cluster record (high-res 1001 thumbnail or original photo)
-        if cluster.photo_indices and self.db:
-            first_idx = cluster.photo_indices[0]
-            first_path = cluster.photo_paths[0] if cluster.photo_paths else ""
-            pix = self.get_face_avatar(first_path, fr, db_idx=first_idx, size=size, circular=circular)
-            if pix and not pix.isNull():
-                if size == 64 and circular:
-                    cluster.avatar_pixmap = pix
-                return pix
-
-        # FR : 3. Tenter depuis le fichier original sur disque
-        # EN: 3. Try from original file on disk
-        for ppath in cluster.photo_paths:
-            if os.path.exists(ppath):
-                pil_img = self._open_photo_for_face_crop(ppath, fr, size)
+        # FR : 1. Tenter depuis la couverture personnalisée si définie (en privilégiant la miniature 1001 en base)
+        # EN: 1. Try from custom cover photo if set (preferring the type 1001 DB thumbnail if available)
+        if cluster.cover_photo_path:
+            cover_db_idx = (
+                self.db.find_photo_index(cluster.cover_photo_path)
+                if (self.db and hasattr(self.db, "find_photo_index"))
+                else None
+            )
+            if cover_db_idx is not None:
+                gen_pix = self.get_face_avatar(
+                    cluster.cover_photo_path,
+                    fr,
+                    db_idx=cover_db_idx,
+                    size=target_gen_size,
+                    circular=circular,
+                )
+            if (gen_pix is None or gen_pix.isNull()) and os.path.exists(cluster.cover_photo_path):
+                pil_img = self._open_photo_for_face_crop(cluster.cover_photo_path, fr, target_gen_size)
                 if pil_img is not None:
                     try:
                         aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
-                        disp_fr = fr.project_for_photo_ini(ppath, aspect_ratio=aspect_img, db=self.db)
-                        pix = disp_fr.crop_avatar(pil_img, avatar_size=size, circular=circular)
-                        if size == 64 and circular:
-                            cluster.avatar_pixmap = pix
-                        return pix
+                        disp_fr = fr.project_for_photo_ini(cluster.cover_photo_path, aspect_ratio=aspect_img, db=self.db)
+                        gen_pix = disp_fr.crop_avatar(pil_img, avatar_size=target_gen_size, circular=circular)
                     except Exception:
-                        pass
+                        gen_pix = None
+
+        # FR : 2. Tenter via get_face_avatar sur le premier enregistrement du cluster (1001 haute résolution ou photo originale)
+        # EN: 2. Try via get_face_avatar on the first cluster record (high-res 1001 thumbnail or original photo)
+        if (gen_pix is None or gen_pix.isNull()) and cluster.photo_indices and self.db:
+            first_idx = cluster.photo_indices[0]
+            first_path = cluster.photo_paths[0] if cluster.photo_paths else ""
+            gen_pix = self.get_face_avatar(
+                first_path,
+                fr,
+                db_idx=first_idx,
+                size=target_gen_size,
+                circular=circular,
+            )
+
+        # FR : 3. Tenter depuis le fichier original sur disque
+        # EN: 3. Try from original file on disk
+        if gen_pix is None or gen_pix.isNull():
+            for ppath in cluster.photo_paths:
+                if os.path.exists(ppath):
+                    pil_img = self._open_photo_for_face_crop(ppath, fr, target_gen_size)
+                    if pil_img is not None:
+                        try:
+                            aspect_img = (pil_img.width / float(pil_img.height)) if pil_img.height > 0 else 1.0
+                            disp_fr = fr.project_for_photo_ini(ppath, aspect_ratio=aspect_img, db=self.db)
+                            gen_pix = disp_fr.crop_avatar(pil_img, avatar_size=target_gen_size, circular=circular)
+                            if gen_pix and not gen_pix.isNull():
+                                break
+                        except Exception:
+                            pass
+
+        if gen_pix and not gen_pix.isNull():
+            if circular:
+                if target_gen_size == 64:
+                    cluster.avatar_pixmap = gen_pix
+                    self._avatar_cache[("person_avatar", cid, 64, True)] = gen_pix
+                elif cluster.avatar_pixmap is None or cluster.avatar_pixmap.isNull():
+                    cluster.avatar_pixmap = gen_pix.scaled(
+                        64,
+                        64,
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation,
+                    )
+                    self._avatar_cache[("person_avatar", cid, 64, True)] = cluster.avatar_pixmap
+                if size != target_gen_size:
+                    scaled = gen_pix.scaled(
+                        size,
+                        size,
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation,
+                    )
+                    self._avatar_cache[cache_key] = scaled
+                    return scaled
+            self._avatar_cache[cache_key] = gen_pix
+            return gen_pix
 
         return None
 
@@ -937,6 +966,10 @@ class PicasaFaceManager:
 
         cluster.primary_face_rect = face_rect
         cluster.cover_photo_path = photo_path
+        cluster.avatar_pixmap = None
+        for k in list(self._avatar_cache.keys()):
+            if isinstance(k, tuple) and len(k) >= 2 and k[0] == "person_avatar" and k[1] == cid:
+                self._avatar_cache.pop(k, None)
 
         # FR : Recréer immédiatement l'avatar circulaire
         # EN: Immediately recreate the circular avatar
@@ -983,7 +1016,8 @@ class PicasaFaceManager:
         face_rect: FaceRect,
         db_idx: Optional[int] = None,
         size: int = 64,
-        circular: bool = True
+        circular: bool = True,
+        allow_disk_fallback: bool = True,
     ) -> Optional[QPixmap]:
         """
         FR : Génère ou découpe un avatar haute résolution pour un visage donné :
@@ -992,12 +1026,16 @@ class PicasaFaceManager:
           puis `thumbs_0.db` (`120x144`, `size="small"`), ou découpe depuis l'original sur disque si `size > 288`.
         - Si l'enregistrement est une photo entière (`type != 1001`), découpe le visage depuis la photo originale
           haute résolution sur disque (et non depuis la miniature `144x108` de la photo entière !).
+        - Si `allow_disk_fallback=False` (utilisé pendant un `paintEvent`), ne fait jamais `_open_photo_for_face_crop`
+          sur le fichier haute résolution du disque si la miniature `thumbs_0.db` est absente.
         EN: Generate or crop a high-resolution avatar for a given face:
         - When the record is a `type == 1001` face sub-record (or has a matching `1001` child),
           uses the high-resolution `bigthumbs_0.db` (`240x288`, `size="large"`) face thumbnail first,
           then `thumbs_0.db` (`120x144`, `size="small"`), or crops from the on-disk original if `size > 288`.
         - When the record is a full photo (`type != 1001`), crops the face from the high-resolution
           original photo on disk (never from the tiny `144x108` whole-photo thumbnail unless the file is missing).
+        - When `allow_disk_fallback=False` (used during `paintEvent`), never opens the high-resolution
+          disk file via `_open_photo_for_face_crop` if the `thumbs_0.db` thumbnail is absent.
         Ref: picasa3.exe @ 0x009B93F0, 0x00896F74, 0x0057A4F0
         """
         from PySide6.QtGui import QGuiApplication
@@ -1022,21 +1060,25 @@ class PicasaFaceManager:
 
         has_geo_edits = False
         geo_sig = (0, "", 0.0)
-        if photo_path and os.path.exists(photo_path):
+        if photo_path:
             parent_dir = os.path.dirname(photo_path)
-            ini_p = os.path.join(parent_dir, ".picasa.ini")
-            if not os.path.exists(ini_p):
-                ini_p = os.path.join(parent_dir, "Picasa.ini")
-            if os.path.exists(ini_p):
+            if self.db and hasattr(self.db, "get_parsed_ini"):
+                doc = self.db.get_parsed_ini(os.path.join(parent_dir, ".picasa.ini"))
+                if doc is None:
+                    doc = self.db.get_parsed_ini(os.path.join(parent_dir, "Picasa.ini"))
+            else:
+                ini_p = os.path.join(parent_dir, ".picasa.ini")
+                if not os.path.exists(ini_p):
+                    ini_p = os.path.join(parent_dir, "Picasa.ini")
+                doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else None
+            if doc is not None:
                 try:
-                    doc = self.db.get_parsed_ini(ini_p) if (self.db and hasattr(self.db, "get_parsed_ini")) else PicasaIniParser.parse_file(ini_p)
-                    if doc is not None:
-                        bname = os.path.basename(photo_path)
-                        rot_v = (doc.get_rotate(bname) or 0) % 4
-                        crop_v = doc.get_crop(bname) or ""
-                        tilt_v = round(float(doc.get_tilt(bname) or 0.0), 3)
-                        geo_sig = (rot_v, crop_v, tilt_v)
-                        has_geo_edits = bool(rot_v != 0 or crop_v or abs(tilt_v) >= 0.01)
+                    bname = os.path.basename(photo_path)
+                    rot_v = (doc.get_rotate(bname) or 0) % 4
+                    crop_v = doc.get_crop(bname) or ""
+                    tilt_v = round(float(doc.get_tilt(bname) or 0.0), 3)
+                    geo_sig = (rot_v, crop_v, tilt_v)
+                    has_geo_edits = bool(rot_v != 0 or crop_v or abs(tilt_v) >= 0.01)
                 except Exception:
                     pass
 
@@ -1048,7 +1090,7 @@ class PicasaFaceManager:
         # de transformation géométrique non répercutée, utiliser bigthumbs_0.db (240x288) ou thumbs_0.db (120x144).
         # EN: 1. When a face sub-record (type == 1001) is available and no unapplied geometric edit is active,
         # use bigthumbs_0.db (240x288) or thumbs_0.db (120x144).
-        if face_rec_idx is not None and self.db and (not has_geo_edits or not (photo_path and os.path.exists(photo_path))):
+        if face_rec_idx is not None and self.db and (not has_geo_edits or not allow_disk_fallback or not (photo_path and os.path.exists(photo_path))):
             thumb_jpeg = (
                 self.db.get_thumbnail(face_rec_idx, size="large")
                 or self.db.get_thumbnail(face_rec_idx, size="small")
@@ -1056,7 +1098,7 @@ class PicasaFaceManager:
             if thumb_jpeg:
                 try:
                     with Image.open(io.BytesIO(thumb_jpeg)) as img:
-                        if size <= max(img.size) or not (photo_path and os.path.exists(photo_path)):
+                        if size <= max(img.size) or not allow_disk_fallback or not (photo_path and os.path.exists(photo_path)):
                             pix = FaceRect.to_avatar_pixmap(img, avatar_size=size, circular=circular)
                             if pix and not pix.isNull():
                                 self._avatar_cache[cache_key] = pix
@@ -1066,7 +1108,7 @@ class PicasaFaceManager:
 
         # FR : 2. Découpage haute résolution depuis le fichier photo original sur disque (avec projection .picasa.ini)
         # EN: 2. High-resolution crop from the original photo file on disk (with .picasa.ini projection)
-        if photo_path and os.path.exists(photo_path):
+        if allow_disk_fallback and photo_path and os.path.exists(photo_path):
             pil_img = self._open_photo_for_face_crop(photo_path, face_rect, size)
             if pil_img is not None:
                 try:
@@ -1079,9 +1121,9 @@ class PicasaFaceManager:
                 except Exception:
                     pass
 
-        # FR : 3. Repli (uniquement si le fichier original sur disque est introuvable) :
+        # FR : 3. Repli (uniquement si le fichier original sur disque est introuvable ou allow_disk_fallback=False) :
         # essayer previews_0.db puis bigthumbs_0.db puis thumbs_0.db de la photo parente
-        # EN: 3. Fallback (only when the original on-disk file is missing):
+        # EN: 3. Fallback (when the original on-disk file is missing or allow_disk_fallback=False):
         # try previews_0.db, then bigthumbs_0.db, then thumbs_0.db of the parent photo
         if parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
             for sz in ("preview", "large", "small"):
@@ -1310,15 +1352,18 @@ class PicasaFaceManager:
                 db_idx = None
 
         if (db_idx is None or db_idx < 0) and self.db and photo_path:
-            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
-            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
-            fname_lower = os.path.basename(photo_path).lower()
-            for i, r in enumerate(self.db.index):
-                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
-                    fpath = folders_map.get(r.parent_idx, "")
-                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
-                        db_idx = i
-                        break
+            if hasattr(self.db, "find_photo_index"):
+                db_idx = self.db.find_photo_index(photo_path)
+            else:
+                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                fname_lower = os.path.basename(photo_path).lower()
+                for i, r in enumerate(self.db.index):
+                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                        fpath = folders_map.get(r.parent_idx, "")
+                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                            db_idx = i
+                            break
 
         if db_idx is not None:
             self._scanned_photo_indices.add(db_idx)
@@ -1412,7 +1457,10 @@ class PicasaFaceManager:
 
             child_idx: Optional[int] = None
             if db_idx is not None and db_idx >= 0 and self.db:
-                child_idx = self._get_or_create_1001_child(db_idx, df)
+                if pil_img is None and photo_path and os.path.exists(photo_path):
+                    if self._find_matching_1001_child(db_idx, df) is None:
+                        pil_img = self._open_photo_for_face_crop(photo_path, df, target_size=288)
+                child_idx = self._get_or_create_1001_child(db_idx, df, source_img=pil_img)
                 if child_idx is not None:
                     self.photo_to_faces.setdefault(child_idx, [df])
                     if isinstance(template_blob, (bytes, bytearray)) and len(template_blob) > 0 and hasattr(self.db, "add_face_template"):
@@ -1670,15 +1718,18 @@ class PicasaFaceManager:
             self.people[contact_id] = cluster
 
         if (db_idx is None or db_idx < 0) and self.db and photo_path:
-            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
-            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
-            fname_lower = os.path.basename(photo_path).lower()
-            for i, r in enumerate(self.db.index):
-                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
-                    fpath = folders_map.get(r.parent_idx, "")
-                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
-                        db_idx = i
-                        break
+            if hasattr(self.db, "find_photo_index"):
+                db_idx = self.db.find_photo_index(photo_path)
+            else:
+                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                fname_lower = os.path.basename(photo_path).lower()
+                for i, r in enumerate(self.db.index):
+                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                        fpath = folders_map.get(r.parent_idx, "")
+                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                            db_idx = i
+                            break
 
         parent_photo_idx: Optional[int] = None
         face_rec_idx: Optional[int] = None
@@ -1690,7 +1741,9 @@ class PicasaFaceManager:
                 parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
             else:
                 parent_photo_idx = db_idx
-                face_rec_idx = self._get_or_create_1001_child(parent_photo_idx, face_rect)
+                face_rec_idx = self._get_or_create_1001_child(
+                    parent_photo_idx, face_rect, source_img=source_image
+                )
         elif db_idx is not None and db_idx >= 0:
             parent_photo_idx = db_idx
 
@@ -1884,15 +1937,18 @@ class PicasaFaceManager:
         Ref: picasa3.exe @ peoplepanel/addname, peopleautocomplete (0x008A15D0)
         """
         if (db_idx is None or db_idx < 0) and self.db and photo_path:
-            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
-            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
-            fname_lower = os.path.basename(photo_path).lower()
-            for i, r in enumerate(self.db.index):
-                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
-                    fpath = folders_map.get(r.parent_idx, "")
-                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
-                        db_idx = i
-                        break
+            if hasattr(self.db, "find_photo_index"):
+                db_idx = self.db.find_photo_index(photo_path)
+            else:
+                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                fname_lower = os.path.basename(photo_path).lower()
+                for i, r in enumerate(self.db.index):
+                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                        fpath = folders_map.get(r.parent_idx, "")
+                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                            db_idx = i
+                            break
 
         old_cid = old_face_rect.contact_id or source_contact_id
         old_cluster = self.get_person(old_cid) if old_cid else None
@@ -1966,15 +2022,18 @@ class PicasaFaceManager:
         Ref: picasa3.exe @ peoplepanel::ignore, removesel (0x00896FA8)
         """
         if (db_idx is None or db_idx < 0) and self.db and photo_path:
-            folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
-            norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
-            fname_lower = os.path.basename(photo_path).lower()
-            for i, r in enumerate(self.db.index):
-                if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
-                    fpath = folders_map.get(r.parent_idx, "")
-                    if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
-                        db_idx = i
-                        break
+            if hasattr(self.db, "find_photo_index"):
+                db_idx = self.db.find_photo_index(photo_path)
+            else:
+                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                fname_lower = os.path.basename(photo_path).lower()
+                for i, r in enumerate(self.db.index):
+                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                        fpath = folders_map.get(r.parent_idx, "")
+                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                            db_idx = i
+                            break
 
         parent_photo_idx: Optional[int] = None
         face_rec_idx: Optional[int] = None
@@ -2610,15 +2669,18 @@ class PicasaFaceManager:
         else:
             photo_path = str(photo_idx_or_path or "")
             if self.db and photo_path:
-                folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
-                norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
-                fname_lower = os.path.basename(photo_path).lower()
-                for i, r in enumerate(self.db.index):
-                    if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
-                        fpath = folders_map.get(r.parent_idx, "")
-                        if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
-                            db_idx = i
-                            break
+                if hasattr(self.db, "find_photo_index"):
+                    db_idx = self.db.find_photo_index(photo_path)
+                else:
+                    folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+                    norm_dir = os.path.dirname(photo_path).replace("/", "\\").rstrip("\\").lower()
+                    fname_lower = os.path.basename(photo_path).lower()
+                    for i, r in enumerate(self.db.index):
+                        if r.type not in (0, 1, 1001) and r.path.lower() == fname_lower:
+                            fpath = folders_map.get(r.parent_idx, "")
+                            if fpath.replace("/", "\\").rstrip("\\").lower() == norm_dir:
+                                db_idx = i
+                                break
         if not photo_path:
             return
         parent_dir = os.path.dirname(photo_path)
@@ -2718,6 +2780,7 @@ class BackgroundFaceDetectionWorker(QThread):
 
         total_detected = 0
         pending_ui_notify = 0
+        last_emit_time = time.monotonic()
 
         for i, (db_idx, photo_path) in enumerate(candidates):
             if self._is_cancelled:
@@ -2739,11 +2802,15 @@ class BackgroundFaceDetectionWorker(QThread):
                     total_detected += added
                     pending_ui_notify += added
                     self.faces_detected.emit(db_idx, photo_path, added)
-                    if pending_ui_notify >= 3:
+                    now = time.monotonic()
+                    if now - last_emit_time >= 3.0:
                         pending_ui_notify = 0
+                        last_emit_time = now
                         self.people_updated.emit()
             except Exception:
                 pass
+            if (i + 1) % 10 == 0:
+                time.sleep(0.001)
 
         if total_detected > 0:
             self.people_updated.emit()

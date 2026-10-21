@@ -57,6 +57,7 @@ class PicasaFilmstrip(QWidget):
 
         self.scroll_x: int = 0
         self._thumb_cache: Dict[int, QPixmap] = {}
+        self._pixmap_cache: Dict[int, QPixmap] = self._thumb_cache
 
     def apply_style(self, style: PicasaStyle) -> None:
         """
@@ -106,6 +107,13 @@ class PicasaFilmstrip(QWidget):
             if p_idx is not None:
                 self._thumb_cache.pop(p_idx, None)
         self.update()
+
+    def invalidate_index(self, idx: int) -> None:
+        """
+        FR: Alias de `invalidate_thumbnail` pour invalider une miniature par son index en base.
+        EN: Alias for `invalidate_thumbnail` to invalidate a cached thumbnail by its database index.
+        """
+        self.invalidate_thumbnail(idx)
 
     def clear_cache(self) -> None:
         """

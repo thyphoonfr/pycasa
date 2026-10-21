@@ -15,12 +15,12 @@ import os
 import sys
 import io
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSlider, QFrame,
     QButtonGroup, QStackedWidget, QSplitter, QSizePolicy, QLineEdit
 )
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtGui import QPixmap, QImage
 from PIL import Image
 
@@ -104,6 +104,14 @@ class PicasaOneUpView(QWidget):
         self._tuning_base_img: Optional[Image.Image] = None
         self._tuning_history_slot: int = -1
         self._effect_preview_base_img: Optional[Image.Image] = None
+        self._fast_preview_base_source: Optional[Image.Image] = None
+        self._fast_preview_base_img: Optional[Image.Image] = None
+        self._pending_full_res_preview: Optional[Tuple[str, Any, Any]] = None
+        self._original_pixmap_dirty: bool = True
+        self._full_res_preview_timer = QTimer(self)
+        self._full_res_preview_timer.setSingleShot(True)
+        self._full_res_preview_timer.setInterval(60)
+        self._full_res_preview_timer.timeout.connect(self._flush_full_res_preview)
 
         # FR: Paramètres de transformation d'affichage active (crop, tilt, rotate)
         # EN: Active display transformation parameters (crop, tilt, rotate)
@@ -759,7 +767,9 @@ class PicasaOneUpView(QWidget):
 
         Ref: picasa3.exe @ 0x005F8D80, 0x005F92E0, 0x0057BB50
         """
-        if getattr(self, "_is_tool_locked", False) or self.edit_panel.main_stack.currentIndex() != 0:
+        if getattr(self, "_is_tool_locked", False) or self.edit_panel.stack.currentIndex() != 0:
+            if hasattr(self, "canvas") and self.canvas is not None:
+                self.canvas.cancel_manual_face_add()
             self.edit_panel.cancel_active_subpanel()
             self._set_modal_tool_lock(False, 0, "")
         self.back_to_library_requested.emit()
@@ -1025,9 +1035,10 @@ class PicasaOneUpView(QWidget):
                 self.btn_swap_2up_layout.show()
             if hasattr(self, "btn_swap_2up_focus"):
                 self.btn_swap_2up_focus.show()
-            if self._original_pil_img:
+            if self._original_pil_img and (self._original_pixmap_dirty or self.canvas.original_pixmap is None):
                 orig_pix = self._pil_to_pixmap(self._original_pil_img)
                 self.canvas.set_original_pixmap(orig_pix)
+                self._original_pixmap_dirty = False
 
         self._update_top_bar_info()
 
@@ -1133,7 +1144,11 @@ class PicasaOneUpView(QWidget):
             img = self._history[self._history_idx]
         if img is not None and self.db is not None and self.current_index >= 0:
             if hasattr(self.db, "update_thumbnails_from_pil"):
-                self.db.update_thumbnails_from_pil(self.current_index, img, persist_to_disk=True)
+                if hasattr(self.db, "schedule_save_thumbnails"):
+                    self.db.update_thumbnails_from_pil(self.current_index, img, persist_to_disk=False)
+                    self.db.schedule_save_thumbnails(1500)
+                else:
+                    self.db.update_thumbnails_from_pil(self.current_index, img, persist_to_disk=True)
         if hasattr(self, "filmstrip") and self.current_index >= 0:
             if hasattr(self.filmstrip, "invalidate_thumbnail"):
                 self.filmstrip.invalidate_thumbnail(self.current_index)
@@ -1744,14 +1759,17 @@ class PicasaOneUpView(QWidget):
         elif self.canvas.view_mode == "A_A":
             self.lbl_top_info.setText(f"Comparaison A | A  •  Originale (Avant) vs Retouchée (Après) — {filename}")
 
-    def _display_pil_on_canvas(self, img: Image.Image) -> None:
+    def _display_pil_on_canvas(self, img: Image.Image, is_live_preview: bool = False) -> None:
         """
         FR: Affiche une image PIL sur le canevas et met à jour l'histogramme sans altérer l'historique.
         EN: Displays a PIL image on the canvas and updates the histogram without altering history.
         """
         pix = self._pil_to_pixmap(img)
         self.canvas.set_pixmap_direct(pix)
-        self.edit_panel.set_image(img)
+        if is_live_preview:
+            self.edit_panel.histogram_widget.set_image(img)
+        else:
+            self.edit_panel.set_image(img)
         if self.right_drawer.isVisible() and hasattr(self.right_drawer.panel_properties, "set_image"):
             self.right_drawer.panel_properties.set_image(img)
 
@@ -1767,8 +1785,57 @@ class PicasaOneUpView(QWidget):
         self._display_pil_on_canvas(img)
 
         if self._original_pil_img:
-            orig_pix = self._pil_to_pixmap(self._original_pil_img)
-            self.canvas.set_original_pixmap(orig_pix)
+            if self.canvas.view_mode == "A_A":
+                orig_pix = self._pil_to_pixmap(self._original_pil_img)
+                self.canvas.set_original_pixmap(orig_pix)
+                self._original_pixmap_dirty = False
+            else:
+                self._original_pixmap_dirty = True
+
+    def _get_fast_preview_base(self, base_img: Image.Image) -> Image.Image:
+        """
+        FR: Retourne une copie réduite (max 720px) mise en cache pour le glissement fluide des curseurs à 60 FPS.
+        EN: Returns a cached downscaled copy (max 720px) for smooth 60 FPS slider dragging.
+        """
+        if self._fast_preview_base_source is base_img and self._fast_preview_base_img is not None:
+            return self._fast_preview_base_img
+        self._fast_preview_base_source = base_img
+        w, h = base_img.size
+        max_dim = max(w, h)
+        if max_dim > 720:
+            sc = 720.0 / float(max_dim)
+            self._fast_preview_base_img = base_img.resize(
+                (max(1, int(round(w * sc))), max(1, int(round(h * sc)))),
+                Image.Resampling.BILINEAR,
+            )
+        else:
+            self._fast_preview_base_img = base_img
+        return self._fast_preview_base_img
+
+    def _flush_full_res_preview(self) -> None:
+        """
+        FR: Recalcule l'aperçu pleine résolution (1600px) 60 ms après l'arrêt du glissement d'un curseur.
+        EN: Recomputes the full-resolution preview (1600px) 60 ms after slider dragging pauses.
+        """
+        pending = self._pending_full_res_preview
+        self._pending_full_res_preview = None
+        if pending is None or self._history_idx < 0 or not self._history:
+            return
+        kind, arg1, arg2 = pending
+        if kind == "tuning" and self._tuning_base_img is not None:
+            tp = arg1
+            preview_img = PicasaImageProcessor.finetune(
+                self._tuning_base_img,
+                fill=float(tp.get("fill", 0.0)),
+                highlights=float(tp.get("highlights", 0.0)),
+                shadows=float(tp.get("shadows", 0.0)),
+                colortemp=float(tp.get("colortemp", 0.0)),
+            )
+            self._display_pil_on_canvas(preview_img, is_live_preview=True)
+        elif kind == "effect" and self._effect_preview_base_img is not None:
+            preview_img = PicasaImageProcessor.execute_effect(self._effect_preview_base_img, arg1, arg2)
+            if preview_img is not None:
+                self._display_pil_on_canvas(preview_img, is_live_preview=True)
 
     def _push_history(self, img: Image.Image) -> None:
         """
@@ -1798,14 +1865,22 @@ class PicasaOneUpView(QWidget):
         if self._tuning_base_img is None:
             self._tuning_base_img = self._history[self._history_idx].copy()
 
+        is_dragging = hasattr(self.edit_panel, "is_any_slider_down") and self.edit_panel.is_any_slider_down()
+        src_img = self._get_fast_preview_base(self._tuning_base_img) if is_dragging else self._tuning_base_img
         preview_img = PicasaImageProcessor.finetune(
-            self._tuning_base_img,
+            src_img,
             fill=float(tuning_params.get("fill", 0.0)),
             highlights=float(tuning_params.get("highlights", 0.0)),
             shadows=float(tuning_params.get("shadows", 0.0)),
             colortemp=float(tuning_params.get("colortemp", 0.0)),
         )
-        self._display_pil_on_canvas(preview_img)
+        self._display_pil_on_canvas(preview_img, is_live_preview=True)
+        if is_dragging and src_img is not self._tuning_base_img:
+            self._pending_full_res_preview = ("tuning", dict(tuning_params), None)
+            self._full_res_preview_timer.start()
+        else:
+            self._full_res_preview_timer.stop()
+            self._pending_full_res_preview = None
 
     def _on_tuning_applied(self, tuning_params: dict) -> None:
         """
@@ -1887,9 +1962,17 @@ class PicasaOneUpView(QWidget):
         if self._effect_preview_base_img is None:
             self._effect_preview_base_img = self._history[self._history_idx].copy()
 
-        preview_img = PicasaImageProcessor.execute_effect(self._effect_preview_base_img, effect_name, params)
+        is_dragging = hasattr(self.edit_panel, "is_any_slider_down") and self.edit_panel.is_any_slider_down()
+        src_img = self._get_fast_preview_base(self._effect_preview_base_img) if is_dragging else self._effect_preview_base_img
+        preview_img = PicasaImageProcessor.execute_effect(src_img, effect_name, params)
         if preview_img is not None:
-            self._display_pil_on_canvas(preview_img)
+            self._display_pil_on_canvas(preview_img, is_live_preview=True)
+            if is_dragging and src_img is not self._effect_preview_base_img:
+                self._pending_full_res_preview = ("effect", effect_name, dict(params))
+                self._full_res_preview_timer.start()
+            else:
+                self._full_res_preview_timer.stop()
+                self._pending_full_res_preview = None
 
     def _on_effect_applied(self, effect_name: str, params: dict) -> None:
         """
@@ -2673,7 +2756,7 @@ class PicasaOneUpView(QWidget):
         """
         if getattr(self, "_is_tool_locked", False):
             if event.key() == Qt.Key.Key_Escape:
-                if self.edit_panel.main_stack.currentIndex() != 0:
+                if self.edit_panel.stack.currentIndex() != 0:
                     self.edit_panel.cancel_active_subpanel()
                 else:
                     self.canvas.cancel_manual_face_add()

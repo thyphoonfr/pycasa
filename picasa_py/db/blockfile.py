@@ -15,8 +15,10 @@ Traçabilité Ghidra / Ghidra Traceability:
 """
 
 from __future__ import annotations
+import os
 import struct
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Tuple, Optional
 
 
@@ -405,6 +407,8 @@ class BlockContainerFile:
         """
         self.magic = magic
         self.payload: bytearray = bytearray(data) if data is not None else bytearray()
+        self._dirty_ranges: List[Tuple[int, int]] = []
+        self._fully_dirty: bool = False
 
     @classmethod
     # Ref: picasa3.exe @ 0x006B61E0 (OpenBlock)
@@ -448,6 +452,23 @@ class BlockContainerFile:
             )
         return bytes(self.payload[rel_offset:end_offset])
 
+    # Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
+    def write_entry(self, offset: int, payload: bytes) -> None:
+        """
+        FR: Écrit directement une charge utile à l'offset fichier spécifié (>= 4) et enregistre la plage modifiée.
+        EN: Directly writes a payload at the specified file offset (>= 4) and records the dirty range.
+        Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
+        """
+        if offset < 4:
+            raise ValueError(f"Offset d'entrée invalide : {offset} (doit être >= 4)")
+        size = len(payload)
+        rel_offset = offset - 4
+        if rel_offset + size > len(self.payload):
+            self.payload.extend(b"\x00" * (rel_offset + size - len(self.payload)))
+        self.payload[rel_offset : rel_offset + size] = payload
+        if size > 0:
+            self._dirty_ranges.append((offset, offset + size))
+
     def append_blob(self, blob: bytes, checksum: int = 0, block_idx: int = 0) -> BlockEntry:
         """
         FR: Ajoute un nouveau blob à la fin du conteneur et renvoie la BlockEntry correspondante.
@@ -459,6 +480,8 @@ class BlockContainerFile:
             raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
         abs_offset = len(self.payload) + 4
         self.payload.extend(blob)
+        if size > 0:
+            self._dirty_ranges.append((abs_offset, abs_offset + size))
         return BlockEntry(checksum=checksum, offset=abs_offset, size=size, block=block_idx)
 
     def write_blob(
@@ -489,6 +512,8 @@ class BlockContainerFile:
             rel_offset = existing_entry.offset - 4
             if rel_offset + size <= len(self.payload):
                 self.payload[rel_offset : rel_offset + size] = blob
+                if size > 0:
+                    self._dirty_ranges.append((existing_entry.offset, existing_entry.offset + size))
                 return BlockEntry(
                     checksum=checksum,
                     offset=existing_entry.offset,
@@ -496,4 +521,69 @@ class BlockContainerFile:
                     block=block_idx,
                 )
         return self.append_blob(blob, checksum=checksum, block_idx=block_idx)
+
+    # Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry), 0x006B7FC0 (CBlockFile::SaveIndex)
+    def flush_to_file(self, path: Path | str) -> None:
+        """
+        FR: Synchronise le conteneur CBlockFile sur disque :
+        - Si le fichier n'existe pas, est marqué entièrement modifié (_fully_dirty) ou a rétréci,
+          écrit le fichier complet de manière atomique (.tmp + os.replace).
+        - Si aucune plage n'a été modifiée (_dirty_ranges vide) et que la taille sur disque correspond,
+          ne fait aucune écriture disque.
+        - Sinon, écrit uniquement sur place (r+b, seek + write) les plages d'octets modifiées ou ajoutées.
+        EN: Flushes the CBlockFile container to disk:
+        - If the file does not exist, is marked _fully_dirty, or shrank, writes the full file atomically.
+        - If no range was modified (_dirty_ranges empty) and the on-disk size matches, performs no disk I/O.
+        - Otherwise, writes only the modified or appended byte ranges in-place (r+b, seek + write).
+        Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
+        """
+        target = Path(path)
+        total_size = 4 + len(self.payload)
+
+        def _full_atomic_write() -> None:
+            raw = self.to_bytes()
+            tmp = target.with_suffix(target.suffix + ".tmp")
+            tmp.write_bytes(raw)
+            try:
+                os.replace(str(tmp), str(target))
+            except PermissionError:
+                try:
+                    target.write_bytes(raw)
+                finally:
+                    tmp.unlink(missing_ok=True)
+            self._dirty_ranges.clear()
+            self._fully_dirty = False
+
+        if not target.exists() or self._fully_dirty:
+            _full_atomic_write()
+            return
+
+        try:
+            disk_size = target.stat().st_size
+        except OSError:
+            _full_atomic_write()
+            return
+
+        if disk_size > total_size or disk_size < 4:
+            _full_atomic_write()
+            return
+
+        if not self._dirty_ranges:
+            if disk_size == total_size:
+                return
+            _full_atomic_write()
+            return
+
+        try:
+            with open(target, "r+b") as f:
+                for start, end in self._dirty_ranges:
+                    s = max(4, int(start))
+                    e = min(total_size, int(end))
+                    if e > s:
+                        f.seek(s)
+                        f.write(self.payload[s - 4 : e - 4])
+            self._dirty_ranges.clear()
+            self._fully_dirty = False
+        except OSError:
+            _full_atomic_write()
 

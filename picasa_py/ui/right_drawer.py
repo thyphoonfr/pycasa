@@ -51,6 +51,29 @@ from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
 from picasa_py.ui.name_face_dialog import PicasaNameFaceDialog
 from picasa_py.ui.histogram_widget import PicasaHistogramWidget
 
+_EXIF_META_CACHE: Dict[str, Tuple[float, Dict[str, Any]]] = {}
+
+
+def _get_cached_full_metadata(file_path: str) -> Dict[str, Any]:
+    """
+    FR: Récupère les métadonnées EXIF complètes avec mise en cache par (chemin, mtime).
+    EN: Retrieves full EXIF metadata cached by (path, mtime).
+    """
+    if not file_path or not os.path.exists(file_path):
+        return extract_full_metadata(file_path)
+    try:
+        mtime = os.path.getmtime(file_path)
+        cached = _EXIF_META_CACHE.get(file_path)
+        if cached is not None and cached[0] == mtime:
+            return cached[1]
+        meta = extract_full_metadata(file_path)
+        if len(_EXIF_META_CACHE) >= 512:
+            _EXIF_META_CACHE.clear()
+        _EXIF_META_CACHE[file_path] = (mtime, meta)
+        return meta
+    except Exception:
+        return extract_full_metadata(file_path)
+
 
 # =============================================================================
 # 1. VOLET DES PERSONNES / PEOPLE PANEL
@@ -3463,27 +3486,41 @@ class PicasaPropertiesPanel(QWidget):
         """
         self.histogram_widget.set_image(img)
 
-    def set_photo_metadata(self, file_path: str, source_img: Optional[Image.Image] = None) -> None:
+    def set_photo_metadata(
+        self,
+        file_path: str,
+        source_img: Optional[Image.Image] = None,
+        db: Optional[Any] = None,
+        db_index: int = -1,
+    ) -> None:
         """
         FR: Extrait et affiche les métadonnées EXIF et l'histogramme de la photo spécifiée.
         EN: Extracts and displays the EXIF metadata and histogram of the specified photo.
         """
-        meta = extract_full_metadata(file_path)
+        meta = _get_cached_full_metadata(file_path)
         self.lbl_filename.setText(meta["filename"])
         self.lbl_path.setText(meta["folder"])
         self.lbl_size_date.setText(f"{meta['filesize']}  •  {meta['date']}")
 
         if source_img is not None:
             self.histogram_widget.set_image(source_img)
-        elif file_path and os.path.exists(file_path):
-            try:
-                from picasa_py.ui.image_processor import PicasaImageProcessor
-                im = PicasaImageProcessor.load_transformed_image(file_path, max_size=512)
-                self.histogram_widget.set_image(im)
-            except Exception:
-                self.histogram_widget.set_image(None)
         else:
-            self.histogram_widget.set_image(None)
+            hist_img: Optional[Image.Image] = None
+            if db is not None and db_index >= 0 and hasattr(db, "get_thumbnail"):
+                try:
+                    raw = db.get_thumbnail(db_index, "large") or db.get_thumbnail(db_index, "small")
+                    if raw:
+                        with Image.open(io.BytesIO(raw)) as im_thumb:
+                            hist_img = im_thumb.convert("RGB")
+                except Exception:
+                    hist_img = None
+            if hist_img is None and file_path and os.path.exists(file_path):
+                try:
+                    from picasa_py.ui.image_processor import PicasaImageProcessor
+                    hist_img = PicasaImageProcessor.load_transformed_image(file_path, max_size=512)
+                except Exception:
+                    hist_img = None
+            self.histogram_widget.set_image(hist_img)
 
         props = meta.get("properties", [])
         self.table.setRowCount(len(props))
@@ -4031,7 +4068,7 @@ class PicasaRightDrawer(QWidget):
         # 2. Métadonnées EXIF GPS
         if check_exif:
             try:
-                meta = extract_full_metadata(photo_path)
+                meta = _get_cached_full_metadata(photo_path)
                 if meta.get("gps"):
                     lat, lon, _ = meta["gps"]
                     return float(lat), float(lon)
@@ -4052,13 +4089,12 @@ class PicasaRightDrawer(QWidget):
         """
         markers: List[Dict[str, Any]] = []
         seen_paths = set()
-        check_exif = len(candidate_paths) <= 40
 
         for p in candidate_paths[:250]:
             if not p or p in seen_paths:
                 continue
             seen_paths.add(p)
-            lat, lon = self._extract_photo_geotag(db, p, check_exif=check_exif)
+            lat, lon = self._extract_photo_geotag(db, p, check_exif=False)
             if lat is not None and lon is not None:
                 markers.append({
                     "lat": lat,
@@ -4146,7 +4182,7 @@ class PicasaRightDrawer(QWidget):
                     faces = db.face_manager.get_faces_for_photo(photo_index, photo_path=photo_path)
                 self.panel_people.set_photo_faces(db, photo_index, photo_path, faces, source_img=source_img)
             elif panel == "properties":
-                self.panel_properties.set_photo_metadata(photo_path, source_img=source_img)
+                self.panel_properties.set_photo_metadata(photo_path, source_img=source_img, db=db, db_index=photo_index)
             elif panel == "tags":
                 self.panel_tags.set_photo_path(photo_path, db=db)
             elif panel == "places":
@@ -4258,7 +4294,7 @@ class PicasaRightDrawer(QWidget):
         self._dirty_panels = {"people", "places", "tags", "properties"}
         if not self._explicitly_hidden:
             self._sync_active_panel()
-            if "people" in self._dirty_panels:
+            if self.parentWidget() is None and "people" in self._dirty_panels:
                 self._dirty_panels.discard("people")
                 self.panel_people.set_multiple_photos(db, self._current_multi_indices, self._current_multi_paths)
 

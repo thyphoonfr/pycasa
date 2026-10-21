@@ -143,8 +143,8 @@ def test_main_window_one_up_switching(qapp):
         assert win.top_bar.isHidden()
         assert win.photo_tray.isHidden()
 
-        # Retour à la bibliothèque
-        win._back_to_library()
+        # Retour à la bibliothèque en cliquant sur le bouton « Retour à la photothèque » (`btn_back`)
+        win.one_up_view.edit_panel.btn_back.click()
         assert win.stack.currentIndex() == 0  # Grille
         assert not win.top_bar.isHidden()
         assert not win.photo_tray.isHidden()
@@ -373,6 +373,7 @@ def test_revert_all_edits_and_fx_thumbnails_and_2up_extra_buttons(qapp, tmp_path
     ini_file = tmp_path / ".picasa.ini"
 
     win = PicasaMainWindow()
+    win.db = PicasaDatabase(tmp_path / "db3")
     win._update_photo_ini(
         str(photo_file),
         lambda doc, fname: (
@@ -549,6 +550,18 @@ def test_modal_tool_and_effect_ui_locking(qapp, tmp_path, sample_image):
     # 4. Curseurs d'éclairage (mode == 5, "soft" finetune2) -> aperçu direct sans verrouiller les barres
     view.edit_panel.sldr_fill.setValue(25)
     _assert_locked(False)
+
+    # 5. Clic sur « Retour à la photothèque » (`btn_back`) en mode normal et pendant un outil actif
+    back_signals: list[bool] = []
+    view.back_to_library_requested.connect(lambda: back_signals.append(True))
+    view.edit_panel.btn_back.click()
+    assert len(back_signals) == 1
+
+    view.edit_panel.btn_crop.click()
+    _assert_locked(True)
+    view.edit_panel.btn_back.click()
+    _assert_locked(False)
+    assert len(back_signals) == 2
 
     view.close()
 

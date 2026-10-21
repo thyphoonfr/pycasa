@@ -1441,6 +1441,7 @@ class PicasaEditPanel(QWidget):
         # 2. FR: Boîte d'outils principale / EN: Main toolbox: editpanel/edittabbase & editpanel/editcontrols (rect=(3, 40, 279, 391))
         # Ref: respack.yt @ tre:editpanel (editpanel/tab1..tab5, Property button_buttcon 1), TOOLTIPS_FR.XML:231-245
         self.stack = QStackedWidget()
+        self.main_stack = self.stack
 
         self.tabs = QTabWidget()
         self.tabs.setIconSize(QSize(25, 19))
@@ -1591,8 +1592,10 @@ class PicasaEditPanel(QWidget):
         if hasattr(self, "hist_box"):
             self.hist_box.setEnabled(not locked)
         if hasattr(self, "btn_back"):
-            # Ref: picasa3.exe @ 0x0057BE8B (editpanel/albumview disabled in mode 3)
-            self.btn_back.setEnabled(not (locked and mode == 3))
+            # FR: Le bouton Retour à la photothèque reste toujours cliquable (annule l'outil actif avant de quitter)
+            # EN: Back to library button remains clickable at all times (cancels active tool before leaving)
+            # Ref: picasa3.exe @ 0x005F8D80, 0x005F92E0 (editpanel/albumview)
+            self.btn_back.setEnabled(True)
 
         if emit_signal:
             self.modal_tool_lock_changed.emit(self.is_tool_locked, self.active_tool_mode, self.active_tool_id)
@@ -2494,6 +2497,24 @@ class PicasaEditPanel(QWidget):
         if tab_idx in (2, 3, 4):
             self._refresh_effect_tiles_for_tab(tab_idx)
 
+    def is_any_slider_down(self) -> bool:
+        """
+        FR: Indique si l'utilisateur maintient actuellement un curseur de réglage ou d'effet enfoncé à la souris.
+        EN: Returns whether the user is currently holding down a tuning or effect slider with the mouse.
+        """
+        for attr in ("sldr_basic_fill", "sldr_fill", "sldr_highlights", "sldr_shadows", "sldr_temp"):
+            sldr = getattr(self, attr, None)
+            if sldr is not None and sldr.isSliderDown():
+                return True
+        if hasattr(self, "straighten_subpanel") and hasattr(self.straighten_subpanel, "slider"):
+            if self.straighten_subpanel.slider.isSliderDown():
+                return True
+        if hasattr(self, "effect_subpanel") and hasattr(self.effect_subpanel, "_sliders"):
+            for sldr in self.effect_subpanel._sliders.values():
+                if hasattr(sldr, "isSliderDown") and sldr.isSliderDown():
+                    return True
+        return False
+
     def set_image(self, img: Optional[Image.Image]) -> None:
         """
         FR: Met à jour l'histogramme en direct et les miniatures d'aperçu des effets (`editpanel/fxthumbs`)
@@ -2503,6 +2524,9 @@ class PicasaEditPanel(QWidget):
         Ref: picasa3.exe @ 0x00568A08 (FUN_00568A08), editpanel/fxthumbs
         """
         self.histogram_widget.set_image(img)
+        if img is getattr(self, "_last_fx_source_img", object()) and img is not None:
+            return
+        self._last_fx_source_img = img
         self._fx_preview_cache.clear()
         if img is None:
             self._base_fx_thumb = None

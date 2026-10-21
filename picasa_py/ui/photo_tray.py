@@ -470,9 +470,16 @@ class PicasaTrayThumbnailItemWidget(QWidget):
 
         # FR: 2. Image miniature réelle
         # EN: 2. Actual thumbnail image
-        pix = _resolve_item_pixmap(self.item)
-        if pix and not pix.isNull():
-            scaled = pix.scaled(38, 38, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        scaled = getattr(self.item, "_tray_scaled_38", None)
+        if not isinstance(scaled, QPixmap) or scaled.isNull():
+            pix = _resolve_item_pixmap(self.item)
+            if pix and not pix.isNull():
+                scaled = pix.scaled(38, 38, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                try:
+                    setattr(self.item, "_tray_scaled_38", scaled)
+                except Exception:
+                    pass
+        if scaled and not scaled.isNull():
             x_off = 2 + (42 - scaled.width()) // 2
             y_off = 2 + (42 - scaled.height()) // 2
             frame_r = QRect(x_off - 1, y_off - 1, scaled.width() + 2, scaled.height() + 2)

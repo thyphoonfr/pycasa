@@ -18,6 +18,7 @@ from __future__ import annotations
 import io
 import os
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -748,6 +749,8 @@ class PicasaDirScanner:
                         pmp = self.db.pmps.get(col_name)
                         if pmp is not None and c_idx < len(pmp.records):
                             pmp.records[c_idx] = 0
+            if hasattr(self.db, "_invalidate_path_index_cache"):
+                self.db._invalidate_path_index_cache()
 
         return deleted_count
 
@@ -1084,6 +1087,9 @@ class BackgroundScanWorker(QThread):
                 changed += 1
                 self.file_indexed.emit(os.path.dirname(fpath), fname)
 
+            if (i + 1) % 25 == 0:
+                time.sleep(0.001)
+
         offset = len(to_index)
         for j, (rec_idx, fpath) in enumerate(to_update):
             if self._is_cancelled:
@@ -1094,6 +1100,9 @@ class BackgroundScanWorker(QThread):
             if scanner.update_indexed_file(rec_idx, fpath):
                 changed += 1
                 self.file_indexed.emit(os.path.dirname(fpath), fname)
+
+            if (j + 1) % 25 == 0:
+                time.sleep(0.001)
 
         alb_synced = scanner._sync_ini_albums_to_pmp()
         if alb_synced > 0 and changed == 0:
