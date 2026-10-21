@@ -1,9 +1,12 @@
 """
-Tests de validation aller-retour (round-trip) octet pour octet des fichiers .picasa.ini.
-
+FR: Tests de validation aller-retour (round-trip) octet pour octet des fichiers .picasa.ini.
 Conformément à AGENTS.md §7:
 "1. Round-trip : lecture puis réécriture identique au bit près sur tous les fichiers de référence.
 Tout écart (même un octet) est un bug."
+EN: Byte-for-byte round-trip validation tests for .picasa.ini files.
+In accordance with AGENTS.md §7:
+"1. Round-trip: reading followed by rewriting must be bit-for-bit identical across all reference files.
+Any discrepancy (even a single byte) is a bug."
 """
 
 import os
@@ -15,6 +18,10 @@ FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures", "ini")
 
 
 def get_fixture_files():
+    """
+    FR: Retourne la liste des fichiers .ini de référence situés dans tests/fixtures/ini.
+    EN: Return the list of reference .ini fixture files located in tests/fixtures/ini.
+    """
     files = glob.glob(os.path.join(FIXTURES_DIR, "*.ini"))
     assert len(files) > 0, "Aucun fichier fixture trouvé dans tests/fixtures/ini"
     return files
@@ -23,8 +30,9 @@ def get_fixture_files():
 @pytest.mark.parametrize("filepath", get_fixture_files())
 def test_fixtures_bit_exact_roundtrip(filepath):
     """
-    Vérifie qu'un fichier de test de référence relu puis réécrit
+    FR: Vérifie qu'un fichier de test de référence relu puis réécrit
     est absolument identique au bit près à l'original.
+    EN: Verify that a reference test file read and rewritten is bit-for-bit identical to the original.
     """
     with open(filepath, "rb") as f:
         original_bytes = f.read()
@@ -40,8 +48,10 @@ def test_fixtures_bit_exact_roundtrip(filepath):
 
 def test_real_system_inis_roundtrip():
     """
-    Teste tous les fichiers .picasa.ini réels découverts dans Pictures/
+    FR: Teste tous les fichiers .picasa.ini réels découverts dans Pictures/
     (test en lecture seule, sans modification des originaux).
+    EN: Test all real .picasa.ini files discovered in Pictures/
+    (read-only test without modifying the originals).
     """
     pictures_dir = os.path.expanduser(r"~\Pictures")
     ini_files = glob.glob(os.path.join(pictures_dir, "**", ".picasa.ini"), recursive=True)
@@ -63,7 +73,8 @@ def test_real_system_inis_roundtrip():
 
 def test_high_level_model_access():
     """
-    Vérifie les accesseurs haut niveau sur un document.
+    FR: Vérifie les accesseurs haut niveau sur un document.
+    EN: Verify high-level model accessors on a parsed INI document.
     """
     sample = (
         b"[Contacts2]\r\n"
@@ -105,7 +116,8 @@ def test_high_level_model_access():
 
 def test_modifications_and_additions():
     """
-    Vérifie l'ajout de nouvelles sections et clés selon le format canonique de FUN_0068ac80.
+    FR: Vérifie l'ajout de nouvelles sections et clés selon le format canonique de FUN_0068ac80.
+    EN: Verify adding new sections and keys according to the canonical format of FUN_0068ac80.
     """
     doc = PicasaIniParser.parse_bytes(b"[Contacts2]\r\n")
 

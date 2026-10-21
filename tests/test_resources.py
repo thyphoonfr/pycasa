@@ -1,5 +1,6 @@
 """
-Validation tests for extracted PE resources, style definitions, and XML configs.
+FR: Tests de validation pour les ressources PE extraites, les définitions de style et les configurations XML.
+EN: Validation tests for extracted PE resources, style definitions, and XML configs.
 
 Ref: AGENTS.md §4 bis.2 (PE Resources verification)
 """
@@ -14,6 +15,10 @@ RESOURCES_DIR = Path(__file__).resolve().parent.parent / "ui" / "resources"
 
 
 def test_extracted_icons_validity():
+    """
+    FR: Vérifie la présence et la validité des icônes de groupe PE extraites et du manifeste icons.json.
+    EN: Verify the presence and validity of extracted PE group icons and the icons.json manifest.
+    """
     icon_dir = RESOURCES_DIR / "icons"
     assert icon_dir.exists(), "icons directory must exist"
     
@@ -32,6 +37,10 @@ def test_extracted_icons_validity():
 
 
 def test_extracted_cursors_validity():
+    """
+    FR: Vérifie la présence et la validité des 12 curseurs PE extraits (.cur) et du manifeste cursors.json.
+    EN: Verify the presence and validity of the 12 extracted PE cursors (.cur) and the cursors.json manifest.
+    """
     cur_dir = RESOURCES_DIR / "cursors"
     assert cur_dir.exists(), "cursors directory must exist"
     
@@ -51,6 +60,10 @@ def test_extracted_cursors_validity():
 
 
 def test_extracted_strings_table():
+    """
+    FR: Vérifie que la table de chaînes PE extraite (strings.json) contient les entrées attendues.
+    EN: Verify that the extracted PE string table (strings.json) contains the expected entries.
+    """
     str_file = RESOURCES_DIR / "strings" / "strings.json"
     assert str_file.exists(), "strings.json must exist"
     strings = json.loads(str_file.read_text(encoding="utf-8"))
@@ -63,6 +76,10 @@ def test_extracted_strings_table():
 
 
 def test_constants_ui_parsing():
+    """
+    FR: Vérifie que le fichier de constantes de mise en page constants.ui est parsé correctement.
+    EN: Verify that the constants.ui layout constants file is parsed properly.
+    """
     from picasa_py.ini.parser import PicasaIniParser
     
     const_file = RESOURCES_DIR / "style" / "constants.ui"
@@ -81,6 +98,10 @@ def test_constants_ui_parsing():
 
 
 def test_shortcuts_xml_validity():
+    """
+    FR: Vérifie la validité syntaxique XML de SHORTCUTS.XML.
+    EN: Verify the XML syntactic validity of SHORTCUTS.XML.
+    """
     sc_file = RESOURCES_DIR / "xml" / "SHORTCUTS.XML"
     assert sc_file.exists(), "SHORTCUTS.XML must exist"
     
@@ -91,6 +112,10 @@ def test_shortcuts_xml_validity():
 
 
 def test_fen_layout_files_validity():
+    """
+    FR: Vérifie la présence et la validité XML des fichiers de mise en page .fen extraits.
+    EN: Verify the presence and XML validity of the extracted .fen layout files.
+    """
     fen_dir = RESOURCES_DIR / "fen"
     assert fen_dir.exists(), "fen directory must exist"
     fen_files = list(fen_dir.glob("*.fen"))

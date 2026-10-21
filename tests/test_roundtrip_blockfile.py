@@ -1,8 +1,10 @@
 """
-Tests de round-trip bit-exact pour CBlockFile (*_0.db et *_index.db).
-
+FR: Tests de round-trip bit-exact pour CBlockFile (*_0.db et *_index.db).
 Vérifie l'exigence non négociable 1 d'AGENTS.md :
 Lecture puis réécriture identique au bit près sur le format binaire.
+EN: Bit-exact round-trip tests for CBlockFile (*_0.db and *_index.db).
+Verifies non-negotiable requirement 1 of AGENTS.md:
+Reading followed by writing produces bit-for-bit identical binary output.
 """
 
 import glob
@@ -18,6 +20,10 @@ from picasa_py.db.blockfile import (
 
 
 def test_synthetic_blockfile_roundtrip():
+    """
+    FR: Vérifie le round-trip binaire sur un conteneur CBlockFile et son fichier d'index synthétiques.
+    EN: Verify binary round-trip on a synthetic CBlockFile container and its index file.
+    """
     # 1. Création d'un container avec 2 blobs
     container = BlockContainerFile()
     blob1 = b"\xff\xd8\xff\xe0" + b"TEST_JPEG_1" + b"\xff\xd9"
@@ -63,6 +69,10 @@ def test_synthetic_blockfile_roundtrip():
 
 
 def test_fixtures_blockfile_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur les fichiers CBlockFile de référence dans tests/fixtures/db/.
+    EN: Verify bit-exact round-trip on the reference CBlockFile fixtures in tests/fixtures/db/.
+    """
     idx_path = Path("tests/fixtures/db/thumbs_sample_index.db")
     c_path = Path("tests/fixtures/db/thumbs_sample_0.db")
 
@@ -82,6 +92,10 @@ def test_fixtures_blockfile_roundtrip():
 
 
 def test_all_real_index_files_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur tous les fichiers *_index.db réels du dossier db3 local.
+    EN: Verify bit-exact round-trip on all real *_index.db files in the local db3 directory.
+    """
     db_dir = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3"))
     if not db_dir.exists():
         pytest.skip(f"Répertoire de référence non trouvé : {db_dir}")
@@ -102,6 +116,10 @@ def test_all_real_index_files_roundtrip():
 
 
 def test_real_thumbs_container_and_index():
+    """
+    FR: Vérifie l'extraction de miniatures JPEG et le round-trip bit-exact sur thumbs_index.db et thumbs_0.db réels.
+    EN: Verify JPEG thumbnail extraction and bit-exact round-trip on real thumbs_index.db and thumbs_0.db.
+    """
     db_dir = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3"))
     if not db_dir.exists():
         pytest.skip(f"Répertoire de référence non trouvé : {db_dir}")

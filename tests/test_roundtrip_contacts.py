@@ -1,5 +1,6 @@
 """
-Tests de round-trip pour contacts.xml.
+FR: Tests de round-trip pour contacts.xml.
+EN: Round-trip tests for contacts.xml.
 """
 
 import os
@@ -9,6 +10,10 @@ from picasa_py.db.contacts import ContactsFile, Contact
 
 
 def test_synthetic_contacts_roundtrip():
+    """
+    FR: Vérifie la sérialisation et désérialisation aller-retour d'un fichier contacts.xml synthétique.
+    EN: Verify round-trip serialization and deserialization of a synthetic contacts.xml file.
+    """
     contacts = [
         Contact(id="aa28c3a53f34c2f8", name="Alice", modified_time="2026-02-16T05:32:52+01:00", local_contact="1"),
         Contact(id="d58a057b4464a07a", name="Bob", modified_time="2026-08-26T15:52:06+02:00", local_contact="1"),
@@ -23,6 +28,10 @@ def test_synthetic_contacts_roundtrip():
 
 
 def test_real_contacts_roundtrip():
+    """
+    FR: Vérifie le round-trip XML sur le fichier contacts.xml réel de Picasa 2/3 s'il est présent.
+    EN: Verify XML round-trip on the real Picasa 2/3 contacts.xml file if present.
+    """
     contacts_path = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\contacts\contacts.xml"))
     if not contacts_path.exists():
         pytest.skip("contacts.xml introuvable")

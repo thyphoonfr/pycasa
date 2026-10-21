@@ -1,12 +1,18 @@
 """
-Tests unitaires pour le moteur de scan et de surveillance de répertoires.
-
+FR: Tests unitaires pour le moteur de scan et de surveillance de répertoires.
 Vérifie :
 1. Extraction EXIF, orientation, dimensions, dates OLE et génération de miniature JPEG.
 2. Détection des fichiers non indexés par PicasaDirScanner.
 3. Insertion d'enregistrements dans thumbindex.db et thumbs_0.db.
 4. Surveillance en temps réel par PicasaFolderWatcher avec debounce de 500 ms (0x00704F20).
 5. Dialogue Folder Manager et persistance dans repository.dat.
+EN: Unit tests for the directory scanning and folder watching engine.
+Verifies:
+1. EXIF extraction, orientation, dimensions, OLE dates, and JPEG thumbnail generation.
+2. Detection of unindexed files by PicasaDirScanner.
+3. Record insertion in thumbindex.db and thumbs_0.db.
+4. Real-time folder watching by PicasaFolderWatcher with 500 ms debounce (0x00704F20).
+5. Folder Manager dialog and persistence in repository.dat.
 """
 
 import io
@@ -35,6 +41,10 @@ from picasa_py.ui.folder_manager import PicasaFolderManagerDialog
 
 @pytest.fixture(scope="session")
 def qapp():
+    """
+    FR: Fournit une instance partagée de QApplication pour la session de tests.
+    EN: Provide a shared QApplication instance for the test session.
+    """
     app = QApplication.instance()
     if app is None:
         app = QApplication([])
@@ -43,7 +53,10 @@ def qapp():
 
 @pytest.fixture
 def temp_picasa_env(tmp_path):
-    """Crée un environnement temporaire avec dossier d'images et dossier db3."""
+    """
+    FR: Crée un environnement temporaire avec dossier d'images et dossier db3.
+    EN: Create a temporary environment with an images folder and a db3 directory.
+    """
     photos_dir = tmp_path / "photos"
     photos_dir.mkdir()
 
@@ -74,6 +87,10 @@ def temp_picasa_env(tmp_path):
 
 
 def test_extract_image_metadata_and_thumb(tmp_path):
+    """
+    FR: Vérifie l'extraction des métadonnées d'image (dimensions, date OLE) et la génération de la miniature JPEG.
+    EN: Verify image metadata extraction (dimensions, OLE date) and JPEG thumbnail generation.
+    """
     img_path = tmp_path / "sample.jpg"
     img = Image.new("RGB", (640, 480), color=(255, 128, 0))
     img.save(img_path, "JPEG")
@@ -94,6 +111,10 @@ def test_extract_image_metadata_and_thumb(tmp_path):
 
 
 def test_dir_scanner_and_indexing(temp_picasa_env):
+    """
+    FR: Vérifie la détection des fichiers non indexés, leur indexation dans la base et leur persistance sur disque.
+    EN: Verify unindexed file detection, database indexing, and disk persistence.
+    """
     photos_dir, db3_dir, db = temp_picasa_env
     scanner = PicasaDirScanner(db)
 
@@ -123,6 +144,10 @@ def test_dir_scanner_and_indexing(temp_picasa_env):
 
 
 def test_background_scan_worker(temp_picasa_env, qapp):
+    """
+    FR: Vérifie l'exécution du worker de scan en arrière-plan et l'émission des signaux de progression et de fin.
+    EN: Verify execution of the background scan worker and emission of progress and finished signals.
+    """
     photos_dir, db3_dir, db = temp_picasa_env
 
     worker = BackgroundScanWorker(db, [str(photos_dir)])
@@ -145,6 +170,10 @@ def test_background_scan_worker(temp_picasa_env, qapp):
 
 
 def test_watcher_reload_and_directories(temp_picasa_env, qapp):
+    """
+    FR: Vérifie l'ajout et le retrait de répertoires surveillés dans PicasaFolderWatcher.
+    EN: Verify adding and removing watched directories in PicasaFolderWatcher.
+    """
     photos_dir, db3_dir, db = temp_picasa_env
 
     watcher = PicasaFolderWatcher(db)
@@ -161,6 +190,10 @@ def test_watcher_reload_and_directories(temp_picasa_env, qapp):
 
 
 def test_folder_manager_dialog(temp_picasa_env, qapp):
+    """
+    FR: Vérifie le gestionnaire de dossiers (PicasaFolderManagerDialog) et la sauvegarde dans repository.dat.
+    EN: Verify the Folder Manager dialog (PicasaFolderManagerDialog) and saving in repository.dat.
+    """
     photos_dir, db3_dir, db = temp_picasa_env
 
     dlg = PicasaFolderManagerDialog(db)

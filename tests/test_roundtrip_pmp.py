@@ -1,8 +1,10 @@
 """
-Tests de validation round-trip binaire strict pour les fichiers .pmp.
-
+FR: Tests de validation round-trip binaire strict pour les fichiers .pmp.
 Conformément à AGENTS.md §3 et §7 :
 "Round-trip : lecture puis réécriture identique au bit près sur tous les fichiers de référence."
+EN: Strict binary round-trip validation tests for .pmp files.
+In accordance with AGENTS.md §3 and §7:
+"Round-trip: reading followed by rewriting is bit-for-bit identical across all reference files."
 """
 
 import os
@@ -14,6 +16,10 @@ FIXTURES_DB_DIR = os.path.join(os.path.dirname(__file__), "fixtures", "db")
 
 
 def get_db_fixtures():
+    """
+    FR: Retourne la liste des fichiers .pmp de référence situés dans tests/fixtures/db.
+    EN: Return the list of reference .pmp fixture files located in tests/fixtures/db.
+    """
     files = glob.glob(os.path.join(FIXTURES_DB_DIR, "*.pmp"))
     assert len(files) > 0, "Aucune fixture .pmp trouvée dans tests/fixtures/db"
     return files
@@ -22,8 +28,9 @@ def get_db_fixtures():
 @pytest.mark.parametrize("filepath", get_db_fixtures())
 def test_fixtures_pmp_bit_exact_roundtrip(filepath):
     """
-    Vérifie qu'un fichier .pmp de fixture relu puis réécrit
+    FR: Vérifie qu'un fichier .pmp de fixture relu puis réécrit
     est strictement identique au bit près à l'original.
+    EN: Verify that a fixture .pmp file read and rewritten is strictly bit-for-bit identical to the original.
     """
     with open(filepath, "rb") as f:
         original_bytes = f.read()
@@ -39,8 +46,9 @@ def test_fixtures_pmp_bit_exact_roundtrip(filepath):
 
 def test_all_system_pmps_roundtrip():
     """
-    Teste l'intégralité des fichiers .pmp réels présents dans db3/
+    FR: Teste l'intégralité des fichiers .pmp réels présents dans db3/
     (test en lecture seule).
+    EN: Test all real .pmp files present in db3/ (read-only test).
     """
     db3_dir = os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3")
     pmp_files = glob.glob(os.path.join(db3_dir, "*.pmp"))

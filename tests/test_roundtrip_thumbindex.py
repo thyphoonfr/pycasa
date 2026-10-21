@@ -1,8 +1,10 @@
 """
-Tests de round-trip bit-exact pour thumbindex.db (Picasa File & Folder Index).
-
+FR: Tests de round-trip bit-exact pour thumbindex.db (Picasa File & Folder Index).
 Vérifie l'exigence non négociable 1 d'AGENTS.md :
 Lecture puis réécriture identique au bit près sur le format binaire.
+EN: Bit-exact round-trip tests for thumbindex.db (Picasa File & Folder Index).
+Verifies non-negotiable requirement 1 of AGENTS.md:
+Reading followed by rewriting is bit-for-bit identical on the binary format.
 """
 
 import os
@@ -16,6 +18,10 @@ from picasa_py.db.thumbindex import (
 
 
 def test_synthetic_thumbindex_roundtrip():
+    """
+    FR: Vérifie le round-trip binaire sur un index thumbindex.db synthétique.
+    EN: Verify binary round-trip on a synthetic thumbindex.db index.
+    """
     records = [
         ThumbIndexRecord(
             path="C:\\Photos\\Vacances\\",
@@ -51,6 +57,10 @@ def test_synthetic_thumbindex_roundtrip():
 
 
 def test_fixture_thumbindex_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur le fichier de référence thumbindex_sample.db.
+    EN: Verify bit-exact round-trip on the reference thumbindex_sample.db fixture file.
+    """
     fixture_path = Path("tests/fixtures/db/thumbindex_sample.db")
     assert fixture_path.exists()
     data = fixture_path.read_bytes()
@@ -61,6 +71,10 @@ def test_fixture_thumbindex_roundtrip():
 
 
 def test_real_thumbindex_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur le fichier thumbindex.db réel de Picasa 3 s'il existe.
+    EN: Verify bit-exact round-trip on the real Picasa 3 thumbindex.db file if it exists.
+    """
     db_path = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3\thumbindex.db"))
     if not db_path.exists():
         pytest.skip(f"Fichier de référence non trouvé : {db_path}")

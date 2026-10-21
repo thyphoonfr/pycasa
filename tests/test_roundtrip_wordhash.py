@@ -1,8 +1,10 @@
 """
-Tests de round-trip bit-exact pour wordhash.dat (Index de recherche textuelle).
-
+FR: Tests de round-trip bit-exact pour wordhash.dat (Index de recherche textuelle).
 Vérifie l'exigence non négociable 1 d'AGENTS.md :
 Lecture puis réécriture identique au bit près sur le format binaire.
+EN: Bit-exact round-trip tests for wordhash.dat (Full-text search index).
+Verifies non-negotiable requirement 1 of AGENTS.md:
+Reading followed by rewriting is bit-for-bit identical on the binary format.
 """
 
 import os
@@ -12,6 +14,10 @@ from picasa_py.db.wordhash import WordHashFile, WordEntry, WORDHASH_MAGIC
 
 
 def test_synthetic_wordhash_roundtrip():
+    """
+    FR: Vérifie le round-trip binaire sur un fichier wordhash.dat synthétique.
+    EN: Verify binary round-trip on a synthetic wordhash.dat file.
+    """
     pool = b"vacances\x00plage\x00soleil\x00"
     entries = [
         WordEntry("vacances", 0, [1, 2, 5]),
@@ -31,6 +37,10 @@ def test_synthetic_wordhash_roundtrip():
 
 
 def test_fixture_wordhash_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur le fichier de référence wordhash_sample.dat.
+    EN: Verify bit-exact round-trip on the reference wordhash_sample.dat fixture file.
+    """
     fixture_path = Path("tests/fixtures/db/wordhash_sample.dat")
     assert fixture_path.exists()
     data = fixture_path.read_bytes()
@@ -41,6 +51,10 @@ def test_fixture_wordhash_roundtrip():
 
 
 def test_real_wordhash_roundtrip():
+    """
+    FR: Vérifie le round-trip bit-exact sur le fichier wordhash.dat réel de Picasa 3 s'il existe.
+    EN: Verify bit-exact round-trip on the real Picasa 3 wordhash.dat file if it exists.
+    """
     db_path = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3\wordhash.dat"))
     if not db_path.exists():
         pytest.skip(f"Fichier de référence non trouvé : {db_path}")

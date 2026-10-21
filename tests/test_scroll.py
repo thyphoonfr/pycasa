@@ -1,5 +1,5 @@
-"""
-Tests for PicasaAlbumScroll (AVCScrollThrottle), PicasaScrollTooltip and Multi-Album Continuous Scrolling.
+"""FR: Tests pour PicasaAlbumScroll (AVCScrollThrottle), PicasaScrollTooltip et le défilement continu multi-albums.
+EN: Tests for PicasaAlbumScroll (AVCScrollThrottle), PicasaScrollTooltip and Multi-Album Continuous Scrolling.
 Ref: picasa3.exe @ 0x0072E6E6, 0x00CAD944, 0x005DE8E0, 0x005CE090
 """
 
@@ -15,6 +15,9 @@ from picasa_py.db.database import PicasaDatabase
 
 @pytest.fixture(scope="session")
 def qapp():
+    """FR: Fournit une instance partagée de QApplication pour la session de tests.
+    EN: Provides a shared QApplication instance for the test session.
+    """
     app = QApplication.instance()
     if app is None:
         app = QApplication([])
@@ -22,6 +25,9 @@ def qapp():
 
 
 def test_format_ole_date():
+    """FR: Vérifie le formatage des dates OLE Automation en chaîne mois/année.
+    EN: Verifies formatting of OLE Automation dates into month/year strings.
+    """
     # 45459.4 -> 2024-06-16 -> "Juin 2024"
     res = format_ole_date(45459.4)
     assert "Juin" in res
@@ -33,6 +39,9 @@ def test_format_ole_date():
 
 
 def test_album_scroll_throttle_centered_and_deflection(qapp):
+    """FR: Vérifie le centrage du curseur throttle au repos et sa vitesse non linéaire selon la déflexion.
+    EN: Verifies throttle thumb centering at rest and its non-linear speed upon deflection.
+    """
     scroll = PicasaAlbumScroll()
     scroll.resize(20, 500)
     scroll.set_range(0, 1000, page_step=200)
@@ -68,12 +77,18 @@ def test_album_scroll_throttle_centered_and_deflection(qapp):
 
 
 def test_album_scroll_tooltip_provider(qapp):
+    """FR: Vérifie le fournisseur d'info-bulle de défilement d'album.
+    EN: Verifies the album scroll tooltip information provider.
+    """
     scroll = PicasaAlbumScroll()
     scroll.resize(20, 500)
     scroll.set_range(0, 1000, page_step=200)
 
     # Setup provider
     def info_cb(val: int):
+        """FR: Retourne les informations d'album pour une position de défilement donnée.
+        EN: Returns album information for a given scroll position.
+        """
         if val < 500:
             return ("Vacances 2023", "Août 2023 • 32 photos")
         else:
@@ -91,10 +106,32 @@ def test_album_scroll_tooltip_provider(qapp):
 
 
 def test_thumbnail_view_multi_album_sections(qapp):
+    """FR: Vérifie la mise en page multi-albums et la navigation inter-sections dans PicasaThumbnailView.
+    EN: Verifies multi-album layout and inter-section navigation in PicasaThumbnailView.
+    """
+    from picasa_py.ui.thumbnail_view import AlbumSection, ThumbnailItem
+
     db = PicasaDatabase.open_default()
     view = PicasaThumbnailView()
     view.resize(800, 600)
     view.set_database(db)
+
+    if len(view.sections) < 2:
+        items = []
+        sec0_indices = []
+        sec1_indices = []
+        for i in range(40):
+            items.append(ThumbnailItem(i, f"C:/Photos/Album1/img_{i}.jpg", f"img_{i}.jpg", "Album 1", "C:/Photos/Album1"))
+            sec0_indices.append(i)
+        for i in range(40, 80):
+            items.append(ThumbnailItem(i, f"C:/Photos/Album2/img_{i}.jpg", f"img_{i}.jpg", "Album 2", "C:/Photos/Album2"))
+            sec1_indices.append(i)
+        sec0 = AlbumSection(name="Album 1", folder_path="C:/Photos/Album1", date_str="Mai 2024", item_indices=sec0_indices)
+        sec1 = AlbumSection(name="Album 2", folder_path="C:/Photos/Album2", date_str="Juin 2024", item_indices=sec1_indices)
+        view.items = items
+        view.sections = [sec0, sec1]
+        view.visible_sections = [sec0, sec1]
+        view._recompute_layout()
 
     # Check sections created
     assert len(view.sections) > 0
@@ -124,3 +161,125 @@ def test_thumbnail_view_multi_album_sections(qapp):
     assert view.scroll_y == second_y
     view._on_jump_prev_album()
     assert view.scroll_y == first_y
+
+
+def test_sticky_album_header_pin_and_push(qapp):
+    """FR: Vérifie l'effet 'sticky header' de Picasa :
+    1. L'en-tête reste épinglé à y=0 tant qu'on défile dans l'album.
+    2. Quand l'en-tête de l'album suivant arrive, il le pousse vers le haut (sticky_y < 0).
+    3. Dès que l'album suivant atteint le haut, il devient le nouvel en-tête épinglé.
+    4. Clic sur le bouton Diaporama et sélection complète du dossier.
+
+    EN: Verifies Picasa's 'sticky header' behavior:
+    1. Header remains pinned at y=0 while scrolling within the album.
+    2. When the next album header arrives, it pushes the current header upward (sticky_y < 0).
+    3. Once the next album reaches the top, it becomes the new pinned header.
+    4. Clicking the Slideshow button and full folder selection.
+    """
+    from picasa_py.ui.thumbnail_view import AlbumSection, ThumbnailItem
+    from PySide6.QtGui import QPixmap, QMouseEvent
+    from PySide6.QtCore import QPointF
+
+    view = PicasaThumbnailView()
+    view.resize(800, 600)
+
+    # Créer 2 sections artificielles
+    sec0 = AlbumSection(
+        name="Dossier 1",
+        folder_path="C:/Photos/Dossier1",
+        date_str="Mai 2024",
+        item_indices=[0, 1],
+        y_start=12,
+        height=300
+    )
+    sec1 = AlbumSection(
+        name="Dossier 2",
+        folder_path="C:/Photos/Dossier2",
+        date_str="Juin 2024",
+        item_indices=[2, 3],
+        y_start=312,
+        height=400
+    )
+    view.items = [
+        ThumbnailItem(0, "C:/Photos/Dossier1/1.jpg", "1.jpg", "Dossier1", "C:/Photos/Dossier1"),
+        ThumbnailItem(1, "C:/Photos/Dossier1/2.jpg", "2.jpg", "Dossier1", "C:/Photos/Dossier1"),
+        ThumbnailItem(2, "C:/Photos/Dossier2/3.jpg", "3.jpg", "Dossier2", "C:/Photos/Dossier2"),
+        ThumbnailItem(3, "C:/Photos/Dossier2/4.jpg", "4.jpg", "Dossier2", "C:/Photos/Dossier2"),
+    ]
+    view.visible_sections = [sec0, sec1]
+
+    # 1. Au sommet (scroll_y = 0) : Dossier 1 démarre à y=12 > 0 -> pas d'en-tête épinglé
+    view.scroll_y = 0
+    idx, sy = view._get_sticky_header_info()
+    assert idx is None
+
+    # 2. Défilement dans Dossier 1 (scroll_y = 100) : Dossier 1 épinglé à y=0
+    view.scroll_y = 100
+    idx, sy = view._get_sticky_header_info()
+    assert idx == 0
+    assert sy == 0  # Collé en haut à y=0
+
+    # 3. Arrivée de Dossier 2 qui pousse l'en-tête (sec1 top = 312 - 300 = 12 < 38)
+    view.scroll_y = 300
+    idx, sy = view._get_sticky_header_info()
+    assert idx == 0
+    assert sy == 12 - 38  # Poussé vers le haut à -26 px
+
+    # 4. Entrée complète dans Dossier 2 (scroll_y = 330) : Dossier 2 devient épinglé à y=0
+    view.scroll_y = 330
+    idx, sy = view._get_sticky_header_info()
+    assert idx == 1
+    assert sy == 0
+
+    # 5. Rendu graphique complet avec paintEvent
+    pix = QPixmap(800, 600)
+    view.render(pix)
+    assert not pix.isNull()
+
+    # 6. Test du clic sur le bouton Diaporama de l'en-tête épinglé
+    slideshow_paths = []
+    view.slideshow_requested.connect(lambda p: slideshow_paths.extend(p))
+
+    # Clic sur le bouton Diaporama de sec1
+    btn_rect = view._get_slideshow_btn_rect(0)
+    click_pos = btn_rect.center()
+    event = QMouseEvent(
+        QMouseEvent.Type.MouseButtonPress,
+        QPointF(click_pos),
+        QPointF(click_pos),
+        Qt.MouseButton.LeftButton,
+        Qt.MouseButton.LeftButton,
+        Qt.KeyboardModifier.NoModifier
+    )
+    view.mousePressEvent(event)
+    assert len(slideshow_paths) == 2
+    assert "3.jpg" in slideshow_paths[0]
+    assert "4.jpg" in slideshow_paths[1]
+
+
+def test_library_tree_scrollbar_visibility_and_contrast(qapp):
+    """FR: Vérifie que la barre de défilement de l'arborescence de gauche (PicasaLibraryTree)
+    apparaît bien avec un défilement fluide au pixel et un curseur contrasté lorsqu'il y a
+    beaucoup de personnes, d'albums ou de dossiers.
+    EN: Verifies that the left library tree (PicasaLibraryTree) scrollbar appears with smooth
+    pixel scrolling and a contrasted thumb when there are many people, albums, or folders.
+    """
+    from PySide6.QtWidgets import QTreeWidgetItem, QAbstractItemView
+    from picasa_py.ui.library_tree import PicasaLibraryTree
+
+    lt = PicasaLibraryTree()
+    lt.resize(220, 300)
+    for i in range(40):
+        it = QTreeWidgetItem(lt.cat_people)
+        it.setText(0, f"Personne {i} (12)")
+    lt.show()
+    qapp.processEvents()
+
+    vsb = lt.tree.verticalScrollBar()
+    assert lt.tree.verticalScrollMode() == QAbstractItemView.ScrollMode.ScrollPerPixel
+    assert vsb.isVisible()
+    assert vsb.maximum() > 0
+    assert vsb.width() >= 12
+    assert "QScrollBar:vertical" in lt.tree.styleSheet()
+    assert "QScrollBar::handle:vertical" in lt.tree.styleSheet()
+

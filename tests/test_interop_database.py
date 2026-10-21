@@ -1,5 +1,5 @@
-"""
-Tests d'intégration de haut niveau pour PicasaDatabase.
+"""FR: Tests d'intégration de haut niveau pour PicasaDatabase.
+EN: High-level integration tests for PicasaDatabase.
 """
 
 import os
@@ -9,6 +9,9 @@ from picasa_py.db.database import PicasaDatabase
 
 
 def test_open_default_database():
+    """FR: Vérifie l'ouverture de la base Picasa par défaut (thumbindex, repository, PMP, CBlockFile, miniature JPEG).
+    EN: Verifies opening the default Picasa database (thumbindex, repository, PMP, CBlockFile, JPEG thumbnail).
+    """
     db_dir = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3"))
     if not db_dir.exists():
         pytest.skip(f"Répertoire Picasa non trouvé : {db_dir}")

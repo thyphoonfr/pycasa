@@ -1,5 +1,5 @@
-"""
-Tests for One-Up View, Image Processor, and editor navigation.
+"""FR: Tests pour la vue One-Up, le processeur d'image et la navigation dans l'éditeur.
+EN: Tests for One-Up View, Image Processor, and editor navigation.
 
 Ref: AGENTS.md §4 bis (Mode visualiseur/retouche fidèle)
 """
@@ -22,6 +22,9 @@ from picasa_py.db.database import PicasaDatabase
 
 @pytest.fixture(scope="session")
 def qapp():
+    """FR: Fournit une instance partagée de QApplication pour la session de tests.
+    EN: Provides a shared QApplication instance for the test session.
+    """
     app = QApplication.instance()
     if app is None:
         app = QApplication(["picasa_test", "-platform", "offscreen"])
@@ -30,12 +33,18 @@ def qapp():
 
 @pytest.fixture
 def sample_image():
+    """FR: Crée une image RGB de test 100x100.
+    EN: Creates a 100x100 test RGB image.
+    """
     # Créer une image de test 100x100 RGB
     img = Image.new("RGB", (100, 100), color=(120, 80, 40))
     return img
 
 
 def test_image_processor_filters(sample_image):
+    """FR: Vérifie les filtres principaux de PicasaImageProcessor (contraste, couleur, N&B, sépia, netteté, grain).
+    EN: Verifies core PicasaImageProcessor filters (auto-contrast, auto-color, B&W, sepia, sharpen, grain).
+    """
     proc = PicasaImageProcessor
 
     # Auto contrast
@@ -75,6 +84,9 @@ def test_image_processor_filters(sample_image):
 
 
 def test_image_canvas_rotations(qapp, sample_image):
+    """FR: Vérifie les rotations horaires et antihoraires sur PicasaImageCanvas.
+    EN: Verifies clockwise and counterclockwise rotations on PicasaImageCanvas.
+    """
     canvas = PicasaImageCanvas()
     buf = io.BytesIO()
     sample_image.save(buf, format="JPEG")
@@ -94,6 +106,9 @@ def test_image_canvas_rotations(qapp, sample_image):
 
 
 def test_one_up_undo_redo(qapp, sample_image):
+    """FR: Vérifie l'historique d'annulation (undo) et de rétablissement (redo) dans PicasaOneUpView.
+    EN: Verifies the undo and redo history stack in PicasaOneUpView.
+    """
     view = PicasaOneUpView()
     view._history = [sample_image.copy()]
     view._history_idx = 0
@@ -113,7 +128,12 @@ def test_one_up_undo_redo(qapp, sample_image):
 
 
 def test_main_window_one_up_switching(qapp):
-    win = PicasaMainWindow()
+    """FR: Vérifie le basculement entre la grille de photothèque et la vue One-Up dans PicasaMainWindow.
+    EN: Verifies switching between the library grid and One-Up view in PicasaMainWindow.
+    """
+    win = PicasaMainWindow(auto_scan=True)
+    assert "Erreur lors du chargement de la base de données" not in win.status_bar.currentMessage()
+    assert "QTimer" not in win.status_bar.currentMessage()
     assert win.stack.currentIndex() == 0  # Grille
 
     # Simuler double-clic sur photo 0 si base présente
@@ -133,9 +153,10 @@ def test_main_window_one_up_switching(qapp):
 
 
 def test_get_media_full_path_resolution():
-    """
-    Test que PicasaDatabase.get_media_full_path reconstitue correctement
+    """FR: Test que PicasaDatabase.get_media_full_path reconstitue correctement
     le chemin disque absolu parent_path + filename.
+    EN: Tests that PicasaDatabase.get_media_full_path properly reconstructs
+    the absolute disk path parent_path + filename.
     Ref: picasa3.exe @ 0x0045C0A0
     """
     from picasa_py.db.database import PicasaDatabase
@@ -170,8 +191,8 @@ def test_get_media_full_path_resolution():
 
 
 def test_image_canvas_loupe_and_anchored_zoom(qapp):
-    """
-    Test du système de zoom ancré et du navigateur Loupe avec cadre de visée orange.
+    """FR: Test du système de zoom ancré et du navigateur Loupe avec cadre de visée orange.
+    EN: Tests the anchored zoom system and Loupe navigator with orange viewport frame.
     Ref: picasa3.exe @ CLoupeNode (0x00942AE4), OneUpUI (0x0094355C)
     """
     from PySide6.QtCore import QPointF, QSize
@@ -224,9 +245,9 @@ def test_image_canvas_loupe_and_anchored_zoom(qapp):
 
 
 def test_one_up_top_bar_and_comparison_modes(qapp, sample_image):
-    """
-    Test de la barre supérieure One-Up / Two-Up et des modes de comparaison
+    """FR: Test de la barre supérieure One-Up / Two-Up et des modes de comparaison
     côte à côte A, A|B, A|A.
+    EN: Tests the One-Up / Two-Up top bar and side-by-side comparison modes A, A|B, A|A.
     Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
     """
     from picasa_py.db.database import PicasaDatabase
@@ -284,9 +305,10 @@ def test_one_up_top_bar_and_comparison_modes(qapp, sample_image):
 
 
 def test_palette_transparency_and_huge_image_support(qapp, tmp_path):
-    """
-    Vérifie le chargement sans avertissement ni rejet des images en mode palette avec transparence,
+    """FR: Vérifie le chargement sans avertissement ni rejet des images en mode palette avec transparence,
     ainsi que les images très haute résolution dépassant les limites par défaut de Qt/PIL.
+    EN: Verifies warning-free loading of palette images with transparency,
+    as well as very high-resolution images exceeding default Qt/PIL limits.
     """
     import warnings
     from PIL import Image
@@ -327,5 +349,207 @@ def test_palette_transparency_and_huge_image_support(qapp, tmp_path):
     assert canvas._raw_pixmap.width() == 4000
     assert canvas._raw_pixmap.height() == 3000
 
+
+def test_revert_all_edits_and_fx_thumbnails_and_2up_extra_buttons(qapp, tmp_path, sample_image):
+    """FR: Vérifie les 4 comportements de Picasa 3 :
+    1) Clic droit -> Annuler toutes les modifications (ID_PICTURE_REVERT / action_undo_all_edits) ;
+    2) Miniatures d'aperçu d'effets dans la colonne de gauche (editpanel/fxthumbs, editpanel/fx1..fx12) ;
+    3) Boutons d'icônes sans texte dans les onglets de la colonne de droite (people/places/tags/properties_toggle) ;
+    4) Apparition des 2 boutons supplémentaires (swap_2up_layout et swap_2up_focus) en mode A|B et A|A.
+    EN: Verifies the 4 Picasa 3 behaviors:
+    1) Right-click -> Undo All Edits (ID_PICTURE_REVERT / action_undo_all_edits);
+    2) Live effect preview thumbnails in the left edit panel (editpanel/fxthumbs, editpanel/fx1..fx12);
+    3) Icon-only buttons with no text for the right drawer toggles (people/places/tags/properties_toggle);
+    4) Visibility and behavior of the 2 extra buttons (swap_2up_layout and swap_2up_focus) in A|B and A|A modes.
+    Ref: picasa3.exe @ 0x00C8D849, 0x00568A08, 0x005D96D4, 0x00569720, 0x0056A160
+    """
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.ui.photo_tray import PicasaPhotoTray
+    from picasa_py.ui.edit_panel import PicasaEffectTileButton
+
+    # --- 1. Right-click -> Annuler toutes les modifications (action_undo_all_edits) ---
+    photo_file = tmp_path / "test_revert.jpg"
+    sample_image.save(str(photo_file), "JPEG")
+    ini_file = tmp_path / ".picasa.ini"
+
+    win = PicasaMainWindow()
+    win._update_photo_ini(
+        str(photo_file),
+        lambda doc, fname: (
+            doc.set_rotate(fname, 1),
+            doc.set_tilt(fname, 0.25),
+            doc.get_or_create_section(fname).set("filters", "sepia=1;bw=1;"),
+        ),
+    )
+    doc_before = PicasaIniParser.parse_file(ini_file)
+    assert doc_before.get_rotate("test_revert.jpg") == 1
+    assert doc_before.get_section("test_revert.jpg").get("filters") == "sepia=1;bw=1;"
+
+    win.action_undo_all_edits([str(photo_file)])
+
+    doc_after = PicasaIniParser.parse_file(ini_file)
+    assert doc_after.get_rotate("test_revert.jpg") == 0
+    assert doc_after.get_tilt("test_revert.jpg") is None
+    sec_after = doc_after.get_section("test_revert.jpg")
+    assert sec_after is None or sec_after.get("filters") is None
+
+    # --- 2. Miniatures d'effets dans la colonne de gauche (editpanel/fxthumbs) ---
+    view = win.one_up_view
+    view.edit_panel.set_image(sample_image)
+    for tab_idx in (2, 3, 4):
+        view.edit_panel.tabs.setCurrentIndex(tab_idx)
+        tiles = view.edit_panel._effect_tiles_by_tab[tab_idx]
+        assert len(tiles) >= 12
+        for tile in tiles:
+            assert isinstance(tile, PicasaEffectTileButton)
+            assert tile.preview_pixmap is not None
+            assert not tile.preview_pixmap.isNull()
+            assert tile.preview_pixmap.width() == 46
+            assert tile.preview_pixmap.height() == 46
+
+    # --- 3. Boutons de la colonne de droite : icônes uniquement et aucun texte ---
+    tray = PicasaPhotoTray()
+    for btn in (
+        tray.btn_panel_people,
+        tray.btn_panel_places,
+        tray.btn_panel_tags,
+        tray.btn_panel_props,
+        view.btn_panel_people,
+        view.btn_panel_places,
+        view.btn_panel_tags,
+        view.btn_panel_props,
+    ):
+        assert btn.text() == ""
+        assert not btn.icon().isNull()
+        assert len(btn.toolTip()) > 0
+
+    # --- 4. Boutons supplémentaires A|B et A|A : swap_2up_layout et swap_2up_focus ---
+    view._on_view_mode_changed(0)  # Mode 1-Up ("A")
+    assert not view.btn_swap_2up_layout.isVisibleTo(view.viewer_top_bar)
+    assert not view.btn_swap_2up_focus.isVisibleTo(view.viewer_top_bar)
+
+    view._on_view_mode_changed(1)  # Mode A|B
+    assert view.btn_swap_2up_layout.isVisibleTo(view.viewer_top_bar)
+    assert view.btn_swap_2up_focus.isVisibleTo(view.viewer_top_bar)
+    assert view.canvas.split_orientation == "horizontal"
+    assert view.canvas.active_pane == "A"
+
+    # Clic sur swap_2up_layout -> bascule horizontal <-> vertical
+    view.btn_swap_2up_layout.click()
+    assert view.canvas.split_orientation == "vertical"
+    view.btn_swap_2up_layout.click()
+    assert view.canvas.split_orientation == "horizontal"
+
+    # Clic sur swap_2up_focus -> bascule A <-> B
+    view.btn_swap_2up_focus.click()
+    assert view.canvas.active_pane == "B"
+    view.btn_swap_2up_focus.click()
+    assert view.canvas.active_pane == "A"
+
+    # Mode A|A -> les 2 boutons restent visibles
+    view._on_view_mode_changed(2)
+    assert view.btn_swap_2up_layout.isVisibleTo(view.viewer_top_bar)
+    assert view.btn_swap_2up_focus.isVisibleTo(view.viewer_top_bar)
+
+    # Retour en mode 1-Up -> les 2 boutons sont masqués
+    view._on_view_mode_changed(0)
+    assert not view.btn_swap_2up_layout.isVisibleTo(view.viewer_top_bar)
+    assert not view.btn_swap_2up_focus.isVisibleTo(view.viewer_top_bar)
+
+    win.close()
+
+
+def test_modal_tool_and_effect_ui_locking(qapp, tmp_path, sample_image):
+    """FR: Vérifie que cliquer sur Recadrer, Redresser, Texte, Yeux rouges, Retoucher ou un filtre
+    paramétré (`mode="effect"`) verrouille la barre du haut (`viewer_top_bar`), masque la barre de
+    légende (`caption_bar`), verrouille la barre du bas (`transport_bar`), la colonne de droite
+    (`right_drawer`) et les onglets/boutons globaux du panneau gauche jusqu'à Appliquer ou Annuler,
+    tandis que les effets instantanés (`mode="oneclick"`) et les curseurs d'éclairage (`mode="soft"`)
+    ne verrouillent pas l'interface, conformément à `FUN_0057bb50 @ 0x0057BB50` et `FUN_005f8520 @ 0x005F8520`.
+    EN: Verifies that clicking Crop, Straighten, Text, Red-eye, Retouch, or a parameterized filter
+    (`mode="effect"`) locks the top bar (`viewer_top_bar`), hides the caption bar (`caption_bar`),
+    locks the bottom bar (`transport_bar`), the right drawer (`right_drawer`), and the left panel
+    tabs/global buttons until Apply or Cancel, while instant effects (`mode="oneclick"`) and tuning
+    sliders (`mode="soft"`) do not lock the UI, matching `FUN_0057bb50 @ 0x0057BB50` and `FUN_005f8520 @ 0x005F8520`.
+    Ref: picasa3.exe @ 0x0057BB50, 0x005F8520, 0x005F8730, 0x00900490
+    """
+    p1 = tmp_path / "lock_test_1.jpg"
+    p2 = tmp_path / "lock_test_2.jpg"
+    sample_image.save(str(p1), "JPEG")
+    sample_image.save(str(p2), "JPEG")
+
+    db = PicasaDatabase()
+    from picasa_py.db.thumbindex import ThumbIndexFile, ThumbIndexRecord
+    ti = ThumbIndexFile()
+    ti.records.append(ThumbIndexRecord(path=str(tmp_path), ft1=0, ft2=0, size=0, type=1, flags=0, parent_idx=-1))
+    ti.records.append(ThumbIndexRecord(path="lock_test_1.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0))
+    ti.records.append(ThumbIndexRecord(path="lock_test_2.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0))
+    db.thumbindex = ti
+
+    view = PicasaOneUpView()
+    view.resize(1200, 800)
+    view.show()
+    view.open_photo(db, 1, [1, 2], direct_path=str(p1))
+    view.right_drawer.show_panel("people")
+
+    def _assert_locked(expected: bool) -> None:
+        """FR: Vérifie l'état de verrouillage de toutes les barres et panneaux.
+        EN: Asserts the lock state of all bars and panels.
+        """
+        assert view._is_tool_locked is expected
+        assert view.edit_panel.is_tool_locked is expected
+        assert view.viewer_top_bar.isEnabled() is (not expected)
+        assert view.transport_bar.isEnabled() is (not expected)
+        assert view.right_drawer.isEnabled() is (not expected)
+        assert view.edit_panel.tabs.tabBar().isEnabled() is (not expected)
+        assert view.edit_panel.btn_undo.isEnabled() is (not expected)
+        assert view.edit_panel.btn_redo.isEnabled() is (not expected)
+        assert view.edit_panel.btn_save.isEnabled() is (not expected)
+        assert view.caption_bar.isHidden() is expected
+
+    _assert_locked(False)
+
+    # 1. Outil Recadrer (mode == 2) : verrouille jusqu'à Annuler ou Appliquer
+    view.edit_panel.btn_crop.click()
+    _assert_locked(True)
+    assert view._active_tool_mode == 2
+    # La navigation est bloquée pendant que l'outil est actif
+    view.navigate_next()
+    assert view.current_index == 1
+    # Annuler déverrouille tout
+    view.edit_panel.crop_subpanel.btn_cancel.click()
+    _assert_locked(False)
+
+    # 2. Outil Redresser (mode == 6 + forcefit="1") : force le zoom Fit et verrouille jusqu'à Appliquer/Annuler
+    view.canvas.set_zoom(2.0)
+    assert view.canvas.fit_to_window is False
+    view.edit_panel.btn_straighten.click()
+    _assert_locked(True)
+    assert view._active_tool_mode == 6
+    assert view.canvas.fit_to_window is True  # <zoom forcefit="1"/> @ 0x005F8730
+    view.edit_panel.straighten_subpanel.btn_apply.click()
+    _assert_locked(False)
+
+    # 3. Filtre paramétré (mode == 4, ex: "sepia" retiré de ONECLICK ou "tint" / "soft_focus") :
+    #    - "sepia", "bw", "warmify", "sharpen", "invert" sont mode="oneclick" (mode == 1) -> pas de verrouillage
+    view.edit_panel._on_effect_button_clicked("sepia")
+    _assert_locked(False)
+    view.edit_panel._on_effect_button_clicked("invert")
+    _assert_locked(False)
+
+    #    - "soft_focus" est mode="effect" (mode == 4) avec forcefit="1" -> ouvre sous-panneau et verrouille
+    view.canvas.set_zoom(1.8)
+    view.edit_panel._on_effect_button_clicked("soft_focus")
+    _assert_locked(True)
+    assert view._active_tool_mode == 4
+    assert view.canvas.fit_to_window is True
+    view.edit_panel.effect_subpanel.btn_cancel.click()
+    _assert_locked(False)
+
+    # 4. Curseurs d'éclairage (mode == 5, "soft" finetune2) -> aperçu direct sans verrouiller les barres
+    view.edit_panel.sldr_fill.setValue(25)
+    _assert_locked(False)
+
+    view.close()
 
 
