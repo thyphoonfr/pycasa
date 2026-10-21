@@ -1,6 +1,6 @@
 """
-PyCasa UI Package.
-Provides UI components matching Picasa 3.
+FR: Paquetage d'interface utilisateur de PyCasa. Fournit les composants graphiques fidèles à Picasa 3.
+EN: PyCasa UI Package. Provides UI components matching Picasa 3.
 """
 
 from picasa_py.ui.style import PicasaStyle

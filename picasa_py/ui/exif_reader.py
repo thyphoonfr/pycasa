@@ -1,5 +1,6 @@
 """
-Module d'extraction et de formatage des métadonnées EXIF et de géolocalisation pour PyCasa.
+FR: Module d'extraction et de formatage des métadonnées EXIF et de géolocalisation pour PyCasa.
+EN: EXIF and geolocation metadata extraction and formatting module for PyCasa.
 
 Ref: picasa3.exe @ IMAGEPROPERTIES.XML, imageproperties.fen
 Ref: picasa3.exe @ 0x00889210 (EXIF parsing & display strings)
@@ -18,7 +19,10 @@ Image.MAX_IMAGE_PIXELS = None
 
 
 def format_filesize(size_bytes: int) -> str:
-    """Formate une taille de fichier en Ko ou Mo selon la convention Picasa."""
+    """
+    FR: Formate une taille de fichier en octets, Ko ou Mo selon la convention Picasa.
+    EN: Formats a file size in bytes, KB, or MB following Picasa's display convention.
+    """
     if size_bytes < 1024:
         return f"{size_bytes} octets"
     elif size_bytes < 1024 * 1024:
@@ -28,14 +32,17 @@ def format_filesize(size_bytes: int) -> str:
 
 
 def format_exposure_time(val: Any) -> str:
-    """Formate un temps d'exposition en fraction lisible (ex: 1/125 s)."""
+    """
+    FR: Formate un temps d'exposition en fraction lisible (ex: 1/125 s).
+    EN: Formats an exposure time value as a human-readable fraction (e.g., 1/125 s).
+    """
     try:
         f = float(val)
         if f <= 0:
             return str(val)
         if f >= 1.0:
             return f"{f:.1f} s".replace(".", ",")
-        # Fraction standard
+        # FR: Fraction standard / EN: Standard fraction
         frac = Fraction(f).limit_denominator(8000)
         return f"1/{round(1.0 / f)} s"
     except Exception:
@@ -43,7 +50,10 @@ def format_exposure_time(val: Any) -> str:
 
 
 def format_f_number(val: Any) -> str:
-    """Formate une valeur d'ouverture f (ex: f/2.8)."""
+    """
+    FR: Formate une valeur d'ouverture f (ex: f/2.8).
+    EN: Formats an aperture f-number value (e.g., f/2.8).
+    """
     try:
         f = float(val)
         return f"f/{f:.1f}" if f != int(f) else f"f/{int(f)}"
@@ -52,7 +62,10 @@ def format_f_number(val: Any) -> str:
 
 
 def format_focal_length(val: Any) -> str:
-    """Formate une distance focale (ex: 50,0 mm)."""
+    """
+    FR: Formate une distance focale (ex: 50,0 mm).
+    EN: Formats a focal length value in millimeters (e.g., 50,0 mm).
+    """
     try:
         f = float(val)
         return f"{f:.1f} mm".replace(".", ",")
@@ -62,8 +75,10 @@ def format_focal_length(val: Any) -> str:
 
 def parse_gps_coordinates(exif: Any) -> Optional[Tuple[float, float, Optional[float]]]:
     """
-    Extrait les coordonnées GPS en degrés décimaux depuis les métadonnées EXIF.
+    FR: Extrait les coordonnées GPS en degrés décimaux depuis les métadonnées EXIF.
     Renvoie (latitude, longitude, altitude_m).
+    EN: Extracts GPS coordinates in decimal degrees from EXIF metadata.
+    Returns (latitude, longitude, altitude_m).
     """
     try:
         gps_ifd = exif.get_ifd(ExifTags.IFD.GPSInfo)
@@ -81,6 +96,10 @@ def parse_gps_coordinates(exif: Any) -> Optional[Tuple[float, float, Optional[fl
             return None
 
         def dms_to_dec(dms: Any) -> float:
+            """
+            FR: Convertit un tuple (degrés, minutes, secondes) en degrés décimaux.
+            EN: Converts a (degrees, minutes, seconds) tuple into decimal degrees.
+            """
             d = float(dms[0])
             m = float(dms[1])
             s = float(dms[2])
@@ -101,7 +120,10 @@ def parse_gps_coordinates(exif: Any) -> Optional[Tuple[float, float, Optional[fl
 
 
 def format_gps_dms(lat: float, lon: float, alt: Optional[float] = None) -> str:
-    """Formate les coordonnées en DMS (Degrés Minutes Secondes) pour l'affichage."""
+    """
+    FR: Formate les coordonnées en DMS (Degrés Minutes Secondes) pour l'affichage.
+    EN: Formats GPS coordinates into DMS (Degrees Minutes Seconds) for display.
+    """
     lat_card = "N" if lat >= 0 else "S"
     lat_abs = abs(lat)
     lat_deg = int(lat_abs)
@@ -122,7 +144,8 @@ def format_gps_dms(lat: float, lon: float, alt: Optional[float] = None) -> str:
 
 def extract_full_metadata(file_path: str) -> Dict[str, Any]:
     """
-    Extrait l'ensemble des informations de base, propriétés EXIF et GPS d'une photo.
+    FR: Extrait l'ensemble des informations de base, propriétés EXIF et GPS d'une photo.
+    EN: Extracts all basic file information, EXIF properties, and GPS coordinates from a photo.
     """
     data: Dict[str, Any] = {
         "filename": os.path.basename(file_path),
@@ -169,7 +192,7 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
 
             exif = img.getexif()
             if exif:
-                # Récupérer les tags EXIF de base
+                # FR: Récupérer les tags EXIF de base / EN: Retrieve basic EXIF tags
                 make = str(exif.get(0x010F, "")).strip()  # Make
                 model = str(exif.get(0x0110, "")).strip()  # Model
                 if model:
@@ -185,39 +208,39 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                         pass
                 props.append(("Date de prise de vue", data["date"]))
 
-                # IFD EXIF étendu
+                # FR: IFD EXIF étendu / EN: Extended EXIF IFD
                 try:
                     exif_ifd = exif.get_ifd(ExifTags.IFD.Exif)
                 except Exception:
                     exif_ifd = {}
 
                 if exif_ifd:
-                    # Temps de pose / Vitesse d'obturation
+                    # FR: Temps de pose / Vitesse d'obturation / EN: Exposure time / Shutter speed
                     exp_time = exif_ifd.get(0x829A)
                     if exp_time is not None:
                         props.append(("Vitesse d'obturation", format_exposure_time(exp_time)))
 
-                    # Ouverture F-Number
+                    # FR: Ouverture F-Number / EN: F-Number Aperture
                     f_num = exif_ifd.get(0x829D)
                     if f_num is not None:
                         props.append(("Ouverture", format_f_number(f_num)))
 
-                    # Sensibilité ISO
+                    # FR: Sensibilité ISO / EN: ISO Sensitivity
                     iso = exif_ifd.get(0x8827)
                     if iso is not None:
                         props.append(("Sensibilité ISO", f"ISO {iso}"))
 
-                    # Distance focale
+                    # FR: Distance focale / EN: Focal length
                     focal = exif_ifd.get(0x920A)
                     if focal is not None:
                         props.append(("Distance focale", format_focal_length(focal)))
 
-                    # Focale équivalente 35mm
+                    # FR: Focale équivalente 35mm / EN: 35mm equivalent focal length
                     focal_35 = exif_ifd.get(0xA405)
                     if focal_35:
                         props.append(("Équivalent 35mm", f"{focal_35} mm"))
 
-                    # Flash
+                    # FR: Flash / EN: Flash status
                     flash_val = exif_ifd.get(0x9209)
                     if flash_val is not None:
                         try:
@@ -227,19 +250,19 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                         except Exception:
                             pass
 
-                    # Balance des blancs
+                    # FR: Balance des blancs / EN: White balance
                     wb = exif_ifd.get(0xA403)
                     if wb is not None:
                         props.append(("Balance des blancs", "Automatique" if wb == 0 else "Manuelle"))
 
-                # Coordonnées GPS
+                # FR: Coordonnées GPS / EN: GPS Coordinates
                 gps_coords = parse_gps_coordinates(exif)
                 if gps_coords:
                     data["gps"] = gps_coords
                     data["gps_formatted"] = format_gps_dms(gps_coords[0], gps_coords[1], gps_coords[2])
                     props.append(("Coordonnées GPS", data["gps_formatted"]))
 
-                # Logiciel
+                # FR: Logiciel / EN: Software
                 software = exif.get(0x0131)
                 if software:
                     props.append(("Logiciel", str(software).strip()))
@@ -250,3 +273,8 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
         pass
 
     return data
+
+
+# FR: Alias pour la rétrocompatibilité / EN: Alias for backward compatibility
+extract_photo_metadata = extract_full_metadata
+
