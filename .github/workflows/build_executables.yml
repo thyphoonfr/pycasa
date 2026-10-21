@@ -13,6 +13,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build PyCasa (${{ matrix.os }})
@@ -23,16 +26,19 @@ jobs:
         include:
           - os: windows-latest
             artifact_name: PyCasa-Windows-x64
-            asset_path: dist/PyCasa.exe
+            asset_path: |
+              dist/PyCasa.exe
+              dist/PyCasa-*-Windows-x64.zip
           - os: macos-latest
             artifact_name: PyCasa-macOS-App
-            asset_path: dist/PyCasa.app
+            asset_path: dist/PyCasa-macOS.zip
           - os: ubuntu-latest
             artifact_name: PyCasa-Linux-x64
             asset_path: |
               dist/PyCasa
               dist/PyCasa.png
               dist/PyCasa.desktop
+              dist/PyCasa-Linux-x64.tar.gz
 
     steps:
       - name: Checkout repository
@@ -73,9 +79,45 @@ jobs:
         run: |
           python tools/build_executable.py
 
+      - name: Package macOS .app archive
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent PyCasa.app PyCasa-macOS.zip
+
+      - name: Package Linux .tar.gz archive
+        if: runner.os == 'Linux'
+        run: |
+          cd dist
+          tar -czvf PyCasa-Linux-x64.tar.gz PyCasa PyCasa.png PyCasa.desktop
+
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.asset_path }}
           if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all built OS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
+          merge-multiple: true
+
+      - name: Create GitHub Release and attach Windows, macOS & Linux binaries
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release_assets/PyCasa.exe
+            release_assets/PyCasa-*-Windows-x64.zip
+            release_assets/PyCasa-macOS.zip
+            release_assets/PyCasa-Linux-x64.tar.gz
