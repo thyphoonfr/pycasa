@@ -1,16 +1,17 @@
 """
-Module de lecture et d'écriture des conteneurs CBlockFile (*_0.db) et de leurs index (*_index.db).
+FR: Module de lecture et d'écriture des conteneurs CBlockFile (*_0.db) et de leurs index (*_index.db).
+EN: Module for reading and writing CBlockFile containers (*_0.db) and their index files (*_index.db).
 
-Traçabilité Ghidra :
-- Source originale : .\\thumblab\\CBlockFile.cpp @ 0x00CA847C, 0x00CA8487
+Traçabilité Ghidra / Ghidra Traceability:
+- Source originale / Original source : .\\thumblab\\CBlockFile.cpp @ 0x00CA847C, 0x00CA8487
 - Magic number : 0x3FCCCCCD (1.6f float32 à l'adresse globale _DAT_00d678e0)
-- Écriture d'index : picasa3.exe @ 0x006B7FC0 (FUN_006b7fc0 -> CBlockFile::SaveIndex)
-- Lecture d'index : picasa3.exe @ 0x006B82E0 (FUN_006b82e0 -> CBlockFile::ReadIndex)
-- Écriture d'entrée : picasa3.exe @ 0x006B75F0 (FUN_006b75f0 -> CBlockFile::WriteEntry)
-- Validation des tables : picasa3.exe @ 0x006B8AC0 (FUN_006b8ac0 -> CBlockFile::InitTable)
-- Sérialisation d'un vecteur colonne : picasa3.exe @ 0x0099C1E0 (FUN_0099c1e0)
-- Sérialisation d'un bloc actif : picasa3.exe @ 0x00996D50 (FUN_00996d50)
-- Format CSV de diagnostic : picasa3.exe @ 0x006B5E00 ("Size,Offset,Checksum\\n", "%d,%d,%d\\n")
+- Écriture d'index / Index write : picasa3.exe @ 0x006B7FC0 (FUN_006b7fc0 -> CBlockFile::SaveIndex)
+- Lecture d'index / Index read : picasa3.exe @ 0x006B82E0 (FUN_006b82e0 -> CBlockFile::ReadIndex)
+- Écriture d'entrée / Entry write : picasa3.exe @ 0x006B75F0 (FUN_006b75f0 -> CBlockFile::WriteEntry)
+- Validation des tables / Table validation : picasa3.exe @ 0x006B8AC0 (FUN_006b8ac0 -> CBlockFile::InitTable)
+- Sérialisation d'un vecteur colonne / Column vector serialization : picasa3.exe @ 0x0099C1E0 (FUN_0099c1e0)
+- Sérialisation d'un bloc actif / Active block serialization : picasa3.exe @ 0x00996D50 (FUN_00996d50)
+- Format CSV de diagnostic / Diagnostic CSV format : picasa3.exe @ 0x006B5E00 ("Size,Offset,Checksum\\n", "%d,%d,%d\\n")
 """
 
 from __future__ import annotations
@@ -20,19 +21,176 @@ from typing import List, Tuple, Optional
 
 
 # Ref: picasa3.exe @ _DAT_00d678e0
-BLOCKFILE_MAGIC = 0x3FCCCCCD  # 1.6f en IEEE 754 float32
+BLOCKFILE_MAGIC = 0x3FCCCCCD  # 1.6f en IEEE 754 float32 / 1.6f in IEEE 754 float32
 
-# En-tête d'index : magic (uint32), active_block (uint32)
+# FR: En-tête d'index : magic (uint32), active_block (uint32) / EN: Index header: magic (uint32), active_block (uint32)
 INDEX_HEADER_STRUCT = struct.Struct("<II")
 
-# En-tête de container : magic (uint32)
+# FR: En-tête de container : magic (uint32) / EN: Container header: magic (uint32)
 CONTAINER_HEADER_STRUCT = struct.Struct("<I")
+
+# Ref: picasa3.exe @ 0x0048050B, 0x00482399 (facetemplatesV2_index.db checksum = 1)
+FACETEMPLATE_BLOCK_CHECKSUM = 1
+FACETEMPLATE_BLOB_SIZE = 1044
+VQC_CUE_CLASS_ID = 0x00423002
+VQC_CUE_FORMAT_ID = 0x0044DD4D
+
+
+def _rol32(val: int, shift: int) -> int:
+    """
+    FR: Rotation circulaire 32 bits vers la gauche (instruction x86 ROL).
+    EN: 32-bit circular rotate left (x86 ROL instruction).
+    """
+    val &= 0xFFFFFFFF
+    shift &= 31
+    return ((val << shift) | (val >> (32 - shift))) & 0xFFFFFFFF
+
+
+# Ref: picasa3.exe @ 0x006B99F0 (FUN_006b99f0, full_hash=1) & 0x004E3AB0 (FUN_004e3ab0)
+# Ghidra project: ghidra/picasa3.gpr
+def compute_thumb_checksum(folder_path: str, filename: str, ft2: int, file_size: int) -> int:
+    """
+    FR: Calcule le checksum 32 bits exact stocké dans thumbs_index.db et thumbs2_index.db.
+    Reproduit à l'identique la boucle de hachage insensible à la casse ASCII de FUN_006b99f0
+    (seed 0x12345678, modulo 0xF4327 = 1000231) combinée par XOR avec les rotations de ft2 et size.
+    EN: Computes the exact 32-bit checksum stored in thumbs_index.db and thumbs2_index.db.
+    Faithfully reproduces the ASCII case-insensitive hash loop of FUN_006b99f0
+    (seed 0x12345678, modulo 0xF4327 = 1000231) XOR-combined with bit rotations of ft2 and size.
+    """
+    h = 0x12345678
+    for text in (folder_path, filename):
+        raw = text.encode("utf-8", errors="surrogateescape")
+        for b in raw:
+            if b == 0:
+                break
+            if 0x41 <= b <= 0x5A:
+                c = b + 0x20
+            elif b >= 0x80:
+                c = b - 256
+            else:
+                c = b
+            term = ((h << 5) + c + (h >> 2)) & 0xFFFFFFFF
+            h = (h ^ term) & 0xFFFFFFFF
+
+    h = h % 0xF4327
+    ft2_lo = ft2 & 0xFFFFFFFF
+    ft2_hi = (ft2 >> 32) & 0xFFFFFFFF
+    sz = file_size & 0xFFFFFFFF
+    edx = _rol32(ft2_hi, 0x11) ^ _rol32(sz, 0x12) ^ _rol32(ft2_lo, 0x0D)
+    return (h ^ edx) & 0xFFFFFFFF
+
+
+# Ref: picasa3.exe @ 0x006B9B26 (FUN_006b99f0, full_hash=0) & 0x0042AD1E (FUN_0042a800)
+# Ghidra project: ghidra/picasa3.gpr
+def compute_preview_checksum(ft2: int, rotate_step: int = 0, flip: int = 0) -> int:
+    """
+    FR: Calcule le checksum 32 bits exact stocké dans bigthumbs_index.db et previews_index.db.
+    Arrondit le FILETIME ft2 à la seconde la plus proche ((ft2 + 5_000_000) // 10_000_000),
+    applique les rotations ROL 13 et ROL 17, puis applique le masque d'orientation (((flip * 4) ^ rotate_step) << 4).
+    EN: Computes the exact 32-bit checksum stored in bigthumbs_index.db and previews_index.db.
+    Rounds FILETIME ft2 to the nearest second ((ft2 + 5_000_000) // 10_000_000),
+    applies ROL 13 and ROL 17 rotations, then XORs the orientation mask (((flip * 4) ^ rotate_step) << 4).
+    """
+    q = ((ft2 & 0xFFFFFFFFFFFFFFFF) + 0x4C4B40) // 0x989680
+    q_lo = q & 0xFFFFFFFF
+    q_hi = (q >> 32) & 0xFFFFFFFF
+    base = (_rol32(q_lo, 0x0D) ^ _rol32(q_hi, 0x11)) & 0xFFFFFFFF
+    orient_mask = ((((1 if flip else 0) * 4) ^ (rotate_step & 3)) << 4) & 0xFFFFFFFF
+    return (base ^ orient_mask) & 0xFFFFFFFF
+
+
+# Ref: Red.dll @ 0x1003E510 (template consistency check) & 0x10102020 (vqc_Cue::exportArr)
+def verify_face_template_blob(blob: bytes) -> bool:
+    """
+    FR: Vérifie l'intégrité binaire d'un gabarit facial vqc_Cue de 1044 octets dans facetemplatesV2_0.db :
+    - u[0] == 1044 (0x0414), u[1] == 0x00423002 (vqc_Cue), u[3] == 0x0044DD4D (format ID)
+    - Somme modulo 2^32 des 261 uint32 égale à 0xFFFFFFFF (-1), équilibrée par u[10] à +0x28.
+    EN: Verifies the binary integrity of a 1044-byte vqc_Cue face template in facetemplatesV2_0.db:
+    - u[0] == 1044 (0x0414), u[1] == 0x00423002 (vqc_Cue), u[3] == 0x0044DD4D (format ID)
+    - Modulo 2^32 sum of all 261 uint32 words equals 0xFFFFFFFF (-1), balanced by u[10] at +0x28.
+    """
+    if len(blob) < FACETEMPLATE_BLOB_SIZE:
+        return False
+    byte_len = struct.unpack_from("<I", blob, 0)[0]
+    if byte_len != FACETEMPLATE_BLOB_SIZE or (byte_len >> 2) > 0xFFFF:
+        return False
+    n_words = byte_len >> 2
+    words = struct.unpack_from(f"<{n_words}I", blob, 0)
+    if words[1] != VQC_CUE_CLASS_ID or words[3] != VQC_CUE_FORMAT_ID:
+        return False
+    return (sum(words) & 0xFFFFFFFF) == 0xFFFFFFFF
+
+
+# Ref: Red.dll @ 0x10102020 (vqc_Cue::exportArr) & 0x10102100 (vqc_Cue::importArr)
+def encode_face_template_blob(
+    nibbles: List[int] | bytes | bytearray,
+    inv_norm: float,
+    image_stamp: int = 0,
+) -> bytes:
+    """
+    FR: Encode un gabarit facial vqc_Cue en bloc binaire exact de 1044 octets pour facetemplatesV2_0.db.
+    - nibbles : séquence de 2000 valeurs entières 4 bits non signées (0..15) ou 1000 octets déjà packés.
+    - inv_norm : facteur de normalisation float32 (1.0 / sqrt(rawSim(cue, cue))).
+    - image_stamp : horodatage/identifiant d'image uint32 (+0x20).
+    Calcule le mot d'équilibrage u[10] (+0x28) tel que sum(u[0..260]) & 0xFFFFFFFF == 0xFFFFFFFF.
+    EN: Encodes a vqc_Cue facial template into an exact 1044-byte binary block for facetemplatesV2_0.db.
+    - nibbles: sequence of 2000 unsigned 4-bit integers (0..15) or 1000 pre-packed bytes.
+    - inv_norm: float32 normalization factor (1.0 / sqrt(rawSim(cue, cue))).
+    - image_stamp: uint32 image timestamp/identifier (+0x20).
+    Computes balancing word u[10] (+0x28) such that sum(u[0..260]) & 0xFFFFFFFF == 0xFFFFFFFF.
+    """
+    if isinstance(nibbles, (bytes, bytearray)) and len(nibbles) == 1000:
+        packed_bytes = bytes(nibbles)
+    else:
+        q_list = list(nibbles)
+        if len(q_list) != 2000:
+            raise ValueError(f"vqc_Cue requires 2000 4-bit nibbles, got {len(q_list)}")
+        buf = bytearray(1000)
+        for i in range(1000):
+            q_lo = max(0, min(15, int(q_list[2 * i])))
+            q_hi = max(0, min(15, int(q_list[2 * i + 1])))
+            buf[i] = (q_lo & 0x0F) | ((q_hi & 0x0F) << 4)
+        packed_bytes = bytes(buf)
+
+    inv_norm_u32 = struct.unpack("<I", struct.pack("<f", float(inv_norm)))[0]
+    header_9 = (
+        FACETEMPLATE_BLOB_SIZE,  # u[0] = 1044 (0x0414)
+        VQC_CUE_CLASS_ID,        # u[1] = 0x00423002 (vqc_Cue)
+        0,                       # u[2] = 0 (version)
+        VQC_CUE_FORMAT_ID,       # u[3] = 0x0044DD4D (cue_format_id)
+        2000,                    # u[4] = 2000 (size)
+        4,                       # u[5] = 4 (bits)
+        8,                       # u[6] = 8 (pack_size)
+        inv_norm_u32,            # u[7] = inv_norm (float32 bits)
+        image_stamp & 0xFFFFFFFF,# u[8] = image_stamp (uint32)
+        250,                     # u[9] = 250 (uint32 data words)
+    )
+    data_words = struct.unpack("<250I", packed_bytes)
+    partial_sum = (sum(header_9) + sum(data_words)) & 0xFFFFFFFF
+    checksum_u10 = (0xFFFFFFFF - partial_sum) & 0xFFFFFFFF
+    return struct.pack("<11I", *header_9, checksum_u10) + packed_bytes
+
+
+def decode_face_template_blob(blob: bytes) -> Optional[tuple[bytes, float, int]]:
+    """
+    FR: Décode un bloc binaire vqc_Cue de 1044 octets en (packed_1000_bytes, inv_norm, image_stamp).
+    Retourne None si le bloc est invalide.
+    EN: Decodes a 1044-byte vqc_Cue binary block into (packed_1000_bytes, inv_norm, image_stamp).
+    Returns None if the block is invalid.
+    Ref: Red.dll @ 0x10102100 (vqc_Cue::importArr)
+    """
+    if not verify_face_template_blob(blob):
+        return None
+    inv_norm = float(struct.unpack_from("<f", blob, 0x1C)[0])
+    image_stamp = int(struct.unpack_from("<I", blob, 0x20)[0])
+    return blob[0x2C:0x414], inv_norm, image_stamp
 
 
 @dataclass
 class BlockEntry:
     """
-    Entrée individuelle pointée par l'index CBlockFile.
+    FR: Entrée individuelle pointée par l'index CBlockFile.
+    EN: Individual entry pointed to by a CBlockFile index.
     """
     checksum: int = 0
     offset: int = 0
@@ -41,14 +199,28 @@ class BlockEntry:
 
     @property
     def is_empty(self) -> bool:
+        """
+        FR: Indique si l'entrée est vide (taille et offset nuls).
+        EN: Indicates whether the entry is empty (zero size and offset).
+        """
         return self.size == 0 and self.offset == 0
 
     @property
     def raw_size_block(self) -> int:
+        """
+        FR: Combine l'indice de bloc (8 bits hauts) et la taille (24 bits bas).
+        EN: Packs the block index (upper 8 bits) and blob size (lower 24 bits).
+        """
+        if self.size > 0x00FFFFFF:
+            raise ValueError(f"Taille de blob CBlockFile supérieure à 24 bits (max 16 Mo) : {self.size}")
         return ((self.block & 0xFF) << 24) | (self.size & 0x00FFFFFF)
 
     @classmethod
     def from_raw(cls, checksum: int, offset: int, raw_size_block: int) -> BlockEntry:
+        """
+        FR: Construit une BlockEntry depuis les valeurs brutes des 3 vecteurs parallèles.
+        EN: Constructs a BlockEntry from raw values of the 3 parallel vectors.
+        """
         block = (raw_size_block >> 24) & 0xFF
         size = raw_size_block & 0x00FFFFFF
         return cls(checksum=checksum, offset=offset, size=size, block=block)
@@ -56,13 +228,20 @@ class BlockEntry:
 
 class BlockIndexFile:
     """
-    Représente un fichier d'index CBlockFile (*_index.db).
+    FR: Représente un fichier d'index CBlockFile (*_index.db).
     Structure :
       - magic : 0x3FCCCCCD (4 octets)
       - active_block : uint32 (4 octets)
       - Vecteur 1 (Checksums) : count (uint32) + count * uint32
       - Vecteur 2 (Offsets) : count (uint32) + count * uint32
       - Vecteur 3 (Sizes & Blocks) : count (uint32) + count * uint32
+    EN: Represents a CBlockFile index file (*_index.db).
+    Structure:
+      - magic: 0x3FCCCCCD (4 bytes)
+      - active_block: uint32 (4 bytes)
+      - Vector 1 (Checksums): count (uint32) + count * uint32
+      - Vector 2 (Offsets): count (uint32) + count * uint32
+      - Vector 3 (Sizes & Blocks): count (uint32) + count * uint32
     """
 
     def __init__(
@@ -73,6 +252,10 @@ class BlockIndexFile:
         offsets: List[int] | None = None,
         sizes_and_blocks: List[int] | None = None,
     ):
+        """
+        FR: Initialise l'index CBlockFile avec ses 3 vecteurs parallèles.
+        EN: Initializes the CBlockFile index with its 3 parallel vectors.
+        """
         self.magic = magic
         self.active_block = active_block
         self.checksums: List[int] = checksums if checksums is not None else []
@@ -81,9 +264,26 @@ class BlockIndexFile:
 
     @property
     def record_count(self) -> int:
+        """
+        FR: Retourne le nombre total d'entrées dans l'index.
+        EN: Returns the total number of entries in the index.
+        """
         return len(self.checksums)
 
+    def get_entry(self, index: int) -> Optional[BlockEntry]:
+        """
+        FR: Accès direct en O(1) sans allouer la liste complète des enregistrements.
+        EN: Direct O(1) entry lookup without allocating the full list of records.
+        """
+        if 0 <= index < len(self.checksums):
+            return BlockEntry.from_raw(self.checksums[index], self.offsets[index], self.sizes_and_blocks[index])
+        return None
+
     def get_entries(self) -> List[BlockEntry]:
+        """
+        FR: Retourne la liste complète des entrées BlockEntry.
+        EN: Returns the full list of BlockEntry objects.
+        """
         count = self.record_count
         return [
             BlockEntry.from_raw(self.checksums[i], self.offsets[i], self.sizes_and_blocks[i])
@@ -91,13 +291,20 @@ class BlockIndexFile:
         ]
 
     def append_entry(self, entry: BlockEntry) -> None:
-        """Ajoute une nouvelle entrée d'index dans les 3 vecteurs."""
+        """
+        FR: Ajoute une nouvelle entrée d'index dans les 3 vecteurs.
+        EN: Appends a new index entry across the 3 parallel vectors.
+        """
         self.checksums.append(entry.checksum)
         self.offsets.append(entry.offset)
         self.sizes_and_blocks.append(entry.raw_size_block)
 
     @classmethod
     def from_entries(cls, entries: List[BlockEntry], active_block: int = 0) -> BlockIndexFile:
+        """
+        FR: Crée un BlockIndexFile à partir d'une liste d'objets BlockEntry.
+        EN: Creates a BlockIndexFile from a list of BlockEntry objects.
+        """
         checksums = [e.checksum for e in entries]
         offsets = [e.offset for e in entries]
         sizes_and_blocks = [e.raw_size_block for e in entries]
@@ -112,6 +319,10 @@ class BlockIndexFile:
     @classmethod
     # Ref: picasa3.exe @ 0x006B82E0 (ReadIndex)
     def from_bytes(cls, data: bytes) -> BlockIndexFile:
+        """
+        FR: Désérialise un fichier *_index.db depuis un buffer d'octets.
+        EN: Deserializes a *_index.db file from a byte buffer.
+        """
         if len(data) < 20:
             raise ValueError(f"Fichier *_index.db trop court : {len(data)} octets (min 20)")
 
@@ -160,6 +371,10 @@ class BlockIndexFile:
 
     # Ref: picasa3.exe @ 0x006B7FC0 (SaveIndex)
     def to_bytes(self) -> bytes:
+        """
+        FR: Sérialise le fichier *_index.db en octets little-endian.
+        EN: Serializes the *_index.db file into little-endian bytes.
+        """
         count = len(self.checksums)
         if len(self.offsets) != count or len(self.sizes_and_blocks) != count:
             raise ValueError("Les 3 vecteurs de BlockIndexFile doivent avoir la même longueur")
@@ -175,18 +390,29 @@ class BlockIndexFile:
 
 class BlockContainerFile:
     """
-    Représente un fichier conteneur de données CBlockFile (*_0.db, *_1.db...).
+    FR: Représente un fichier conteneur de données CBlockFile (*_0.db, *_1.db...).
     En-tête de 4 octets : magic 0x3FCCCCCD (1.6f).
     Suivi par les blobs de données brutes (images JPEG, modèles, etc.).
+    EN: Represents a CBlockFile data container file (*_0.db, *_1.db...).
+    4-byte header: magic 0x3FCCCCCD (1.6f).
+    Followed by raw data blobs (JPEG images, face templates, etc.).
     """
 
     def __init__(self, magic: int = BLOCKFILE_MAGIC, data: bytes | None = None):
+        """
+        FR: Initialise le conteneur CBlockFile avec son magic number et sa charge utile.
+        EN: Initializes the CBlockFile container with its magic number and payload.
+        """
         self.magic = magic
         self.payload: bytearray = bytearray(data) if data is not None else bytearray()
 
     @classmethod
     # Ref: picasa3.exe @ 0x006B61E0 (OpenBlock)
     def from_bytes(cls, data: bytes) -> BlockContainerFile:
+        """
+        FR: Désérialise un fichier conteneur *_0.db depuis un buffer binaire.
+        EN: Deserializes a *_0.db container file from a binary byte buffer.
+        """
         if len(data) < 4:
             raise ValueError(f"Conteneur blockfile trop court : {len(data)} octets (min 4)")
         magic = struct.unpack_from("<I", data, 0)[0]
@@ -196,12 +422,18 @@ class BlockContainerFile:
 
     # Ref: picasa3.exe @ 0x006B7FC0
     def to_bytes(self) -> bytes:
+        """
+        FR: Sérialise le conteneur CBlockFile en octets.
+        EN: Serializes the CBlockFile container into bytes.
+        """
         return CONTAINER_HEADER_STRUCT.pack(self.magic) + bytes(self.payload)
 
     def get_blob(self, entry: BlockEntry) -> bytes:
         """
-        Extrait le blob correspondant à l'entrée demandée.
+        FR: Extrait le blob correspondant à l'entrée demandée.
         L'offset stocké dans l'entrée est relatif au fichier complet (offset >= 4).
+        EN: Extracts the blob corresponding to the requested entry.
+        The offset stored in the entry is relative to the complete file (offset >= 4).
         """
         if entry.is_empty:
             return b""
@@ -218,9 +450,50 @@ class BlockContainerFile:
 
     def append_blob(self, blob: bytes, checksum: int = 0, block_idx: int = 0) -> BlockEntry:
         """
-        Ajoute un nouveau blob à la fin du conteneur et renvoie la BlockEntry correspondante.
+        FR: Ajoute un nouveau blob à la fin du conteneur et renvoie la BlockEntry correspondante.
+        EN: Appends a new blob to the end of the container and returns the corresponding BlockEntry.
+        Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
         """
-        abs_offset = len(self.payload) + 4
         size = len(blob)
+        if size > 0x00FFFFFF:
+            raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
+        abs_offset = len(self.payload) + 4
         self.payload.extend(blob)
         return BlockEntry(checksum=checksum, offset=abs_offset, size=size, block=block_idx)
+
+    def write_blob(
+        self,
+        blob: bytes,
+        existing_entry: Optional[BlockEntry] = None,
+        checksum: int = 0,
+        block_idx: int = 0,
+    ) -> BlockEntry:
+        """
+        FR: Écrit un blob dans le conteneur conformément à CBlockFile::WriteEntry (FUN_006b75f0 @ 0x006B75F0) :
+        - Si existing_entry est dans le même bloc et a une taille >= len(blob), réécrit sur place.
+        - Sinon, ajoute en fin de conteneur.
+        EN: Writes a blob into the container in accordance with CBlockFile::WriteEntry (FUN_006b75f0 @ 0x006B75F0):
+        - If existing_entry is in the same block and has size >= len(blob), overwrites in place.
+        - Otherwise, appends at the end of the container.
+        """
+        size = len(blob)
+        if size > 0x00FFFFFF:
+            raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
+        if (
+            existing_entry is not None
+            and not existing_entry.is_empty
+            and existing_entry.block == block_idx
+            and existing_entry.size >= size
+            and existing_entry.offset >= 4
+        ):
+            rel_offset = existing_entry.offset - 4
+            if rel_offset + size <= len(self.payload):
+                self.payload[rel_offset : rel_offset + size] = blob
+                return BlockEntry(
+                    checksum=checksum,
+                    offset=existing_entry.offset,
+                    size=size,
+                    block=block_idx,
+                )
+        return self.append_blob(blob, checksum=checksum, block_idx=block_idx)
+

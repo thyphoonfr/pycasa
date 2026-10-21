@@ -1,5 +1,6 @@
 """
-Module de gestion des fichiers INI Picasa (.picasa.ini, Picasa.ini).
+FR: Module de gestion des fichiers INI Picasa (.picasa.ini, Picasa.ini).
+EN: Picasa INI file management package (.picasa.ini, Picasa.ini).
 """
 
 from picasa_py.ini.model import IniEntry, IniSection, FaceItem, CropRect, ContactInfo
@@ -16,3 +17,4 @@ __all__ = [
     "PicasaIniDocument",
     "PicasaIniWriter",
 ]
+

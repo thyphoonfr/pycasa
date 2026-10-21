@@ -77,3 +77,43 @@ Chaque élément est adressé par son triplet `(block, offset, size)` présent d
 - `block` indique le fichier `<prefix>_%d.db`
 - `offset` indique la position exacte de départ dans ce fichier (doit être $\ge 4$)
 - `size` indique le nombre d'octets exacts du blob (ex. image JPEG débutant par `0xFF 0xD8` et se terminant par `0xFF 0xD9`).
+
+---
+
+## 5. Formules exactes de calcul des `Checksums` (Vecteur 1)
+
+| Fichier d'index | Adresse Ghidra | Niveau de confiance | Formule exacte |
+|---|---|---|---|
+| `thumbs_index.db`, `thumbs2_index.db`, `bigthumbs_index.db` | `picasa3.exe @ 0x006B99F0` (`FUN_006b99f0` -> `0x004E3AB0`) | **Confirmé** (100 % sur 753 entrées réelles) | `full_path` (chemin du dossier parent avec `\` final + nom du fichier, converti en minuscules `tolower` octet par octet, terminé par `\0`), haché avec `hash = 0` puis `hash = (hash * 5 + byte) & 0xFFFFFFFF`, puis `checksum = (hash + ft_low + size) & 0xFFFFFFFF` (`ft_low = ft2 & 0xFFFFFFFF`). |
+| `previews_index.db` | `picasa3.exe @ 0x0042A800` (`FUN_0042a800`) | **Confirmé** (100 % sur les entrées réelles) | `checksum = ((ft2 & 0xFFFFFFFF) + (rotate_step & 3) + (4 if flip else 0)) & 0xFFFFFFFF`. |
+| `facetemplatesV2_index.db` | `picasa3.exe @ 0x0048050B` (`FUN_004804a0`) | **Confirmé** (100 % sur 1 160 entrées réelles) | Constante `1` (`0x00000001`). |
+
+---
+
+## 6. Format binaire des blobs `facetemplatesV2_0.db` (`vqc_Cue`, 1 044 octets)
+
+Les empreintes faciales de `facetemplatesV2_0.db` sont sérialisées par le moteur Neven Vision / PittPatt (`Red.dll` + modèle `plugins/red.cfg`, classe C++ `vqc_Cue`, ID `0x00423002`, format `0x0044DD4D`).
+
+### 6.1 Références Ghidra (`Red.dll` & `picasa3.exe`)
+- `picasa3.exe @ 0x00881480` : lecture de `facetemplatesV2` via `CBlockFile::GetBlock` (`checksum == 1`) et désérialisation via `Red.dll`.
+- `Red.dll @ 0x10102020` : sérialisation / désérialisation de `vqc_Cue`.
+- `Red.dll @ 0x1014A340` : calcul du checksum interne sur les `1 032` premiers octets (`sum(bytes[0:1032]) * 0x00041AE5 & 0xFFFFFFFF`).
+- `Red.dll @ 0x100FE262..0x100FE320` : calcul de `inv_norm = float32(1.0 / sqrt(vqc_Relator::rawSim(cue, cue)))`.
+- `Red.dll @ 0x100FF050..0x100FFF45` & `0x101007D7..0x10100865` : `vqc_Relator::rawSim` et `dqc_Relator::init` (table de poids `float32[2000]` à l'offset `0x1F5C1C` dans `plugins/red.cfg`, `delta_term = -2.46279f` à `0x1F7B7A`, facteur `0.25`).
+- `Red.dll @ 0x100FCF60` & `0x100FCB00` : `vqc_Quantizer::map` (classe `0x00423004`, 30 000 seuils `float32[2000, 15]` à l'offset `0x20BBDC` dans `plugins/red.cfg`).
+
+### 6.2 Disposition d'un enregistrement `vqc_Cue` (1 044 octets)
+
+| Offset | Taille | Type | Nom | Description |
+|---|---|---|---|---|
+| `0x000` (0) | 4 | `uint32` | `class_id` | `0x00423002` (`vqc_Cue`) |
+| `0x004` (4) | 4 | `uint32` | `format_id` | `0x0044DD4D` |
+| `0x008` (8) | 4 | `uint32` | `reserved_0` | `0` |
+| `0x00C` (12) | 4 | `uint32` | `n_dims` | `2000` (`0x000007D0`) |
+| `0x010` (16) | 1000 | `uint8[1000]` | `packed_nibbles` | 2 000 valeurs quantifiées sur 4 bits (`0..15`) : `q[2*i] = byte & 0x0F`, `q[2*i+1] = (byte >> 4) & 0x0F` |
+| `0x3F8` (1016) | 4 | `float32` | `inv_norm` | `1.0 / sqrt(vqc_Relator::rawSim(cue, cue))` |
+| `0x3FC` (1020) | 12 | `float32[3]` | `pose_meta` | Métadonnées d'orientation/pose du visage |
+| `0x408` (1032) | 4 | `uint32` | `cue_checksum` | `(sum(blob[0:1032]) * 0x00041AE5) & 0xFFFFFFFF` |
+| `0x40C` (1036) | 4 | `uint32` | `tail_size` | `8` (`0x00000008`) |
+| `0x410` (1040) | 4 | `uint32` | `tail_flags` | `0` (`0x00000000`) |
+
