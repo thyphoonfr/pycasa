@@ -1,3 +1,7 @@
+"""FR: Analyse par désassemblage les appels suivant chaque référence croisée à `.picasa.ini` dans picasa3.exe.
+EN: Analyzes via disassembly the calls following each cross-reference to `.picasa.ini` in picasa3.exe.
+"""
+
 import pefile
 import capstone
 

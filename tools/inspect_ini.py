@@ -1,7 +1,15 @@
+"""FR: Inspecte l'encodage, les fins de ligne et les en-têtes des fichiers .picasa.ini.
+EN: Inspects the encoding, line endings, and headers of .picasa.ini files.
+"""
+
 import os
 import glob
 
-def inspect_inis():
+
+def inspect_inis() -> None:
+    """FR: Parcourt les fichiers .picasa.ini et affiche leurs propriétés de formatage binaire.
+    EN: Scans .picasa.ini files and prints their binary formatting properties.
+    """
     pictures_dir = os.path.expanduser(r"~\Pictures")
     ini_files = glob.glob(os.path.join(pictures_dir, "**", ".picasa.ini"), recursive=True)
     ini_files += glob.glob(os.path.join(pictures_dir, "**", "Picasa.ini"), recursive=True)
@@ -23,6 +31,7 @@ def inspect_inis():
         print(f"  BOM: {has_bom}, CRLF: {has_crlf}, LF-only: {has_lf_only}, [encoding]: {has_encoding_hdr}")
         print("  First 300 bytes (raw):")
         print(raw[:300])
+
 
 if __name__ == "__main__":
     inspect_inis()

@@ -1,3 +1,7 @@
+"""FR: Recherche les constantes magiques PMP (0x3FCCCCCD et 0x1332) dans le binaire picasa3.exe.
+EN: Searches for PMP magic constants (0x3FCCCCCD and 0x1332) in the picasa3.exe binary.
+"""
+
 import pefile
 import struct
 import capstone

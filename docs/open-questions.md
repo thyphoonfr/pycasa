@@ -153,6 +153,31 @@ Ce document consigne toutes les questions, hypothèses et points de doute confor
 
 ---
 
-## 11. Prochaines étapes
-- [ ] Phase 6 : Mesures de performances initiales, profilage et benchmarks comparatifs (`docs/perf/targets.md`).
-- [ ] Phase 7 : Moteur de scan de dossiers & Gestionnaire de dossiers (`FOLDERMGR_TEXT.XML`).
+## 11. Phases Complémentaires Résolues
+- [x] Phase 6 : Mesures de performances, profilage et benchmarks comparatifs (`docs/perf/targets.md`, `benchmarks/test_perf_benchmarks.py`, incluant le benchmark à l'échelle 100 000 entrées).
+- [x] Phase 7 : Moteur de scan de dossiers incrémental (`directory_scanner.py`) & Gestionnaire de dossiers (`folder_manager.py`, `FOLDERMGR_TEXT.XML`).
+- [x] Phase 8 : Implémentation des 84 filtres de `filterdesc.xml` dans `PicasaImageProcessor` et des 15 sous-systèmes clés audités par `tools/audit_picasa_code.py` (`make_movie.py`, `face_movie.py`, `xmp_tagger.py`, `preferences.py`, etc.).
+- [x] Phase 9 : Désassemblage et implémentation exacte des checksums `CBlockFile` (`picasa_py/db/blockfile.py`, validés à 100 % sur l'ensemble des fichiers `db3/*_index.db` réels) :
+  - `thumbs_index.db` / `thumbs2_index.db` (`picasa3.exe @ 0x006B99F0` `full_hash=1` / `0x004E3AB0`) : hash des 32 bits bas de `ft2`, `size`, `filters` (`imagedata_filters.pmp`) et `crop64` (`imagedata_crop64.pmp`), avec résolution vers le parent (`parent_idx`) pour les entrées visage (`type == 1001`, `0x004E3B87`).
+  - `bigthumbs_index.db` / `previews_index.db` (`picasa3.exe @ 0x006B9B26` `full_hash=0` / `0x0042AD1E`) : hash de `ft2` arrondi à la paire de secondes (division entière 64 bits par `20 000 000` via multiplication magique `0xABCC77118461CEFD >> 47` à `0x006B9A6D`) combiné avec `(((flip * 4) ^ rotate_step) << 4)`.
+  - `facetemplatesV2_index.db` (`picasa3.exe @ 0x0048050B`) : constante `checksum = 1`.
+- [x] Phase 10 : Désassemblage de `plugins/Red.dll` + `plugins/red.cfg` et implémentation native 64 bits de `vqc_Cue` et `vqc_Relator` (`picasa_py/db/blockfile.py`, `picasa_py/db/database.py`, `picasa_py/faces/face_manager.py`) :
+  - Format exact des enregistrements `facetemplatesV2_0.db` (1 044 octets = 261 `uint32` : `u[0]=1044`, `u[1]=0x00423002`, `u[3]=0x0044DD4D`, `u[4]=2000`, `u[5]=4`, `u[6]=8`, `u[7]=inv_norm`, `u[8]=image_stamp`, `u[9]=250`, `u[10]=checksum` tel que `sum(u[0..260]) & 0xFFFFFFFF == 0xFFFFFFFF`, `u[11..260]` = 2 000 nibbles 4 bits non signés `q` décodés en `2*q - 15`, `Red.dll @ 0x10102020`, `0x10102100`, `0x1003E510`). Validé à 100 % sur les 1 160 visages réels de `facetemplatesV2_0.db`.
+  - Chargement des 2 000 poids `float32` et paramètres sigmoïdes (`13.5`, `0.45`) depuis `plugins/red.cfg` (`vqc_Relator` `0x00423003` à l'offset `0x2290A9`, `Red.dll @ 0x101005F0`, `0x10100A10`, `0x100FF050`).
+- [x] Phase 11 : Implémentation exacte du critère de chevauchement des rectangles de visages (`picasa3.exe @ 0x0092C2F0` : `inter_area / min(area1, area2)`) et du filtrage de répertoires (`runtime/filters.txt` `DirectoryFilters` @ `0x00D0AD70`, `.picasaoriginals` @ `0x0085A0B0`, `frexclude=1` @ `0x00881690`).
+- [x] Phase 12 : Suite complète de tests d'interopérabilité croisée automatisés (`tests/test_interop_db_ini.py`, `AGENTS.md` §7.2).
+
+---
+
+## 12. Points documentés `# TODO(unverified)` (`AGENTS.md` §8)
+
+Conformément à la règle §8 de `AGENTS.md`, les points suivants disposent d'une implémentation fonctionnelle fidèle aux structures de données externes mais dont certains détails algorithmiques internes restent marqués `# TODO(unverified)` :
+
+1. **Moteur de détection et d'extraction d'embedding pour les visages (`picasa_py/faces/detector.py`, `picasa_py/faces/red_engine_py.py`)** :
+   - *Statut : Résolu à 100 %.*
+   - Le moteur natif (`plugins/Red.dll` + `plugins/red.cfg` via `red_bridge_x86.exe`) ainsi que la réimplémentation Python/NumPy pure désassemblée (`PurePythonRedEngine` dans `picasa_py/faces/red_engine_py.py` lisant les 2,39 Mo de `plugins/red.cfg`) produisent tous deux exactement les mêmes boîtes englobantes, angles, confiances et descripteurs `vqc_Cue` de 1 044 octets (corrélation `1.000000`, `max_diff = 0`). Seul le chemin de repli OpenCV Haar (utilisé uniquement si `plugins/red.cfg` est absent de la machine) reste marqué `# TODO(unverified)`.
+2. **Formules internes de certains filtres artistiques avancés (`picasa_py/ui/image_processor.py`)** :
+   - *Adresse concernée* : `picasa3.exe @ 0x00760F40` et `runtime/filterdesc.xml`.
+   - *État* : Les 84 identifiants de filtres, leurs paramètres et leur sérialisation dans `.picasa.ini` (`filters=...`) ainsi que les tables de correspondance (`Sixties`, `CrossProcess`, `Cinemascope`, `HeatMap`, `NightVision`, `Polaroid`, `QuantizePalette`) extraites de `filterdesc.xml` sont exacts. Les shaders internes de certains effets Picnik (`MuseumMatte`, `ReanimatedEyeColor`, `PicnikFocalPixelate`, etc.) sont reproduits par approximation matricielle NumPy et marqués `# TODO(unverified)`.
+
+

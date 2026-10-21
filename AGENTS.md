@@ -216,6 +216,11 @@ Tout écart (même un octet) est un **bug** jusqu'à preuve, dans le désassembl
 7. Signaler explicitement toute divergence connue entre la version Python et l'original, y compris les écarts de performance.
 8. **Mesurer, ne pas supposer** : aucune affirmation « c'est assez rapide » ou « c'est plus rapide » sans benchmark ; ne pas optimiser prématurément, mais ne pas livrer de chemin chaud non mesuré.
 9. Données personnelles : les fichiers de test issus de vraies photothèques doivent être anonymisés ou non versionnés publiquement.
+10. **Gestion stricte du numéro de version (`z.y.x.w` dans `picasa_py/version.py`)** :
+    - Le numéro de version de PyCasa suit le format **`z.y.x.w`** (défini dans `picasa_py/version.py` et synchronisé dans `pyproject.toml`) :
+      - **`z` et `y`** (ex. `3.9`) : **réservés exclusivement à l'utilisateur**. Aucun agent ne doit jamais modifier `z` ou `y` sans demande explicite de l'utilisateur.
+      - **`x`** (initialisé à `145`) : incrémenté à chaque **demande d'ajout de fonctionnalité**.
+      - **`w`** : incrémenté à **chaque changement dans le code** (correction, ajustement, refactoring ou modification quelconque du code).
 
 ---
 

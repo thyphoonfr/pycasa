@@ -1,11 +1,16 @@
-"""
-Outil de comparaison binaire stricte (diff octet par octet).
+"""FR: Outil de comparaison binaire stricte (diff octet par octet).
 Utilisé pour valider la conformité stricte bit-à-bit imposée par AGENTS.md.
+EN: Strict binary comparison tool (byte-for-byte diff).
+Used to validate the strict bit-exact compliance required by AGENTS.md.
 """
 
 import sys
 
+
 def diff_files(file1: str, file2: str, max_diffs: int = 10) -> bool:
+    """FR: Compare deux fichiers octet par octet et affiche les premières différences.
+    EN: Compares two files byte-for-byte and prints the first differences.
+    """
     with open(file1, "rb") as f1, open(file2, "rb") as f2:
         b1 = f1.read()
         b2 = f2.read()
@@ -27,6 +32,7 @@ def diff_files(file1: str, file2: str, max_diffs: int = 10) -> bool:
     if len(b1) != len(b2):
         print(f"  Différence de taille : taille 1 = {len(b1)}, taille 2 = {len(b2)}")
     return False
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

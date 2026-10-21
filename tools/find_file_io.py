@@ -1,3 +1,7 @@
+"""FR: Localise les entrées IAT et appels indirects à CreateFileA, CreateFileW et ReadFile dans picasa3.exe.
+EN: Locates IAT entries and indirect calls to CreateFileA, CreateFileW, and ReadFile in picasa3.exe.
+"""
+
 import pefile
 import capstone
 import struct

@@ -1,3 +1,7 @@
+"""FR: Recherche les chaînes et références croisées liées à CThumbDB, thumbindex.db et aux conteneurs *_index.db.
+EN: Searches for strings and cross-references related to CThumbDB, thumbindex.db, and *_index.db containers.
+"""
+
 import pefile
 import struct
 

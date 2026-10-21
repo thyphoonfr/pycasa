@@ -1,5 +1,6 @@
-"""
-Extraction of all PE resources, XML internationalization, FEN layout definitions,
+"""FR: Extraction de toutes les ressources PE, fichiers XML d'internationalisation, définitions de mise en page FEN,
+et tables de menus/raccourcis depuis les binaires et répertoires runtime de Picasa 3.
+EN: Extraction of all PE resources, XML internationalization, FEN layout definitions,
 and menu/shortcut tables from Picasa3 binaries and runtime directories.
 
 Ref: picasa3.exe @ PE Resource Directory
@@ -25,6 +26,9 @@ OUT_DIR = BASE_DIR / "ui" / "resources"
 
 
 def extract_icons(pe: pefile.PE, out_dir: Path):
+    """FR: Extrait les groupes d'icônes (RT_GROUP_ICON / RT_ICON) du binaire PE vers des fichiers .ico.
+    EN: Extracts icon groups (RT_GROUP_ICON / RT_ICON) from the PE binary into .ico files.
+    """
     icon_dir = out_dir / "icons"
     icon_dir.mkdir(parents=True, exist_ok=True)
     
@@ -71,6 +75,9 @@ def extract_icons(pe: pefile.PE, out_dir: Path):
 
 
 def extract_cursors(pe: pefile.PE, out_dir: Path):
+    """FR: Extrait les curseurs (RT_CURSOR) du binaire PE vers des fichiers .cur.
+    EN: Extracts cursors (RT_CURSOR) from the PE binary into .cur files.
+    """
     cur_dir = out_dir / "cursors"
     cur_dir.mkdir(parents=True, exist_ok=True)
     
@@ -101,6 +108,9 @@ def extract_cursors(pe: pefile.PE, out_dir: Path):
 
 
 def extract_strings(pe: pefile.PE, out_dir: Path):
+    """FR: Extrait les tables de chaînes (RT_STRING) du binaire PE vers strings.json.
+    EN: Extracts string tables (RT_STRING) from the PE binary into strings.json.
+    """
     str_dir = out_dir / "strings"
     str_dir.mkdir(parents=True, exist_ok=True)
     
@@ -130,6 +140,9 @@ def extract_strings(pe: pefile.PE, out_dir: Path):
 
 
 def extract_dialogs(pe: pefile.PE, out_dir: Path):
+    """FR: Extrait les modèles de boîtes de dialogue (RT_DIALOG) du binaire PE.
+    EN: Extracts dialog templates (RT_DIALOG) from the PE binary.
+    """
     dlg_dir = out_dir / "dialogs"
     dlg_dir.mkdir(parents=True, exist_ok=True)
     
@@ -149,6 +162,9 @@ def extract_dialogs(pe: pefile.PE, out_dir: Path):
 
 
 def extract_manifest(pe: pefile.PE, out_dir: Path):
+    """FR: Extrait le manifeste côte-à-côte (RT_MANIFEST) du binaire PE.
+    EN: Extracts the side-by-side manifest (RT_MANIFEST) from the PE binary.
+    """
     mf_dir = out_dir / "manifest"
     mf_dir.mkdir(parents=True, exist_ok=True)
     for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries:
@@ -162,6 +178,9 @@ def extract_manifest(pe: pefile.PE, out_dir: Path):
 
 
 def extract_fen_and_runtime(out_dir: Path):
+    """FR: Copie les fichiers de mise en page .fen et les fichiers de configuration du répertoire runtime.
+    EN: Copies .fen layout files and configuration files from the runtime directory.
+    """
     fen_dir = out_dir / "fen"
     fen_dir.mkdir(parents=True, exist_ok=True)
     style_dir = out_dir / "style"
@@ -184,6 +203,9 @@ def extract_fen_and_runtime(out_dir: Path):
 
 
 def extract_i18n_xml(out_dir: Path):
+    """FR: Extrait les fichiers XML de traduction (ressource XMLF) depuis Picasa3i18n.dll.
+    EN: Extracts translation XML files (XMLF resource) from Picasa3i18n.dll.
+    """
     xml_dir = out_dir / "xml"
     xml_dir.mkdir(parents=True, exist_ok=True)
     
@@ -211,6 +233,9 @@ def extract_i18n_xml(out_dir: Path):
 
 
 def extract_menus_and_shortcuts(out_dir: Path):
+    """FR: Extrait la table des menus et raccourcis clavier depuis la section de données de picasa3.exe.
+    EN: Extracts the menu and keyboard shortcut table from the data section of picasa3.exe.
+    """
     menu_dir = out_dir / "menus"
     menu_dir.mkdir(parents=True, exist_ok=True)
     
@@ -266,6 +291,9 @@ def extract_menus_and_shortcuts(out_dir: Path):
 
 
 def main():
+    """FR: Point d'entrée principal pour l'extraction complète des ressources PE et runtime.
+    EN: Main entry point for full PE and runtime resource extraction.
+    """
     print(f"Opening {EXE_PATH}...")
     pe = pefile.PE(str(EXE_PATH))
     

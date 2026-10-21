@@ -1,7 +1,36 @@
+# Python bytecode & test/lint caches
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.benchmarks/
+.coverage
+htmlcov/
+
+# Scratch & temporary files
+scratch/
+*.tmp
+*.bak
+*.swp
+
+# Virtual environments & packaging artifacts
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+ui/resources/icons/group_icon_105.icns
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Original proprietary executable & local Ghidra repository database
 bin/Picasa3.exe
 ghidra/picasa3.rep/
 ghidra/*.log
+/thumbindex.db

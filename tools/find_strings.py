@@ -1,6 +1,14 @@
+"""FR: Recherche les chaînes ASCII et UTF-16LE liées aux fichiers .picasa.ini dans picasa3.exe.
+EN: Searches for ASCII and UTF-16LE strings related to .picasa.ini files in picasa3.exe.
+"""
+
 import pefile
 
-def scan_strings():
+
+def scan_strings() -> None:
+    """FR: Parcourt picasa3.exe pour trouver les chaînes cibles en ASCII et UTF-16LE et affiche leurs VA.
+    EN: Scans picasa3.exe to find target strings in ASCII and UTF-16LE and prints their VAs.
+    """
     pe = pefile.PE("bin/Picasa3.exe")
     image_base = pe.OPTIONAL_HEADER.ImageBase
     print(f"Image Base: 0x{image_base:08X}")
@@ -65,6 +73,7 @@ def scan_strings():
             u_decoded = data[s:e].decode("utf-16le", errors="replace")
             print(f"[UTF16] {target} @ file 0x{pos:08X}, VA 0x{va:08X}: {repr(u_decoded)}")
             idx = pos + 2
+
 
 if __name__ == "__main__":
     scan_strings()

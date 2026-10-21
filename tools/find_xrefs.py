@@ -1,7 +1,15 @@
+"""FR: Recherche dans la section .text de picasa3.exe les références croisées vers des adresses de chaînes .picasa.ini.
+EN: Searches the .text section of picasa3.exe for cross-references to .picasa.ini string addresses.
+"""
+
 import pefile
 import struct
 
-def find_xrefs():
+
+def find_xrefs() -> None:
+    """FR: Localise et affiche toutes les références croisées dans .text vers les chaînes cibles.
+    EN: Locates and prints all cross-references in .text to the target strings.
+    """
     pe = pefile.PE("bin/Picasa3.exe")
     image_base = pe.OPTIONAL_HEADER.ImageBase
     
@@ -49,6 +57,7 @@ def find_xrefs():
             context_end = min(len(text_data), pos + 20)
             hex_ctx = text_data[context_start:context_end].hex()
             print(f"  -> xref at VA 0x{ref_va:08X} (offset 0x{ref_offset:08X})")
+
 
 if __name__ == "__main__":
     find_xrefs()

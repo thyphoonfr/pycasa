@@ -1,7 +1,15 @@
+"""FR: Script d'inspection préliminaire de la structure binaire de thumbindex.db.
+EN: Preliminary inspection script for the thumbindex.db binary structure.
+"""
+
 import struct
 import os
 
-def parse_thumbindex():
+
+def parse_thumbindex() -> None:
+    """FR: Lit l'en-tête et les premiers chemins terminés par un octet nul dans thumbindex.db.
+    EN: Reads the header and first null-terminated paths in thumbindex.db.
+    """
     path = os.path.expandvars(r"%LOCALAPPDATA%\Google\Picasa2\db3\thumbindex.db")
     with open(path, "rb") as f:
         data = f.read()
@@ -43,6 +51,7 @@ def parse_thumbindex():
         offset = end + 1
 
     print(f"Successfully parsed {len(all_paths)} / {count} paths. Consumed {offset} / {len(data)} bytes.")
+
 
 if __name__ == "__main__":
     parse_thumbindex()
