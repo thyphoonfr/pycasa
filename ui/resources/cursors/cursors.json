@@ -3,72 +3,108 @@
     "file": "cursor_1.cur",
     "hotspot_x": 9,
     "hotspot_y": 8,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_1.png",
+    "width": 32,
+    "height": 32
   },
   "2": {
     "file": "cursor_2.cur",
     "hotspot_x": 0,
     "hotspot_y": 19,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_2.png",
+    "width": 32,
+    "height": 32
   },
   "3": {
     "file": "cursor_3.cur",
     "hotspot_x": 7,
     "hotspot_y": 9,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_3.png",
+    "width": 32,
+    "height": 32
   },
   "4": {
     "file": "cursor_4.cur",
     "hotspot_x": 7,
     "hotspot_y": 9,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_4.png",
+    "width": 32,
+    "height": 32
   },
   "5": {
     "file": "cursor_5.cur",
     "hotspot_x": 14,
     "hotspot_y": 15,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_5.png",
+    "width": 32,
+    "height": 32
   },
   "6": {
     "file": "cursor_6.cur",
     "hotspot_x": 0,
     "hotspot_y": 0,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_6.png",
+    "width": 32,
+    "height": 32
   },
   "7": {
     "file": "cursor_7.cur",
     "hotspot_x": 2,
     "hotspot_y": 2,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_7.png",
+    "width": 32,
+    "height": 32
   },
   "8": {
     "file": "cursor_8.cur",
     "hotspot_x": 12,
     "hotspot_y": 9,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_8.png",
+    "width": 32,
+    "height": 32
   },
   "9": {
     "file": "cursor_9.cur",
     "hotspot_x": 14,
     "hotspot_y": 15,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_9.png",
+    "width": 32,
+    "height": 32
   },
   "10": {
     "file": "cursor_10.cur",
     "hotspot_x": 0,
     "hotspot_y": 0,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_10.png",
+    "width": 32,
+    "height": 32
   },
   "11": {
     "file": "cursor_11.cur",
     "hotspot_x": 7,
     "hotspot_y": 9,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_11.png",
+    "width": 32,
+    "height": 32
   },
   "12": {
     "file": "cursor_12.cur",
     "hotspot_x": 15,
     "hotspot_y": 14,
-    "size_bytes": 326
+    "size_bytes": 326,
+    "png_file": "cursor_12.png",
+    "width": 32,
+    "height": 32
   }
 }

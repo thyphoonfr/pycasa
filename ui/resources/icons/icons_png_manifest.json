@@ -1,0 +1,136 @@
+{
+  "group_icons": {
+    "105": {
+      "png_file": "group_icon_105.png",
+      "ico_file": "group_icon_105.ico",
+      "sizes": {
+        "16x16": "group_icon_105_16x16.png",
+        "32x32": "group_icon_105_32x32.png",
+        "48x48": "group_icon_105_48x48.png",
+        "256x256": "group_icon_105_256x256.png"
+      }
+    },
+    "106": {
+      "png_file": "group_icon_106.png",
+      "ico_file": "group_icon_106.ico",
+      "sizes": {
+        "32x32": "group_icon_106.png"
+      }
+    },
+    "150": {
+      "png_file": "group_icon_150.png",
+      "ico_file": "group_icon_150.ico",
+      "sizes": {
+        "16x16": "group_icon_150.png"
+      }
+    },
+    "151": {
+      "png_file": "group_icon_151.png",
+      "ico_file": "group_icon_151.ico",
+      "sizes": {
+        "16x16": "group_icon_151_16x16.png",
+        "32x32": "group_icon_151_32x32.png"
+      }
+    },
+    "152": {
+      "png_file": "group_icon_152.png",
+      "ico_file": "group_icon_152.ico",
+      "sizes": {
+        "16x16": "group_icon_152.png"
+      }
+    },
+    "153": {
+      "png_file": "group_icon_153.png",
+      "ico_file": "group_icon_153.ico",
+      "sizes": {
+        "16x16": "group_icon_153.png"
+      }
+    },
+    "157": {
+      "png_file": "group_icon_157.png",
+      "ico_file": "group_icon_157.ico",
+      "sizes": {
+        "16x12": "group_icon_157.png"
+      }
+    },
+    "158": {
+      "png_file": "group_icon_158.png",
+      "ico_file": "group_icon_158.ico",
+      "sizes": {
+        "16x12": "group_icon_158.png"
+      }
+    },
+    "159": {
+      "png_file": "group_icon_159.png",
+      "ico_file": "group_icon_159.ico",
+      "sizes": {
+        "16x12": "group_icon_159.png"
+      }
+    },
+    "161": {
+      "png_file": "group_icon_161.png",
+      "ico_file": "group_icon_161.ico",
+      "sizes": {
+        "16x12": "group_icon_161.png"
+      }
+    },
+    "320": {
+      "png_file": "group_icon_320.png",
+      "ico_file": "group_icon_320.ico",
+      "sizes": {
+        "16x16": "group_icon_320_16x16.png",
+        "32x32": "group_icon_320_32x32.png",
+        "48x48": "group_icon_320_48x48.png",
+        "256x256": "group_icon_320_256x256.png"
+      }
+    }
+  },
+  "ui_icons_png": [
+    "editpanel_aa_2up_icon.png",
+    "editpanel_ab_2up_icon.png",
+    "editpanel_only_1up_icon.png",
+    "editpanel_swap_2up_focus_icon.png",
+    "editpanel_swap_2up_layout_horiz_icon.png",
+    "editpanel_swap_2up_layout_icon.png",
+    "editpanel_tab1_basic.png",
+    "editpanel_tab2_tuning.png",
+    "editpanel_tab3_fx1.png",
+    "editpanel_tab4_fx2.png",
+    "editpanel_tab5_fx3.png",
+    "editpanel_tool_autocolor.png",
+    "editpanel_tool_autolighting.png",
+    "editpanel_tool_crop.png",
+    "editpanel_tool_dropper.png",
+    "editpanel_tool_enhance.png",
+    "editpanel_tool_redeye.png",
+    "editpanel_tool_retouch.png",
+    "editpanel_tool_straighten.png",
+    "editpanel_tool_text.png",
+    "group_icon_105.png",
+    "group_icon_105_16x16.png",
+    "group_icon_105_256x256.png",
+    "group_icon_105_32x32.png",
+    "group_icon_105_48x48.png",
+    "group_icon_106.png",
+    "group_icon_150.png",
+    "group_icon_151.png",
+    "group_icon_151_16x16.png",
+    "group_icon_151_32x32.png",
+    "group_icon_152.png",
+    "group_icon_153.png",
+    "group_icon_157.png",
+    "group_icon_158.png",
+    "group_icon_159.png",
+    "group_icon_161.png",
+    "group_icon_320.png",
+    "group_icon_320_16x16.png",
+    "group_icon_320_256x256.png",
+    "group_icon_320_32x32.png",
+    "group_icon_320_48x48.png",
+    "star_icon.png",
+    "thumbui_people_icon.png",
+    "thumbui_places_icon.png",
+    "thumbui_properties_icon.png",
+    "thumbui_tags_icon.png"
+  ]
+}
