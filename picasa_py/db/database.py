@@ -288,6 +288,14 @@ class PicasaDatabase:
         self.db3_dir = db3_dir
         self.contacts_dir = contacts_dir
         self._lock = threading.RLock()
+        # FR: Verrous indépendants par conteneur CBlockFile (thumbs, thumbs2, bigthumbs, previews, facetemplatesV2, albums)
+        # afin que la lecture des miniatures (get_thumbnail) ne soit jamais bloquée par les opérations sur les tables PMP.
+        # EN: Independent per-CBlockFile locks (thumbs, thumbs2, bigthumbs, previews, facetemplatesV2, albums)
+        # so thumbnail reads (get_thumbnail) are never blocked by PMP table operations.
+        # Ref: picasa3.exe @ 0x00415790 (decomp_dir_scanner_ctor.c:601-652), 0x006B7FC0 (cblockfile_006B7FC0.c:30)
+        self._block_locks: Dict[str, threading.RLock] = {
+            prefix: threading.RLock() for prefix in STANDARD_BLOCKFILE_PREFIXES
+        }
 
         self.thumbindex: Optional[ThumbIndexFile] = None
         self.repository: Optional[KeyValueTableFile] = None
@@ -312,9 +320,45 @@ class PicasaDatabase:
         self._albums_cache_sig: Optional[Tuple[int, int]] = None
         self._starred_cache: Optional[List[str]] = None
         self._starred_cache_sig: Optional[int] = None
+        self._search_haystack_cache: Optional[Dict[int, str]] = None
+        self._search_haystack_len: int = -1
+        self._deleted_or_reset_indices: Set[int] = set()
+        self._modified_media_indices: Set[int] = set()
         self._thumb_save_timer: Optional[threading.Timer] = None
         self._min_aligned_idx: int = -1
         self._aligned_pmp_count: int = 0
+
+    @property
+    def _deleted_or_Reset_indices(self) -> Set[int]:
+        """
+        FR: Alias de compatibilité vers `_deleted_or_reset_indices`.
+        EN: Compatibility alias to `_deleted_or_reset_indices`.
+        """
+        return self._deleted_or_reset_indices
+
+    @_deleted_or_Reset_indices.setter
+    def _deleted_or_Reset_indices(self, value: Set[int]) -> None:
+        self._deleted_or_reset_indices = value
+
+    def invalidate_search_cache(self) -> None:
+        """
+        FR: Invalide le cache inversé de recherche plein texte (`_search_haystack_cache`).
+        EN: Invalidates the full-text search haystack cache (`_search_haystack_cache`).
+        """
+        self._search_haystack_cache = None
+        self._search_haystack_len = -1
+
+    def _get_cached_folder_ini_doc(self, folder_path: str) -> Optional[Any]:
+        """
+        FR: Retourne le document `.picasa.ini` ou `Picasa.ini` mis en cache pour `folder_path` sans stat disque répété.
+        EN: Returns the cached `.picasa.ini` or `Picasa.ini` document for `folder_path` without repeated disk stat.
+        """
+        if not folder_path:
+            return None
+        doc = self.get_parsed_ini(os.path.join(folder_path, ".picasa.ini"))
+        if doc is None:
+            doc = self.get_parsed_ini(os.path.join(folder_path, "Picasa.ini"))
+        return doc
 
     @property
     def block_files(self) -> Dict[str, _BlockFileHandle]:
@@ -405,7 +449,7 @@ class PicasaDatabase:
                 suffix_part = cont_path.stem[len(prefix) + 1 :]
                 if suffix_part.isdigit():
                     block_num = int(suffix_part)
-                    cont_obj = BlockContainerFile.from_bytes(cont_path.read_bytes())
+                    cont_obj = BlockContainerFile.from_file(cont_path)
                     self.block_containers_by_block[(prefix, block_num)] = cont_obj
                     if block_num == 0:
                         self.block_containers[prefix] = cont_obj
@@ -414,6 +458,8 @@ class PicasaDatabase:
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
             self.contacts = ContactsFile.from_xml((self.contacts_dir / "contacts.xml").read_text(encoding="utf-8"))
 
+        self._deleted_or_reset_indices.clear()
+        self._modified_media_indices.clear()
         self._invalidate_path_index_cache()
         self._albums_cache = None
         self._starred_cache = None
@@ -469,23 +515,26 @@ class PicasaDatabase:
         p_cont.mkdir(parents=True, exist_ok=True)
 
         db = cls(db3_dir=p_db3, contacts_dir=p_cont)
-        db.thumbindex = ThumbIndexFile(records=[])
+        db.thumbindex = ThumbIndexFile(records=[], dirty=True)
         db.repository = KeyValueTableFile(pairs=[])
         db.usernames = KeyValueTableFile(pairs=[])
-        db.wordhash = WordHashFile()
+        db.wordhash = WordHashFile(dirty=True)
         db.contacts = ContactsFile(contacts=[])
 
         for stem, pmp_type in STANDARD_PMP_SCHEMA.items():
             default_records = list(DEFAULT_CATDATA_RECORDS.get(stem, []))
-            db.pmps[stem] = PmpFile(pmp_type=pmp_type, records=default_records)
+            db.pmps[stem] = PmpFile(pmp_type=pmp_type, records=default_records, dirty=True)
 
         for prefix in STANDARD_BLOCKFILE_PREFIXES:
-            db.block_indices[prefix] = BlockIndexFile.from_entries([], active_block=0)
+            idx_obj = BlockIndexFile.from_entries([], active_block=0)
+            idx_obj.dirty = True
+            db.block_indices[prefix] = idx_obj
             cont = BlockContainerFile()
+            cont._fully_dirty = True
             db.block_containers[prefix] = cont
             db.block_containers_by_block[(prefix, 0)] = cont
 
-        db.save_database()
+        db.save_database(force_all=True)
         return db
 
     @property
@@ -527,10 +576,10 @@ class PicasaDatabase:
         """
         FR: Recherche plein texte multi-mots (AND) avec support des préfixes.
         Combine l'index inversé wordhash.dat avec l'indexation dynamique des enregistrements
-        (noms de fichiers, dossiers parents, personnes identifiées, mots-clés).
+        (noms de fichiers, dossiers parents, personnes identifiées, mots-clés) via un cache mémoire O(1).
         EN: Multi-word full-text search (AND) with prefix matching support.
         Combines the wordhash.dat inverted index with dynamic record indexing
-        (filenames, parent folders, identified people, keywords).
+        (filenames, parent folders, identified people, keywords) via an O(1) in-memory haystack cache.
         Ref: picasa3.exe @ 0x007046E0 (wordhash search), 0x0088C3EC (live search)
         """
         query_stripped = query.strip()
@@ -543,56 +592,84 @@ class PicasaDatabase:
         if self.wordhash:
             try:
                 wh_results = self.wordhash.search(query_stripped)
-                matched_indices.update(wh_results)
+                for idx in wh_results:
+                    if idx not in self._deleted_or_reset_indices:
+                        matched_indices.add(idx)
             except Exception:
                 pass
 
-        # 2. Recherche dynamique dans les métadonnées de la base / Dynamic search in database metadata
+        # 2. Recherche dynamique dans les métadonnées de la base via _search_haystack_cache
         tokens = [t.lower() for t in query_stripped.split() if t]
         if not tokens:
             return sorted(list(matched_indices))
 
         if self.thumbindex:
-            folder_names: Dict[int, str] = {}
-            for i, r in enumerate(self.thumbindex.records):
-                if r.type == 1:
-                    clean_p = r.path.rstrip("\\/").replace("\\", "/")
-                    folder_names[i] = os.path.basename(clean_p).lower()
+            recs = self.thumbindex.records
+            if self._search_haystack_cache is None or self._search_haystack_len != len(recs):
+                haystack: Dict[int, str] = {}
+                folder_names: Dict[int, str] = {}
+                for i, r in enumerate(recs):
+                    if r.type == 1:
+                        clean_p = r.path.rstrip("\\/").replace("\\", "/")
+                        folder_names[i] = os.path.basename(clean_p).lower()
 
-            pmp_tags = self.pmps.get("imagedata_tags")
-            pmp_caption = self.pmps.get("imagedata_caption")
+                pmp_tags = self.pmps.get("imagedata_tags")
+                tags_recs = pmp_tags.records if pmp_tags else []
+                tags_len = len(tags_recs)
 
-            for i, r in enumerate(self.thumbindex.records):
-                if r.type not in MEDIA_RECORD_TYPES:
-                    continue
+                pmp_caption = self.pmps.get("imagedata_caption")
+                cap_recs = pmp_caption.records if pmp_caption else []
+                cap_len = len(cap_recs)
 
-                if i in matched_indices:
-                    continue
-
-                fn = r.path.lower()
-                parent_folder = folder_names.get(r.parent_idx, "")
-                corpus_parts = [fn, parent_folder]
-
-                if pmp_tags and i < len(pmp_tags.records) and pmp_tags.records[i]:
-                    corpus_parts.append(str(pmp_tags.records[i]).lower())
-                if pmp_caption and i < len(pmp_caption.records) and pmp_caption.records[i]:
-                    corpus_parts.append(str(pmp_caption.records[i]).lower())
-
+                person_names_by_idx: Dict[int, List[str]] = {}
                 if self._face_manager is not None:
-                    faces = self._face_manager.get_faces_for_photo(i)
-                    for f in faces:
-                        p = self._face_manager.get_person(f.contact_id)
-                        if p and p.name:
-                            corpus_parts.append(p.name.lower())
+                    people_dict = getattr(self._face_manager, "people", None)
+                    if isinstance(people_dict, dict):
+                        for person in people_dict.values():
+                            pname = (getattr(person, "display_name", "") or getattr(person, "name", "") or "").strip().lower()
+                            if not pname:
+                                continue
+                            for p_idx in getattr(person, "photo_indices", ()):
+                                lst = person_names_by_idx.get(p_idx)
+                                if lst is None:
+                                    person_names_by_idx[p_idx] = [pname]
+                                else:
+                                    lst.append(pname)
+                    for p_idx, flist in getattr(self._face_manager, "photo_to_faces", {}).items():
+                        for f in flist:
+                            cid = getattr(f, "contact_id", "")
+                            if cid and cid != "ffffffffffffffff":
+                                p = self._face_manager.get_person(cid)
+                                if p and p.name:
+                                    pname = p.name.lower()
+                                    lst = person_names_by_idx.get(p_idx)
+                                    if lst is None:
+                                        person_names_by_idx[p_idx] = [pname]
+                                    elif pname not in lst:
+                                        lst.append(pname)
 
-                corpus = " ".join(corpus_parts)
-                all_match = True
-                for tok in tokens:
-                    if tok not in corpus:
-                        all_match = False
-                        break
+                deleted_set = self._deleted_or_reset_indices
+                for i, r in enumerate(recs):
+                    if r.type not in MEDIA_RECORD_TYPES or i in deleted_set or not r.path:
+                        continue
+                    parts = [r.path.lower(), folder_names.get(r.parent_idx, "")]
+                    if i < tags_len and tags_recs[i]:
+                        parts.append(str(tags_recs[i]).lower())
+                    if i < cap_len and cap_recs[i]:
+                        parts.append(str(cap_recs[i]).lower())
+                    pnames = person_names_by_idx.get(i)
+                    if pnames:
+                        parts.extend(pnames)
+                    haystack[i] = " ".join(parts)
 
-                if all_match:
+                self._search_haystack_cache = haystack
+                self._search_haystack_len = len(recs)
+
+            deleted_set = self._deleted_or_reset_indices
+            for i, corpus in self._search_haystack_cache.items():
+                if i in matched_indices or i in deleted_set:
+                    continue
+                if all(tok in corpus for tok in tokens):
                     matched_indices.add(i)
 
         return sorted(list(matched_indices))
@@ -600,7 +677,11 @@ class PicasaDatabase:
     def get_parsed_ini(self, ini_path: str) -> Optional[Any]:
         """
         FR: Lit et met en cache l'arbre d'un fichier .picasa.ini pour éviter des relectures multiples.
+        Toutes les écritures internes appellent `invalidate_ini_cache`, ce qui permet un TTL long (30 s)
+        sans appels `os.path.exists`/`os.path.getmtime` répétés sur le thread GUI.
         EN: Reads and caches a .picasa.ini file tree to avoid redundant disk reads.
+        All internal writes call `invalidate_ini_cache`, allowing a 30s TTL without repeated
+        `os.path.exists`/`os.path.getmtime` calls on the GUI thread.
         Ref: AGENTS.md §4 ter (Performances - Réduction des I/O disque).
         """
         if not ini_path:
@@ -610,10 +691,22 @@ class PicasaDatabase:
         cached = self._ini_cache.get(key)
         if cached is not None and len(cached) == 3:
             c_mtime, last_check, c_doc = cached
-            if now - last_check < 2.0:
+            if now - last_check < 30.0:
                 return c_doc
         else:
             c_mtime, c_doc = (-2.0, None)
+
+        # FR: Si on demande Picasa.ini alors que .picasa.ini existe déjà dans le cache de ce dossier,
+        # éviter un stat disque inutile sur Picasa.ini.
+        # EN: If Picasa.ini is requested while .picasa.ini already exists in cache for this folder,
+        # skip an unnecessary disk stat on Picasa.ini.
+        bname_low = os.path.basename(key)
+        if bname_low == "picasa.ini":
+            dot_key = os.path.join(os.path.dirname(key), ".picasa.ini")
+            dot_cached = self._ini_cache.get(dot_key)
+            if dot_cached is not None and len(dot_cached) == 3 and dot_cached[2] is not None:
+                self._ini_cache[key] = (-1.0, now, None)
+                return None
 
         if not os.path.exists(ini_path):
             self._ini_cache[key] = (-1.0, now, None)
@@ -630,19 +723,29 @@ class PicasaDatabase:
         except Exception:
             return None
 
-    def invalidate_ini_cache(self, ini_path: Optional[str] = None) -> None:
+    def invalidate_ini_cache(
+        self,
+        ini_path: Optional[str | Path] = None,
+        invalidate_albums_starred: bool = True,
+    ) -> None:
         """
         FR: Invalide l'entrée de cache INI lors d'une modification sur disque.
+        Si `invalidate_albums_starred=False` (ex. mise à jour de `faces=` uniquement),
+        conserve `_albums_cache` et `_starred_cache` intacts.
         EN: Invalidates the INI cache entry when modified on disk.
+        When `invalidate_albums_starred=False` (e.g. updating `faces=` only),
+        preserves `_albums_cache` and `_starred_cache`.
         """
         if ini_path:
-            key = os.path.normcase(os.path.abspath(ini_path))
+            ini_str = str(ini_path)
+            key = os.path.normcase(os.path.abspath(ini_str))
             self._ini_cache.pop(key, None)
-            self._ini_cache.pop(ini_path, None)
+            self._ini_cache.pop(ini_str, None)
         else:
             self._ini_cache.clear()
-        self._albums_cache = None
-        self._starred_cache = None
+        if invalidate_albums_starred:
+            self._albums_cache = None
+            self._starred_cache = None
 
     def _invalidate_path_index_cache(self) -> None:
         """
@@ -651,6 +754,7 @@ class PicasaDatabase:
         """
         self._path_index_version = -1
         self._parent_to_face_children_len = -1
+        self.invalidate_search_cache()
 
     def _index_single_record_into_cache(self, idx: int, r: ThumbIndexRecord) -> None:
         """
@@ -827,12 +931,16 @@ class PicasaDatabase:
                         def_v = pmp.default_value()
                         while len(pmp.records) <= alb_idx:
                             pmp.records.append(def_v)
+                            pmp.dirty = True
                 if ad_tokens is not None:
                     ad_tokens.records[alb_idx] = f"]album:{clean_tok}"
+                    ad_tokens.dirty = True
                 if ad_uids is not None:
                     ad_uids.records[alb_idx] = clean_tok
+                    ad_uids.dirty = True
                 if ad_cats is not None:
                     ad_cats.records[alb_idx] = 0
+                    ad_cats.dirty = True
 
             if alb_idx is not None:
                 for stem, pmp in self.pmps.items():
@@ -840,9 +948,12 @@ class PicasaDatabase:
                         def_v = pmp.default_value()
                         while len(pmp.records) <= alb_idx:
                             pmp.records.append(def_v)
+                            pmp.dirty = True
                 aname = sec.get("name")
                 if aname is not None and ad_names is not None:
-                    ad_names.records[alb_idx] = aname
+                    if ad_names.records[alb_idx] != aname:
+                        ad_names.records[alb_idx] = aname
+                        ad_names.dirty = True
                 date_str = sec.get("date")
                 if date_str is not None and ad_dates is not None:
                     d_clean = date_str.strip()
@@ -857,8 +968,9 @@ class PicasaDatabase:
                             ole_val = (dt - ole_epoch).total_seconds() / 86400.0
                         except Exception:
                             ole_val = None
-                    if ole_val is not None:
+                    if ole_val is not None and ad_dates.records[alb_idx] != ole_val:
                         ad_dates.records[alb_idx] = ole_val
+                        ad_dates.dirty = True
 
     def sync_photo_ini_to_db(self, photo_path: str | Path | int, doc: Any = None) -> None:
         """
@@ -911,7 +1023,10 @@ class PicasaDatabase:
             default_v = pmp.default_value()
             while len(pmp.records) <= idx:
                 pmp.records.append(default_v)
-            pmp.records[idx] = val
+                pmp.dirty = True
+            if pmp.records[idx] != val:
+                pmp.records[idx] = val
+                pmp.dirty = True
 
         # 1. Rotation (Ref: picasa3.exe @ 0x0042A570 : rotate(-1) ou absent -> 0 / "")
         raw_rot_val = sec.get("rotate") if sec is not None else None
@@ -950,7 +1065,8 @@ class PicasaDatabase:
         # 4. Filters, Text, Keywords, Caption, BackupHash, DeferredFace, Geotag
         if sec is None:
             _set_pmp("imagedata_filters", "")
-            _set_pmp("imagedata_edited", 1 if (crop_u64 or rot > 0) else 0)
+            # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
+            _set_pmp("imagedata_edited", 1 if crop_u64 else (2 if rot > 0 else 0))
             _set_pmp("imagedata_text", "")
             _set_pmp("imagedata_textactive", 0)
             _set_pmp("imagedata_tags", "")
@@ -960,7 +1076,8 @@ class PicasaDatabase:
         else:
             filters_str = sec.get("filters", "") or ""
             _set_pmp("imagedata_filters", filters_str)
-            _set_pmp("imagedata_edited", 1 if (filters_str or crop_u64 or rot > 0) else 0)
+            # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
+            _set_pmp("imagedata_edited", 1 if (filters_str or crop_u64) else (2 if rot > 0 else 0))
 
             text_str = sec.get("text", "") or ""
             _set_pmp("imagedata_text", text_str)
@@ -1012,6 +1129,7 @@ class PicasaDatabase:
                         words.append(w.strip())
                 for tok in words:
                     self.wordhash.add_word(tok, idx)
+        self.invalidate_search_cache()
 
     def _resolve_photo_record_index(self, idx: int) -> Optional[int]:
         """
@@ -1076,10 +1194,12 @@ class PicasaDatabase:
             default_v = pmp_rot.default_value()
             while len(pmp_rot.records) <= eff_idx:
                 pmp_rot.records.append(default_v)
+                pmp_rot.dirty = True
             if int(getattr(pmp_rot, "pmp_type", 1)) in (0, 6):
                 pmp_rot.records[eff_idx] = f"rotate({rot})" if rot > 0 else ""
             else:
                 pmp_rot.records[eff_idx] = rot
+            pmp_rot.dirty = True
             return True
         return False
 
@@ -1174,8 +1294,12 @@ class PicasaDatabase:
             default_v = pmp_cap.default_value()
             while len(pmp_cap.records) <= eff_idx:
                 pmp_cap.records.append(default_v)
+                pmp_cap.dirty = True
             pmp_cap.records[eff_idx] = caption or ""
+            pmp_cap.dirty = True
+            self.invalidate_search_cache()
             return True
+        self.invalidate_search_cache()
         return False
 
     def get_tags(self, idx: int) -> List[str]:
@@ -1226,8 +1350,12 @@ class PicasaDatabase:
             default_v = pmp_tags.default_value()
             while len(pmp_tags.records) <= eff_idx:
                 pmp_tags.records.append(default_v)
+                pmp_tags.dirty = True
             pmp_tags.records[eff_idx] = ",".join(tag_list)
+            pmp_tags.dirty = True
+            self.invalidate_search_cache()
             return True
+        self.invalidate_search_cache()
         return False
 
     def add_keyword(self, idx: int, keyword: str) -> bool:
@@ -1280,6 +1408,8 @@ class PicasaDatabase:
         rec.mark_deleted()
         rec.mod_time = 0.0
         rec.version = 0
+        self.thumbindex.dirty = True
+        self._deleted_or_reset_indices.add(rec_idx)
 
         # Supprimer les enregistrements enfants de visages (type == 1001, parent_idx == rec_idx)
         facerect_pmp = self.pmps.get("imagedata_facerect")
@@ -1290,22 +1420,30 @@ class PicasaDatabase:
             child_rec.mark_deleted()
             child_rec.mod_time = 0.0
             child_rec.version = 0
+            self._deleted_or_reset_indices.add(child_idx)
             if facerect_pmp is not None and child_idx < len(facerect_pmp.records):
                 facerect_pmp.records[child_idx] = 0
+                facerect_pmp.dirty = True
             if personalbumid_pmp is not None and child_idx < len(personalbumid_pmp.records):
                 personalbumid_pmp.records[child_idx] = 0
+                personalbumid_pmp.dirty = True
             if suggestion_pmp is not None and child_idx < len(suggestion_pmp.records):
                 suggestion_pmp.records[child_idx] = 0
+                suggestion_pmp.dirty = True
         self._invalidate_path_index_cache()
+        self.invalidate_search_cache()
         self._albums_cache = None
         self._starred_cache = None
 
         if facerect_pmp is not None and rec_idx < len(facerect_pmp.records):
             facerect_pmp.records[rec_idx] = 0
+            facerect_pmp.dirty = True
         if personalbumid_pmp is not None and rec_idx < len(personalbumid_pmp.records):
             personalbumid_pmp.records[rec_idx] = 0
+            personalbumid_pmp.dirty = True
         if suggestion_pmp is not None and rec_idx < len(suggestion_pmp.records):
             suggestion_pmp.records[rec_idx] = 0
+            suggestion_pmp.dirty = True
 
         if delete_from_disk and full_path and os.path.exists(full_path):
             try:
@@ -1395,13 +1533,21 @@ class PicasaDatabase:
             new_parent_idx = self.get_or_create_folder_index(dest_dir_str)
             self.thumbindex.records[rec_idx].parent_idx = new_parent_idx
             self.thumbindex.records[rec_idx].path = fname
+            self.thumbindex.dirty = True
+            self._modified_media_indices.add(rec_idx)
 
         self._invalidate_path_index_cache()
+        self.invalidate_search_cache()
         self._albums_cache = None
         self._starred_cache = None
         return True
 
-    def update_photo_ini(self, photo_path: str, mutator: Any) -> bool:
+    def update_photo_ini(
+        self,
+        photo_path: str,
+        mutator: Any,
+        invalidate_albums_starred: bool = True,
+    ) -> bool:
         """
         FR: Modifie de façon atomique l'entrée d'une photo dans le fichier .picasa.ini de son dossier,
         invalide le cache INI et synchronise les colonnes PMP / wordhash correspondantes.
@@ -1419,8 +1565,9 @@ class PicasaDatabase:
             doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
             mutator(doc, fname)
             doc.write_file(ini_path)
-            self.invalidate_ini_cache(ini_path)
+            self.invalidate_ini_cache(ini_path, invalidate_albums_starred=invalidate_albums_starred)
             self.sync_photo_ini_to_db(photo_path, doc)
+            self.invalidate_search_cache()
             return True
         except Exception:
             return False
@@ -1473,9 +1620,10 @@ class PicasaDatabase:
         ad_names = self.pmps.get("albumdata_name")
         ad_cats = self.pmps.get("albumdata_category")
         ad_tokens = self.pmps.get("albumdata_token")
+        self._ensure_path_index_cache()
         curr_sig = (
             len(ad_names.records) if ad_names else 0,
-            len(self.thumbindex.records) if self.thumbindex else 0,
+            len(self._folder_idx_to_norms),
         )
         if self._albums_cache is not None and self._albums_cache_sig == curr_sig:
             return [
@@ -1511,17 +1659,22 @@ class PicasaDatabase:
                         "source": "pmp",
                     }
 
-        # 2. Albums définis dans les fichiers .picasa.ini des dossiers surveillés
-        watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
-        self._ensure_path_index_cache()
+        # 2. Albums définis dans les fichiers .picasa.ini des dossiers surveillés et indexés
+        watched_set: Dict[str, str] = {}
+        for p, st in self.get_watched_folders().items():
+            if st in ("1", "2"):
+                hp = _to_host_path(p.rstrip("\\/"))
+                nk = os.path.normcase(os.path.abspath(hp))
+                watched_set[nk] = hp
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1:
-                    p = _to_host_path(r.path.rstrip("\\/"))
-                    if os.path.isdir(p) and p not in watched:
-                        watched.append(p)
+                if r.type == 1 and r.path:
+                    hp = _to_host_path(r.path.rstrip("\\/"))
+                    nk = os.path.normcase(os.path.abspath(hp))
+                    if nk not in watched_set:
+                        watched_set[nk] = hp
 
-        for w in watched:
+        for w in watched_set.values():
             ini_p = os.path.join(w, ".picasa.ini")
             doc = self.get_parsed_ini(ini_p)
             if not doc:
@@ -1600,37 +1753,51 @@ class PicasaDatabase:
 
     def get_starred_photo_paths(self) -> List[str]:
         """
-        FR: Récupère l'ensemble des chemins complets des photos marquées comme favorites (star=yes).
-        EN: Retrieves all full file paths of photos marked as starred (star=yes).
+        FR: Récupère l'ensemble des chemins complets des photos marquées comme favorites (star=yes)
+        sans appels `os.path.isdir` / `os.path.exists` bloquants par fichier sur le thread GUI.
+        EN: Retrieves all full file paths of photos marked as starred (star=yes)
+        without blocking per-file `os.path.isdir` / `os.path.exists` calls on the GUI thread.
         Ref: picasa3.exe @ CThumbDB::starredphotos (0x0088F6FC, 0x0068B800)
         """
-        curr_sig = len(self.thumbindex.records) if self.thumbindex else 0
+        self._ensure_path_index_cache()
+        curr_sig = len(self._folder_idx_to_norms)
         if self._starred_cache is not None and self._starred_cache_sig == curr_sig:
             return list(self._starred_cache)
 
         starred_paths: List[str] = []
-        watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
+        starred_seen: Set[str] = set()
+        watched_set: Dict[str, str] = {}
+        for p, st in self.get_watched_folders().items():
+            if st in ("1", "2"):
+                hp = _to_host_path(p.rstrip("\\/"))
+                nk = os.path.normcase(os.path.abspath(hp))
+                watched_set[nk] = hp
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1:
-                    p = _to_host_path(r.path.rstrip("\\/"))
-                    if os.path.isdir(p) and p not in watched:
-                        watched.append(p)
+                if r.type == 1 and r.path:
+                    hp = _to_host_path(r.path.rstrip("\\/"))
+                    nk = os.path.normcase(os.path.abspath(hp))
+                    if nk not in watched_set:
+                        watched_set[nk] = hp
 
-        for w in watched:
-            for ini_name in (".picasa.ini", "Picasa.ini"):
-                ini_p = os.path.join(w, ini_name)
-                doc = self.get_parsed_ini(ini_p)
-                if not doc:
-                    continue
-                try:
-                    for sec in doc.sections:
-                        if sec.get("star", "").lower() == "yes":
-                            photo_full_path = os.path.join(w, sec.name)
-                            if os.path.exists(photo_full_path) and photo_full_path not in starred_paths:
+        for w in watched_set.values():
+            norm_w = os.path.abspath(w).replace("/", "\\").rstrip("\\").lower()
+            doc = self.get_parsed_ini(os.path.join(w, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(w, "Picasa.ini"))
+            if not doc:
+                continue
+            try:
+                for sec in doc.sections:
+                    if sec.get("star", "").lower() == "yes":
+                        photo_full_path = os.path.join(w, sec.name)
+                        norm_p = f"{norm_w}\\{sec.name.lower()}"
+                        if norm_p not in starred_seen:
+                            if norm_p in self._path_index_cache or os.path.exists(photo_full_path):
+                                starred_seen.add(norm_p)
                                 starred_paths.append(photo_full_path)
-                except Exception:
-                    pass
+            except Exception:
+                pass
         self._starred_cache = list(starred_paths)
         self._starred_cache_sig = curr_sig
         return starred_paths
@@ -1722,6 +1889,7 @@ class PicasaDatabase:
                                 pmp_col.records[row_idx] = 0xFFFFFFFF
                             else:
                                 pmp_col.records[row_idx] = def_v
+                            pmp_col.dirty = True
             deleted = True
 
         # Supprimer le fichier .pal éventuel dans db3/albums/
@@ -1799,6 +1967,7 @@ class PicasaDatabase:
                             while len(ad_names.records) <= i:
                                 ad_names.records.append("")
                             ad_names.records[i] = new_name
+                            ad_names.dirty = True
                             renamed = True
 
         self._albums_cache = None
@@ -1839,6 +2008,32 @@ class PicasaDatabase:
         self.repository.set(norm_path, str(status))
         self._albums_cache = None
         self._starred_cache = None
+
+    def save_repository_only(self) -> None:
+        """
+        FR: Sauvegarde atomiquement sur disque uniquement `repository.dat` (configuration des dossiers
+        surveillés) sans réécrire les 56 tables `.pmp` ni `thumbindex.db`, évitant tout gel de l'UI
+        à la fermeture du Gestionnaire de dossiers.
+        EN: Atomically saves only `repository.dat` (watched folder settings) to disk without rewriting
+        all 56 `.pmp` tables or `thumbindex.db`, preventing any UI freeze when closing the Folder Manager.
+        Ref: picasa3.exe @ 0x008B1BF0, 0x008B7F90 (repository.dat)
+        """
+        if not self.db3_dir or self.db3_dir == Path(".") or not self.repository:
+            return
+        if not self.db3_dir.exists():
+            self.db3_dir.mkdir(parents=True, exist_ok=True)
+        with self._lock:
+            repo_bytes = self.repository.to_bytes()
+        target = self.db3_dir / "repository.dat"
+        tmp = target.with_suffix(target.suffix + ".tmp")
+        tmp.write_bytes(repo_bytes)
+        try:
+            os.replace(str(tmp), str(target))
+        except PermissionError:
+            try:
+                target.write_bytes(repo_bytes)
+            finally:
+                tmp.unlink(missing_ok=True)
 
     def get_media_full_path(self, index: int) -> Optional[str]:
         """
@@ -1924,13 +2119,29 @@ class PicasaDatabase:
             return self.block_containers.get(prefix)
         return None
 
+    def _get_block_lock(self, prefix: str) -> threading.RLock:
+        """
+        FR: Retourne le verrou dédié au conteneur `CBlockFile` correspondant à `prefix`.
+        EN: Returns the dedicated lock for the `CBlockFile` container matching `prefix`.
+        Ref: picasa3.exe @ 0x006B7FC0 (cblockfile_006B7FC0.c:30, LPCRITICAL_SECTION at this - 8)
+        """
+        locks = getattr(self, "_block_locks", None)
+        if locks is None:
+            self._block_locks = {p: threading.RLock() for p in STANDARD_BLOCKFILE_PREFIXES}
+            locks = self._block_locks
+        lck = locks.get(prefix)
+        if lck is None:
+            lck = threading.RLock()
+            locks[prefix] = lck
+        return lck
+
     def get_thumbnail(self, index: int, size: str = "small") -> Optional[bytes]:
         """
         FR: Extrait la miniature d'une image à un index donné (supporte les conteneurs multi-blocs *_0.db, *_1.db...).
         size: "small" (thumbs), "medium" (thumbs2), "large" (bigthumbs), "preview" (previews).
         EN: Extracts the thumbnail for an image at a given index (supports multi-block containers *_0.db, *_1.db...).
         size: "small" (thumbs), "medium" (thumbs2), "large" (bigthumbs), "preview" (previews).
-        Ref: picasa3.exe @ 0x006B6AF0, 0x006B7390
+        Ref: picasa3.exe @ 0x006B6AF0, 0x006B7390, 0x006B7FC0
         """
         prefix_map = {
             "small": "thumbs",
@@ -1939,9 +2150,9 @@ class PicasaDatabase:
             "preview": "previews",
         }
         prefix = prefix_map.get(size, size)
-        with self._lock:
+        with self._get_block_lock(prefix):
             idx_file = self.block_indices.get(prefix)
-            if not idx_file or index >= idx_file.record_count:
+            if not idx_file or index < 0 or index >= idx_file.record_count:
                 return None
 
             entry = idx_file.get_entry(index)
@@ -2112,6 +2323,7 @@ class PicasaDatabase:
                 while len(ft_pmp.records) <= index:
                     ft_pmp.records.append(0)
                 ft_pmp.records[index] = 1
+                ft_pmp.dirty = True
                 self._dirty = True
         return blob
 
@@ -2131,7 +2343,7 @@ class PicasaDatabase:
         - u[11..260] (+0x2C..+0x414) = 1000 bytes = 2000 unsigned 4-bit nibbles q -> (2*q - 15).
         Ref: Red.dll @ 0x10102020 (vqc_Cue::exportArr), 0x10100A10 (vqc_Relator::sim), 0x100FF050 (rawSim)
         """
-        with self._lock:
+        with self._get_block_lock("facetemplatesV2"):
             idx_file = self.block_indices.get("facetemplatesV2")
             if not idx_file or index < 0 or index >= idx_file.record_count:
                 return None
@@ -2142,23 +2354,23 @@ class PicasaDatabase:
             if not container:
                 return None
             blob = container.get_blob(entry)
-            if len(blob) < 1044:
-                return None
-            decoded = decode_face_template_blob(blob)
-            if decoded is not None:
-                packed_1000, inv_norm, image_stamp = decoded
-                raw_bytes = np.frombuffer(packed_1000, dtype=np.uint8)
-                vals = np.empty(2000, dtype=np.float32)
-                vals[0::2] = (raw_bytes & 0x0F).astype(np.float32) * 2.0 - 15.0
-                vals[1::2] = ((raw_bytes >> 4) & 0x0F).astype(np.float32) * 2.0 - 15.0
-                sqrt_w, _ = self._get_vqc_relator_weights()
-                return vals * (inv_norm * sqrt_w), inv_norm, image_stamp
-            # FR: Fallback pour blobs synthétiques de test / EN: Fallback for synthetic test blobs
-            raw = np.frombuffer(blob[20:1044], dtype=np.int8).astype(np.float32)
-            norm = float(np.linalg.norm(raw))
-            if norm > 1e-6:
-                return raw / norm, 1.0, 0
+        if len(blob) < 1044:
             return None
+        decoded = decode_face_template_blob(blob)
+        if decoded is not None:
+            packed_1000, inv_norm, image_stamp = decoded
+            raw_bytes = np.frombuffer(packed_1000, dtype=np.uint8)
+            vals = np.empty(2000, dtype=np.float32)
+            vals[0::2] = (raw_bytes & 0x0F).astype(np.float32) * 2.0 - 15.0
+            vals[1::2] = ((raw_bytes >> 4) & 0x0F).astype(np.float32) * 2.0 - 15.0
+            sqrt_w, _ = self._get_vqc_relator_weights()
+            return vals * (inv_norm * sqrt_w), inv_norm, image_stamp
+        # FR: Fallback pour blobs synthétiques de test / EN: Fallback for synthetic test blobs
+        raw = np.frombuffer(blob[20:1044], dtype=np.int8).astype(np.float32)
+        norm = float(np.linalg.norm(raw))
+        if norm > 1e-6:
+            return raw / norm, 1.0, 0
+        return None
 
     @classmethod
     def decode_vqc_cue_vector(cls, blob: bytes) -> Optional[np.ndarray]:
@@ -2249,6 +2461,23 @@ class PicasaDatabase:
                 return e1.checksum
         return cs
 
+    # Ref: picasa3.exe @ 0x00412DEA, 0x00412E3F — valeur par défaut -1 (0xFFFFFFFF) passée à FUN_006d1a40
+    # pour ces colonnes (vérifié sur db3 : lignes actives = 0xFFFFFFFF ; imagedata_aliasparents reste 0).
+    _PMP_NEW_ROW_DEFAULTS: Dict[str, Any] = {
+        "imagedata_personalbumrecs": 0xFFFFFFFF,
+        "imagedata_personalbumrecs2": 0xFFFFFFFF,
+    }
+
+    def _pmp_new_row_default(self, stem: str, pmp: Any) -> Any:
+        """
+        FR: Renvoie la valeur par défaut d'une nouvelle ligne pour la colonne PMP `stem`, conforme à picasa3.exe.
+        EN: Returns the default value of a new row for PMP column `stem`, matching picasa3.exe.
+        Ref: picasa3.exe @ 0x004127A0..0x00412F20 (FUN_006d1a40 default argument)
+        """
+        if stem in self._PMP_NEW_ROW_DEFAULTS:
+            return self._PMP_NEW_ROW_DEFAULTS[stem]
+        return pmp.default_value()
+
     def _align_imagedata_tables(self, target_idx: int) -> None:
         """
         FR: Aligne toutes les colonnes imagedata_*.pmp et les *_index.db jusqu'à target_idx inclus.
@@ -2270,8 +2499,9 @@ class PicasaDatabase:
             if name.startswith("imagedata_"):
                 missing = target_idx + 1 - len(pmp.records)
                 if missing > 0:
-                    def_val = pmp.default_value()
+                    def_val = self._pmp_new_row_default(name, pmp)
                     pmp.records.extend([def_val] * missing)
+                    pmp.dirty = True
         for prefix, idx_file in self.block_indices.items():
             if prefix in ("thumbs", "thumbs2", "bigthumbs", "previews", "facetemplatesV2"):
                 missing = target_idx + 1 - idx_file.record_count
@@ -2279,6 +2509,7 @@ class PicasaDatabase:
                     idx_file.checksums.extend([0] * missing)
                     idx_file.offsets.extend([0] * missing)
                     idx_file.sizes_and_blocks.extend([0] * missing)
+                    idx_file.dirty = True
         self._min_aligned_idx = target_idx
         self._aligned_pmp_count = len(self.pmps)
 
@@ -2325,6 +2556,7 @@ class PicasaDatabase:
             parent_idx=0xFFFFFFFF,
         )
         self.thumbindex.records.append(new_rec)
+        self.thumbindex.dirty = True
         new_idx = len(self.thumbindex.records) - 1
         self._index_single_record_into_cache(new_idx, new_rec)
         self._path_index_version = len(self.thumbindex.records)
@@ -2340,40 +2572,43 @@ class PicasaDatabase:
         EN: Adds an image or video record to thumbindex.db with flags=0x0100 and a valid FILETIME.
         Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex)
         """
-        if not self.thumbindex:
-            self.thumbindex = ThumbIndexFile()
+        with self._lock:
+            if not self.thumbindex:
+                self.thumbindex = ThumbIndexFile()
 
-        parent_idx = self.get_or_create_folder_index(folder_path)
-        if mtime > 100000000000:
-            ft = int(mtime)
-        elif mtime > 0:
-            ft = unix_to_filetime(float(mtime))
-        else:
-            ft = 0
-            host_folder = _to_host_path(folder_path)
-            full_p = os.path.join(host_folder, filename)
-            if os.path.exists(full_p):
-                try:
-                    ft = unix_to_filetime(os.path.getmtime(full_p))
-                except Exception:
-                    ft = 0
+            parent_idx = self.get_or_create_folder_index(folder_path)
+            if mtime > 100000000000:
+                ft = int(mtime)
+            elif mtime > 0:
+                ft = unix_to_filetime(float(mtime))
+            else:
+                ft = 0
+                host_folder = _to_host_path(folder_path)
+                full_p = os.path.join(host_folder, filename)
+                if os.path.exists(full_p):
+                    try:
+                        ft = unix_to_filetime(os.path.getmtime(full_p))
+                    except Exception:
+                        ft = 0
 
-        new_rec = ThumbIndexRecord(
-            path=filename,
-            ft1=ft,
-            ft2=ft,
-            size=file_size,
-            type=media_type,
-            flags=THUMBINDEX_ACTIVE_FLAG,
-            parent_idx=parent_idx,
-        )
-        self.thumbindex.records.append(new_rec)
-        new_idx = len(self.thumbindex.records) - 1
-        self._index_single_record_into_cache(new_idx, new_rec)
-        self._path_index_version = len(self.thumbindex.records)
-        self._parent_to_face_children_len = len(self.thumbindex.records)
-        self._align_imagedata_tables(new_idx)
-        return new_idx
+            new_rec = ThumbIndexRecord(
+                path=filename,
+                ft1=ft,
+                ft2=ft,
+                size=file_size,
+                type=media_type,
+                flags=THUMBINDEX_ACTIVE_FLAG,
+                parent_idx=parent_idx,
+            )
+            self.thumbindex.records.append(new_rec)
+            self.thumbindex.dirty = True
+            new_idx = len(self.thumbindex.records) - 1
+            self._index_single_record_into_cache(new_idx, new_rec)
+            self._path_index_version = len(self.thumbindex.records)
+            self._parent_to_face_children_len = len(self.thumbindex.records)
+            self.invalidate_search_cache()
+            self._align_imagedata_tables(new_idx)
+            return new_idx
 
     def add_thumbnail(self, index: int, jpeg_bytes: bytes, size: str = "small", checksum: int = 0) -> None:
         """
@@ -2390,38 +2625,40 @@ class PicasaDatabase:
             "preview": "previews",
         }
         prefix = prefix_map.get(size, size)
-        idx_file = self.block_indices.get(prefix)
-        if not idx_file:
-            return
-
         if checksum == 0:
-            checksum = self.compute_entry_checksum(index, prefix)
+            with self._lock:
+                checksum = self.compute_entry_checksum(index, prefix)
+        with self._get_block_lock(prefix):
+            idx_file = self.block_indices.get(prefix)
+            if not idx_file:
+                return
 
-        active_blk = idx_file.active_block
-        container = self._get_container_for_entry(prefix, active_blk)
-        if not container:
-            container = self.block_containers.get(prefix)
-            active_blk = 0
-        if not container:
-            return
+            active_blk = idx_file.active_block
+            container = self._get_container_for_entry(prefix, active_blk)
+            if not container:
+                container = self.block_containers.get(prefix)
+                active_blk = 0
+            if not container:
+                return
 
-        while idx_file.record_count < index:
-            idx_file.append_entry(BlockEntry())
+            while idx_file.record_count < index:
+                idx_file.append_entry(BlockEntry())
 
-        existing = idx_file.get_entry(index) if index < idx_file.record_count else None
-        entry = container.write_blob(
-            jpeg_bytes,
-            existing_entry=existing,
-            checksum=checksum,
-            block_idx=active_blk,
-        )
+            existing = idx_file.get_entry(index) if index < idx_file.record_count else None
+            entry = container.write_blob(
+                jpeg_bytes,
+                existing_entry=existing,
+                checksum=checksum,
+                block_idx=active_blk,
+            )
 
-        if index < idx_file.record_count:
-            idx_file.checksums[index] = entry.checksum
-            idx_file.offsets[index] = entry.offset
-            idx_file.sizes_and_blocks[index] = entry.raw_size_block
-        else:
-            idx_file.append_entry(entry)
+            if index < idx_file.record_count:
+                idx_file.checksums[index] = entry.checksum
+                idx_file.offsets[index] = entry.offset
+                idx_file.sizes_and_blocks[index] = entry.raw_size_block
+                idx_file.dirty = True
+            else:
+                idx_file.append_entry(entry)
 
     def update_thumbnails_from_pil(
         self,
@@ -2481,24 +2718,40 @@ class PicasaDatabase:
                 sub.save(buf, format="JPEG", quality=quality)
                 return buf.getvalue()
 
+            # FR: Compression JPEG et calcul de la couleur moyenne HORS verrou global (Ref: 0x00414C90 CThumbMaker)
+            # EN: JPEG compression and average color computation OUTSIDE the global lock (Ref: 0x00414C90 CThumbMaker)
+            encoded_small = _encode_scaled_jpeg(144, 90) if "thumbs" in self.block_indices else None
+            encoded_med = _encode_scaled_jpeg(72, 90) if "thumbs2" in self.block_indices else None
+            encoded_large = _encode_scaled_jpeg(288, 90) if "bigthumbs" in self.block_indices else None
+            encoded_prev = _encode_scaled_jpeg(640, 90) if "previews" in self.block_indices else None
+
+            avg_u32: Optional[int] = None
+            if "imagedata_avgcolor" in self.pmps:
+                try:
+                    avg_px = rgb_img.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
+                    if isinstance(avg_px, tuple) and len(avg_px) >= 3:
+                        avg_u32 = ((int(avg_px[0]) & 0xFF) << 16) | ((int(avg_px[1]) & 0xFF) << 8) | (int(avg_px[2]) & 0xFF)
+                except Exception:
+                    avg_u32 = None
+
             with self._lock:
                 self._align_imagedata_tables(resolved_idx)
 
                 # 1. thumbs (0x90 = 144px, quality 90 -> 0x5A)
-                if "thumbs" in self.block_indices:
-                    self.add_thumbnail(resolved_idx, _encode_scaled_jpeg(144, 90), size="small")
+                if encoded_small is not None:
+                    self.add_thumbnail(resolved_idx, encoded_small, size="small")
 
                 # 2. thumbs2 (0x48 = 72px, quality 90 -> 0x5A, Ref: FUN_00424CA0)
-                if "thumbs2" in self.block_indices:
-                    self.add_thumbnail(resolved_idx, _encode_scaled_jpeg(72, 90), size="medium")
+                if encoded_med is not None:
+                    self.add_thumbnail(resolved_idx, encoded_med, size="medium")
 
                 # 3. bigthumbs (0x120 = 288px, quality 90 -> 0x5A, Ref: FUN_00425210)
-                if "bigthumbs" in self.block_indices:
-                    self.add_thumbnail(resolved_idx, _encode_scaled_jpeg(288, 90), size="large")
+                if encoded_large is not None:
+                    self.add_thumbnail(resolved_idx, encoded_large, size="large")
 
                 # 4. previews (Ref: 0x0042525F : 0x280 = 640px, quality 90 -> 0x5A)
-                if "previews" in self.block_indices:
-                    self.add_thumbnail(resolved_idx, _encode_scaled_jpeg(640, 90), size="preview")
+                if encoded_prev is not None:
+                    self.add_thumbnail(resolved_idx, encoded_prev, size="preview")
 
                 # 5. Colonnes PMP imagedata_edit_width, imagedata_edit_height, imagedata_avgcolor
                 for col_name, col_val in (
@@ -2511,19 +2764,15 @@ class PicasaDatabase:
                         while len(pmp.records) <= resolved_idx:
                             pmp.records.append(def_v)
                         pmp.records[resolved_idx] = col_val
+                        pmp.dirty = True
 
                 pmp_avg = self.pmps.get("imagedata_avgcolor")
-                if pmp_avg is not None:
-                    try:
-                        avg_px = rgb_img.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                        if isinstance(avg_px, tuple) and len(avg_px) >= 3:
-                            avg_u32 = ((int(avg_px[0]) & 0xFF) << 16) | ((int(avg_px[1]) & 0xFF) << 8) | (int(avg_px[2]) & 0xFF)
-                            def_v = pmp_avg.default_value()
-                            while len(pmp_avg.records) <= resolved_idx:
-                                pmp_avg.records.append(def_v)
-                            pmp_avg.records[resolved_idx] = avg_u32
-                    except Exception:
-                        pass
+                if pmp_avg is not None and avg_u32 is not None:
+                    def_v = pmp_avg.default_value()
+                    while len(pmp_avg.records) <= resolved_idx:
+                        pmp_avg.records.append(def_v)
+                    pmp_avg.records[resolved_idx] = avg_u32
+                    pmp_avg.dirty = True
 
                 # 6. Sous-enregistrements de visages enfants (type == 1001, Ref: FUN_00425210 @ 0x004258D1..0x00425B6C)
                 if self.thumbindex is not None:
@@ -2563,20 +2812,22 @@ class PicasaDatabase:
                     self._updated_thumb_indices = set()
                 self._updated_thumb_indices.add(resolved_idx)
 
-                if persist_to_disk:
-                    self.save_thumbnails_only()
+            if persist_to_disk:
+                self.save_thumbnails_only()
             return True
         except Exception:
             return False
 
-    # Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470 (deferred CBlockFile index/thumb flush)
+    # Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470, 0x006C1920 (deferred CBlockFile index/thumb flush)
     def schedule_save_thumbnails(self, delay_ms: int = 1500) -> None:
         """
         FR: Planifie en arrière-plan une écriture différée et coalescée de `save_thumbnails_only`
         afin de ne jamais bloquer le thread GUI lors d'une séquence de retouche rapide.
+        Si l'utilisateur interagit encore avec la GUI au moment du déclenchement, reporte l'écriture.
         EN: Schedules a coalesced background call to `save_thumbnails_only` so the GUI thread
         is never blocked during rapid interactive editing.
-        Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470
+        If the user is still actively interacting with the GUI when the timer fires, defers the flush.
+        Ref: picasa3.exe @ 0x006B7FC0, 0x006B9470, 0x006C1920 (CIndexSaver)
         """
         with self._lock:
             if self._thumb_save_timer is not None:
@@ -2587,6 +2838,15 @@ class PicasaDatabase:
                 self._thumb_save_timer = None
 
             def _flush_worker() -> None:
+                try:
+                    from picasa_py.scanner.scanner import BackgroundScanWorker, set_current_thread_background_priority
+                    # Ref: picasa3.exe @ 0x00415790 (CIndexSaver -> THREAD_PRIORITY_BELOW_NORMAL)
+                    set_current_thread_background_priority(lowest=False)
+                    if BackgroundScanWorker.is_gui_active(0.8):
+                        self.schedule_save_thumbnails(1000)
+                        return
+                except Exception:
+                    pass
                 with self._lock:
                     self._thumb_save_timer = None
                 try:
@@ -2664,26 +2924,43 @@ class PicasaDatabase:
                     pass
                 self._thumb_save_timer = None
 
+            ti_bytes: Optional[bytes] = None
+            ti_path = self.db3_dir / "thumbindex.db"
             if self.thumbindex is not None:
                 if len(self.thumbindex.records) > 0:
                     self._align_imagedata_tables(len(self.thumbindex.records) - 1)
-                _atomic_write(self.db3_dir / "thumbindex.db", self.thumbindex.to_bytes())
+                if getattr(self.thumbindex, "dirty", True) or not ti_path.exists():
+                    ti_bytes = self.thumbindex.to_bytes()
+                    self.thumbindex.dirty = False
 
-            thumb_prefixes = ("thumbs", "thumbs2", "bigthumbs", "previews")
-            saved_containers: Set[Tuple[str, int]] = set()
-            for (prefix, block_num), container in self.block_containers_by_block.items():
-                if prefix in thumb_prefixes:
+        if ti_bytes is not None:
+            _atomic_write(ti_path, ti_bytes)
+
+        thumb_prefixes = ("thumbs", "thumbs2", "bigthumbs", "previews")
+        saved_containers: Set[Tuple[str, int]] = set()
+        for (prefix, block_num), container in list(self.block_containers_by_block.items()):
+            if prefix in thumb_prefixes:
+                with self._get_block_lock(prefix):
                     container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
-                    saved_containers.add((prefix, block_num))
+                saved_containers.add((prefix, block_num))
 
-            for prefix in thumb_prefixes:
-                container = self.block_containers.get(prefix)
-                if container is not None and (prefix, 0) not in saved_containers:
+        for prefix in thumb_prefixes:
+            container = self.block_containers.get(prefix)
+            if container is not None and (prefix, 0) not in saved_containers:
+                with self._get_block_lock(prefix):
                     container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
-                idx_file = self.block_indices.get(prefix)
-                if idx_file is not None:
-                    _atomic_write(self.db3_dir / f"{prefix}_index.db", idx_file.to_bytes())
+            idx_file = self.block_indices.get(prefix)
+            if idx_file is not None:
+                idx_path = self.db3_dir / f"{prefix}_index.db"
+                idx_bytes: Optional[bytes] = None
+                with self._get_block_lock(prefix):
+                    if getattr(idx_file, "dirty", True) or not idx_path.exists():
+                        idx_bytes = idx_file.to_bytes()
+                        idx_file.dirty = False
+                if idx_bytes is not None:
+                    _atomic_write(idx_path, idx_bytes)
 
+        with self._lock:
             target_img_len = len(self.thumbindex.records) if self.thumbindex is not None else 0
             always_save_stems = {
                 "imagedata_edited",
@@ -2704,31 +2981,44 @@ class PicasaDatabase:
                     def_val = pmp_file.default_value()
                     while len(pmp_file.records) < target_img_len:
                         pmp_file.records.append(def_val)
+                        pmp_file.dirty = True
                     if len(pmp_file.records) > target_img_len:
                         del pmp_file.records[target_img_len:]
-                pmp_path = self.db3_dir / f"{stem}.pmp"
-                should_write = stem in always_save_stems
-                if not should_write:
-                    if not pmp_path.exists():
-                        should_write = True
-                    else:
-                        try:
-                            with open(pmp_path, "rb") as fh:
-                                hdr = fh.read(20)
-                            if len(hdr) < 20 or struct.unpack_from("<I", hdr, 16)[0] != len(pmp_file.records):
-                                should_write = True
-                        except Exception:
-                            should_write = True
-                if should_write:
-                    pmp_file.write_file(str(pmp_path))
+                        pmp_file.dirty = True
 
-    def save_database(self) -> None:
+        is_bg_thread = threading.current_thread() is not threading.main_thread()
+        for stem, pmp_file in list(self.pmps.items()):
+            if not stem.startswith("imagedata_"):
+                continue
+            pmp_path = self.db3_dir / f"{stem}.pmp"
+            should_write = getattr(pmp_file, "dirty", True) or not pmp_path.exists()
+            if not should_write and stem not in always_save_stems:
+                try:
+                    with open(pmp_path, "rb") as fh:
+                        hdr = fh.read(20)
+                    if len(hdr) < 20 or struct.unpack_from("<I", hdr, 16)[0] != len(pmp_file.records):
+                        should_write = True
+                except Exception:
+                    should_write = True
+            if should_write:
+                with self._lock:
+                    pmp_bytes = pmp_file.to_bytes()
+                    pmp_file.dirty = False
+                _atomic_write(pmp_path, pmp_bytes)
+                if is_bg_thread:
+                    time.sleep(0.0005)
+
+    def save_database(self, force_all: bool = False) -> None:
         """
-        FR: Sauvegarde atomique complète de thumbindex.db, conteneurs multi-blocs, tables PMP,
+        FR: Sauvegarde atomique de thumbindex.db, conteneurs multi-blocs, tables PMP,
         wordhash.dat, repository.dat, usernames.dat et contacts.xml.
-        EN: Full atomic save of thumbindex.db, multi-block containers, PMP tables,
+        N'écrit sur disque que les fichiers marqués `dirty` ou absents sur disque (ou tous si `force_all=True`),
+        et exécute toutes les écritures disque en dehors de `self._lock`.
+        EN: Atomic save of thumbindex.db, multi-block containers, PMP tables,
         wordhash.dat, repository.dat, usernames.dat, and contacts.xml.
-        Ref: picasa3.exe @ 0x004F54B0, 0x006B7FC0, 0x006A2CD0, 0x004DB4F0
+        Only writes files marked `dirty` or missing on disk (or all when `force_all=True`),
+        performing all disk I/O outside `self._lock`.
+        Ref: picasa3.exe @ 0x004F54B0, 0x006B7FC0 (CBlockFile::SaveIndex), 0x006A2CD0, 0x006C1920 (CPMTable), 0x004DB4F0
         """
         if not self.db3_dir or self.db3_dir == Path("."):
             return
@@ -2747,74 +3037,120 @@ class PicasaDatabase:
                     tmp.unlink(missing_ok=True)
 
         # 1. thumbindex.db
-        if self._thumb_save_timer is not None:
-            try:
-                self._thumb_save_timer.cancel()
-            except Exception:
-                pass
-            self._thumb_save_timer = None
+        ti_path = self.db3_dir / "thumbindex.db"
+        with self._lock:
+            if self._thumb_save_timer is not None:
+                try:
+                    self._thumb_save_timer.cancel()
+                except Exception:
+                    pass
+                self._thumb_save_timer = None
 
-        if self.thumbindex is not None:
-            if len(self.thumbindex.records) > 0:
-                self._align_imagedata_tables(len(self.thumbindex.records) - 1)
-            _atomic_write(self.db3_dir / "thumbindex.db", self.thumbindex.to_bytes())
+            ti_bytes: Optional[bytes] = None
+            if self.thumbindex is not None:
+                if len(self.thumbindex.records) > 0:
+                    self._align_imagedata_tables(len(self.thumbindex.records) - 1)
+                if force_all or getattr(self.thumbindex, "dirty", True) or not ti_path.exists():
+                    ti_bytes = self.thumbindex.to_bytes()
+
+        if ti_bytes is not None:
+            _atomic_write(ti_path, ti_bytes)
+            if self.thumbindex is not None:
+                self.thumbindex.dirty = False
 
         # 2. BlockFiles (thumbs_0.db, thumbs_1.db, thumbs_index.db, etc.)
         saved_containers: Set[Tuple[str, int]] = set()
-        for (prefix, block_num), container in self.block_containers_by_block.items():
-            container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
+        for (prefix, block_num), container in list(self.block_containers_by_block.items()):
+            with self._get_block_lock(prefix):
+                container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
             saved_containers.add((prefix, block_num))
 
-        for prefix, container in self.block_containers.items():
+        for prefix, container in list(self.block_containers.items()):
             if (prefix, 0) not in saved_containers:
-                container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
+                with self._get_block_lock(prefix):
+                    container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
 
-        for prefix, idx_file in self.block_indices.items():
-            _atomic_write(self.db3_dir / f"{prefix}_index.db", idx_file.to_bytes())
+        for prefix, idx_file in list(self.block_indices.items()):
+            idx_path = self.db3_dir / f"{prefix}_index.db"
+            idx_bytes: Optional[bytes] = None
+            with self._get_block_lock(prefix):
+                if force_all or getattr(idx_file, "dirty", True) or not idx_path.exists():
+                    idx_bytes = idx_file.to_bytes()
+            if idx_bytes is not None:
+                _atomic_write(idx_path, idx_bytes)
+                idx_file.dirty = False
 
         # 3. Tables PMP (*.pmp) : alignement strict des tables imagedata_*, albumdata_*, catdata_*
-        if self.thumbindex is not None:
-            target_img_len = len(self.thumbindex.records)
-            for stem, pmp_file in self.pmps.items():
-                if stem.startswith("imagedata_"):
-                    def_val = pmp_file.default_value()
-                    while len(pmp_file.records) < target_img_len:
-                        pmp_file.records.append(def_val)
-                    if len(pmp_file.records) > target_img_len:
-                        del pmp_file.records[target_img_len:]
+        with self._lock:
+            if self.thumbindex is not None:
+                target_img_len = len(self.thumbindex.records)
+                for stem, pmp_file in self.pmps.items():
+                    if stem.startswith("imagedata_"):
+                        def_val = self._pmp_new_row_default(stem, pmp_file)
+                        while len(pmp_file.records) < target_img_len:
+                            pmp_file.records.append(def_val)
+                            pmp_file.dirty = True
+                        if len(pmp_file.records) > target_img_len:
+                            del pmp_file.records[target_img_len:]
+                            pmp_file.dirty = True
 
-        if "albumdata_name" in self.pmps:
-            target_alb_len = len(self.pmps["albumdata_name"].records)
-            for stem, pmp_file in self.pmps.items():
-                if stem.startswith("albumdata_"):
-                    def_val = pmp_file.default_value()
-                    while len(pmp_file.records) < target_alb_len:
-                        pmp_file.records.append(def_val)
-                    if len(pmp_file.records) > target_alb_len:
-                        del pmp_file.records[target_alb_len:]
+            if "albumdata_name" in self.pmps:
+                target_alb_len = len(self.pmps["albumdata_name"].records)
+                for stem, pmp_file in self.pmps.items():
+                    if stem.startswith("albumdata_"):
+                        def_val = pmp_file.default_value()
+                        while len(pmp_file.records) < target_alb_len:
+                            pmp_file.records.append(def_val)
+                            pmp_file.dirty = True
+                        if len(pmp_file.records) > target_alb_len:
+                            del pmp_file.records[target_alb_len:]
+                            pmp_file.dirty = True
 
-        if "catdata_name" in self.pmps:
-            target_cat_len = len(self.pmps["catdata_name"].records)
-            for stem, pmp_file in self.pmps.items():
-                if stem.startswith("catdata_"):
-                    def_val = pmp_file.default_value()
-                    while len(pmp_file.records) < target_cat_len:
-                        pmp_file.records.append(def_val)
-                    if len(pmp_file.records) > target_cat_len:
-                        del pmp_file.records[target_cat_len:]
+            if "catdata_name" in self.pmps:
+                target_cat_len = len(self.pmps["catdata_name"].records)
+                for stem, pmp_file in self.pmps.items():
+                    if stem.startswith("catdata_"):
+                        def_val = pmp_file.default_value()
+                        while len(pmp_file.records) < target_cat_len:
+                            pmp_file.records.append(def_val)
+                            pmp_file.dirty = True
+                        if len(pmp_file.records) > target_cat_len:
+                            del pmp_file.records[target_cat_len:]
+                            pmp_file.dirty = True
 
-        for stem, pmp_file in self.pmps.items():
-            pmp_file.write_file(str(self.db3_dir / f"{stem}.pmp"))
+        is_bg_thread = threading.current_thread() is not threading.main_thread()
+        for stem, pmp_file in list(self.pmps.items()):
+            pmp_path = self.db3_dir / f"{stem}.pmp"
+            pmp_bytes: Optional[bytes] = None
+            with self._lock:
+                if force_all or getattr(pmp_file, "dirty", True) or not pmp_path.exists():
+                    pmp_bytes = pmp_file.to_bytes()
+            if pmp_bytes is not None:
+                _atomic_write(pmp_path, pmp_bytes)
+                pmp_file.dirty = False
+                if is_bg_thread:
+                    time.sleep(0.0005)
 
         # 4. repository.dat & usernames.dat
         if self.repository:
-            _atomic_write(self.db3_dir / "repository.dat", self.repository.to_bytes())
+            with self._lock:
+                repo_bytes = self.repository.to_bytes()
+            _atomic_write(self.db3_dir / "repository.dat", repo_bytes)
         if self.usernames:
-            _atomic_write(self.db3_dir / "usernames.dat", self.usernames.to_bytes())
+            with self._lock:
+                un_bytes = self.usernames.to_bytes()
+            _atomic_write(self.db3_dir / "usernames.dat", un_bytes)
 
         # 5. wordhash.dat
         if self.wordhash:
-            _atomic_write(self.db3_dir / "wordhash.dat", self.wordhash.to_bytes())
+            wh_path = self.db3_dir / "wordhash.dat"
+            wh_bytes: Optional[bytes] = None
+            with self._lock:
+                if force_all or getattr(self.wordhash, "dirty", True) or not wh_path.exists():
+                    wh_bytes = self.wordhash.to_bytes()
+            if wh_bytes is not None:
+                _atomic_write(wh_path, wh_bytes)
+                self.wordhash.dirty = False
 
         # 6. contacts.xml
         if self.contacts and self.contacts_dir:
@@ -2865,7 +3201,7 @@ class PicasaDatabase:
             if not idx_file or not container:
                 continue
 
-            initial_bytes += len(container.to_bytes())
+            initial_bytes += container.byte_size()
 
             new_container = BlockContainerFile(magic=container.magic)
             new_entries: List[BlockEntry] = []
@@ -2887,12 +3223,13 @@ class PicasaDatabase:
 
             new_container._fully_dirty = True
             new_idx = BlockIndexFile.from_entries(new_entries, active_block=0)
+            new_idx.dirty = True
             self.block_containers[prefix] = new_container
             self.block_containers_by_block[(prefix, 0)] = new_container
             self.block_indices[prefix] = new_idx
-            final_bytes += len(new_container.to_bytes())
+            final_bytes += new_container.byte_size()
 
-        self.save_database()
+        self.save_database(force_all=True)
         return (initial_bytes, final_bytes)
 
 

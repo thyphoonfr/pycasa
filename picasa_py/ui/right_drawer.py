@@ -516,14 +516,9 @@ class PicasaPeoplePanel(QWidget):
             self.faces_layout.insertWidget(0, empty_widget)
             return
 
-        # Charger l'image source avec orientation et retouches pour découper les avatars
-        if source_img is None and photo_path and os.path.exists(photo_path):
-            try:
-                from picasa_py.ui.image_processor import PicasaImageProcessor
-                source_img = PicasaImageProcessor.load_transformed_image(photo_path)
-                self.cached_source_img = source_img
-            except Exception:
-                pass
+        # Utiliser l'image source déjà en mémoire si fournie, sinon déléguer aux miniatures DB en RAM
+        if source_img is not None:
+            self.cached_source_img = source_img
 
         for i, fr in enumerate(faces):
             card = self._create_face_card(i, fr, source_img)
@@ -770,7 +765,12 @@ class PicasaPeoplePanel(QWidget):
         pix: Optional[QPixmap] = None
         if self.db and getattr(self.db, "face_manager", None):
             pix = self.db.face_manager.get_face_avatar(
-                sample_path, sample_fr, db_idx=sample_idx, size=72, circular=False
+                sample_path,
+                sample_fr,
+                db_idx=sample_idx,
+                size=72,
+                circular=False,
+                allow_disk_fallback=False,
             )
         if not pix or pix.isNull():
             if sample_idx is not None and self.db:
@@ -1043,9 +1043,13 @@ class PicasaPeoplePanel(QWidget):
         """)
         pix: Optional[QPixmap] = None
         if self.db and getattr(self.db, "face_manager", None):
-            pix = self.db.face_manager.get_person_avatar(cid, size=72, circular=False)
+            pix = self.db.face_manager.get_person_avatar(
+                cid, size=72, circular=False, allow_disk_fallback=False
+            )
             if not pix or pix.isNull():
-                pix = self.db.face_manager.get_face_avatar(sample_path, sample_fr, size=72, circular=False)
+                pix = self.db.face_manager.get_face_avatar(
+                    sample_path, sample_fr, size=72, circular=False, allow_disk_fallback=False
+                )
         if pix and not pix.isNull():
             pix = make_rounded_avatar(pix, size=72, radius=4)
             avatar_lbl.setPixmap(pix)
@@ -1161,8 +1165,30 @@ class PicasaPeoplePanel(QWidget):
                 avatar_lbl.setText("👤")
                 avatar_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         else:
-            avatar_lbl.setText("👤")
-            avatar_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            pix_av: Optional[QPixmap] = None
+            if self.db and getattr(self.db, "face_manager", None):
+                pix_av = self.db.face_manager.get_face_avatar(
+                    self.photo_path,
+                    fr,
+                    db_idx=self.photo_index if self.photo_index >= 0 else None,
+                    size=72,
+                    circular=False,
+                    allow_disk_fallback=False,
+                )
+                if (pix_av is None or pix_av.isNull()) and len(getattr(self.db, "index", [])) <= 64:
+                    pix_av = self.db.face_manager.get_face_avatar(
+                        self.photo_path,
+                        fr,
+                        db_idx=self.photo_index if self.photo_index >= 0 else None,
+                        size=72,
+                        circular=False,
+                        allow_disk_fallback=True,
+                    )
+            if pix_av and not pix_av.isNull():
+                avatar_lbl.setPixmap(make_rounded_avatar(pix_av, size=72, radius=4))
+            else:
+                avatar_lbl.setText("👤")
+                avatar_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         if fr.contact_id and name_str and not name_str.startswith("? ") and name_str != "Sans nom":
             avatar_lbl.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -3514,7 +3540,7 @@ class PicasaPropertiesPanel(QWidget):
                             hist_img = im_thumb.convert("RGB")
                 except Exception:
                     hist_img = None
-            if hist_img is None and file_path and os.path.exists(file_path):
+            if hist_img is None and (db is None or db_index < 0) and file_path and os.path.exists(file_path):
                 try:
                     from picasa_py.ui.image_processor import PicasaImageProcessor
                     hist_img = PicasaImageProcessor.load_transformed_image(file_path, max_size=512)
@@ -4111,12 +4137,34 @@ class PicasaRightDrawer(QWidget):
         """
         if self._album_paths and photo_path in self._album_paths:
             return self._album_paths
-        if not photo_path or not os.path.exists(photo_path):
+        if not photo_path:
             return []
         folder = os.path.dirname(photo_path)
         cached_folder = getattr(self, "_cached_sibling_folder", None)
         if cached_folder == folder and getattr(self, "_cached_sibling_paths", None):
             return self._cached_sibling_paths
+        db = getattr(self, "_active_db", None) or getattr(self, "_current_db", None)
+        if db is not None and hasattr(db, "index") and db.index:
+            norm_folder = folder.replace("\\", "/").rstrip("/").lower()
+            matching_parent_ids = {
+                i
+                for i, rec in enumerate(db.index)
+                if getattr(rec, "type", 0) == 1
+                and getattr(rec, "path", "").replace("\\", "/").rstrip("/").lower() == norm_folder
+            }
+            if matching_parent_ids:
+                paths = [
+                    os.path.join(folder, rec.path)
+                    for rec in db.index
+                    if getattr(rec, "parent_idx", -1) in matching_parent_ids
+                    and getattr(rec, "type", 0) in (2, 6, 7, 13, 18, 31, 0x20)
+                ]
+                if paths:
+                    self._cached_sibling_folder = folder
+                    self._cached_sibling_paths = paths
+                    return paths
+        if not os.path.exists(photo_path):
+            return []
         exts = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".webp"}
         try:
             paths = [
@@ -4139,6 +4187,8 @@ class PicasaRightDrawer(QWidget):
             Avoids any disk I/O, EXIF/image decoding, or `QWebEngineView` rendering when the drawer is closed
             or on the 3 hidden tabs.
         """
+        if self._explicitly_hidden:
+            return
         panel = self.current_panel_name
         if panel not in self._dirty_panels:
             return

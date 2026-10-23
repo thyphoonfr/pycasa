@@ -99,6 +99,8 @@ class PicasaOneUpView(QWidget):
         self._history_idx: int = -1
         self._original_pil_img: Optional[Image.Image] = None
         self._raw_unedited_pil_img: Optional[Image.Image] = None
+        self._orig_backup_path: Optional[str] = None
+        self._orig_backup_loaded: bool = False
         # FR: Images de référence non-cumulatives pour les curseurs de réglage (Tab 1/2) et l'aperçu des filtres (Tab 3/4/5)
         # EN: Non-cumulative reference images for tuning sliders (Tab 1/2) and filter previews (Tab 3/4/5)
         self._tuning_base_img: Optional[Image.Image] = None
@@ -110,8 +112,13 @@ class PicasaOneUpView(QWidget):
         self._original_pixmap_dirty: bool = True
         self._full_res_preview_timer = QTimer(self)
         self._full_res_preview_timer.setSingleShot(True)
-        self._full_res_preview_timer.setInterval(60)
+        self._full_res_preview_timer.setInterval(75)
         self._full_res_preview_timer.timeout.connect(self._flush_full_res_preview)
+        self._pending_thumb_db_sync: Optional[Tuple[int, Image.Image, str]] = None
+        self._thumb_db_sync_timer = QTimer(self)
+        self._thumb_db_sync_timer.setSingleShot(True)
+        self._thumb_db_sync_timer.setInterval(350)
+        self._thumb_db_sync_timer.timeout.connect(self._flush_pending_thumb_db_sync)
 
         # FR: Paramètres de transformation d'affichage active (crop, tilt, rotate)
         # EN: Active display transformation parameters (crop, tilt, rotate)
@@ -767,6 +774,7 @@ class PicasaOneUpView(QWidget):
 
         Ref: picasa3.exe @ 0x005F8D80, 0x005F92E0, 0x0057BB50
         """
+        self._flush_pending_thumb_db_sync()
         if getattr(self, "_is_tool_locked", False) or self.edit_panel.stack.currentIndex() != 0:
             if hasattr(self, "canvas") and self.canvas is not None:
                 self.canvas.cancel_manual_face_add()
@@ -1035,6 +1043,33 @@ class PicasaOneUpView(QWidget):
                 self.btn_swap_2up_layout.show()
             if hasattr(self, "btn_swap_2up_focus"):
                 self.btn_swap_2up_focus.show()
+            if getattr(self, "_orig_backup_path", None) and not getattr(self, "_orig_backup_loaded", False):
+                try:
+                    from PIL import ImageOps
+                    with Image.open(str(self._orig_backup_path)) as b_raw:
+                        if getattr(b_raw, "format", "") == "JPEG":
+                            try:
+                                b_raw.draft("RGB", (3200, 3200))
+                            except Exception:
+                                pass
+                        b_img = ImageOps.exif_transpose(b_raw)
+                        if b_img.mode not in ("RGB", "RGBA"):
+                            b_img = b_img.convert("RGB")
+                        b_img.load()
+                        uw, uh = b_img.size
+                        umax = max(uw, uh)
+                        if umax > 1600:
+                            usc = 1600.0 / float(umax)
+                            b_img = b_img.resize(
+                                (max(1, int(round(uw * usc))), max(1, int(round(uh * usc)))),
+                                Image.Resampling.BILINEAR,
+                            )
+                        self._raw_unedited_pil_img = b_img
+                        self._original_pil_img = b_img
+                        self._orig_backup_loaded = True
+                        self._original_pixmap_dirty = True
+                except Exception:
+                    self._orig_backup_loaded = True
             if self._original_pil_img and (self._original_pixmap_dirty or self.canvas.original_pixmap is None):
                 orig_pix = self._pil_to_pixmap(self._original_pil_img)
                 self.canvas.set_original_pixmap(orig_pix)
@@ -1129,7 +1164,11 @@ class PicasaOneUpView(QWidget):
                     return None
         return None
 
-    def _sync_current_thumbnails_to_db(self, pil_img: Optional[Image.Image] = None) -> None:
+    def _sync_current_thumbnails_to_db(
+        self,
+        pil_img: Optional[Image.Image] = None,
+        index_override: Optional[int] = None,
+    ) -> None:
         """
         FR: Recalcule les miniatures et aperçus (`thumbs`, `thumbs2`, `bigthumbs`, `previews`)
         dans `PicasaDatabase` à partir de l'image active et invalide le cache de la pellicule (`filmstrip`).
@@ -1139,22 +1178,54 @@ class PicasaOneUpView(QWidget):
         Faithfully reproduces `FUN_00579360 @ 0x00579360` -> `FUN_00425210` / `FUN_00425F60` and `0x00579680`.
         Ref: picasa3.exe @ 0x00579360, 0x00425210, 0x00425F60, 0x00579680 (editpanel/filmstrip)
         """
+        if index_override is None and self._thumb_db_sync_timer.isActive():
+            self._thumb_db_sync_timer.stop()
+            self._pending_thumb_db_sync = None
+        target_idx = self.current_index if index_override is None else index_override
         img = pil_img
         if img is None and self._history and 0 <= self._history_idx < len(self._history):
             img = self._history[self._history_idx]
-        if img is not None and self.db is not None and self.current_index >= 0:
+        if img is not None and self.db is not None and target_idx >= 0:
             if hasattr(self.db, "update_thumbnails_from_pil"):
                 if hasattr(self.db, "schedule_save_thumbnails"):
-                    self.db.update_thumbnails_from_pil(self.current_index, img, persist_to_disk=False)
+                    self.db.update_thumbnails_from_pil(target_idx, img, persist_to_disk=False)
                     self.db.schedule_save_thumbnails(1500)
                 else:
-                    self.db.update_thumbnails_from_pil(self.current_index, img, persist_to_disk=True)
-        if hasattr(self, "filmstrip") and self.current_index >= 0:
+                    self.db.update_thumbnails_from_pil(target_idx, img, persist_to_disk=True)
+        if hasattr(self, "filmstrip") and target_idx >= 0:
             if hasattr(self.filmstrip, "invalidate_thumbnail"):
-                self.filmstrip.invalidate_thumbnail(self.current_index)
+                self.filmstrip.invalidate_thumbnail(target_idx)
             else:
-                self.filmstrip._thumb_cache.pop(self.current_index, None)
+                self.filmstrip._thumb_cache.pop(target_idx, None)
                 self.filmstrip.update()
+
+    def _schedule_thumb_db_sync(self, pil_img: Image.Image, target_path: str) -> None:
+        """
+        FR: Planifie la mise à jour différée (350 ms) des miniatures de la base de données et l'émission
+        du signal `photo_edited` après le relâchement d'un curseur de réglage afin de ne pas bloquer l'interface.
+        EN: Schedules a debounced (350 ms) update of database thumbnails and emission of the
+        `photo_edited` signal after a tuning slider release so the UI thread stays responsive.
+        Ref: picasa3.exe @ 0x00579360, 0x00760F40
+        """
+        self._pending_thumb_db_sync = (self.current_index, pil_img, target_path)
+        self._thumb_db_sync_timer.start()
+
+    def _flush_pending_thumb_db_sync(self) -> None:
+        """
+        FR: Exécute immédiatement toute synchronisation de miniatures en attente avant un changement de photo ou de vue.
+        EN: Immediately flushes any pending thumbnail database synchronization before switching photos or views.
+        Ref: picasa3.exe @ 0x00579360
+        """
+        if self._thumb_db_sync_timer.isActive():
+            self._thumb_db_sync_timer.stop()
+        pending = self._pending_thumb_db_sync
+        self._pending_thumb_db_sync = None
+        if pending is None:
+            return
+        sync_idx, sync_img, sync_path = pending
+        self._sync_current_thumbnails_to_db(sync_img, index_override=sync_idx)
+        if sync_path:
+            self.photo_edited.emit(sync_path)
 
     def _restore_ini_snapshot(self, snapshot: Optional[str]) -> None:
         """
@@ -1210,21 +1281,28 @@ class PicasaOneUpView(QWidget):
         if t_path and os.path.exists(t_path):
             parent_dir = os.path.dirname(t_path)
             ini_path = os.path.join(parent_dir, ".picasa.ini")
-            if not os.path.exists(ini_path):
-                ini_path = os.path.join(parent_dir, "Picasa.ini")
-            if os.path.exists(ini_path):
-                try:
-                    from picasa_py.ini.parser import PicasaIniParser
-                    from picasa_py.faces.facerect import decode_rect64_string
-                    doc = PicasaIniParser.parse_file(ini_path)
+            try:
+                from picasa_py.ini.parser import PicasaIniParser
+                from picasa_py.faces.facerect import decode_rect64_string
+                doc = None
+                if self.db and hasattr(self.db, "get_parsed_ini"):
+                    doc = self.db.get_parsed_ini(ini_path)
+                    if doc is None:
+                        doc = self.db.get_parsed_ini(os.path.join(parent_dir, "Picasa.ini"))
+                else:
+                    if not os.path.exists(ini_path):
+                        ini_path = os.path.join(parent_dir, "Picasa.ini")
+                    if os.path.exists(ini_path):
+                        doc = PicasaIniParser.parse_file(ini_path)
+                if doc is not None:
                     base_name = os.path.basename(t_path)
                     crop_hex = doc.get_crop(base_name)
                     if crop_hex:
                         self._active_crop_rect = decode_rect64_string(crop_hex)
                     self._active_rotate = doc.get_rotate(base_name) or 0
                     self._active_tilt = doc.get_tilt(base_name) or 0.0
-                except Exception:
-                    pass
+            except Exception:
+                pass
         self.canvas.set_active_transform(self._active_crop_rect, self._active_tilt, self._active_rotate)
         curr_img = (
             self._history[self._history_idx]
@@ -1281,19 +1359,19 @@ class PicasaOneUpView(QWidget):
                 tilt = 0.0
                 parent_dir = os.path.dirname(full_path)
                 ini_path = os.path.join(parent_dir, ".picasa.ini")
-                if not os.path.exists(ini_path):
-                    ini_path = os.path.join(parent_dir, "Picasa.ini")
-                if os.path.exists(ini_path):
-                    try:
-                        from picasa_py.ini.parser import PicasaIniParser
-                        from picasa_py.faces.facerect import decode_rect64_string
-                        doc = (
-                            self.db.get_parsed_ini(ini_path)
-                            if (self.db and hasattr(self.db, "get_parsed_ini"))
-                            else PicasaIniParser.parse_file(ini_path)
-                        )
+                try:
+                    from picasa_py.ini.parser import PicasaIniParser
+                    from picasa_py.faces.facerect import decode_rect64_string
+                    if self.db and hasattr(self.db, "get_parsed_ini"):
+                        doc = self.db.get_parsed_ini(ini_path)
                         if doc is None:
+                            doc = self.db.get_parsed_ini(os.path.join(parent_dir, "Picasa.ini"))
+                    else:
+                        if not os.path.exists(ini_path):
+                            ini_path = os.path.join(parent_dir, "Picasa.ini")
+                        if os.path.exists(ini_path):
                             doc = PicasaIniParser.parse_file(ini_path)
+                    if doc is not None:
                         crop_hex = doc.get_crop(base_name)
                         if crop_hex:
                             left_f, top_f, right_f, bottom_f = decode_rect64_string(crop_hex)
@@ -1302,8 +1380,8 @@ class PicasaOneUpView(QWidget):
                         self._active_rotate = rot
                         tilt = doc.get_tilt(base_name) or 0.0
                         self._active_tilt = tilt
-                    except Exception:
-                        pass
+                except Exception:
+                    pass
 
                 with Image.open(full_path) as raw_img:
                     if max_size and max_size > 0 and getattr(raw_img, "format", "") == "JPEG":
@@ -1347,9 +1425,11 @@ class PicasaOneUpView(QWidget):
                         return src_img.copy()
 
                     orig_backup = Path(full_path).parent / ".picasaoriginals" / os.path.basename(full_path)
-                    if orig_backup.exists():
+                    self._orig_backup_path = str(orig_backup) if orig_backup.exists() else None
+                    self._orig_backup_loaded = False
+                    if self._orig_backup_path and self.canvas.view_mode in ("A_A", "A_B"):
                         try:
-                            with Image.open(str(orig_backup)) as b_raw:
+                            with Image.open(self._orig_backup_path) as b_raw:
                                 if max_size and max_size > 0 and getattr(b_raw, "format", "") == "JPEG":
                                     try:
                                         b_raw.draft("RGB", (max_size * 2, max_size * 2))
@@ -1360,6 +1440,7 @@ class PicasaOneUpView(QWidget):
                                     b_img = b_img.convert("RGB")
                                 b_img.load()
                                 self._raw_unedited_pil_img = _make_unedited_copy(b_img)
+                                self._orig_backup_loaded = True
                         except Exception:
                             self._raw_unedited_pil_img = _make_unedited_copy(pil_img)
                     else:
@@ -1475,6 +1556,7 @@ class PicasaOneUpView(QWidget):
         EN: Opens a media item (photo or video) in One-Up View, initializes edit history,
         loads faces, `.picasa.ini` metadata, the filmstrip, and the right side drawer.
         """
+        self._flush_pending_thumb_db_sync()
         if db is not None:
             if index >= 0:
                 index = self._resolve_db_photo_index(db, index)
@@ -1515,18 +1597,15 @@ class PicasaOneUpView(QWidget):
         if getattr(self, "_is_tool_locked", False):
             self._set_modal_tool_lock(False, 0, "")
 
-        faces = []
-        if db is not None and getattr(db, "face_manager", None):
-            faces = db.face_manager.get_faces_for_photo(index, photo_path=direct_path)
-
         full_path = direct_path if (direct_path and os.path.exists(direct_path)) else (
             self.db.get_media_full_path(index) if (self.db and 0 <= index < len(self.db.index)) else None
         )
         if not full_path and (self.db is None or index < 0 or index >= len(self.db.index)):
             return
 
-        if not faces and db is not None and getattr(db, "face_manager", None) and full_path:
-            faces = db.face_manager.get_faces_for_photo(index, photo_path=full_path)
+        faces = []
+        if db is not None and getattr(db, "face_manager", None):
+            faces = db.face_manager.get_faces_for_photo(index, photo_path=full_path or direct_path)
 
         self._current_photo_path = full_path
 
@@ -1582,15 +1661,15 @@ class PicasaOneUpView(QWidget):
 
         pil_img = self._load_pil_image_at_index(index, direct_path=direct_path)
         if pil_img:
-            self._original_pil_img = (getattr(self, "_raw_unedited_pil_img", None) or pil_img).copy()
-            self._tuning_base_img = pil_img.copy()
+            self._original_pil_img = getattr(self, "_raw_unedited_pil_img", None) or pil_img
+            self._tuning_base_img = pil_img
             self._tuning_history_slot = -1
             self._effect_preview_base_img = None
-            self._history = [pil_img.copy()]
+            self._history = [pil_img]
             self._history_ini_snapshots = [self._read_current_ini_snapshot(full_path)]
             self._history_idx = 0
             self.edit_panel.reset_tuning_controls_silently()
-            self._display_current_history()
+            self._display_current_history(preserve_view=False)
 
             self.edit_panel.set_photo_metadata(full_path or "")
 
@@ -1759,21 +1838,27 @@ class PicasaOneUpView(QWidget):
         elif self.canvas.view_mode == "A_A":
             self.lbl_top_info.setText(f"Comparaison A | A  •  Originale (Avant) vs Retouchée (Après) — {filename}")
 
-    def _display_pil_on_canvas(self, img: Image.Image, is_live_preview: bool = False) -> None:
+    def _display_pil_on_canvas(
+        self,
+        img: Image.Image,
+        is_live_preview: bool = False,
+        preserve_view: bool = False,
+    ) -> None:
         """
         FR: Affiche une image PIL sur le canevas et met à jour l'histogramme sans altérer l'historique.
         EN: Displays a PIL image on the canvas and updates the histogram without altering history.
+        Ref: picasa3.exe @ 0x00760F40
         """
         pix = self._pil_to_pixmap(img)
-        self.canvas.set_pixmap_direct(pix)
+        self.canvas.set_pixmap_direct(pix, preserve_view=(is_live_preview or preserve_view))
         if is_live_preview:
             self.edit_panel.histogram_widget.set_image(img)
         else:
             self.edit_panel.set_image(img)
-        if self.right_drawer.isVisible() and hasattr(self.right_drawer.panel_properties, "set_image"):
-            self.right_drawer.panel_properties.set_image(img)
+            if self.right_drawer.isVisible() and hasattr(self.right_drawer.panel_properties, "set_image"):
+                self.right_drawer.panel_properties.set_image(img)
 
-    def _display_current_history(self) -> None:
+    def _display_current_history(self, preserve_view: bool = True) -> None:
         """
         FR: Affiche l'image correspondant à l'indice courant de l'historique d'édition.
         EN: Displays the image corresponding to the current index in the edit history.
@@ -1782,7 +1867,7 @@ class PicasaOneUpView(QWidget):
             return
 
         img = self._history[self._history_idx]
-        self._display_pil_on_canvas(img)
+        self._display_pil_on_canvas(img, preserve_view=preserve_view)
 
         if self._original_pil_img:
             if self.canvas.view_mode == "A_A":
@@ -1794,16 +1879,18 @@ class PicasaOneUpView(QWidget):
 
     def _get_fast_preview_base(self, base_img: Image.Image) -> Image.Image:
         """
-        FR: Retourne une copie réduite (max 720px) mise en cache pour le glissement fluide des curseurs à 60 FPS.
-        EN: Returns a cached downscaled copy (max 720px) for smooth 60 FPS slider dragging.
+        FR: Retourne une copie réduite (max 480px) mise en cache pour le glissement fluide des curseurs à 60 FPS.
+        EN: Returns a cached downscaled copy (max 480px) for smooth 60 FPS slider dragging.
+        Ref: picasa3.exe @ 0x00760F40
         """
         if self._fast_preview_base_source is base_img and self._fast_preview_base_img is not None:
             return self._fast_preview_base_img
         self._fast_preview_base_source = base_img
         w, h = base_img.size
         max_dim = max(w, h)
-        if max_dim > 720:
-            sc = 720.0 / float(max_dim)
+        target_max = 480
+        if max_dim > target_max:
+            sc = float(target_max) / float(max_dim)
             self._fast_preview_base_img = base_img.resize(
                 (max(1, int(round(w * sc))), max(1, int(round(h * sc)))),
                 Image.Resampling.BILINEAR,
@@ -1814,8 +1901,8 @@ class PicasaOneUpView(QWidget):
 
     def _flush_full_res_preview(self) -> None:
         """
-        FR: Recalcule l'aperçu pleine résolution (1600px) 60 ms après l'arrêt du glissement d'un curseur.
-        EN: Recomputes the full-resolution preview (1600px) 60 ms after slider dragging pauses.
+        FR: Recalcule l'aperçu pleine résolution (1600px) 75 ms après l'arrêt du glissement d'un curseur.
+        EN: Recomputes the full-resolution preview (1600px) 75 ms after slider dragging pauses.
         """
         pending = self._pending_full_res_preview
         self._pending_full_res_preview = None
@@ -1831,13 +1918,13 @@ class PicasaOneUpView(QWidget):
                 shadows=float(tp.get("shadows", 0.0)),
                 colortemp=float(tp.get("colortemp", 0.0)),
             )
-            self._display_pil_on_canvas(preview_img, is_live_preview=True)
+            self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
         elif kind == "effect" and self._effect_preview_base_img is not None:
             preview_img = PicasaImageProcessor.execute_effect(self._effect_preview_base_img, arg1, arg2)
             if preview_img is not None:
-                self._display_pil_on_canvas(preview_img, is_live_preview=True)
+                self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
 
-    def _push_history(self, img: Image.Image) -> None:
+    def _push_history(self, img: Image.Image, preserve_view: bool = True) -> None:
         """
         FR: Empile un nouvel état d'image dans l'historique d'édition et rafraîchit le canevas.
         EN: Pushes a new image state onto the edit history stack and refreshes the canvas.
@@ -1847,7 +1934,7 @@ class PicasaOneUpView(QWidget):
         self._history.append(img.copy())
         self._history_ini_snapshots.append(self._read_current_ini_snapshot())
         self._history_idx = len(self._history) - 1
-        self._display_current_history()
+        self._display_current_history(preserve_view=preserve_view)
 
     def _on_tuning_preview_changed(self, tuning_params: dict) -> None:
         """
@@ -1858,15 +1945,14 @@ class PicasaOneUpView(QWidget):
         Always computes from `self._tuning_base_img` so moving a slider back and forth never stacks
         the effect onto itself, and returning to 0 restores the exact base image.
 
-        Ref: picasa3.exe @ filterdesc.xml (finetune2, mode="soft", flightslider1)
+        Ref: picasa3.exe @ filterdesc.xml (finetune2, mode="soft", flightslider1), 0x00760F40
         """
         if self._history_idx < 0 or not self._history:
             return
         if self._tuning_base_img is None:
             self._tuning_base_img = self._history[self._history_idx].copy()
 
-        is_dragging = hasattr(self.edit_panel, "is_any_slider_down") and self.edit_panel.is_any_slider_down()
-        src_img = self._get_fast_preview_base(self._tuning_base_img) if is_dragging else self._tuning_base_img
+        src_img = self._get_fast_preview_base(self._tuning_base_img)
         preview_img = PicasaImageProcessor.finetune(
             src_img,
             fill=float(tuning_params.get("fill", 0.0)),
@@ -1874,8 +1960,8 @@ class PicasaOneUpView(QWidget):
             shadows=float(tuning_params.get("shadows", 0.0)),
             colortemp=float(tuning_params.get("colortemp", 0.0)),
         )
-        self._display_pil_on_canvas(preview_img, is_live_preview=True)
-        if is_dragging and src_img is not self._tuning_base_img:
+        self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
+        if src_img is not self._tuning_base_img:
             self._pending_full_res_preview = ("tuning", dict(tuning_params), None)
             self._full_res_preview_timer.start()
         else:
@@ -1904,9 +1990,9 @@ class PicasaOneUpView(QWidget):
         new_img = PicasaImageProcessor.finetune(base_img, fill_v, hl_v, sh_v, ct_v)
         if self._tuning_history_slot == self._history_idx and self._tuning_history_slot > 0:
             self._history[self._history_idx] = new_img.copy()
-            self._display_current_history()
+            self._display_current_history(preserve_view=True)
         else:
-            self._push_history(new_img)
+            self._push_history(new_img, preserve_view=True)
         self._tuning_base_img = new_img.copy()
         self._tuning_history_slot = -1
         self.edit_panel.reset_tuning_controls_silently()
@@ -1962,12 +2048,11 @@ class PicasaOneUpView(QWidget):
         if self._effect_preview_base_img is None:
             self._effect_preview_base_img = self._history[self._history_idx].copy()
 
-        is_dragging = hasattr(self.edit_panel, "is_any_slider_down") and self.edit_panel.is_any_slider_down()
-        src_img = self._get_fast_preview_base(self._effect_preview_base_img) if is_dragging else self._effect_preview_base_img
+        src_img = self._get_fast_preview_base(self._effect_preview_base_img)
         preview_img = PicasaImageProcessor.execute_effect(src_img, effect_name, params)
         if preview_img is not None:
-            self._display_pil_on_canvas(preview_img, is_live_preview=True)
-            if is_dragging and src_img is not self._effect_preview_base_img:
+            self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
+            if src_img is not self._effect_preview_base_img:
                 self._pending_full_res_preview = ("effect", effect_name, dict(params))
                 self._full_res_preview_timer.start()
             else:
@@ -1981,6 +2066,8 @@ class PicasaOneUpView(QWidget):
 
         Ref: TOOLTIPS_FR.XML @ editpanel/ok ("Appliquer")
         """
+        self._full_res_preview_timer.stop()
+        self._pending_full_res_preview = None
         if self._effect_preview_base_img is not None and 0 <= self._history_idx < len(self._history):
             self._history[self._history_idx] = self._effect_preview_base_img.copy()
         self._effect_preview_base_img = None
@@ -1993,11 +2080,13 @@ class PicasaOneUpView(QWidget):
 
         Ref: TOOLTIPS_FR.XML @ editpanel/cancel ("Annuler")
         """
+        self._full_res_preview_timer.stop()
+        self._pending_full_res_preview = None
         if self._effect_preview_base_img is not None:
-            self._display_pil_on_canvas(self._effect_preview_base_img)
+            self._display_pil_on_canvas(self._effect_preview_base_img, preserve_view=True)
             self._effect_preview_base_img = None
         else:
-            self._display_current_history()
+            self._display_current_history(preserve_view=True)
 
     def _on_apply_effect(self, effect_name: str, params: dict) -> None:
         """
@@ -2006,6 +2095,8 @@ class PicasaOneUpView(QWidget):
         """
         if self._history_idx < 0 or not self._history:
             return
+        self._full_res_preview_timer.stop()
+        self._pending_full_res_preview = None
 
         # FR: --- Cas 1 : Curseurs d'éclairage (Tab 1 Lumière d'appoint / Tab 2 Réglages) ---
         # Calculés de façon NON-CUMULATIVE depuis `self._tuning_base_img` !
@@ -2036,9 +2127,9 @@ class PicasaOneUpView(QWidget):
             # EN: Update the tuning history slot in place instead of stacking on every slider movement
             if self._tuning_history_slot == self._history_idx and self._tuning_history_slot > 0:
                 self._history[self._history_idx] = new_img.copy()
-                self._display_current_history()
+                self._display_current_history(preserve_view=True)
             else:
-                self._push_history(new_img)
+                self._push_history(new_img, preserve_view=True)
                 self._tuning_history_slot = self._history_idx
 
             target_path = self.current_photo_path
@@ -2056,8 +2147,7 @@ class PicasaOneUpView(QWidget):
                         target_path,
                         f"finetune2=1,{fill_v:.6f},{hl_v:.6f},{sh_v:.6f},{ct_v:.6f}",
                     )
-                self._sync_current_thumbnails_to_db(new_img)
-                self.photo_edited.emit(target_path)
+                self._schedule_thumb_db_sync(new_img, target_path)
             return
 
         if effect_name == "reset_lighting":
@@ -2281,7 +2371,7 @@ class PicasaOneUpView(QWidget):
             self._history[self._history_idx] = self._history[self._history_idx].rotate(90, expand=True)
             if self._tuning_base_img is not None:
                 self._tuning_base_img = self._tuning_base_img.rotate(90, expand=True)
-            self._display_current_history()
+            self._display_current_history(preserve_view=False)
         else:
             self.canvas.rotate_counterclockwise()
         target_path = self.current_photo_path
@@ -2303,7 +2393,7 @@ class PicasaOneUpView(QWidget):
             self._history[self._history_idx] = self._history[self._history_idx].rotate(270, expand=True)
             if self._tuning_base_img is not None:
                 self._tuning_base_img = self._tuning_base_img.rotate(270, expand=True)
-            self._display_current_history()
+            self._display_current_history(preserve_view=False)
         else:
             self.canvas.rotate_clockwise()
         target_path = self.current_photo_path
@@ -2676,6 +2766,7 @@ class PicasaOneUpView(QWidget):
         """
         if getattr(self, "_is_tool_locked", False):
             return
+        self._flush_pending_thumb_db_sync()
         if hasattr(self, "video_player"):
             self.video_player.stop()
         if not self.available_indices or self.db is None:
@@ -2715,6 +2806,7 @@ class PicasaOneUpView(QWidget):
         """
         if getattr(self, "_is_tool_locked", False):
             return
+        self._flush_pending_thumb_db_sync()
         if hasattr(self, "video_player"):
             self.video_player.stop()
         if not self.available_indices or self.db is None:
@@ -2770,6 +2862,7 @@ class PicasaOneUpView(QWidget):
         elif event.key() == Qt.Key.Key_Right:
             self.navigate_next()
         elif event.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self._flush_pending_thumb_db_sync()
             self.back_to_library_requested.emit()
         elif event.key() == Qt.Key.Key_A:
             # FR: Raccourci A pour basculer en mode A simple
@@ -2799,6 +2892,7 @@ class PicasaOneUpView(QWidget):
 
         Ref: picasa3.exe @ .picasaoriginals (0x008814AC, 0x009B9290)
         """
+        self._flush_pending_thumb_db_sync()
         if not self._history or self._history_idx < 0:
             return False
 

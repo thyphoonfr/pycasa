@@ -19,11 +19,12 @@ import os
 import struct
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 
 
 # Ref: picasa3.exe @ _DAT_00d678e0
 BLOCKFILE_MAGIC = 0x3FCCCCCD  # 1.6f en IEEE 754 float32 / 1.6f in IEEE 754 float32
+BLOCK_CONTAINER_MAGIC = BLOCKFILE_MAGIC
 
 # FR: En-tête d'index : magic (uint32), active_block (uint32) / EN: Index header: magic (uint32), active_block (uint32)
 INDEX_HEADER_STRUCT = struct.Struct("<II")
@@ -227,6 +228,59 @@ class BlockEntry:
         size = raw_size_block & 0x00FFFFFF
         return cls(checksum=checksum, offset=offset, size=size, block=block)
 
+    def __int__(self) -> int:
+        return self.offset
+
+    def __index__(self) -> int:
+        return self.offset
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, BlockEntry):
+            return (
+                self.checksum == other.checksum
+                and self.offset == other.offset
+                and self.size == other.size
+                and self.block == other.block
+            )
+        if isinstance(other, int):
+            return self.offset == other
+        return NotImplemented
+
+    def __add__(self, other: int) -> int:
+        if isinstance(other, int):
+            return self.offset + other
+        return NotImplemented
+
+    def __radd__(self, other: int) -> int:
+        if isinstance(other, int):
+            return other + self.offset
+        return NotImplemented
+
+    def __sub__(self, other: int) -> int:
+        if isinstance(other, int):
+            return self.offset - other
+        return NotImplemented
+
+    def __ge__(self, other: int) -> bool:
+        if isinstance(other, int):
+            return self.offset >= other
+        return NotImplemented
+
+    def __gt__(self, other: int) -> bool:
+        if isinstance(other, int):
+            return self.offset > other
+        return NotImplemented
+
+    def __le__(self, other: int) -> bool:
+        if isinstance(other, int):
+            return self.offset <= other
+        return NotImplemented
+
+    def __lt__(self, other: int) -> bool:
+        if isinstance(other, int):
+            return self.offset < other
+        return NotImplemented
+
 
 class BlockIndexFile:
     """
@@ -253,16 +307,19 @@ class BlockIndexFile:
         checksums: List[int] | None = None,
         offsets: List[int] | None = None,
         sizes_and_blocks: List[int] | None = None,
+        dirty: bool = False,
     ):
         """
-        FR: Initialise l'index CBlockFile avec ses 3 vecteurs parallèles.
-        EN: Initializes the CBlockFile index with its 3 parallel vectors.
+        FR: Initialise l'index CBlockFile avec ses 3 vecteurs parallèles et son flag d'état modifié (`dirty`).
+        EN: Initializes the CBlockFile index with its 3 parallel vectors and its modified state flag (`dirty`).
+        Ref: picasa3.exe @ 0x006B7FC0 (CBlockFile::SaveIndex)
         """
         self.magic = magic
         self.active_block = active_block
         self.checksums: List[int] = checksums if checksums is not None else []
         self.offsets: List[int] = offsets if offsets is not None else []
         self.sizes_and_blocks: List[int] = sizes_and_blocks if sizes_and_blocks is not None else []
+        self.dirty: bool = dirty
 
     @property
     def record_count(self) -> int:
@@ -292,14 +349,30 @@ class BlockIndexFile:
             for i in range(count)
         ]
 
+    def set_entry(self, index: int, entry: BlockEntry) -> None:
+        """
+        FR: Définit ou remplace l'entrée d'index à la position `index` et marque l'index comme modifié (`dirty`).
+        EN: Sets or replaces the index entry at position `index` and marks the index as modified (`dirty`).
+        Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry), 0x006B7FC0 (CBlockFile::SaveIndex)
+        """
+        while len(self.checksums) <= index:
+            self.checksums.append(0)
+            self.offsets.append(0)
+            self.sizes_and_blocks.append(0)
+        self.checksums[index] = entry.checksum
+        self.offsets[index] = entry.offset
+        self.sizes_and_blocks[index] = entry.raw_size_block
+        self.dirty = True
+
     def append_entry(self, entry: BlockEntry) -> None:
         """
-        FR: Ajoute une nouvelle entrée d'index dans les 3 vecteurs.
-        EN: Appends a new index entry across the 3 parallel vectors.
+        FR: Ajoute une nouvelle entrée d'index dans les 3 vecteurs et marque l'index comme modifié (`dirty`).
+        EN: Appends a new index entry across the 3 parallel vectors and marks the index as modified (`dirty`).
         """
         self.checksums.append(entry.checksum)
         self.offsets.append(entry.offset)
         self.sizes_and_blocks.append(entry.raw_size_block)
+        self.dirty = True
 
     @classmethod
     def from_entries(cls, entries: List[BlockEntry], active_block: int = 0) -> BlockIndexFile:
@@ -395,9 +468,14 @@ class BlockContainerFile:
     FR: Représente un fichier conteneur de données CBlockFile (*_0.db, *_1.db...).
     En-tête de 4 octets : magic 0x3FCCCCCD (1.6f).
     Suivi par les blobs de données brutes (images JPEG, modèles, etc.).
+    Supporte un mode paresseux adossé au disque (`from_file`) afin de ne pas charger
+    des centaines de Mo en RAM au démarrage.
     EN: Represents a CBlockFile data container file (*_0.db, *_1.db...).
     4-byte header: magic 0x3FCCCCCD (1.6f).
     Followed by raw data blobs (JPEG images, face templates, etc.).
+    Supports a lazy disk-backed mode (`from_file`) to avoid loading hundreds of MB
+    into RAM at startup.
+    Ref: picasa3.exe @ 0x006B6AF0, 0x006B7390
     """
 
     def __init__(self, magic: int = BLOCKFILE_MAGIC, data: bytes | None = None):
@@ -406,9 +484,99 @@ class BlockContainerFile:
         EN: Initializes the CBlockFile container with its magic number and payload.
         """
         self.magic = magic
-        self.payload: bytearray = bytearray(data) if data is not None else bytearray()
+        self._backing_path: Optional[Path] = None
+        self._disk_payload_len: int = 0
+        self._payload: Optional[bytearray] = bytearray(data) if data is not None else bytearray()
+        self._append_buf: bytearray = bytearray()
+        self._patch_map: Dict[int, bytes] = {}
         self._dirty_ranges: List[Tuple[int, int]] = []
         self._fully_dirty: bool = False
+
+    @property
+    def payload(self) -> bytearray:
+        """
+        FR: Retourne la charge utile complète en mémoire, en la matérialisant paresseusement
+        depuis `_backing_path` uniquement si un appelant accède directement à `container.payload`
+        ou appelle `to_bytes()`.
+        EN: Returns the full in-memory payload, lazily materializing it from `_backing_path`
+        only if a caller accesses `container.payload` directly or calls `to_bytes()`.
+        """
+        if self._payload is None:
+            buf = bytearray()
+            if self._backing_path is not None and self._backing_path.exists() and self._disk_payload_len > 0:
+                with open(self._backing_path, "rb") as f:
+                    f.seek(4)
+                    buf.extend(f.read(self._disk_payload_len))
+            if len(buf) < self._disk_payload_len:
+                buf.extend(b"\x00" * (self._disk_payload_len - len(buf)))
+            if self._append_buf:
+                buf.extend(self._append_buf)
+            if self._patch_map:
+                for p_off, p_bytes in self._patch_map.items():
+                    rel = p_off - 4
+                    end_rel = rel + len(p_bytes)
+                    if end_rel > len(buf):
+                        buf.extend(b"\x00" * (end_rel - len(buf)))
+                    buf[rel:end_rel] = p_bytes
+            self._payload = buf
+            self._append_buf.clear()
+            self._patch_map.clear()
+        return self._payload
+
+    @payload.setter
+    def payload(self, value: bytearray | bytes) -> None:
+        self._payload = value if isinstance(value, bytearray) else bytearray(value)
+        self._append_buf = bytearray()
+        self._patch_map = {}
+
+    def byte_size(self) -> int:
+        """
+        FR: Retourne la taille totale en octets du conteneur (en-tête 4 octets inclus)
+        sans allouer ni matérialiser le fichier complet en mémoire.
+        EN: Returns the total byte size of the container (including the 4-byte header)
+        without allocating or materializing the full file in memory.
+        Ref: picasa3.exe @ 0x006B6AF0, 0x006B7390
+        """
+        return 4 + (
+            len(self._payload)
+            if self._payload is not None
+            else self._disk_payload_len + len(self._append_buf)
+        )
+
+    @classmethod
+    # Ref: picasa3.exe @ 0x006B6AF0, 0x006B7390 (CBlockFile::OpenBlock)
+    def from_file(cls, path: Union[str, Path]) -> BlockContainerFile:
+        """
+        FR: Ouvre un fichier conteneur *_0.db en mode paresseux adossé au disque :
+        lit uniquement les 4 premiers octets (`magic`), vérifie `magic == BLOCK_CONTAINER_MAGIC`,
+        et conserve la référence `_backing_path` sans charger le reste du fichier en RAM.
+        EN: Opens a *_0.db container file in lazy disk-backed mode:
+        reads only the first 4 bytes (`magic`), verifies `magic == BLOCK_CONTAINER_MAGIC`,
+        and stores `_backing_path` without reading the rest of the file into RAM.
+        """
+        p = Path(path)
+        with open(p, "rb") as f:
+            hdr = f.read(4)
+            if len(hdr) < 4:
+                raise ValueError(f"Conteneur blockfile trop court : {len(hdr)} octets (min 4)")
+            magic = struct.unpack_from("<I", hdr, 0)[0]
+            if magic != BLOCK_CONTAINER_MAGIC:
+                raise ValueError(
+                    f"Magic container blockfile invalide : 0x{magic:08X} (attendu 0x{BLOCK_CONTAINER_MAGIC:08X})"
+                )
+            f.seek(0, os.SEEK_END)
+            st_size = f.tell()
+
+        inst = cls.__new__(cls)
+        inst.magic = magic
+        inst._backing_path = p
+        inst._disk_payload_len = max(0, st_size - 4)
+        inst._payload = None
+        inst._append_buf = bytearray()
+        inst._patch_map = {}
+        inst._dirty_ranges = []
+        inst._fully_dirty = False
+        return inst
 
     @classmethod
     # Ref: picasa3.exe @ 0x006B61E0 (OpenBlock)
@@ -432,25 +600,121 @@ class BlockContainerFile:
         """
         return CONTAINER_HEADER_STRUCT.pack(self.magic) + bytes(self.payload)
 
-    def get_blob(self, entry: BlockEntry) -> bytes:
+    # Ref: picasa3.exe @ 0x006B7390 (CBlockFile::ReadEntry)
+    def get_blob(self, entry_or_offset: BlockEntry | int, size: Optional[int] = None) -> bytes:
         """
-        FR: Extrait le blob correspondant à l'entrée demandée.
-        L'offset stocké dans l'entrée est relatif au fichier complet (offset >= 4).
-        EN: Extracts the blob corresponding to the requested entry.
-        The offset stored in the entry is relative to the complete file (offset >= 4).
+        FR: Extrait le blob correspondant à l'entrée (`BlockEntry`) ou au couple `(file_offset, size)`.
+        L'offset est relatif au fichier complet (`file_offset >= 4`).
+        En mode paresseux (`_payload is None`), lit depuis `_append_buf`, `_patch_map` ou directement
+        via `seek(file_offset)` + `read(size)` sur `_backing_path` sans charger tout le fichier.
+        EN: Extracts the blob corresponding to the requested `BlockEntry` or `(file_offset, size)` pair.
+        The offset is relative to the complete file (`file_offset >= 4`).
+        In lazy mode (`_payload is None`), reads from `_append_buf`, `_patch_map`, or directly
+        via `seek(file_offset)` + `read(size)` on `_backing_path` without loading the entire file.
         """
-        if entry.is_empty:
+        if isinstance(entry_or_offset, BlockEntry) and size is None:
+            if entry_or_offset.is_empty:
+                return b""
+            file_offset = entry_or_offset.offset
+            blob_size = entry_or_offset.size
+        else:
+            file_offset = int(entry_or_offset)
+            blob_size = int(size or 0)
+            if blob_size == 0 and file_offset == 0:
+                return b""
+
+        if blob_size == 0:
+            if file_offset < 4:
+                raise ValueError(f"Offset d'entrée invalide : {file_offset} (doit être >= 4)")
             return b""
-        if entry.offset < 4:
-            raise ValueError(f"Offset d'entrée invalide : {entry.offset} (doit être >= 4)")
-        rel_offset = entry.offset - 4
-        end_offset = rel_offset + entry.size
-        if end_offset > len(self.payload):
+        if file_offset < 4:
+            raise ValueError(f"Offset d'entrée invalide : {file_offset} (doit être >= 4)")
+
+        rel_offset = file_offset - 4
+        end_offset = rel_offset + blob_size
+        total_payload_len = (
+            len(self._payload)
+            if self._payload is not None
+            else self._disk_payload_len + len(self._append_buf)
+        )
+        if end_offset > total_payload_len:
             raise ValueError(
-                f"Entrée hors limites du container : offset={entry.offset}, taille={entry.size}, "
-                f"fin={end_offset} > taille utile={len(self.payload)}"
+                f"Entrée hors limites du container : offset={file_offset}, taille={blob_size}, "
+                f"fin={end_offset} > taille utile={total_payload_len}"
             )
-        return bytes(self.payload[rel_offset:end_offset])
+
+        if self._payload is not None:
+            return bytes(self._payload[rel_offset:end_offset])
+
+        if file_offset in self._patch_map and len(self._patch_map[file_offset]) == blob_size:
+            return self._patch_map[file_offset]
+
+        if rel_offset >= self._disk_payload_len:
+            app_start = rel_offset - self._disk_payload_len
+            data = bytearray(self._append_buf[app_start : app_start + blob_size])
+        elif end_offset <= self._disk_payload_len:
+            assert self._backing_path is not None
+            with open(self._backing_path, "rb") as f:
+                f.seek(file_offset)
+                data = bytearray(f.read(blob_size))
+        else:
+            assert self._backing_path is not None
+            disk_part_len = self._disk_payload_len - rel_offset
+            with open(self._backing_path, "rb") as f:
+                f.seek(file_offset)
+                data = bytearray(f.read(disk_part_len))
+            data.extend(self._append_buf[: blob_size - disk_part_len])
+
+        if self._patch_map:
+            req_start = file_offset
+            req_end = file_offset + blob_size
+            for p_off, p_bytes in self._patch_map.items():
+                p_end = p_off + len(p_bytes)
+                ov_start = max(req_start, p_off)
+                ov_end = min(req_end, p_end)
+                if ov_end > ov_start:
+                    data[ov_start - req_start : ov_end - req_start] = p_bytes[ov_start - p_off : ov_end - p_off]
+
+        return bytes(data)
+
+    # Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
+    def write_blob_at(self, file_offset: int, blob: bytes) -> None:
+        """
+        FR: Écrit un blob à l'offset fichier spécifié (`file_offset >= 4`) sans matérialiser
+        le fichier disque lorsque l'instance est en mode paresseux (`_payload is None`).
+        EN: Writes a blob at the specified file offset (`file_offset >= 4`) without materializing
+        the on-disk file when the instance is in lazy mode (`_payload is None`).
+        Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
+        """
+        if file_offset < 4:
+            raise ValueError(f"Offset d'entrée invalide : {file_offset} (doit être >= 4)")
+        size = len(blob)
+        if self._payload is None:
+            curr_end = 4 + self._disk_payload_len + len(self._append_buf)
+            if file_offset == curr_end:
+                self._append_buf.extend(blob)
+                if size > 0:
+                    self._dirty_ranges.append((file_offset, file_offset + size))
+                return
+            if file_offset >= 4 + self._disk_payload_len and file_offset + size <= curr_end:
+                app_off = file_offset - (4 + self._disk_payload_len)
+                self._append_buf[app_off : app_off + size] = blob
+                if size > 0:
+                    self._dirty_ranges.append((file_offset, file_offset + size))
+                return
+            if file_offset + size <= 4 + self._disk_payload_len:
+                self._patch_map[file_offset] = bytes(blob)
+                if size > 0:
+                    self._dirty_ranges.append((file_offset, file_offset + size))
+                return
+
+        rel_offset = file_offset - 4
+        payload_buf = self.payload
+        if rel_offset + size > len(payload_buf):
+            payload_buf.extend(b"\x00" * (rel_offset + size - len(payload_buf)))
+        payload_buf[rel_offset : rel_offset + size] = blob
+        if size > 0:
+            self._dirty_ranges.append((file_offset, file_offset + size))
 
     # Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
     def write_entry(self, offset: int, payload: bytes) -> None:
@@ -459,27 +723,27 @@ class BlockContainerFile:
         EN: Directly writes a payload at the specified file offset (>= 4) and records the dirty range.
         Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
         """
-        if offset < 4:
-            raise ValueError(f"Offset d'entrée invalide : {offset} (doit être >= 4)")
-        size = len(payload)
-        rel_offset = offset - 4
-        if rel_offset + size > len(self.payload):
-            self.payload.extend(b"\x00" * (rel_offset + size - len(self.payload)))
-        self.payload[rel_offset : rel_offset + size] = payload
-        if size > 0:
-            self._dirty_ranges.append((offset, offset + size))
+        self.write_blob_at(offset, payload)
 
     def append_blob(self, blob: bytes, checksum: int = 0, block_idx: int = 0) -> BlockEntry:
         """
-        FR: Ajoute un nouveau blob à la fin du conteneur et renvoie la BlockEntry correspondante.
-        EN: Appends a new blob to the end of the container and returns the corresponding BlockEntry.
+        FR: Ajoute un nouveau blob à la fin du conteneur et renvoie la BlockEntry correspondante
+        (compatible avec un entier via `__int__` / `__eq__`).
+        En mode paresseux (`_payload is None`), ajoute à `_append_buf` sans matérialiser le fichier disque.
+        EN: Appends a new blob to the end of the container and returns the corresponding BlockEntry
+        (also int-compatible via `__int__` / `__eq__`).
+        In lazy mode (`_payload is None`), appends to `_append_buf` without materializing the on-disk file.
         Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
         """
         size = len(blob)
         if size > 0x00FFFFFF:
             raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
-        abs_offset = len(self.payload) + 4
-        self.payload.extend(blob)
+        if self._payload is None:
+            abs_offset = 4 + self._disk_payload_len + len(self._append_buf)
+            self._append_buf.extend(blob)
+        else:
+            abs_offset = 4 + len(self._payload)
+            self._payload.extend(blob)
         if size > 0:
             self._dirty_ranges.append((abs_offset, abs_offset + size))
         return BlockEntry(checksum=checksum, offset=abs_offset, size=size, block=block_idx)
@@ -508,37 +772,67 @@ class BlockContainerFile:
             and existing_entry.block == block_idx
             and existing_entry.size >= size
             and existing_entry.offset >= 4
+            and existing_entry.offset + size <= self.byte_size()
         ):
-            rel_offset = existing_entry.offset - 4
-            if rel_offset + size <= len(self.payload):
-                self.payload[rel_offset : rel_offset + size] = blob
-                if size > 0:
-                    self._dirty_ranges.append((existing_entry.offset, existing_entry.offset + size))
-                return BlockEntry(
-                    checksum=checksum,
-                    offset=existing_entry.offset,
-                    size=size,
-                    block=block_idx,
-                )
+            self.write_blob_at(existing_entry.offset, blob)
+            return BlockEntry(
+                checksum=checksum,
+                offset=existing_entry.offset,
+                size=size,
+                block=block_idx,
+            )
         return self.append_blob(blob, checksum=checksum, block_idx=block_idx)
 
     # Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry), 0x006B7FC0 (CBlockFile::SaveIndex)
     def flush_to_file(self, path: Path | str) -> None:
         """
         FR: Synchronise le conteneur CBlockFile sur disque :
-        - Si le fichier n'existe pas, est marqué entièrement modifié (_fully_dirty) ou a rétréci,
+        - En mode paresseux (`_payload is None`) vers `_backing_path`, ouvre le fichier en `r+b`,
+          applique les patches `_patch_map` et ajoute `_append_buf` à la fin sans jamais charger le fichier.
+        - Si le fichier n'existe pas, est marqué entièrement modifié (`_fully_dirty`) ou a rétréci,
           écrit le fichier complet de manière atomique (.tmp + os.replace).
-        - Si aucune plage n'a été modifiée (_dirty_ranges vide) et que la taille sur disque correspond,
+        - Si aucune plage n'a été modifiée (`_dirty_ranges` vide) et que la taille sur disque correspond,
           ne fait aucune écriture disque.
-        - Sinon, écrit uniquement sur place (r+b, seek + write) les plages d'octets modifiées ou ajoutées.
+        - Sinon, écrit uniquement sur place (`r+b`, `seek` + `write`) les plages d'octets modifiées ou ajoutées.
         EN: Flushes the CBlockFile container to disk:
-        - If the file does not exist, is marked _fully_dirty, or shrank, writes the full file atomically.
-        - If no range was modified (_dirty_ranges empty) and the on-disk size matches, performs no disk I/O.
-        - Otherwise, writes only the modified or appended byte ranges in-place (r+b, seek + write).
+        - In lazy mode (`_payload is None`) targeting `_backing_path`, opens the file in `r+b`,
+          writes `_patch_map` patches and appends `_append_buf` at the end without loading the file.
+        - If the file does not exist, is marked `_fully_dirty`, or shrank, writes the full file atomically.
+        - If no range was modified (`_dirty_ranges` empty) and the on-disk size matches, performs no disk I/O.
+        - Otherwise, writes only the modified or appended byte ranges in-place (`r+b`, `seek` + `write`).
         Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
         """
         target = Path(path)
-        total_size = 4 + len(self.payload)
+
+        if (
+            self._payload is None
+            and self._backing_path is not None
+            and not self._fully_dirty
+            and target.exists()
+            and os.path.normcase(os.path.abspath(str(target)))
+            == os.path.normcase(os.path.abspath(str(self._backing_path)))
+        ):
+            if not self._patch_map and not self._append_buf and not self._dirty_ranges:
+                return
+            try:
+                with open(target, "r+b") as f:
+                    for p_off, p_bytes in self._patch_map.items():
+                        if p_bytes:
+                            f.seek(p_off)
+                            f.write(p_bytes)
+                    if self._append_buf:
+                        f.seek(4 + self._disk_payload_len)
+                        f.write(self._append_buf)
+                        self._disk_payload_len += len(self._append_buf)
+                self._append_buf.clear()
+                self._patch_map.clear()
+                self._dirty_ranges.clear()
+                self._fully_dirty = False
+                return
+            except OSError:
+                pass
+
+        total_size = self.byte_size()
 
         def _full_atomic_write() -> None:
             raw = self.to_bytes()
@@ -551,6 +845,8 @@ class BlockContainerFile:
                     target.write_bytes(raw)
                 finally:
                     tmp.unlink(missing_ok=True)
+            self._backing_path = target
+            self._disk_payload_len = len(raw) - 4
             self._dirty_ranges.clear()
             self._fully_dirty = False
 
@@ -574,6 +870,7 @@ class BlockContainerFile:
             _full_atomic_write()
             return
 
+        payload_buf = self.payload
         try:
             with open(target, "r+b") as f:
                 for start, end in self._dirty_ranges:
@@ -581,7 +878,7 @@ class BlockContainerFile:
                     e = min(total_size, int(end))
                     if e > s:
                         f.seek(s)
-                        f.write(self.payload[s - 4 : e - 4])
+                        f.write(payload_buf[s - 4 : e - 4])
             self._dirty_ranges.clear()
             self._fully_dirty = False
         except OSError:

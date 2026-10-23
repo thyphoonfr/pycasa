@@ -18,6 +18,7 @@ import io
 import math
 import os
 import threading
+import time
 from datetime import datetime, timedelta
 from typing import Any, Deque, Dict, List, Optional, Set, Tuple, Union
 from dataclasses import dataclass, field
@@ -125,7 +126,7 @@ class ViewportThumbWorker:
     the viewport using a bounded LIFO queue, without ever blocking `paintEvent`.
     Ref: picasa3.exe @ 0x007301F0, 0x00730320 (CThumbCache & Viewport Throttle)
     """
-    def __init__(self, max_pending: int = 64) -> None:
+    def __init__(self, max_pending: int = 96) -> None:
         """
         FR: Initialise la file LIFO bornée aux éléments visibles et le thread démon d'arrière-plan.
         EN: Initializes the viewport-bounded LIFO queue and the background daemon thread.
@@ -133,24 +134,40 @@ class ViewportThumbWorker:
         self.max_pending = max_pending
         self._lock = threading.Lock()
         self._cond = threading.Condition(self._lock)
-        self._pending_lifo: List[Tuple[int, int, str, bool]] = []
+        self._pending_lifo: List[Tuple[int, int, str, bool, Any, bool, Any, Optional[str], int]] = []
         self._in_flight: Set[int] = set()
         self._failed_items: Set[int] = set()
         self.completed: Deque[Tuple[int, int, QImage, Any]] = deque()
         self._thread: Optional[threading.Thread] = None
 
-    def schedule(self, item_idx: int, db_idx: int, path: str, is_backup_only: bool = False) -> None:
+    def schedule(
+        self,
+        item_idx: int,
+        db_idx: int,
+        path: str,
+        is_backup_only: bool = False,
+        db: Optional[Any] = None,
+        db_fast: bool = False,
+        is_face: bool = False,
+        face_rect: Optional[Any] = None,
+        contact_id: Optional[str] = None,
+        avatar_size: int = 140,
+    ) -> None:
         """
-        FR: Planifie la régénération asynchrone d'une vignette visible en tête de la pile LIFO.
-        EN: Schedules asynchronous regeneration of a visible thumbnail at the top of the LIFO stack.
+        FR: Planifie la régénération asynchrone d'une vignette ou d'un avatar de visage visible en tête de la pile LIFO.
+        EN: Schedules asynchronous regeneration of a visible thumbnail or face avatar at the top of the LIFO stack.
+        Ref: picasa3.exe @ 0x00414C90 (CThumbMaker LIFO Queue), 0x007301F0
         """
-        if not path:
+        if not path and db_idx < 0:
             return
+        queue_key = (-item_idx - 1) if is_face else item_idx
         with self._cond:
-            if item_idx in self._in_flight or item_idx in self._failed_items:
+            if queue_key in self._in_flight or queue_key in self._failed_items:
                 return
-            self._pending_lifo = [t for t in self._pending_lifo if t[0] != item_idx]
-            self._pending_lifo.append((item_idx, db_idx, path, is_backup_only))
+            self._pending_lifo = [t for t in self._pending_lifo if t[0] != queue_key]
+            self._pending_lifo.append(
+                (queue_key, db_idx, path, is_backup_only, db, db_fast, face_rect, contact_id, avatar_size)
+            )
             if len(self._pending_lifo) > self.max_pending:
                 self._pending_lifo = self._pending_lifo[-self.max_pending :]
             if self._thread is None or not self._thread.is_alive():
@@ -191,42 +208,111 @@ class ViewportThumbWorker:
 
     def _run_loop(self) -> None:
         """
-        FR: Boucle de traitement d'arrière-plan qui décode et applique les filtres PIL hors du thread GUI.
-        EN: Background processing loop that decodes and applies PIL filters off the GUI thread.
+        FR: Boucle de traitement d'arrière-plan qui décode les miniatures DB, recadre les avatars de visages
+        ou applique les filtres PIL hors du thread GUI avec priorité OS réduite.
+        EN: Background processing loop that decodes DB thumbnails, crops face avatars,
+        or applies PIL filters off the GUI thread at lowered OS thread priority.
+        Ref: picasa3.exe @ 0x00414C90 (CThumbMaker), 0x00415790 (SetThreadPriority), 0x007301F0
         """
+        if os.name == "nt":
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), -1)
+            except Exception:
+                pass
+
         while True:
             with self._cond:
                 if not self._pending_lifo:
                     self._cond.wait(timeout=2.0)
                     if not self._pending_lifo:
                         return
-                item_idx, db_idx, path, is_backup_only = self._pending_lifo.pop()
-                self._in_flight.add(item_idx)
+                queue_key, db_idx, path, is_backup_only, db_ref, db_fast, face_rect, contact_id, avatar_size = self._pending_lifo.pop()
+                self._in_flight.add(queue_key)
 
             pil_img = None
             qimg: Optional[QImage] = None
             try:
-                if path and os.path.exists(path):
-                    if is_backup_only:
-                        reader = QImageReader(path)
-                        reader.setAutoTransform(True)
-                        orig_sz = reader.size()
-                        if orig_sz.isValid() and orig_sz.width() > 0 and orig_sz.height() > 0:
-                            scale = min(256.0 / orig_sz.width(), 256.0 / orig_sz.height(), 1.0)
-                            target_sz = QSize(max(1, int(orig_sz.width() * scale)), max(1, int(orig_sz.height() * scale)))
-                            reader.setScaledSize(target_sz)
-                        img = reader.read()
-                        if not img.isNull():
-                            qimg = img
-                    else:
-                        from picasa_py.ui.image_processor import PicasaImageProcessor
-                        pil_img = PicasaImageProcessor.load_transformed_image(path, max_size=288)
-                        if pil_img is not None:
-                            rgb_im = pil_img.convert("RGB")
-                            w, h = rgb_im.size
-                            raw = rgb_im.tobytes("raw", "RGB")
-                            qimg = QImage(raw, w, h, w * 3, QImage.Format.Format_RGB888).copy()
-                        else:
+                if queue_key < 0:
+                    # Décodage et recadrage d'un avatar de visage (Personnes / Visages sans nom) hors thread GUI
+                    if db_ref is not None and db_idx >= 0 and db_ref.is_face_record(db_idx):
+                        raw_thumb = (
+                            db_ref.get_thumbnail(db_idx, size="large")
+                            or db_ref.get_thumbnail(db_idx, size="small")
+                        )
+                        if raw_thumb:
+                            img = QImage.fromData(raw_thumb)
+                            if not img.isNull():
+                                qimg = img.copy()
+
+                    if qimg is None:
+                        target_fr = face_rect
+                        if target_fr is None and db_ref is not None and getattr(db_ref, "face_manager", None) is not None and db_idx >= 0:
+                            faces = db_ref.face_manager.get_faces_for_photo(db_idx)
+                            if faces:
+                                if contact_id:
+                                    for f in faces:
+                                        if f.contact_id == contact_id:
+                                            target_fr = f
+                                            break
+                                if target_fr is None:
+                                    target_fr = faces[0]
+
+                        if target_fr is not None:
+                            src_pil: Optional[Image.Image] = None
+                            if db_ref is not None and db_idx >= 0:
+                                raw_b = (
+                                    db_ref.get_thumbnail(db_idx, size="preview")
+                                    or db_ref.get_thumbnail(db_idx, size="large")
+                                )
+                                if raw_b:
+                                    try:
+                                        with Image.open(io.BytesIO(raw_b)) as im:
+                                            src_pil = im.convert("RGB")
+                                    except Exception:
+                                        src_pil = None
+                            if src_pil is None and path and os.path.exists(path):
+                                from picasa_py.ui.image_processor import PicasaImageProcessor
+                                src_pil = PicasaImageProcessor.load_transformed_image(path, max_size=800)
+
+                            if src_pil is not None:
+                                w, h = src_pil.size
+                                fx, fy, fw, fh = target_fr.to_pixel_rect(w, h)
+                                side = max(fw, fh)
+                                cx, cy = fx + fw / 2.0, fy + fh / 2.0
+                                x1, y1, x2, y2 = cx - side / 2.0, cy - side / 2.0, cx + side / 2.0, cy + side / 2.0
+                                if x1 < 0.0:
+                                    x2 = min(float(w), x2 - x1)
+                                    x1 = 0.0
+                                if y1 < 0.0:
+                                    y2 = min(float(h), y2 - y1)
+                                    y1 = 0.0
+                                if x2 > float(w):
+                                    x1 = max(0.0, x1 - (x2 - float(w)))
+                                    x2 = float(w)
+                                if y2 > float(h):
+                                    y1 = max(0.0, y1 - (y2 - float(h)))
+                                    y2 = float(h)
+                                ix1 = max(0, int(round(x1)))
+                                iy1 = max(0, int(round(y1)))
+                                ix2 = max(ix1 + 1, min(w, int(round(x2))))
+                                iy2 = max(iy1 + 1, min(h, int(round(y2))))
+                                av_sz = max(64, int(avatar_size))
+                                crop_im = src_pil.crop((ix1, iy1, ix2, iy2)).resize((av_sz, av_sz), Image.Resampling.BILINEAR).convert("RGB")
+                                raw = crop_im.tobytes("raw", "RGB")
+                                qimg = QImage(raw, av_sz, av_sz, av_sz * 3, QImage.Format.Format_RGB888).copy()
+                else:
+                    # 1. Décodage rapide depuis le conteneur CBlockFile en mémoire si demandé (hors thread GUI)
+                    if db_fast and db_ref is not None and db_idx >= 0 and not is_backup_only:
+                        raw_bytes = db_ref.get_thumbnail(db_idx)
+                        if raw_bytes:
+                            img = QImage.fromData(raw_bytes)
+                            if not img.isNull():
+                                qimg = img.copy()
+
+                    # 2. Repli ou application des retouches sur le fichier disque
+                    if qimg is None and path and os.path.exists(path):
+                        if is_backup_only or db_fast:
                             reader = QImageReader(path)
                             reader.setAutoTransform(True)
                             orig_sz = reader.size()
@@ -237,22 +323,42 @@ class ViewportThumbWorker:
                             img = reader.read()
                             if not img.isNull():
                                 qimg = img
+                        else:
+                            from picasa_py.ui.image_processor import PicasaImageProcessor
+                            pil_img = PicasaImageProcessor.load_transformed_image(path, max_size=288)
+                            if pil_img is not None:
+                                rgb_im = pil_img.convert("RGB")
+                                w, h = rgb_im.size
+                                raw = rgb_im.tobytes("raw", "RGB")
+                                qimg = QImage(raw, w, h, w * 3, QImage.Format.Format_RGB888).copy()
+                            else:
+                                reader = QImageReader(path)
+                                reader.setAutoTransform(True)
+                                orig_sz = reader.size()
+                                if orig_sz.isValid() and orig_sz.width() > 0 and orig_sz.height() > 0:
+                                    scale = min(256.0 / orig_sz.width(), 256.0 / orig_sz.height(), 1.0)
+                                    target_sz = QSize(max(1, int(orig_sz.width() * scale)), max(1, int(orig_sz.height() * scale)))
+                                    reader.setScaledSize(target_sz)
+                                img = reader.read()
+                                if not img.isNull():
+                                    qimg = img
             except Exception:
                 qimg = None
 
             with self._cond:
-                self._in_flight.discard(item_idx)
+                self._in_flight.discard(queue_key)
                 if qimg is not None and not qimg.isNull():
-                    self.completed.append((item_idx, db_idx, qimg, pil_img))
+                    self.completed.append((queue_key, db_idx, qimg, pil_img))
                 else:
-                    self._failed_items.add(item_idx)
+                    self._failed_items.add(queue_key)
+            time.sleep(0.0005)
 
 
 class FaceClusterWorker(QThread):
     """
     FR: Worker d'arrière-plan calculant les regroupements de visages sans bloquer l'UI.
     EN: Background worker computing face clusters without blocking the UI thread.
-    Ref: picasa3.exe @ CAlbumLabel::LoadingGrouped (0x00881CC0), AGENTS.md §4 ter
+    Ref: picasa3.exe @ CAlbumLabel::LoadingGrouped (0x00881CC0), 0x00415790, 0x005E4AC0, AGENTS.md §4 ter
     """
     progress = Signal(int, int)
     finished = Signal(list)
@@ -268,9 +374,16 @@ class FaceClusterWorker(QThread):
 
     def run(self) -> None:
         """
-        FR: Exécute l'algorithme de regroupement des visages sans nom et émet la progression.
-        EN: Runs the unnamed face clustering algorithm and emits progress updates.
+        FR: Exécute l'algorithme de regroupement des visages sans nom à priorité OS réduite et émet la progression.
+        EN: Runs the unnamed face clustering algorithm at lowered OS thread priority and emits progress updates.
+        Ref: picasa3.exe @ 0x00415790, 0x005E4AC0
         """
+        if os.name == "nt":
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), -1)
+            except Exception:
+                pass
         try:
             def on_prog(cur, total):
                 """
@@ -352,23 +465,35 @@ class PicasaThumbnailView(QWidget):
         # Cache de vignettes en mémoire et cache de QPixmap déjà redimensionnées au viewport
         # Ref: picasa3.exe @ 0x007301F0, 0x00730320 (CThumbCache & Viewport Throttle)
         self._pixmap_cache: Dict[int, QPixmap] = {}
+        self._db_pixmap_cache: Dict[int, QPixmap] = {}
         self._scaled_pixmap_cache: Dict[Tuple[int, int, int], QPixmap] = {}
         self._folder_backups_cache: Dict[str, Set[str]] = {}
+        self._synced_db_len: int = 0
         self._cache_limit: int = 1000
         self._in_paint_event: bool = False
+        self._paint_start_ts: float = 0.0
+        self._paint_sync_decodes: int = 0
 
         # Worker asynchrone de régénération des vignettes retouchées visibles
-        self._thumb_worker = ViewportThumbWorker(max_pending=64)
+        self._thumb_worker = ViewportThumbWorker(max_pending=96)
         self._thumb_flush_timer = QTimer(self)
         self._thumb_flush_timer.setInterval(16)
         self._thumb_flush_timer.timeout.connect(self._flush_async_thumbnails)
 
         # En-tête globale / filtre actif
         self.current_folder_filter: Optional[str] = None
+        self._unfiltered_special_sections: List[AlbumSection] = []
         self.quick_filter_starred: bool = False
         self.quick_filter_faces: bool = False
         self.quick_filter_videos: bool = False
         self.quick_filter_geo: bool = False
+
+        # Zoom fluide des vignettes (rendu direct GPU pendant le glissement, SmoothTransformation au repos)
+        self._is_zooming_thumbs: bool = False
+        self._zoom_settle_timer = QTimer(self)
+        self._zoom_settle_timer.setSingleShot(True)
+        self._zoom_settle_timer.setInterval(120)
+        self._zoom_settle_timer.timeout.connect(self._on_zoom_settled)
 
         # Barre de défilement personnalisée Picasa 3 (AVAlbumScroll)
         self.scrollbar = PicasaAlbumScroll(style=self.style, parent=self)
@@ -406,26 +531,12 @@ class PicasaThumbnailView(QWidget):
         """
         self.update()
 
-    def set_database(self, db: PicasaDatabase) -> None:
+    def _extract_album_meta_map(self, db: PicasaDatabase) -> Dict[str, Tuple[str, str]]:
         """
-        FR: Charge les entrées de la base de données Picasa et construit les sections d'albums.
-        EN: Loads Picasa database entries and builds continuous album sections.
+        FR: Construit le dictionnaire `norm_folder_path -> (nom_album, date_str)` depuis les tables `albumdata_*`.
+        EN: Builds the `norm_folder_path -> (album_name, date_str)` dictionary from `albumdata_*` tables.
         """
-        self.db = db
-        self.items.clear()
-        self.sections.clear()
-        self.selected_indices.clear()
-        self.anchor_index = None
-        self._pixmap_cache.clear()
-        self._scaled_pixmap_cache.clear()
-        self._folder_backups_cache.clear()
-        self._thumb_worker.clear()
-
-        # 1. Cartographier les répertoires depuis thumbindex.db (type == 1)
-        folders = {i: r.path for i, r in enumerate(db.index) if r.type == 1}
-
-        # 2. Cartographier les métadonnées d'albums (albumdata_name, albumdata_date, albumdata_filename)
-        album_meta: Dict[str, Tuple[str, str]] = {}  # norm_path -> (name, date_str)
+        album_meta: Dict[str, Tuple[str, str]] = {}
         if "albumdata_filename" in db.pmps and "albumdata_name" in db.pmps:
             fn_pmp = db.pmps["albumdata_filename"].records
             name_pmp = db.pmps["albumdata_name"].records
@@ -434,50 +545,56 @@ class PicasaThumbnailView(QWidget):
 
             for idx, fn in enumerate(fn_pmp):
                 if cat_pmp and idx < len(cat_pmp.records) and cat_pmp.records[idx] == 6:
-                    continue  # Ignorer les dossiers système de vignettes
+                    continue
                 norm = fn.replace("\\", "/").rstrip("/").lower()
                 name = name_pmp[idx] if idx < len(name_pmp) and name_pmp[idx] else ""
                 ole_d = date_pmp.records[idx] if date_pmp and idx < len(date_pmp.records) else 0.0
                 date_str = format_ole_date(ole_d)
                 album_meta[norm] = (name, date_str)
+        return album_meta
 
-        # 3. Filtrer UNIQUEMENT les fichiers média réels (JPG, BMP, PSD, TIFF, RAW, WEBP)
-        # Sans appel os.path.exists par fichier ; lecture de .picasa.ini une seule fois par dossier parent
-        folder_items_map: Dict[str, List[int]] = {}
-        folder_ini_meta_cache: Dict[str, Tuple[Set[str], Set[str], Set[str]]] = {}
-
-        def _get_folder_ini_meta(fp: str) -> Tuple[Set[str], Set[str], Set[str]]:
-            """
-            FR: Récupère en une seule passe par dossier les ensembles de fichiers favoris (star=yes),
-            retouchés (rotate/tilt/crop/filters/text) et sauvegardés (.picasaoriginals / backuphash).
-            EN: Retrieves in a single pass per folder the sets of starred (star=yes),
-            edited (rotate/tilt/crop/filters/text), and backed-up (.picasaoriginals / backuphash) files.
-            """
-            norm_k = fp.replace("\\", "/").rstrip("/").lower()
-            if norm_k not in folder_ini_meta_cache:
-                starred_set: Set[str] = set()
-                edited_set: Set[str] = set()
-                backup_set: Set[str] = set()
-                ini_p = os.path.join(fp, ".picasa.ini")
-                doc = db.get_parsed_ini(ini_p) if hasattr(db, "get_parsed_ini") else None
-                if not doc:
-                    alt = os.path.join(fp, "Picasa.ini")
-                    doc = db.get_parsed_ini(alt) if hasattr(db, "get_parsed_ini") else None
-                if doc:
-                    for sec in doc.sections:
-                        sec_low = sec.name.lower()
-                        if sec.get("star", "").lower() == "yes":
-                            starred_set.add(sec_low)
-                        if (
-                            sec.get("rotate", "")
-                            or sec.get("tilt", "")
-                            or sec.get("crop", "")
-                            or sec.get("filters", "")
-                            or sec.get("text", "")
-                        ):
-                            edited_set.add(sec_low)
-                        if sec.get("backuphash", ""):
-                            backup_set.add(sec_low)
+    def _get_folder_ini_meta_dict(
+        self,
+        db: PicasaDatabase,
+        fp: str,
+        folder_ini_meta_cache: Dict[str, Tuple[Set[str], Set[str], Set[str]]],
+    ) -> Tuple[Set[str], Set[str], Set[str]]:
+        """
+        FR: Récupère en une seule passe par dossier les ensembles de fichiers favoris (star=yes),
+        retouchés (rotate/tilt/crop/filters/text) et sauvegardés (.picasaoriginals / backuphash),
+        en réutilisant le cache `_folder_backups_cache` pour éviter les appels `os.listdir` répétés.
+        EN: Retrieves in a single pass per folder the sets of starred (star=yes),
+        edited (rotate/tilt/crop/filters/text), and backed-up (.picasaoriginals / backuphash) files,
+        reusing `_folder_backups_cache` to avoid repeated `os.listdir` calls.
+        """
+        norm_k = fp.replace("\\", "/").rstrip("/").lower()
+        if norm_k not in folder_ini_meta_cache:
+            starred_set: Set[str] = set()
+            edited_set: Set[str] = set()
+            backup_set: Set[str] = set()
+            ini_p = os.path.join(fp, ".picasa.ini")
+            doc = db.get_parsed_ini(ini_p) if hasattr(db, "get_parsed_ini") else None
+            if not doc:
+                alt = os.path.join(fp, "Picasa.ini")
+                doc = db.get_parsed_ini(alt) if hasattr(db, "get_parsed_ini") else None
+            if doc:
+                for sec in doc.sections:
+                    sec_low = sec.name.lower()
+                    if sec.get("star", "").lower() == "yes":
+                        starred_set.add(sec_low)
+                    if (
+                        sec.get("rotate", "")
+                        or sec.get("tilt", "")
+                        or sec.get("crop", "")
+                        or sec.get("filters", "")
+                        or sec.get("text", "")
+                    ):
+                        edited_set.add(sec_low)
+                    if sec.get("backuphash", ""):
+                        backup_set.add(sec_low)
+            if norm_k in self._folder_backups_cache:
+                backup_set.update(self._folder_backups_cache[norm_k])
+            else:
                 orig_dir = os.path.join(fp, ".picasaoriginals")
                 if os.path.isdir(orig_dir):
                     try:
@@ -488,8 +605,77 @@ class PicasaThumbnailView(QWidget):
                         self._folder_backups_cache[norm_k] = set()
                 else:
                     self._folder_backups_cache[norm_k] = set()
-                folder_ini_meta_cache[norm_k] = (starred_set, edited_set, backup_set)
-            return folder_ini_meta_cache[norm_k]
+            folder_ini_meta_cache[norm_k] = (starred_set, edited_set, backup_set)
+        return folder_ini_meta_cache[norm_k]
+
+    def set_database(self, db: PicasaDatabase, preserve_view_state: bool = False) -> None:
+        """
+        FR: Charge les entrées de la base de données Picasa et construit les sections d'albums,
+        tout en préservant les `QPixmap` déjà décodées en mémoire (`_db_pixmap_cache`) afin d'éviter
+        tout re-décodage synchrone des vignettes sur le thread GUI.
+        EN: Loads Picasa database entries and builds continuous album sections while preserving
+        already-decoded `QPixmap` objects in memory (`_db_pixmap_cache`) to avoid synchronous
+        thumbnail re-decoding on the GUI thread.
+        """
+        same_db = (self.db is db)
+        if same_db and self.items and self._pixmap_cache:
+            for it_idx, pm in list(self._pixmap_cache.items()):
+                if 0 <= it_idx < len(self.items) and pm and not pm.isNull():
+                    db_i = self.items[it_idx].index
+                    if db_i >= 0:
+                        self._db_pixmap_cache[db_i] = pm
+        elif not same_db:
+            self._db_pixmap_cache.clear()
+            self._folder_backups_cache.clear()
+
+        saved_scroll = self.scroll_y if preserve_view_state else 0
+        saved_filter = self.current_folder_filter if preserve_view_state else None
+        saved_sel_db = (
+            {self.items[idx].index for idx in self.selected_indices if 0 <= idx < len(self.items)}
+            if preserve_view_state
+            else set()
+        )
+
+        self.db = db
+        self.items.clear()
+        self.sections.clear()
+        self.selected_indices.clear()
+        self.anchor_index = None
+        self._pixmap_cache.clear()
+        self._scaled_pixmap_cache.clear()
+        if not same_db:
+            self._thumb_worker.clear()
+
+        # 1. Cartographier les répertoires depuis thumbindex.db (type == 1)
+        folders = {i: r.path for i, r in enumerate(db.index) if r.type == 1}
+
+        # 2. Cartographier les métadonnées d'albums (albumdata_name, albumdata_date, albumdata_filename)
+        album_meta = self._extract_album_meta_map(db)
+
+        # 3. Filtrer UNIQUEMENT les fichiers média réels (JPG, BMP, PSD, TIFF, RAW, WEBP)
+        # Lecture purement en RAM depuis les colonnes .pmp (Ref: picasa3.exe @ 0x004F6470, 0x0071D260)
+        folder_items_map: Dict[str, List[int]] = {}
+        folder_ini_meta_cache: Dict[str, Tuple[Set[str], Set[str], Set[str]]] = {}
+
+        edited_recs = db.pmps["imagedata_edited"].records if "imagedata_edited" in db.pmps else None
+        filters_recs = db.pmps["imagedata_filters"].records if "imagedata_filters" in db.pmps else None
+        crop64_recs = db.pmps["imagedata_crop64"].records if "imagedata_crop64" in db.pmps else None
+        rotate_recs = db.pmps["imagedata_rotate"].records if "imagedata_rotate" in db.pmps else None
+        tilt_recs = db.pmps["imagedata_tilt"].records if "imagedata_tilt" in db.pmps else None
+        text_recs = db.pmps["imagedata_textactive"].records if "imagedata_textactive" in db.pmps else None
+        backup_recs = db.pmps["imagedata_backuphash"].records if "imagedata_backuphash" in db.pmps else None
+        star_recs = db.pmps["imagedata_star"].records if "imagedata_star" in db.pmps else None
+        has_pmp_meta = any(
+            r is not None
+            for r in (edited_recs, filters_recs, crop64_recs, rotate_recs, tilt_recs, text_recs, backup_recs)
+        )
+        starred_cache_raw = getattr(db, "_starred_cache", None)
+        starred_norm_set: Set[str] = (
+            {os.path.normcase(os.path.normpath(p)) for p in starred_cache_raw}
+            if starred_cache_raw
+            else set()
+        )
+        allow_disk_ini_fallback = (not has_pmp_meta) and len(db.index) <= 64
 
         for i, entry in enumerate(db.index):
             is_vid = (entry.type == 0x20) or (Path(entry.path).suffix.lower() in VIDEO_EXTENSIONS)
@@ -500,15 +686,26 @@ class PicasaThumbnailView(QWidget):
             folder_name = folder_path.replace("\\", "/").rstrip("/").split("/")[-1] if folder_path else "Photos"
             full_path = os.path.join(folder_path, entry.path) if folder_path else entry.path
 
-            is_st = False
-            has_ed = False
-            has_bk = False
-            if folder_path:
-                st_set, ed_set, bk_set = _get_folder_ini_meta(folder_path)
+            is_st = bool(star_recs and i < len(star_recs) and star_recs[i])
+            if not is_st and starred_norm_set and full_path:
+                is_st = os.path.normcase(os.path.normpath(full_path)) in starred_norm_set
+
+            has_ed = bool(
+                (edited_recs and i < len(edited_recs) and edited_recs[i])
+                or (filters_recs and i < len(filters_recs) and filters_recs[i])
+                or (crop64_recs and i < len(crop64_recs) and crop64_recs[i] not in (0, 0xFFFFFFFFFFFFFFFF))
+                or (rotate_recs and i < len(rotate_recs) and rotate_recs[i])
+                or (tilt_recs and i < len(tilt_recs) and abs(float(tilt_recs[i])) >= 0.01)
+                or (text_recs and i < len(text_recs) and text_recs[i])
+            )
+            has_bk = bool(backup_recs and i < len(backup_recs) and backup_recs[i])
+
+            if allow_disk_ini_fallback and folder_path:
+                st_set, ed_set, bk_set = self._get_folder_ini_meta_dict(db, folder_path, folder_ini_meta_cache)
                 fn_low = entry.path.lower()
-                is_st = fn_low in st_set
-                has_ed = fn_low in ed_set
-                has_bk = fn_low in bk_set
+                is_st = is_st or (fn_low in st_set)
+                has_ed = has_ed or (fn_low in ed_set)
+                has_bk = has_bk or (fn_low in bk_set)
 
             item = ThumbnailItem(
                 index=i,
@@ -523,6 +720,10 @@ class PicasaThumbnailView(QWidget):
             )
             item_list_idx = len(self.items)
             self.items.append(item)
+            if i in self._db_pixmap_cache:
+                self._pixmap_cache[item_list_idx] = self._db_pixmap_cache[i]
+            if preserve_view_state and i in saved_sel_db:
+                self.selected_indices.add(item_list_idx)
 
             norm_fp = folder_path.replace("\\", "/").rstrip("/").lower()
             if norm_fp not in folder_items_map:
@@ -532,7 +733,6 @@ class PicasaThumbnailView(QWidget):
         # 4. Construire les sections d'albums pour le défilement continu
         for norm_fp, item_indices in folder_items_map.items():
             first_item = self.items[item_indices[0]]
-            # Nom et date depuis albumdata ou dossier
             meta = album_meta.get(norm_fp, ("", ""))
             sec_name = meta[0] if meta[0] else first_item.folder
             sec_date = meta[1]
@@ -545,7 +745,159 @@ class PicasaThumbnailView(QWidget):
             )
             self.sections.append(sec)
 
-        self.filter_by_folder(None)
+        self._synced_db_len = len(db.index)
+        self.filter_by_folder(saved_filter)
+        if preserve_view_state:
+            if saved_sel_db:
+                self.selection_changed.emit(sorted(self.selected_indices))
+            if saved_scroll > 0:
+                max_scroll = max(0, self.total_content_height - self.height())
+                clamped_scroll = min(saved_scroll, max_scroll)
+                self.scroll_y = clamped_scroll
+                self.scrollbar.set_value(clamped_scroll)
+                self.update()
+
+    def sync_from_database_incremental(self, db: PicasaDatabase) -> bool:
+        """
+        FR: Ajoute de manière incrémentale les nouveaux enregistrements `db.index[self._synced_db_len:]`
+        sans vider les caches de vignettes (`_pixmap_cache`, `_scaled_pixmap_cache`) ni réinitialiser
+        le défilement ou la sélection active pendant un scan en arrière-plan.
+        EN: Incrementally appends new `db.index[self._synced_db_len:]` records without clearing
+        thumbnail caches (`_pixmap_cache`, `_scaled_pixmap_cache`) or resetting scroll/selection
+        state during a background scan.
+        Ref: picasa3.exe @ 0x00571850 (CThumbUI::NotifyPhotoAddedOrUpdated)
+        """
+        new_len = len(db.index)
+        deleted_set = getattr(db, "_deleted_or_reset_indices", None)
+        has_deleted_in_place = bool(deleted_set)
+        if not has_deleted_in_place and self.db is db and self.items:
+            for it in self.items:
+                if (
+                    not getattr(it, "is_synthetic_unnamed", False)
+                    and not getattr(it, "is_person_item", False)
+                    and 0 <= it.index < new_len
+                ):
+                    rec = db.index[it.index]
+                    if rec.type == 0 or not rec.path:
+                        has_deleted_in_place = True
+                        break
+        if has_deleted_in_place or self.db is not db or self._synced_db_len <= 0 or new_len < self._synced_db_len:
+            if deleted_set is not None and hasattr(deleted_set, "clear"):
+                deleted_set.clear()
+            self.set_database(db, preserve_view_state=True)
+            return True
+
+        modified_set = getattr(db, "_modified_media_indices", None)
+        if modified_set:
+            mod_indices = set(modified_set)
+            if hasattr(modified_set, "clear"):
+                modified_set.clear()
+            for item_list_idx, it in enumerate(self.items):
+                if it.index in mod_indices:
+                    self.invalidate_item(item_list_idx)
+
+        if new_len == self._synced_db_len:
+            return True
+
+        # Si l'utilisateur est sur une vue synthétique (personne / sans nom / recherche / album),
+        # mettre simplement à jour les sections de base en arrière-plan.
+        album_meta = self._extract_album_meta_map(db)
+        edited_recs = db.pmps["imagedata_edited"].records if "imagedata_edited" in db.pmps else None
+        filters_recs = db.pmps["imagedata_filters"].records if "imagedata_filters" in db.pmps else None
+        crop64_recs = db.pmps["imagedata_crop64"].records if "imagedata_crop64" in db.pmps else None
+        rotate_recs = db.pmps["imagedata_rotate"].records if "imagedata_rotate" in db.pmps else None
+        tilt_recs = db.pmps["imagedata_tilt"].records if "imagedata_tilt" in db.pmps else None
+        text_recs = db.pmps["imagedata_textactive"].records if "imagedata_textactive" in db.pmps else None
+        backup_recs = db.pmps["imagedata_backuphash"].records if "imagedata_backuphash" in db.pmps else None
+        star_recs = db.pmps["imagedata_star"].records if "imagedata_star" in db.pmps else None
+        starred_cache_raw = getattr(db, "_starred_cache", None)
+        starred_norm_set: Set[str] = (
+            {os.path.normcase(os.path.normpath(p)) for p in starred_cache_raw}
+            if starred_cache_raw
+            else set()
+        )
+
+        sec_by_norm_fp: Dict[str, AlbumSection] = {}
+        for sec in self.sections:
+            if not sec.is_person and not sec.is_album and not sec.is_search and not sec.is_unnamed:
+                norm_fp = sec.folder_path.replace("\\", "/").rstrip("/").lower()
+                sec_by_norm_fp[norm_fp] = sec
+
+        added_any = False
+        for i in range(self._synced_db_len, new_len):
+            entry = db.index[i]
+            is_vid = (entry.type == 0x20) or (Path(entry.path).suffix.lower() in VIDEO_EXTENSIONS)
+            if entry.type not in (2, 6, 7, 13, 18, 31, 0x20) and not is_vid:
+                continue
+
+            parent_idx = entry.parent_idx
+            folder_path = (
+                db.index[parent_idx].path
+                if (0 <= parent_idx < new_len and db.index[parent_idx].type == 1)
+                else ""
+            )
+            folder_name = folder_path.replace("\\", "/").rstrip("/").split("/")[-1] if folder_path else "Photos"
+            full_path = os.path.join(folder_path, entry.path) if folder_path else entry.path
+
+            is_st = bool(star_recs and i < len(star_recs) and star_recs[i])
+            if not is_st and starred_norm_set and full_path:
+                is_st = os.path.normcase(os.path.normpath(full_path)) in starred_norm_set
+
+            has_ed = bool(
+                (edited_recs and i < len(edited_recs) and edited_recs[i])
+                or (filters_recs and i < len(filters_recs) and filters_recs[i])
+                or (crop64_recs and i < len(crop64_recs) and crop64_recs[i] not in (0, 0xFFFFFFFFFFFFFFFF))
+                or (rotate_recs and i < len(rotate_recs) and rotate_recs[i])
+                or (tilt_recs and i < len(tilt_recs) and abs(float(tilt_recs[i])) >= 0.01)
+                or (text_recs and i < len(text_recs) and text_recs[i])
+            )
+            has_bk = bool(backup_recs and i < len(backup_recs) and backup_recs[i])
+
+            item = ThumbnailItem(
+                index=i,
+                path=full_path,
+                filename=entry.path,
+                folder=folder_name,
+                folder_path=folder_path,
+                starred=is_st,
+                has_edits=has_ed,
+                has_backup=has_bk,
+                is_video=is_vid,
+            )
+            item_list_idx = len(self.items)
+            self.items.append(item)
+            added_any = True
+
+            norm_fp = folder_path.replace("\\", "/").rstrip("/").lower()
+            sec = sec_by_norm_fp.get(norm_fp)
+            if sec is None:
+                meta = album_meta.get(norm_fp, ("", ""))
+                sec_name = meta[0] if meta[0] else folder_name
+                sec_date = meta[1]
+                sec = AlbumSection(
+                    name=sec_name,
+                    folder_path=folder_path,
+                    date_str=sec_date,
+                    item_indices=[item_list_idx],
+                )
+                self.sections.append(sec)
+                sec_by_norm_fp[norm_fp] = sec
+            else:
+                sec.item_indices.append(item_list_idx)
+
+        self._synced_db_len = new_len
+        if not added_any:
+            return True
+
+        # Rafraîchir visible_sections sans perdre scroll_y ni selected_indices
+        if self.current_folder_filter is None or (
+            not self.current_folder_filter.startswith("person:")
+            and self.current_folder_filter != "unnamed_faces"
+            and not self.current_folder_filter.startswith("album:")
+            and not self.current_folder_filter.startswith("search:")
+        ):
+            self._apply_current_filters(reset_scroll=False)
+        return True
 
     def filter_by_folder(self, folder_path: Optional[str]) -> None:
         """
@@ -607,21 +959,75 @@ class PicasaThumbnailView(QWidget):
                     return True
         return False
 
-    def _apply_current_filters(self) -> None:
+    @staticmethod
+    def _clone_special_sections(sections: List[AlbumSection]) -> List[AlbumSection]:
+        """
+        FR: Retourne une copie indépendante d'une liste de sections spéciales (recherche, album, personne, sans nom).
+        EN: Returns an independent copy of a list of special sections (search, album, person, unnamed).
+        """
+        cloned: List[AlbumSection] = []
+        for sec in sections:
+            cloned.append(
+                AlbumSection(
+                    name=sec.name,
+                    folder_path=sec.folder_path,
+                    date_str=sec.date_str,
+                    item_indices=list(sec.item_indices),
+                    is_person=sec.is_person,
+                    is_album=sec.is_album,
+                    is_search=sec.is_search,
+                    is_unnamed=sec.is_unnamed,
+                    face_zoom=sec.face_zoom,
+                    contact_id=sec.contact_id,
+                    album_token=sec.album_token,
+                    suggestions=sec.suggestions,
+                    only_suggestions=sec.only_suggestions,
+                    all_person_indices=list(sec.all_person_indices),
+                    suggestion_item_indices=list(sec.suggestion_item_indices),
+                    unnamed_faces=sec.unnamed_faces,
+                    cluster_faces=sec.cluster_faces,
+                )
+            )
+        return cloned
+
+    def _apply_current_filters(self, reset_scroll: bool = True) -> None:
         """
         FR: Applique le filtre de dossier et les filtres rapides actifs (étoiles, visages, vidéos, géolocalisation).
         EN: Applies the active folder filter and quick filters (starred, faces, videos, geotagging).
         """
         if self.current_folder_filter and self.current_folder_filter.startswith("person:"):
-            base_sections = [sec for sec in self.visible_sections if sec.is_person]
+            src_secs = (
+                self._clone_special_sections(self._unfiltered_special_sections)
+                if self._unfiltered_special_sections
+                else self.visible_sections
+            )
+            base_sections = [sec for sec in src_secs if sec.is_person]
             if not base_sections and self.sections:
                 base_sections = list(self.sections)
         elif self.current_folder_filter and self.current_folder_filter == "unnamed_faces":
-            base_sections = [sec for sec in self.visible_sections if sec.is_unnamed]
-        elif self.current_folder_filter and self.current_folder_filter.startswith("album:"):
-            base_sections = [sec for sec in self.visible_sections if sec.is_album]
+            src_secs = (
+                self._clone_special_sections(self._unfiltered_special_sections)
+                if self._unfiltered_special_sections
+                else self.visible_sections
+            )
+            base_sections = [sec for sec in src_secs if sec.is_unnamed]
+        elif self.current_folder_filter and (
+            self.current_folder_filter.startswith("album:")
+            or self.current_folder_filter == "special:starred"
+        ):
+            src_secs = (
+                self._clone_special_sections(self._unfiltered_special_sections)
+                if self._unfiltered_special_sections
+                else self.visible_sections
+            )
+            base_sections = [sec for sec in src_secs if sec.is_album]
         elif self.current_folder_filter and self.current_folder_filter.startswith("search:"):
-            base_sections = [sec for sec in self.visible_sections if sec.is_search]
+            src_secs = (
+                self._clone_special_sections(self._unfiltered_special_sections)
+                if self._unfiltered_special_sections
+                else self.visible_sections
+            )
+            base_sections = [sec for sec in src_secs if sec.is_search]
         elif self.current_folder_filter:
             norm_target = self.current_folder_filter.replace("\\", "/").rstrip("/").lower()
             base_sections = [
@@ -674,6 +1080,9 @@ class PicasaThumbnailView(QWidget):
                     contact_id=sec.contact_id,
                     album_token=sec.album_token,
                     suggestions=sec.suggestions,
+                    only_suggestions=sec.only_suggestions,
+                    all_person_indices=list(sec.all_person_indices),
+                    suggestion_item_indices=list(sec.suggestion_item_indices),
                     unnamed_faces=sec.unnamed_faces,
                     cluster_faces=sec.cluster_faces,
                 )
@@ -681,12 +1090,19 @@ class PicasaThumbnailView(QWidget):
                 self.filtered_indices.extend(filtered_sec_indices)
 
         self.visible_sections = new_visible_sections
-        self.selected_indices.clear()
-        self.scroll_y = 0
-        self.scrollbar.set_value(0)
+        if reset_scroll:
+            self.selected_indices.clear()
+            self.scroll_y = 0
+            self.scrollbar.set_value(0)
         self._recompute_layout()
+        if not reset_scroll and self.scroll_y > 0:
+            max_scroll = max(0, self.total_content_height - self.height())
+            clamped_scroll = min(self.scroll_y, max_scroll)
+            self.scroll_y = clamped_scroll
+            self.scrollbar.set_value(clamped_scroll)
         self.update()
-        self.selection_changed.emit(list(self.selected_indices))
+        if reset_scroll:
+            self.selection_changed.emit(list(self.selected_indices))
 
     def scroll_to_folder(self, folder_path: str) -> None:
         """
@@ -703,6 +1119,7 @@ class PicasaThumbnailView(QWidget):
         if len(self.visible_sections) != len(self.sections) or self.current_folder_filter is not None:
             self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)]
             self.current_folder_filter = None
+            self._unfiltered_special_sections.clear()
             self.visible_sections = list(self.sections)
             self.filtered_indices = list(range(len(self.items)))
             self._recompute_layout()
@@ -815,17 +1232,18 @@ class PicasaThumbnailView(QWidget):
             name=person_name,
             folder_path=f"person:{contact_id}",
             date_str=date_str,
-            item_indices=active_indices,
+            item_indices=list(active_indices),
             is_person=True,
             face_zoom=True,
             contact_id=contact_id,
             suggestions=suggestions,
             only_suggestions=only_suggestions,
-            all_person_indices=person_item_indices,
-            suggestion_item_indices=suggestion_item_indices,
+            all_person_indices=list(person_item_indices),
+            suggestion_item_indices=list(suggestion_item_indices),
         )
 
         self.visible_sections = [person_sec]
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
         self.filtered_indices = list(active_indices)
         self.selected_indices.clear()
         self.scroll_y = 0
@@ -854,6 +1272,7 @@ class PicasaThumbnailView(QWidget):
             sec.item_indices = list(sec.all_person_indices)
             sec.date_str = "Personnes"
 
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
         self.filtered_indices = list(sec.item_indices)
         self.selected_indices.clear()
         self.scroll_y = 0
@@ -899,14 +1318,15 @@ class PicasaThumbnailView(QWidget):
                 name="Visages sans nom",
                 folder_path="unnamed_faces",
                 date_str=f"{len(item_indices)} visage(s) à identifier",
-                item_indices=item_indices,
+                item_indices=list(item_indices),
                 is_person=True,
                 is_unnamed=True,
                 face_zoom=True,
                 unnamed_faces=unnamed_faces,
             )
             self.visible_sections = [sec]
-            self.filtered_indices = item_indices
+            self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+            self.filtered_indices = list(item_indices)
             self.selected_indices.clear()
             self.scroll_y = 0
             self.scrollbar.set_value(0)
@@ -966,7 +1386,7 @@ class PicasaThumbnailView(QWidget):
 
         worker.progress.connect(_on_prog)
         worker.finished.connect(_on_done)
-        worker.start()
+        worker.start(QThread.Priority.LowPriority)
 
     def _apply_unnamed_clusters(self, clusters: List[List[Tuple[Optional[int], str, Any]]]) -> None:
         """
@@ -1022,7 +1442,7 @@ class PicasaThumbnailView(QWidget):
                 name=f"Groupe de visages similaires #{c_idx + 1}",
                 folder_path=f"unnamed_cluster:{c_idx}",
                 date_str=f"{len(c_indices)} visage(s)",
-                item_indices=c_indices,
+                item_indices=list(c_indices),
                 is_person=True,
                 is_unnamed=True,
                 face_zoom=True,
@@ -1044,7 +1464,7 @@ class PicasaThumbnailView(QWidget):
                 name="Autres visages (isolés)",
                 folder_path="unnamed_cluster:singles",
                 date_str=f"{len(s_indices)} visage(s)",
-                item_indices=s_indices,
+                item_indices=list(s_indices),
                 is_person=True,
                 is_unnamed=True,
                 face_zoom=True,
@@ -1054,6 +1474,7 @@ class PicasaThumbnailView(QWidget):
             self.visible_sections.append(sec_single)
             self.filtered_indices.extend(s_indices)
 
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
         self.selected_indices.clear()
         self.scroll_y = 0
         self.scrollbar.set_value(0)
@@ -1072,12 +1493,13 @@ class PicasaThumbnailView(QWidget):
             name=album_name,
             folder_path=f"album:{album_token}",
             date_str="Album",
-            item_indices=item_indices,
+            item_indices=list(item_indices),
             is_album=True,
             album_token=album_token,
         )
         self.visible_sections = [album_sec]
-        self.filtered_indices = item_indices
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+        self.filtered_indices = list(item_indices)
         self.selected_indices.clear()
         self.scroll_y = 0
         self.scrollbar.set_value(0)
@@ -1097,12 +1519,13 @@ class PicasaThumbnailView(QWidget):
             name="Photos favorites",
             folder_path="special:starred",
             date_str="Favoris",
-            item_indices=starred_indices,
+            item_indices=list(starred_indices),
             is_album=True,
             album_token="starred",
         )
         self.visible_sections = [starred_sec]
-        self.filtered_indices = starred_indices
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+        self.filtered_indices = list(starred_indices)
         self.selected_indices.clear()
         self.scroll_y = 0
         self.scrollbar.set_value(0)
@@ -1121,11 +1544,12 @@ class PicasaThumbnailView(QWidget):
             name=f'Recherche : "{query}"',
             folder_path=f"search:{query}",
             date_str=f"{len(item_indices)} résultat(s)",
-            item_indices=item_indices,
+            item_indices=list(item_indices),
             is_search=True,
         )
         self.visible_sections = [search_sec]
-        self.filtered_indices = item_indices
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+        self.filtered_indices = list(item_indices)
         self.selected_indices.clear()
         self.scroll_y = 0
         self.scrollbar.set_value(0)
@@ -1133,19 +1557,25 @@ class PicasaThumbnailView(QWidget):
         self.update()
         self.selection_changed.emit(list(self.selected_indices))
 
+    def _on_zoom_settled(self) -> None:
+        """
+        FR: Désactive le mode de zoom rapide et redessine les vignettes avec `SmoothTransformation` une fois le curseur stabilisé.
+        EN: Disables fast zoom mode and repaints thumbnails with `SmoothTransformation` once the zoom slider settles.
+        """
+        self._is_zooming_thumbs = False
+        self._scaled_pixmap_cache.clear()
+        self.update()
+
     def set_thumb_size(self, size: int) -> None:
         """
-        FR: Définit la taille de base des vignettes (entre 64 et 320 pixels), invalide le cache
-        des vignettes de visages pour les recalculer à la nouvelle résolution, et recalcule la grille.
-        EN: Sets the base thumbnail size (clamped between 64 and 320 pixels), invalidates cached
-        face pixmaps so they re-render at the new resolution, and recomputes the grid layout.
+        FR: Définit la taille de base des vignettes (entre 64 et 320 pixels) et recalcule la grille.
+        EN: Sets the base thumbnail size (clamped between 64 and 320 pixels) and recomputes the grid layout.
         """
         new_size = max(64, min(320, size))
         if new_size != self.thumb_base_size:
             self.thumb_base_size = new_size
-            self._scaled_pixmap_cache.clear()
-            for it in self.items:
-                it.face_pixmap = None
+            self._is_zooming_thumbs = True
+            self._zoom_settle_timer.start()
         self._recompute_layout()
         self.update()
 
@@ -1213,9 +1643,16 @@ class PicasaThumbnailView(QWidget):
 
     def _on_scroll(self, val: int) -> None:
         """
-        FR: Met à jour le décalage vertical de défilement et émet le dossier actif au sommet.
-        EN: Updates the vertical scroll offset and emits the active top folder.
+        FR: Met à jour le décalage vertical de défilement, signale l'activité GUI aux workers
+        d'arrière-plan pour leur faire céder le CPU, et émet le dossier actif au sommet.
+        EN: Updates the vertical scroll offset, signals GUI activity to background workers
+        so they yield CPU bandwidth, and emits the active top folder.
         """
+        try:
+            from picasa_py.scanner.scanner import BackgroundScanWorker
+            BackgroundScanWorker.notify_gui_activity()
+        except Exception:
+            pass
         self.scroll_y = val
         self.update()
         # Notifier du changement d'album actif au sommet (Ref: MultiAlbumScroll)
@@ -1261,6 +1698,11 @@ class PicasaThumbnailView(QWidget):
         FR: Gère le défilement vertical de la grille à la molette de la souris.
         EN: Handles vertical scrolling of the thumbnail grid via the mouse wheel.
         """
+        try:
+            from picasa_py.scanner.scanner import BackgroundScanWorker
+            BackgroundScanWorker.notify_gui_activity()
+        except Exception:
+            pass
         delta = event.angleDelta().y()
         step = 60 if delta > 0 else -60
         new_val = max(0, min(self.scrollbar.max_val, self.scrollbar.value() - step))
@@ -1271,40 +1713,63 @@ class PicasaThumbnailView(QWidget):
     # -------------------------------------------------------------------------
     # FR: Géométrie & Détection des Clics / EN: Geometry & Hit Testing
     # -------------------------------------------------------------------------
+    def _get_grid_metrics(self) -> Tuple[int, int, int, int]:
+        """
+        FR: Retourne les métriques de la grille de vignettes (colonnes, largeur de cellule, hauteur de cellule, marge X).
+        EN: Returns the thumbnail grid metrics (columns, cell width, cell height, X margin).
+        """
+        available_width = self.width() - self.scrollbar.width() - (self.style.alayout_gutter * 2)
+        slot_width = max(1, self.thumb_base_size + self.style.alayout_thumbGutterX)
+        cols = max(1, available_width // slot_width)
+        slot_height = max(1, self.thumb_base_size + self.style.alayout_thumbGutterY + 16)
+        return cols, slot_width, slot_height, self.style.alayout_gutter
+
     def _get_item_rect(self, sec: AlbumSection, slot_in_sec: int) -> QRect:
         """
         FR: Calcule le rectangle d'affichage d'une vignette dans sa section.
         EN: Computes the display rectangle of a thumbnail within its section.
         """
-        available_width = self.width() - self.scrollbar.width() - (self.style.alayout_gutter * 2)
-        slot_width = self.thumb_base_size + self.style.alayout_thumbGutterX
-        cols = max(1, available_width // slot_width)
+        cols, slot_width, slot_height, margin_x = self._get_grid_metrics()
 
         col = slot_in_sec % cols
         row = slot_in_sec // cols
 
         header_height = 42
-        slot_height = self.thumb_base_size + self.style.alayout_thumbGutterY + 16
 
-        x = self.style.alayout_gutter + col * slot_width
+        x = margin_x + col * slot_width
         y = sec.y_start + header_height + row * slot_height - self.scroll_y
         return QRect(x, y, self.thumb_base_size, self.thumb_base_size)
 
     def _find_item_at(self, point: QPoint) -> Optional[int]:
         """
-        FR: Recherche l'index de la vignette située aux coordonnées données du pointeur.
-        EN: Finds the thumbnail item index located at the given pointer coordinates.
+        FR: Recherche en O(1) l'index de la vignette située aux coordonnées données du pointeur.
+        EN: Finds in O(1) the thumbnail item index located at the given pointer coordinates.
+        Ref: picasa3.exe @ 0x0072E330 (AVCScrollBox bounds & hit-test)
         """
+        cols, _, slot_height, _ = self._get_grid_metrics()
+        header_height = 42
+        vh = self.height()
+        py = point.y()
         for sec in self.visible_sections:
-            if sec.y_start - self.scroll_y > self.height():
+            sec_top = sec.y_start - self.scroll_y
+            if sec_top > vh:
                 break
-            if sec.y_start + sec.height - self.scroll_y < 0:
+            sec_bottom = sec_top + sec.height
+            if sec_bottom < 0:
+                continue
+            if not (sec_top <= py <= sec_bottom):
                 continue
 
-            for slot_idx, item_idx in enumerate(sec.item_indices):
+            rel_y = py - (sec_top + header_height)
+            approx_row = rel_y // slot_height
+            first_row = max(0, approx_row - 1)
+            last_row = approx_row + 1
+            start_slot = first_row * cols
+            end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+            for slot_idx in range(start_slot, end_slot):
                 r = self._get_item_rect(sec, slot_idx)
                 if r.adjusted(-4, -4, 4, 20).contains(point):
-                    return item_idx
+                    return sec.item_indices[slot_idx]
         return None
 
     def _get_sticky_header_info(self) -> Tuple[Optional[int], int]:
@@ -1749,35 +2214,52 @@ class PicasaThumbnailView(QWidget):
         FR: Gère les clics de souris sur les boutons d'action, en-têtes, étoiles, vignettes ou la sélection élastique.
         EN: Handles mouse press events on action buttons, headers, stars, thumbnails, or rubber-band selection.
         """
+        try:
+            from picasa_py.scanner.scanner import BackgroundScanWorker
+            BackgroundScanWorker.notify_gui_activity()
+        except Exception:
+            pass
         if event.button() == Qt.MouseButton.LeftButton:
             pos = event.position().toPoint()
             self._deferred_single_select_idx = None
 
             # 1. Vérifier les clics directs sur les boutons d'action de suggestion (✓ ou ✕) sur les vignettes
             # Ref: picasa3.exe @ adorners/suggestionfaceadorner (0x00714707, 0x00782DF6)
+            cols, _, slot_height, _ = self._get_grid_metrics()
+            header_height = 42
             for sec in self.visible_sections:
-                if sec.y_start - self.scroll_y > self.height():
+                sec_top = sec.y_start - self.scroll_y
+                if sec_top > self.height():
                     break
-                if sec.y_start + sec.height - self.scroll_y < 0:
+                sec_bottom = sec_top + sec.height
+                if sec_bottom < 0:
                     continue
-                for slot_idx, it_idx in enumerate(sec.item_indices):
-                    if it_idx < len(self.items):
-                        it = self.items[it_idx]
-                        if getattr(it, "is_synthetic_suggestion", False):
-                            r = self._get_item_rect(sec, slot_idx)
-                            btn_ok, btn_no = self._get_suggestion_item_buttons(r)
-                            if btn_ok.contains(pos):
-                                self._confirm_single_suggestion(sec, it)
-                                return
-                            elif btn_no.contains(pos):
-                                self._reject_single_suggestion(sec, it)
-                                return
-                        elif getattr(it, "is_synthetic_unnamed", False):
-                            r = self._get_item_rect(sec, slot_idx)
-                            caption_rect = QRect(r.x() - 4, r.bottom() + 1, r.width() + 8, 18)
-                            if caption_rect.contains(pos):
-                                self._open_name_unnamed_face_dialog(it)
-                                return
+                if (sec.is_person or sec.is_unnamed or sec.suggestions) and (sec_top <= pos.y() <= sec_bottom):
+                    rel_y = pos.y() - (sec_top + header_height)
+                    approx_row = rel_y // slot_height
+                    first_row = max(0, approx_row - 1)
+                    last_row = approx_row + 1
+                    start_slot = first_row * cols
+                    end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+                    for slot_idx in range(start_slot, end_slot):
+                        it_idx = sec.item_indices[slot_idx]
+                        if it_idx < len(self.items):
+                            it = self.items[it_idx]
+                            if getattr(it, "is_synthetic_suggestion", False):
+                                r = self._get_item_rect(sec, slot_idx)
+                                btn_ok, btn_no = self._get_suggestion_item_buttons(r)
+                                if btn_ok.contains(pos):
+                                    self._confirm_single_suggestion(sec, it)
+                                    return
+                                elif btn_no.contains(pos):
+                                    self._reject_single_suggestion(sec, it)
+                                    return
+                            elif getattr(it, "is_synthetic_unnamed", False):
+                                r = self._get_item_rect(sec, slot_idx)
+                                caption_rect = QRect(r.x() - 4, r.bottom() + 1, r.width() + 8, 18)
+                                if caption_rect.contains(pos):
+                                    self._open_name_unnamed_face_dialog(it)
+                                    return
 
             # 2. Vérifier d'abord le clic sur l'en-tête épinglé en haut (Sticky Header)
             sticky_idx, sticky_y = self._get_sticky_header_info()
@@ -1801,20 +2283,30 @@ class PicasaThumbnailView(QWidget):
 
             # 4. Vérifier d'abord le clic direct sur l'étoile d'une vignette (Ref: star=yes, thumbui/startoggle)
             for sec in self.visible_sections:
-                if sec.y_start - self.scroll_y > self.height():
+                sec_top = sec.y_start - self.scroll_y
+                if sec_top > self.height():
                     break
-                if sec.y_start + sec.height - self.scroll_y < 0:
+                sec_bottom = sec_top + sec.height
+                if sec_bottom < 0:
                     continue
-                for slot_idx, it_idx in enumerate(sec.item_indices):
-                    r = self._get_item_rect(sec, slot_idx)
-                    star_box = QRect(r.right() - 24, r.bottom() - 24, 24, 24)
-                    if star_box.contains(pos) and it_idx < len(self.items):
-                        target_it = self.items[it_idx]
-                        if target_it.path:
-                            target_it.starred = not target_it.starred
-                            self.star_toggled.emit(target_it.path, target_it.starred)
-                            self.update()
-                            return
+                if sec_top <= pos.y() <= sec_bottom:
+                    rel_y = pos.y() - (sec_top + header_height)
+                    approx_row = rel_y // slot_height
+                    first_row = max(0, approx_row - 1)
+                    last_row = approx_row + 1
+                    start_slot = first_row * cols
+                    end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+                    for slot_idx in range(start_slot, end_slot):
+                        it_idx = sec.item_indices[slot_idx]
+                        r = self._get_item_rect(sec, slot_idx)
+                        star_box = QRect(r.right() - 24, r.bottom() - 24, 24, 24)
+                        if star_box.contains(pos) and it_idx < len(self.items):
+                            target_it = self.items[it_idx]
+                            if target_it.path:
+                                target_it.starred = not target_it.starred
+                                self.star_toggled.emit(target_it.path, target_it.starred)
+                                self.update()
+                                return
 
             # 5. Vérifier le clic sur une vignette individuelle ou le début d'un glisser-déposer / rectangle élastique
             item_idx = self._find_item_at(pos)
@@ -1977,21 +2469,35 @@ class PicasaThumbnailView(QWidget):
 
         # Suivi du survol des boutons ✓ et ✕ sur les vignettes de suggestions
         hovered_sug_btn = None
+        cols, _, slot_height, _ = self._get_grid_metrics()
+        header_height = 42
         for sec in self.visible_sections:
-            if sec.y_start - self.scroll_y > self.height():
+            sec_top = sec.y_start - self.scroll_y
+            if sec_top > self.height():
                 break
-            if sec.y_start + sec.height - self.scroll_y < 0:
+            sec_bottom = sec_top + sec.height
+            if sec_bottom < 0:
                 continue
-            for slot_idx, it_idx in enumerate(sec.item_indices):
-                if it_idx < len(self.items) and getattr(self.items[it_idx], "is_synthetic_suggestion", False):
-                    r = self._get_item_rect(sec, slot_idx)
-                    btn_ok, btn_no = self._get_suggestion_item_buttons(r)
-                    if btn_ok.contains(pos):
-                        hovered_sug_btn = (it_idx, "ok")
-                        break
-                    elif btn_no.contains(pos):
-                        hovered_sug_btn = (it_idx, "no")
-                        break
+            if getattr(self, "_person_selection_mode", False) or sec.is_person or sec.suggestions:
+                if not (sec_top <= pos.y() <= sec_bottom):
+                    continue
+                rel_y = pos.y() - (sec_top + header_height)
+                approx_row = rel_y // slot_height
+                first_row = max(0, approx_row - 1)
+                last_row = approx_row + 1
+                start_slot = first_row * cols
+                end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+                for slot_idx in range(start_slot, end_slot):
+                    it_idx = sec.item_indices[slot_idx]
+                    if it_idx < len(self.items) and getattr(self.items[it_idx], "is_synthetic_suggestion", False):
+                        r = self._get_item_rect(sec, slot_idx)
+                        btn_ok, btn_no = self._get_suggestion_item_buttons(r)
+                        if btn_ok.contains(pos):
+                            hovered_sug_btn = (it_idx, "ok")
+                            break
+                        elif btn_no.contains(pos):
+                            hovered_sug_btn = (it_idx, "no")
+                            break
             if hovered_sug_btn:
                 break
 
@@ -2436,6 +2942,8 @@ class PicasaThumbnailView(QWidget):
         """
         painter = QPainter(self)
         self._in_paint_event = True
+        self._paint_start_ts = time.perf_counter()
+        self._paint_sync_decodes = 0
         try:
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
@@ -2444,6 +2952,8 @@ class PicasaThumbnailView(QWidget):
 
             viewport_h = self.height()
             sticky_idx, sticky_y = self._get_sticky_header_info()
+            cols, _, slot_height, _ = self._get_grid_metrics()
+            header_height = 42
 
             # 1. Rendu des en-têtes naturels et de l'ensemble des vignettes
             for i, sec in enumerate(self.visible_sections):
@@ -2459,8 +2969,15 @@ class PicasaThumbnailView(QWidget):
                 if i != sticky_idx and sec_top > -45 and sec_top < viewport_h:
                     self._draw_section_header(painter, sec, sec_top, is_sticky=False, sec_idx=i)
 
-                # Dessiner les vignettes de la section
-                for slot_idx, item_idx in enumerate(sec.item_indices):
+                # Dessiner uniquement la tranche de lignes visible dans le viewport (calcul direct O(1))
+                rel_top = -20 - (sec_top + header_height)
+                rel_bottom = (viewport_h + 20) - (sec_top + header_height)
+                first_row = max(0, rel_top // slot_height - 1)
+                last_row = max(0, rel_bottom // slot_height + 1)
+                start_slot = first_row * cols
+                end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+                for slot_idx in range(start_slot, end_slot):
+                    item_idx = sec.item_indices[slot_idx]
                     r = self._get_item_rect(sec, slot_idx)
                     if r.bottom() < -20:
                         continue
@@ -2539,7 +3056,9 @@ class PicasaThumbnailView(QWidget):
             # Avatar circulaire de la personne si disponible, sinon icône personne stylisée
             avatar_drawn = False
             if sec.contact_id and self.db and getattr(self.db, "face_manager", None):
-                av = self.db.face_manager.get_person_avatar(sec.contact_id, size=22)
+                av = self.db.face_manager.get_person_avatar(
+                    sec.contact_id, size=22, allow_disk_fallback=not self._in_paint_event
+                )
                 if av and not av.isNull():
                     painter.drawPixmap(icon_x - 2, icon_y - 2, 22, 22, av)
                     avatar_drawn = True
@@ -2801,9 +3320,17 @@ class PicasaThumbnailView(QWidget):
         if pix and not pix.isNull():
             target_rect = rect.adjusted(4, 4, -4, -4)
             tw, th = target_rect.width(), target_rect.height()
-            if not is_face_mode:
-                cache_idx = item.parent_item_idx if is_person_parent else item_idx
-                scale_key = (cache_idx, tw, th)
+            if self._is_zooming_thumbs:
+                fit_sz = pix.size().scaled(target_rect.size(), Qt.AspectRatioMode.KeepAspectRatio)
+                draw_x = target_rect.x() + (tw - fit_sz.width()) // 2
+                draw_y = target_rect.y() + (th - fit_sz.height()) // 2
+                painter.drawPixmap(QRect(draw_x, draw_y, fit_sz.width(), fit_sz.height()), pix)
+            else:
+                if not is_face_mode:
+                    cache_idx = item.parent_item_idx if is_person_parent else item_idx
+                    scale_key = (cache_idx, tw, th)
+                else:
+                    scale_key = (-item_idx - 1, tw, th)
                 scaled = self._scaled_pixmap_cache.get(scale_key)
                 if scaled is None:
                     scaled = pix.scaled(
@@ -2814,16 +3341,9 @@ class PicasaThumbnailView(QWidget):
                     if len(self._scaled_pixmap_cache) >= 1500:
                         self._scaled_pixmap_cache.clear()
                     self._scaled_pixmap_cache[scale_key] = scaled
-            else:
-                painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
-                scaled = pix.scaled(
-                    target_rect.size(),
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation,
-                )
-            draw_x = target_rect.x() + (tw - scaled.width()) // 2
-            draw_y = target_rect.y() + (th - scaled.height()) // 2
-            painter.drawPixmap(draw_x, draw_y, scaled)
+                draw_x = target_rect.x() + (tw - scaled.width()) // 2
+                draw_y = target_rect.y() + (th - scaled.height()) // 2
+                painter.drawPixmap(draw_x, draw_y, scaled)
         else:
             painter.fillRect(rect.adjusted(4, 4, -4, -4), QColor("#D0D0D0"))
 
@@ -2839,23 +3359,24 @@ class PicasaThumbnailView(QWidget):
             painter.drawRect(rect)
 
         # Étoile dorée Picasa si la photo est favorite (Ref: star=yes, ID_PICTURE_STAR)
-        star_box = QRect(rect.right() - 20, rect.bottom() - 20, 18, 18)
-        cx, cy = star_box.center().x(), star_box.center().y()
-        r_out, r_in = 7.5, 3.2
-        pts = []
-        for si in range(10):
-            angle = si * math.pi / 5.0 - math.pi / 2.0
-            r = r_out if si % 2 == 0 else r_in
-            pts.append(QPoint(int(cx + r * math.cos(angle)), int(cy + r * math.sin(angle))))
+        if item.starred or is_hovered:
+            star_box = QRect(rect.right() - 20, rect.bottom() - 20, 18, 18)
+            cx, cy = star_box.center().x(), star_box.center().y()
+            r_out, r_in = 7.5, 3.2
+            pts = []
+            for si in range(10):
+                angle = si * math.pi / 5.0 - math.pi / 2.0
+                r = r_out if si % 2 == 0 else r_in
+                pts.append(QPoint(int(cx + r * math.cos(angle)), int(cy + r * math.sin(angle))))
 
-        if item.starred:
-            painter.setPen(QPen(QColor("#B8860B"), 1))
-            painter.setBrush(QColor("#FFD700"))
-            painter.drawPolygon(QPolygon(pts))
-        elif is_hovered:
-            painter.setPen(QPen(QColor(255, 255, 255, 200), 1))
-            painter.setBrush(QColor(0, 0, 0, 70))
-            painter.drawPolygon(QPolygon(pts))
+            if item.starred:
+                painter.setPen(QPen(QColor("#B8860B"), 1))
+                painter.setBrush(QColor("#FFD700"))
+                painter.drawPolygon(QPolygon(pts))
+            else:
+                painter.setPen(QPen(QColor(255, 255, 255, 200), 1))
+                painter.setBrush(QColor(0, 0, 0, 70))
+                painter.drawPolygon(QPolygon(pts))
 
         # Badge vidéo Picasa (Ref: picasa3.exe @ movie badge / DirEntry.IsMovie)
         if item.is_video:
@@ -2932,6 +3453,12 @@ class PicasaThumbnailView(QWidget):
         if item.face_pixmap and not item.face_pixmap.isNull():
             return item.face_pixmap
 
+        if self._in_paint_event:
+            if self._paint_sync_decodes >= 6 or (time.perf_counter() - self._paint_start_ts) > 0.0035:
+                if not self._thumb_flush_timer.isActive():
+                    self._thumb_flush_timer.start()
+                return None
+
         # FR: 1. Si c'est un enregistrement de visage dans bigthumbs_0.db / thumbs_0.db (type 1001),
         # la vignette stockée par Picasa est DÉJÀ un avatar cadré exactement sur la tête (240x288 dans bigthumbs_0.db).
         # EN: 1. If this is a face sub-record in bigthumbs_0.db / thumbs_0.db (type 1001),
@@ -2942,13 +3469,24 @@ class PicasaThumbnailView(QWidget):
                 or self.db.get_thumbnail(item.index, size="small")
             )
             if raw_thumb:
+                if self._in_paint_event:
+                    self._paint_sync_decodes += 1
+                qimg = QImage.fromData(raw_thumb)
+                if not qimg.isNull():
+                    # FR: Mise à la hauteur de la grille (thumb_base_size) une seule fois, puis cache
+                    # EN: Scale once to the grid height (thumb_base_size), then cache
+                    if qimg.height() != self.thumb_base_size and qimg.height() > 0:
+                        qimg = qimg.scaledToHeight(self.thumb_base_size, Qt.TransformationMode.SmoothTransformation)
+                    pix = QPixmap.fromImage(qimg)
+                    if not pix.isNull():
+                        item.face_pixmap = pix
+                        return pix
                 try:
                     with Image.open(io.BytesIO(raw_thumb)) as thumb_raw:
-                        if self.thumb_base_size <= max(thumb_raw.size) or not (item.path and os.path.exists(item.path)):
-                            pix = FaceRect.to_avatar_pixmap(thumb_raw, avatar_size=self.thumb_base_size, circular=False)
-                            if pix and not pix.isNull():
-                                item.face_pixmap = pix
-                                return pix
+                        pix = FaceRect.to_avatar_pixmap(thumb_raw, avatar_size=self.thumb_base_size, circular=False)
+                        if pix and not pix.isNull():
+                            item.face_pixmap = pix
+                            return pix
                 except Exception:
                     pass
 
@@ -2956,9 +3494,15 @@ class PicasaThumbnailView(QWidget):
         # EN: 2. When a FaceRect is attached to the item (unnamed face, cluster, or suggestion)
         if item.face_rect is not None:
             if self.db and getattr(self.db, "face_manager", None):
+                if self._in_paint_event:
+                    self._paint_sync_decodes += 1
                 pix = self.db.face_manager.get_face_avatar(
-                    item.path, item.face_rect, item.index if item.index >= 0 else None,
-                    size=self.thumb_base_size, circular=False
+                    item.path,
+                    item.face_rect,
+                    item.index if item.index >= 0 else None,
+                    size=self.thumb_base_size,
+                    circular=False,
+                    allow_disk_fallback=not self._in_paint_event,
                 )
                 if pix and not pix.isNull():
                     item.face_pixmap = pix
@@ -2968,9 +3512,7 @@ class PicasaThumbnailView(QWidget):
             return self._get_thumbnail_pixmap(item_idx)
 
         # FR: 3. Chercher le visage pour ce contact dans cette photo et déléguer à get_face_avatar
-        # (qui utilise l'enfant 1001 240x288 ou découpe la photo haute résolution sur disque)
         # EN: 3. Find the face for this contact in this photo and delegate to get_face_avatar
-        # (which uses the 240x288 1001 child thumbnail or crops from the high-resolution photo on disk)
         faces = self.db.face_manager.get_faces_for_photo(item.index)
         target_face = None
         if faces:
@@ -2983,12 +3525,15 @@ class PicasaThumbnailView(QWidget):
                 target_face = faces[0]
 
         if target_face and getattr(self.db, "face_manager", None):
+            if self._in_paint_event:
+                self._paint_sync_decodes += 1
             pix = self.db.face_manager.get_face_avatar(
                 item.path,
                 target_face,
                 db_idx=item.index if item.index >= 0 else None,
                 size=self.thumb_base_size,
                 circular=False,
+                allow_disk_fallback=not self._in_paint_event,
             )
             if pix and not pix.isNull():
                 item.face_pixmap = pix
@@ -3012,14 +3557,26 @@ class PicasaThumbnailView(QWidget):
         if self.db.is_face_record(item.index):
             parent_idx = self.db.get_face_parent_photo_idx(item.index)
             if parent_idx is not None and parent_idx >= 0:
+                if parent_idx in self._db_pixmap_cache:
+                    pix = self._db_pixmap_cache[parent_idx]
+                    item.pixmap = pix
+                    return pix
+                if self._in_paint_event:
+                    if self._paint_sync_decodes >= 6 or (time.perf_counter() - self._paint_start_ts) > 0.0035:
+                        if not self._thumb_flush_timer.isActive():
+                            self._thumb_flush_timer.start()
+                        return None
                 raw_bytes = (
                     self.db.get_thumbnail(parent_idx, size="large")
                     or self.db.get_thumbnail(parent_idx, size="small")
                 )
                 if raw_bytes:
+                    if self._in_paint_event:
+                        self._paint_sync_decodes += 1
                     qimg = QImage.fromData(raw_bytes)
                     if not qimg.isNull():
                         pix = QPixmap.fromImage(qimg)
+                        self._db_pixmap_cache[parent_idx] = pix
                         item.pixmap = pix
                         return pix
 
@@ -3034,10 +3591,11 @@ class PicasaThumbnailView(QWidget):
         if isinstance(item_idx_or_path, int):
             self._thumb_worker._failed_items.discard(item_idx_or_path)
             self._pixmap_cache.pop(item_idx_or_path, None)
-            for k in [k for k in self._scaled_pixmap_cache if k[0] == item_idx_or_path]:
+            for k in [k for k in self._scaled_pixmap_cache if k[0] in (item_idx_or_path, -item_idx_or_path - 1)]:
                 self._scaled_pixmap_cache.pop(k, None)
             if 0 <= item_idx_or_path < len(self.items):
                 it = self.items[item_idx_or_path]
+                self._db_pixmap_cache.pop(it.index, None)
                 it.pixmap = None
                 it.face_pixmap = None
                 if it.path:
@@ -3050,7 +3608,8 @@ class PicasaThumbnailView(QWidget):
                 if it.path == item_idx_or_path or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target):
                     self._thumb_worker._failed_items.discard(idx)
                     self._pixmap_cache.pop(idx, None)
-                    for k in [k for k in self._scaled_pixmap_cache if k[0] == idx]:
+                    self._db_pixmap_cache.pop(it.index, None)
+                    for k in [k for k in self._scaled_pixmap_cache if k[0] in (idx, -idx - 1)]:
                         self._scaled_pixmap_cache.pop(k, None)
                     it.pixmap = None
                     it.face_pixmap = None
@@ -3067,6 +3626,26 @@ class PicasaThumbnailView(QWidget):
         """
         completed = self._thumb_worker.pop_completed()
         if not completed:
+            has_unloaded_visible_faces = False
+            for sec in self.visible_sections:
+                if sec.is_person or sec.is_unnamed:
+                    sec_top = sec.y_start - self.scroll_y
+                    sec_bottom = sec_top + sec.height
+                    if sec_bottom < -20 or sec_top > self.height() + 20:
+                        continue
+                    for idx in sec.item_indices:
+                        if 0 <= idx < len(self.items):
+                            it = self.items[idx]
+                            if (sec.face_zoom and it.face_pixmap is None) or (
+                                not sec.face_zoom and it.pixmap is None and idx not in self._pixmap_cache
+                            ):
+                                has_unloaded_visible_faces = True
+                                break
+                if has_unloaded_visible_faces:
+                    break
+            if has_unloaded_visible_faces:
+                self.update()
+                return
             if not self._thumb_worker.has_pending():
                 self._thumb_flush_timer.stop()
             return
@@ -3076,6 +3655,8 @@ class PicasaThumbnailView(QWidget):
                 pix = QPixmap.fromImage(qimg)
                 if not pix.isNull():
                     self._pixmap_cache[item_idx] = pix
+                    if db_idx >= 0:
+                        self._db_pixmap_cache[db_idx] = pix
                     for k in [k for k in self._scaled_pixmap_cache if k[0] == item_idx]:
                         self._scaled_pixmap_cache.pop(k, None)
                     any_updated = True
@@ -3103,6 +3684,12 @@ class PicasaThumbnailView(QWidget):
             return None
 
         item = self.items[item_idx]
+        if item.index >= 0 and not item.has_edits and not item.has_backup and item.index in self._db_pixmap_cache:
+            cached_db_pix = self._db_pixmap_cache[item.index]
+            if cached_db_pix and not cached_db_pix.isNull():
+                self._pixmap_cache[item_idx] = cached_db_pix
+                return cached_db_pix
+
         pix: Optional[QPixmap] = None
 
         # 1. Si la photo a été enregistrée sur le disque, .picasaoriginals/ existe et le fichier sur le disque a priorité
@@ -3114,9 +3701,27 @@ class PicasaThumbnailView(QWidget):
                 has_backup = True
                 item.has_backup = True
 
+        # Budget de temps strict par frame (< 3.5 ms / max 6 décodages synchrones dans paintEvent)
+        # Ref: picasa3.exe @ 0x00414C90 (CThumbMaker), 0x007301F0 (CThumbCache Frame Budget)
+        if self._in_paint_event:
+            if self._paint_sync_decodes >= 6 or (time.perf_counter() - self._paint_start_ts) > 0.0035:
+                self._thumb_worker.schedule(
+                    item_idx,
+                    item.index,
+                    item.path,
+                    is_backup_only=has_backup,
+                    db=self.db,
+                    db_fast=(not has_backup and not item.has_edits),
+                )
+                if not self._thumb_flush_timer.isActive():
+                    self._thumb_flush_timer.start()
+                return None
+
         if not has_backup:
             raw_bytes = self.db.get_thumbnail(item.index)
             if raw_bytes:
+                if self._in_paint_event:
+                    self._paint_sync_decodes += 1
                 img = QImage.fromData(raw_bytes)
                 if not img.isNull():
                     pix = QPixmap.fromImage(img)
@@ -3215,6 +3820,12 @@ class PicasaThumbnailView(QWidget):
                 if oldest_key is not None:
                     self._pixmap_cache.pop(oldest_key, None)
             self._pixmap_cache[item_idx] = pix
+            if item.index >= 0:
+                if len(self._db_pixmap_cache) >= self._cache_limit * 2:
+                    oldest_db_k = next(iter(self._db_pixmap_cache), None)
+                    if oldest_db_k is not None:
+                        self._db_pixmap_cache.pop(oldest_db_k, None)
+                self._db_pixmap_cache[item.index] = pix
             return pix
 
         return None

@@ -14,6 +14,7 @@ Traçabilité Ghidra / Ghidra Traceability:
 """
 
 from __future__ import annotations
+import bisect
 import os
 from pathlib import Path
 import struct
@@ -52,6 +53,9 @@ class WordEntry:
     image_ids: List[int]
 
 
+WordHashEntry = WordEntry
+
+
 class WordHashFile:
     """
     FR: Représente le fichier wordhash.dat complet.
@@ -71,18 +75,64 @@ class WordHashFile:
         pool_bytes: bytes | None = None,
         entries: List[WordEntry] | None = None,
         version: int | None = None,
+        dirty: bool = False,
     ):
         """
-        FR: Initialise l'index inversé wordhash.dat en mémoire.
-        EN: Initializes the in-memory wordhash.dat inverted index.
+        FR: Initialise l'index inversé wordhash.dat en mémoire avec son flag d'état modifié (`dirty`)
+        et son dictionnaire interne `_word_map` en O(1).
+        EN: Initializes the in-memory wordhash.dat inverted index with its modified state flag (`dirty`)
+        and its O(1) internal `_word_map` dictionary.
+        Ref: picasa3.exe @ 0x004DB4F0 (FUN_004db4f0), 0x004DB720, 0x004DC110
         """
         self.magic = magic
         self.max_doc_id = version if version is not None else max_doc_id
         self.chunk_size = chunk_size
         self.used_bytes = used_bytes
-        self.pool_bytes = pool_bytes if pool_bytes is not None else b""
+        self._raw_pool_bytes: bytes = pool_bytes if pool_bytes is not None else b""
+        self._pool_buf: Optional[bytearray] = None
         self.entries: List[WordEntry] = entries if entries is not None else []
+        self._word_map: Dict[str, WordEntry] = {}
+        for e in self.entries:
+            self._word_map[e.word] = e
+            self._word_map.setdefault(e.word.lower(), e)
         self.words: Dict[str, List[int]] = {e.word: e.image_ids for e in self.entries}
+        self.dirty: bool = dirty
+
+    @property
+    def pool_bytes(self) -> bytes:
+        """
+        FR: Retourne les octets bruts du pool de chaînes (matérialise `_pool_buf` à la demande).
+        EN: Returns the raw string pool bytes (lazily materializing `_pool_buf` on demand).
+        """
+        if self._pool_buf is not None:
+            self._raw_pool_bytes = bytes(self._pool_buf)
+            self._pool_buf = None
+        return self._raw_pool_bytes
+
+    @pool_bytes.setter
+    def pool_bytes(self, val: bytes) -> None:
+        self._raw_pool_bytes = bytes(val)
+        self._pool_buf = None
+
+    def _ensure_pool_buf(self) -> bytearray:
+        """
+        FR: Initialise le buffer de chaînes mutable `_pool_buf` une seule fois pour des ajouts en O(1) amorti.
+        EN: Initializes the mutable string buffer `_pool_buf` once for amortized O(1) appends.
+        """
+        if self._pool_buf is None:
+            raw = self._raw_pool_bytes
+            if self.used_bytes is not None:
+                self._pool_buf = bytearray(raw[: self.used_bytes])
+            elif self.entries:
+                max_end = 0
+                for e in self.entries:
+                    end_pos = raw.find(b"\x00", e.str_offset)
+                    if end_pos != -1:
+                        max_end = max(max_end, end_pos + 1)
+                self._pool_buf = bytearray(raw[:max_end])
+            else:
+                self._pool_buf = bytearray(raw)
+        return self._pool_buf
 
     @property
     def version(self) -> int:
@@ -100,29 +150,30 @@ class WordHashFile:
         EN: Sets the upper bound `max_doc_id` (`version`) in the header.
         """
         self.max_doc_id = int(val)
+        self.dirty = True
 
     def _sync_words_to_entries(self) -> None:
         """
-        FR: Synchronise le dictionnaire `self.words` vers `self.entries` et `self.pool_bytes` si `self.words` a été modifié directement.
-        EN: Synchronizes the `self.words` dictionary into `self.entries` and `self.pool_bytes` if `self.words` was mutated directly.
+        FR: Synchronise le dictionnaire `self.words` vers `self.entries`, `self._word_map` et `self.pool_bytes`
+        si `self.words` a été modifié directement.
+        EN: Synchronizes the `self.words` dictionary into `self.entries`, `self._word_map`, and `self.pool_bytes`
+        if `self.words` was mutated directly.
         """
-        existing_by_word = {e.word: e for e in self.entries}
-        if set(self.words.keys()) == set(existing_by_word.keys()) and all(
-            self.words[w] is existing_by_word[w].image_ids or self.words[w] == existing_by_word[w].image_ids
-            for w in self.words
-        ):
-            return
+        if len(self.words) == len(self.entries):
+            in_sync = True
+            for w, ids in self.words.items():
+                ent = self._word_map.get(w)
+                if ent is None or ent.word != w or (ids is not ent.image_ids and ids != ent.image_ids):
+                    in_sync = False
+                    break
+            if in_sync:
+                return
 
-        raw_pool = bytearray(self.pool_bytes[: self.used_bytes] if self.used_bytes is not None else self.pool_bytes)
-        if self.used_bytes is None and self.entries:
-            max_end = 0
-            for e in self.entries:
-                end_pos = self.pool_bytes.find(b"\x00", e.str_offset)
-                if end_pos != -1:
-                    max_end = max(max_end, end_pos + 1)
-            raw_pool = bytearray(self.pool_bytes[:max_end])
+        existing_by_word = {e.word: e for e in self.entries}
+        raw_pool = self._ensure_pool_buf()
 
         new_entries: List[WordEntry] = []
+        new_word_map: Dict[str, WordEntry] = {}
         for w, ids in self.words.items():
             clean_ids = sorted(list(set(int(x) for x in ids)))
             if clean_ids:
@@ -139,10 +190,13 @@ class WordHashFile:
                 ent = WordEntry(word=w, str_offset=str_off, image_ids=clean_ids)
                 self.words[w] = ent.image_ids
                 new_entries.append(ent)
+            new_word_map[ent.word] = ent
+            new_word_map.setdefault(ent.word.lower(), ent)
 
         self.entries = new_entries
+        self._word_map = new_word_map
         self.used_bytes = len(raw_pool)
-        self.pool_bytes = bytes(raw_pool)
+        self.dirty = True
 
     def search(self, query: str) -> List[int]:
         """
@@ -312,58 +366,60 @@ class WordHashFile:
 
     def add_word(self, word: str, record_id: int) -> None:
         """
-        FR: Ajoute un mot associé à un `record_id` et met à jour la borne `version` (`max_doc_id = max(version, record_id + 1)`).
-        EN: Adds a word associated with a `record_id` and updates the `version` bound (`max_doc_id = max(version, record_id + 1)`).
-        Ref: picasa3.exe @ 0x004D9AA0 / 0x004DB4F0
+        FR: Ajoute en O(1) un mot associé à un `record_id` via `self._word_map` et met à jour
+        la borne `version` (`max_doc_id = max(version, record_id + 1)`).
+        EN: Adds in O(1) a word associated with a `record_id` via `self._word_map` and updates
+        the `version` bound (`max_doc_id = max(version, record_id + 1)`).
+        Ref: picasa3.exe @ 0x004D9AA0 / 0x004DB4F0 / 0x004DB720 / 0x004DC110
         """
         if record_id < 0:
             return
         if record_id + 1 > self.max_doc_id:
             self.max_doc_id = record_id + 1
+            self.dirty = True
         self.add_document_words(record_id, [word])
 
     def add_document_words(self, doc_id: int, words: List[str]) -> None:
         """
-        FR: Ajoute ou met à jour les mots associés à un doc_id dans l'index inversé.
-        EN: Adds or updates words associated with a doc_id in the inverted index.
-        Ref: picasa3.exe @ 0x004D9AA0 / 0x00704500
+        FR: Ajoute ou met à jour en O(1) par mot les mots associés à un `doc_id` dans l'index inversé.
+        EN: Adds or updates in O(1) per word the words associated with a `doc_id` in the inverted index.
+        Ref: picasa3.exe @ 0x004D9AA0 / 0x00704500 / 0x004DB720 / 0x004DC110
         """
         if doc_id < 0:
             return
-        self._sync_words_to_entries()
-        self.max_doc_id = max(self.max_doc_id, doc_id + 1)
-        by_word = {e.word.lower(): e for e in self.entries}
-        raw_pool = bytearray(self.pool_bytes[: self.used_bytes] if self.used_bytes is not None else self.pool_bytes)
-        # FR: S'assurer qu'on n'ajoute pas après des octets nuls de bourrage / EN: Ensure we do not append after padding null bytes
-        if self.used_bytes is None and self.entries:
-            max_end = 0
-            for e in self.entries:
-                end_pos = self.pool_bytes.find(b"\x00", e.str_offset)
-                if end_pos != -1:
-                    max_end = max(max_end, end_pos + 1)
-            raw_pool = bytearray(self.pool_bytes[:max_end])
+        if len(self.words) != len(self.entries):
+            self._sync_words_to_entries()
+        if doc_id + 1 > self.max_doc_id:
+            self.max_doc_id = doc_id + 1
+            self.dirty = True
 
         for w in words:
             clean_w = w.strip().lower()
             if not clean_w:
                 continue
-            existing = by_word.get(clean_w)
+            existing = self._word_map.get(clean_w)
             if existing is not None:
-                if doc_id not in existing.image_ids:
-                    existing.image_ids.append(doc_id)
-                    existing.image_ids.sort()
-                self.words[existing.word] = existing.image_ids
+                ids = existing.image_ids
+                if not ids or ids[-1] < doc_id:
+                    ids.append(doc_id)
+                    self.dirty = True
+                else:
+                    pos = bisect.bisect_left(ids, doc_id)
+                    if pos >= len(ids) or ids[pos] != doc_id:
+                        ids.insert(pos, doc_id)
+                        self.dirty = True
+                self.words[existing.word] = ids
             else:
+                raw_pool = self._ensure_pool_buf()
                 str_off = len(raw_pool)
                 b_word = clean_w.encode("utf-8", errors="surrogateescape") + b"\x00"
                 raw_pool.extend(b_word)
+                self.used_bytes = len(raw_pool)
                 new_entry = WordEntry(word=clean_w, str_offset=str_off, image_ids=[doc_id])
                 self.entries.append(new_entry)
-                by_word[clean_w] = new_entry
+                self._word_map[clean_w] = new_entry
                 self.words[clean_w] = new_entry.image_ids
-
-        self.used_bytes = len(raw_pool)
-        self.pool_bytes = bytes(raw_pool)
+                self.dirty = True
 
     def write(self, path: Union[str, Path]) -> None:
         """
@@ -374,6 +430,7 @@ class WordHashFile:
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(self.to_bytes())
+        self.dirty = False
 
     @classmethod
     def read(cls, path: Union[str, Path]) -> WordHashFile:

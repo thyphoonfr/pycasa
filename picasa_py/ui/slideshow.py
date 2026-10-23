@@ -259,9 +259,10 @@ class PicasaSlideshowWindow(QWidget):
         self.hud.star_clicked.connect(self.toggle_star_current)
         self.hud.exit_clicked.connect(self.close)
 
-        # FR: Cache INI pour éviter relectures disque
-        # EN: INI cache to avoid redundant disk reads
+        # FR: Cache INI pour éviter relectures disque et cache de préchargement (1 diapositive d'avance)
+        # EN: INI cache to avoid redundant disk reads and preload cache (1 slide ahead)
         self._ini_cache = {}
+        self._preload_cache: dict[str, QPixmap] = {}
 
         # FR: Musique de fond / EN: Background music (Ref: album.fen / usemusic)
         self.media_player: Optional[QMediaPlayer] = None
@@ -444,88 +445,12 @@ class PicasaSlideshowWindow(QWidget):
 
         self.hud.set_starred(starred)
 
-        # FR: Décodage de l'image avec orientation EXIF + transformations non-destructives Picasa
-        # EN: Decode image with EXIF orientation + Picasa non-destructive transformations
-        try:
-            from PIL import ImageOps
-            from picasa_py.ui.image_processor import PicasaImageProcessor
-
-            with Image.open(src) as raw_img:
-                exif_orient = 1
-                try:
-                    exif = raw_img.getexif()
-                    if exif:
-                        exif_orient = int(exif.get(0x0112, 1) or 1)
-                except Exception:
-                    exif_orient = 1
-
-                if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
-                    raw_img = raw_img.convert("RGBA")
-                try:
-                    img = ImageOps.exif_transpose(raw_img)
-                except Exception:
-                    img = raw_img
-                if img.mode not in ("RGB", "RGBA"):
-                    img = img.convert("RGB")
-                else:
-                    img = img.copy()
-
-            # FR: Si aucune rotation .picasa.ini ni orientation EXIF (>1) n'est présente,
-            # vérifier imagedata_rotate.pmp dans la base de données parente (Ref: 0x0068B5E0)
-            # EN: When neither .picasa.ini rotate nor EXIF orientation (>1) is set,
-            # check imagedata_rotate.pmp in the parent database (Ref: 0x0068B5E0)
-            if not has_ini_rot and exif_orient <= 1:
-                parent_win = self.parentWidget()
-                db = getattr(parent_win, "db", None) if parent_win else None
-                if db is not None and hasattr(db, "find_media_index_by_path") and hasattr(db, "get_rotate"):
-                    try:
-                        db_idx = db.find_media_index_by_path(path_str)
-                        if db_idx is not None and db_idx >= 0:
-                            rot = db.get_rotate(db_idx)
-                    except Exception:
-                        pass
-
-            if crop_hex:
-                try:
-                    left_f, top_f, right_f, bottom_f = decode_rect64_string(crop_hex)
-                    w, h = img.size
-                    crop_box = (
-                        int(round(left_f * w)),
-                        int(round(top_f * h)),
-                        int(round(right_f * w)),
-                        int(round(bottom_f * h)),
-                    )
-                    if crop_box[2] > crop_box[0] and crop_box[3] > crop_box[1]:
-                        img = img.crop(crop_box)
-                except Exception:
-                    pass
-
-            if rot == 1:
-                img = img.rotate(270, expand=True)
-            elif rot == 2:
-                img = img.rotate(180, expand=True)
-            elif rot == 3:
-                img = img.rotate(90, expand=True)
-
-            if tilt and abs(tilt) >= 0.01:
-                try:
-                    img = PicasaImageProcessor.straighten(img, tilt)
-                except Exception:
-                    pass
-
-            if filters_str:
-                try:
-                    img = PicasaImageProcessor.apply_filter_chain(img, filters_str)
-                except Exception:
-                    pass
-
-            if img.mode != "RGB":
-                img = img.convert("RGB")
-            data = img.tobytes("raw", "RGB")
-            qim = QImage(data, img.width, img.height, img.width * 3, QImage.Format.Format_RGB888).copy()
-            new_pixmap = QPixmap.fromImage(qim)
-        except Exception:
-            new_pixmap = QPixmap()
+        # FR: Décodage de l'image avec sous-échantillonnage matériel (draft) + transformations Picasa
+        # EN: Decode image with hardware sub-sampling (draft) + Picasa transformations
+        if path_str in self._preload_cache:
+            new_pixmap = self._preload_cache.pop(path_str)
+        else:
+            new_pixmap = self._decode_slide_pixmap(path_str, has_ini_rot)
 
         if animate and self._curr_pixmap is not None:
             self._prev_pixmap = self._curr_pixmap
@@ -539,6 +464,77 @@ class PicasaSlideshowWindow(QWidget):
             self.update()
 
         self.photo_changed.emit(self.current_idx)
+        if len(self.photo_paths) > 1:
+            QTimer.singleShot(50, self._preload_next_photo)
+
+    def _decode_slide_pixmap(self, path_str: str, has_ini_rot: bool) -> QPixmap:
+        """
+        FR: Décode et transforme une photo de diaporama à la résolution de l'écran via load_transformed_image.
+        EN: Decodes and transforms a slideshow photo at screen resolution via load_transformed_image.
+        Ref: picasa3.exe @ 0x00620AB7, 0x0068B5E0
+        """
+        try:
+            from picasa_py.ui.image_processor import PicasaImageProcessor
+
+            target_max = max(1920, self.width(), self.height())
+            img = PicasaImageProcessor.load_transformed_image(path_str, max_size=target_max)
+            if img is None:
+                return QPixmap()
+
+            # FR: Si aucune rotation .picasa.ini n'est présente, vérifier imagedata_rotate.pmp
+            # dans la base de données parente lorsque l'orientation EXIF est neutre (<=1) (Ref: 0x0068B5E0)
+            # EN: When no .picasa.ini rotate is set, check imagedata_rotate.pmp
+            # in the parent database when EXIF orientation is neutral (<=1) (Ref: 0x0068B5E0)
+            if not has_ini_rot:
+                parent_win = self.parentWidget()
+                db = getattr(parent_win, "db", None) if parent_win else None
+                if db is not None and hasattr(db, "find_media_index_by_path") and hasattr(db, "get_rotate"):
+                    try:
+                        exif_orient = 1
+                        with Image.open(path_str) as raw_img:
+                            exif = raw_img.getexif()
+                            if exif:
+                                exif_orient = int(exif.get(0x0112, 1) or 1)
+                        if exif_orient <= 1:
+                            db_idx = db.find_media_index_by_path(path_str)
+                            if db_idx is not None and db_idx >= 0:
+                                db_rot = db.get_rotate(db_idx)
+                                if db_rot == 1:
+                                    img = img.rotate(270, expand=True)
+                                elif db_rot == 2:
+                                    img = img.rotate(180, expand=True)
+                                elif db_rot == 3:
+                                    img = img.rotate(90, expand=True)
+                    except Exception:
+                        pass
+
+            return PicasaImageProcessor.pil_to_qpixmap(img)
+        except Exception:
+            return QPixmap()
+
+    def _preload_next_photo(self) -> None:
+        """
+        FR: Précharge en mémoire la diapositive suivante (cache borné à 1 entrée) pour des transitions instantanées.
+        EN: Preloads the next slide into memory (1-entry bounded cache) for instant transitions.
+        """
+        if len(self.photo_paths) <= 1:
+            return
+        next_idx = (self.current_idx + 1) % len(self.photo_paths)
+        next_path = self.photo_paths[next_idx]
+        if next_path in self._preload_cache:
+            return
+        src = Path(next_path)
+        parent_dir = str(src.parent)
+        doc = self._ini_cache.get(parent_dir)
+        has_ini_rot = False
+        if doc:
+            sec = doc.get_section(src.name)
+            if sec and sec.get("rotate") is not None:
+                has_ini_rot = True
+        pix = self._decode_slide_pixmap(next_path, has_ini_rot)
+        if not pix.isNull():
+            self._preload_cache.clear()
+            self._preload_cache[next_path] = pix
 
     def _step_fade(self) -> None:
         """
@@ -586,6 +582,7 @@ class PicasaSlideshowWindow(QWidget):
             except Exception:
                 pass
 
+        self._preload_cache.pop(path_str, None)
         self._load_current_photo(animate=False)
 
     def toggle_star_current(self) -> None:

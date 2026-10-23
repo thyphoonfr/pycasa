@@ -119,13 +119,15 @@ class PmpFile:
     Supports bit-exact reading, manipulation, and serialization.
     """
 
-    def __init__(self, pmp_type: PmpType, records: List[Any] | None = None):
+    def __init__(self, pmp_type: PmpType, records: List[Any] | None = None, dirty: bool = False):
         """
-        FR: Initialise une colonne PMP typée avec sa liste d'enregistrements.
-        EN: Initializes a typed PMP column with its list of records.
+        FR: Initialise une colonne PMP typée avec sa liste d'enregistrements et son flag d'état modifié (`dirty`).
+        EN: Initializes a typed PMP column with its list of records and its modified state flag (`dirty`).
+        Ref: picasa3.exe @ 0x006C1920 (CPMTable)
         """
         self.pmp_type = pmp_type
         self.records: List[Any] = records if records is not None else []
+        self.dirty: bool = dirty
 
     @classmethod
     def from_bytes(cls, data: bytes) -> PmpFile:
@@ -233,28 +235,40 @@ class PmpFile:
         head_bytes = header.to_bytes()
 
         if self.pmp_type in (PmpType.STRING, PmpType.STRING_PTR):
-            body_parts = []
-            for s in self.records:
-                if s is None:
-                    body_parts.append(b"\x00")
-                else:
-                    body_parts.append(str(s).encode("utf-8", errors="surrogateescape") + b"\x00")
-            body_bytes = b"".join(body_parts)
+            body_bytes = b"\x00".join(
+                b"" if s is None else (s if isinstance(s, str) else str(s)).encode("utf-8", errors="surrogateescape")
+                for s in self.records
+            ) + (b"\x00" if count > 0 else b"")
 
         elif self.pmp_type in (PmpType.UINT32, PmpType.UINT32_ALT):
-            body_bytes = struct.pack(f"<{count}I", *(int(x) & 0xFFFFFFFF for x in self.records))
+            try:
+                body_bytes = struct.pack(f"<{count}I", *self.records)
+            except (struct.error, TypeError):
+                body_bytes = struct.pack(f"<{count}I", *(int(x) & 0xFFFFFFFF for x in self.records))
 
         elif self.pmp_type == PmpType.DOUBLE:
-            body_bytes = struct.pack(f"<{count}d", *(float(x) for x in self.records))
+            try:
+                body_bytes = struct.pack(f"<{count}d", *self.records)
+            except (struct.error, TypeError):
+                body_bytes = struct.pack(f"<{count}d", *(float(x) for x in self.records))
 
         elif self.pmp_type == PmpType.UINT8:
-            body_bytes = bytes(int(x) & 0xFF for x in self.records)
+            try:
+                body_bytes = bytes(self.records)
+            except (ValueError, TypeError):
+                body_bytes = bytes(int(x) & 0xFF for x in self.records)
 
         elif self.pmp_type == PmpType.UINT64:
-            body_bytes = struct.pack(f"<{count}Q", *(int(x) & 0xFFFFFFFFFFFFFFFF for x in self.records))
+            try:
+                body_bytes = struct.pack(f"<{count}Q", *self.records)
+            except (struct.error, TypeError):
+                body_bytes = struct.pack(f"<{count}Q", *(int(x) & 0xFFFFFFFFFFFFFFFF for x in self.records))
 
         elif self.pmp_type == PmpType.UINT16:
-            body_bytes = struct.pack(f"<{count}H", *(int(x) & 0xFFFF for x in self.records))
+            try:
+                body_bytes = struct.pack(f"<{count}H", *self.records)
+            except (struct.error, TypeError):
+                body_bytes = struct.pack(f"<{count}H", *(int(x) & 0xFFFF for x in self.records))
 
         else:
             raise NotImplementedError(f"Type PMP non supporté : {self.pmp_type}")
@@ -283,4 +297,5 @@ class PmpFile:
         with open(tmp_path, "wb") as f:
             f.write(data)
         os.replace(tmp_path, abs_path)
+        self.dirty = False
 

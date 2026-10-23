@@ -578,12 +578,12 @@ class PicasaMoviePreviewCanvas(QWidget):
         if not slide.path or not os.path.exists(slide.path):
             return
 
-        # FR: Charger l'image si besoin
-        # EN: Load image if needed
+        # FR: Charger l'image si besoin (sous-échantillonnée à 960px pour prévisualisation 30 FPS)
+        # EN: Load image if needed (sub-sampled to 960px for 30 FPS preview)
         if slide._cached_qimage is None:
             try:
                 from picasa_py.ui.image_processor import PicasaImageProcessor
-                im = PicasaImageProcessor.load_transformed_image(slide.path, max_size=1920)
+                im = PicasaImageProcessor.load_transformed_image(slide.path, max_size=960)
                 if im is not None:
                     slide._cached_qimage = PicasaImageProcessor.pil_to_qimage(im)
                 else:

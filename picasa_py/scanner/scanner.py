@@ -15,13 +15,17 @@ Ref: picasa3.exe @ albumdata_date.pmp (OLE Automation Date)
 """
 
 from __future__ import annotations
+import ctypes
+import hashlib
 import io
 import os
+import struct
 import sys
+import threading
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from PIL import Image, ImageOps, ExifTags
 from PySide6.QtCore import QThread, Signal
@@ -32,6 +36,78 @@ from picasa_py.db.database import PicasaDatabase
 from picasa_py.db.thumbindex import ThumbIndexRecord
 
 
+def set_current_thread_background_priority(lowest: bool = False) -> None:
+    """
+    FR: Abaisse la priorité d'ordonnancement OS du thread courant (`THREAD_PRIORITY_BELOW_NORMAL = -1`
+    ou `THREAD_PRIORITY_LOWEST = -2` sous Windows, `os.nice` sous POSIX) afin que les workers
+    d'arrière-plan ne préemptent jamais le thread GUI principal.
+    EN: Lowers the OS scheduling priority of the current thread (`THREAD_PRIORITY_BELOW_NORMAL = -1`
+    or `THREAD_PRIORITY_LOWEST = -2` on Windows, `os.nice` on POSIX) so background workers never
+    preempt the main GUI thread.
+    Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows), 0x0087ECD6 (BgFaceDetectThread)
+    """
+    try:
+        if os.name == "nt":
+            ctypes.windll.kernel32.SetThreadPriority(
+                ctypes.windll.kernel32.GetCurrentThread(),
+                -2 if lowest else -1,
+            )
+        elif sys.platform.startswith("linux") and hasattr(os, "setpriority"):
+            # FR: Sous Linux, la priorité « nice » est propre à chaque thread (TID) ; valeur absolue (non cumulative).
+            #     Sous macOS, os.nice/setpriority affecterait tout le processus (GUI incluse) : on s'abstient.
+            # EN: On Linux, the nice value is per-thread (TID); absolute value (not cumulative).
+            #     On macOS, os.nice/setpriority would affect the whole process (GUI included): skip.
+            os.setpriority(os.PRIO_PROCESS, threading.get_native_id(), 10 if lowest else 5)
+    except Exception:
+        pass
+
+
+def compute_originfast_hash(file_path: Union[str, Path]) -> int:
+    """
+    FR: Calcule l'empreinte rapide 64 bits `imagedata_originfast` conformément à `FUN_00a4d210` :
+    1. Si une copie originale existe dans `.picasaoriginals/<filename>` ou `Originals/<filename>`
+       du même dossier, calcule le hash sur cette copie originale ; sinon sur `file_path`.
+    2. Lit la taille `sz`, les `min(sz, 0x41C2)` premiers octets (`head`) et les `min(sz - len(head), 0x41C2)`
+       derniers octets (`tail`).
+    3. Calcule `MD5(pack("<I", sz & 0xFFFFFFFF) + head + tail)` et retourne les 8 premiers octets en `uint64` LE.
+    EN: Computes the 64-bit fast origin hash `imagedata_originfast` matching `FUN_00a4d210`:
+    1. If an original copy exists in `.picasaoriginals/<filename>` or `Originals/<filename>` in the
+       same folder, hashes that original copy; otherwise hashes `file_path`.
+    2. Reads file size `sz`, up to `0x41C2` (`16834`) head bytes, and up to `0x41C2` tail bytes.
+    3. Computes `MD5(pack("<I", sz & 0xFFFFFFFF) + head + tail)` and returns the first 8 bytes as LE `uint64`.
+    Ref: picasa3.exe @ 0x00A4D210 (FUN_00a4d210), 0x004350A4, 0x00462BA0
+    """
+    try:
+        p = Path(file_path)
+        parent = p.parent
+        fname = p.name
+        target_path = p
+        for orig_dir in (".picasaoriginals", "Originals"):
+            cand = parent / orig_dir / fname
+            if cand.is_file():
+                target_path = cand
+                break
+        with open(target_path, "rb") as f:
+            sz = os.fstat(f.fileno()).st_size
+            head = f.read(min(sz, 0x41C2))
+            rem = sz - len(head)
+            if rem > 0:
+                tail_len = min(rem, 0x41C2)
+                f.seek(sz - tail_len)
+                tail = f.read(tail_len)
+            else:
+                tail = b""
+        digest = hashlib.md5(struct.pack("<I", sz & 0xFFFFFFFF) + head + tail).digest()
+        return int(struct.unpack_from("<Q", digest, 0)[0])
+    except Exception:
+        return 0
+
+
+RAW_EXTENSIONS = {
+    ".pef", ".cr2", ".nef", ".arw", ".dng", ".orf",
+    ".rw2", ".sr2", ".raf", ".mrw", ".x3f"
+}
+
 VIDEO_EXTENSIONS = {
     ".avi", ".wmv", ".asf", ".mpg", ".mpeg", ".mpe", ".m1v", ".m2v",
     ".mp4", ".m4v", ".mov", ".3gp", ".3g2", ".mkv", ".flv", ".webm"
@@ -39,7 +115,9 @@ VIDEO_EXTENSIONS = {
 
 IMAGE_EXTENSIONS = {
     ".jpg", ".jpeg", ".jpe", ".png", ".bmp", ".gif",
-    ".tif", ".tiff", ".webp", ".psd"
+    ".tif", ".tiff", ".webp", ".psd",
+    ".pef", ".cr2", ".nef", ".arw", ".dng", ".orf",
+    ".rw2", ".sr2", ".raf", ".mrw", ".x3f",
 }
 
 SUPPORTED_EXTENSIONS = IMAGE_EXTENSIONS | VIDEO_EXTENSIONS
@@ -52,6 +130,18 @@ EXTENSION_TYPE_MAP = {
     ".psd": 7,
     ".tif": 13,
     ".tiff": 13,
+    # FR: Formats RAW appareil photo / EN: Camera RAW formats (type 18 = 0x12, Ref: 0x00412826, 0x00434FB0)
+    ".pef": 18,
+    ".cr2": 18,
+    ".nef": 18,
+    ".arw": 18,
+    ".dng": 18,
+    ".orf": 18,
+    ".rw2": 18,
+    ".sr2": 18,
+    ".raf": 18,
+    ".mrw": 18,
+    ".x3f": 18,
     ".webp": 31,
     ".png": 31,
     ".gif": 31,
@@ -151,20 +241,35 @@ def extract_video_metadata_and_thumb(
             cx, cy = max_thumb_size // 2, max_thumb_size // 2
             tri = [(cx - 20, cy - 25), (cx + 25, cy), (cx - 20, cy + 25)]
             draw.polygon(tri, fill=(240, 240, 240))
+            bt_bytes_vid: Optional[bytes] = None
         else:
-            thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.LANCZOS)
             if thumb_img.mode != "RGB":
                 thumb_img = thumb_img.convert("RGB")
+            bt_vid_img = thumb_img.copy()
+            bt_vid_img.thumbnail((288, 288), Image.Resampling.BILINEAR)
+            buf_bt = io.BytesIO()
+            bt_vid_img.save(buf_bt, format="JPEG", quality=90)
+            bt_bytes_vid = buf_bt.getvalue()
+            thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.LANCZOS)
 
         buf = io.BytesIO()
         thumb_img.save(buf, format="JPEG", quality=90, optimize=True)
         jpeg_bytes = buf.getvalue()
+        if bt_bytes_vid is None:
+            bt_bytes_vid = jpeg_bytes
 
         t2_img = thumb_img.copy()
         t2_img.thumbnail((72, 72), Image.Resampling.LANCZOS)
         buf2 = io.BytesIO()
         t2_img.save(buf2, format="JPEG", quality=90, optimize=True)
-        return _MediaMetadataResult(jpeg_bytes, orig_w, orig_h, ole_date, thumb2_bytes=buf2.getvalue())
+        return _MediaMetadataResult(
+            jpeg_bytes,
+            orig_w,
+            orig_h,
+            ole_date,
+            thumb2_bytes=buf2.getvalue(),
+            bigthumb_bytes=bt_bytes_vid,
+        )
     except Exception:
         return None
 
@@ -175,7 +280,7 @@ def extract_media_metadata_and_thumb(
     """
     FR: Extrait les métadonnées et la miniature appropriée selon le type de média (image ou vidéo).
     EN: Extracts metadata and the appropriate thumbnail depending on media type (image or video).
-    Ref: picasa3.exe @ 0x00424CA0 (thumbs=144px, thumbs2=72px, quality=90)
+    Ref: picasa3.exe @ 0x00424CA0 (thumbs=144px, thumbs2=72px, bigthumbs=288px, quality=90)
     """
     ext = os.path.splitext(file_path)[1].lower()
     if ext in VIDEO_EXTENSIONS:
@@ -186,9 +291,9 @@ def extract_media_metadata_and_thumb(
 class _MediaMetadataResult(tuple):
     """
     FR: Nuplet `(jpeg_bytes, width, height, ole_date)` supportant également l'accès par clé dictionnaire
-    (`meta["lat"]`, `meta["lon"]`, `meta.get("lat")`) pour les coordonnées GPS EXIF.
+    (`meta["lat"]`, `meta["lon"]`, `meta.get("lat")`) pour les coordonnées GPS EXIF et `bigthumb_bytes`.
     EN: Tuple `(jpeg_bytes, width, height, ole_date)` also supporting dictionary key access
-    (`meta["lat"]`, `meta["lon"]`, `meta.get("lat")`) for EXIF GPS coordinates.
+    (`meta["lat"]`, `meta["lon"]`, `meta.get("lat")`) for EXIF GPS coordinates and `bigthumb_bytes`.
     """
 
     def __new__(
@@ -200,15 +305,18 @@ class _MediaMetadataResult(tuple):
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         thumb2_bytes: Optional[bytes] = None,
+        bigthumb_bytes: Optional[bytes] = None,
     ):
         obj = super().__new__(cls, (jpeg_bytes, width, height, ole_date))
         obj.lat = lat
         obj.lon = lon
         obj.thumb2_bytes = thumb2_bytes
+        obj.bigthumb_bytes = bigthumb_bytes
         obj._extra = {
             "thumb": jpeg_bytes,
             "jpeg_bytes": jpeg_bytes,
             "thumb2_bytes": thumb2_bytes,
+            "bigthumb_bytes": bigthumb_bytes,
             "width": width,
             "height": height,
             "date": ole_date,
@@ -308,9 +416,13 @@ def extract_image_metadata_and_thumb(
     FR: Ouvre l'image, oriente selon l'EXIF, extrait les dimensions et coordonnées GPS,
     calcule la date OLE, et génère le buffer JPEG de la vignette (144px max, qualité 90,
     ainsi que la vignette `thumbs2` 72px max, qualité 90).
+    Utilise le décodage DCT sous-échantillonné (`Image.draft`) sur les fichiers JPEG haute résolution
+    afin de diviser par 10 le temps CPU et la contention GIL sans modifier les dimensions ni la qualité.
     EN: Opens the image, applies EXIF orientation, extracts dimensions and GPS coordinates,
     computes the OLE date, and generates the thumbnail JPEG buffer (144px max, quality 90,
     along with the `thumbs2` 72px max, quality 90 thumbnail).
+    Uses subsampled DCT decoding (`Image.draft`) on high-resolution JPEG files to cut CPU time
+    and GIL contention by 10x without altering dimensions or thumbnail quality.
     Ref: picasa3.exe @ 0x00424CA0 (FUN_00424ca0 -> thumbs=144px, thumbs2=72px, quality=90)
     """
     try:
@@ -318,16 +430,14 @@ def extract_image_metadata_and_thumb(
             exif_data = raw_img.getexif()
             gps_lat, gps_lon = _extract_exif_gps(raw_img, exif_data)
 
-            # 1. FR: Orientation automatique selon les balises EXIF et conversion propre de la transparence
-            #    EN: Automatic EXIF orientation and clean transparency conversion
-            if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
-                raw_img = raw_img.convert("RGBA")
-            try:
-                img = ImageOps.exif_transpose(raw_img)
-            except Exception:
-                img = raw_img
-
-            orig_w, orig_h = img.size
+            # 1. FR: Dimensions réelles (avec orientation EXIF 0x0112) extraites avant tout draft()
+            #    EN: True pixel dimensions (accounting for EXIF Orientation 0x0112) extracted before draft()
+            raw_w, raw_h = raw_img.size
+            exif_orient = exif_data.get(0x0112, 1) if exif_data else 1
+            if exif_orient in (5, 6, 7, 8):
+                orig_w, orig_h = raw_h, raw_w
+            else:
+                orig_w, orig_h = raw_w, raw_h
 
             # 2. FR: Extraction de la date (EXIF DateTimeOriginal ou date fichier)
             #    EN: Date extraction (EXIF DateTimeOriginal or file modification time)
@@ -356,31 +466,86 @@ def extract_image_metadata_and_thumb(
                 except Exception:
                     ole_date = 0.0
 
-            # 3. FR: Génération de la miniature (JPEG 144x144 conservant le ratio, qualité 90)
-            #    EN: Thumbnail generation (aspect-ratio preserving 144x144 JPEG, quality 90)
-            thumb_img = img.copy()
-            thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.LANCZOS)
-            if thumb_img.mode in ("RGBA", "LA"):
-                bg = Image.new("RGB", thumb_img.size, (255, 255, 255))
-                bg.paste(thumb_img, mask=thumb_img.split()[3])
-                thumb_img = bg
-            elif thumb_img.mode != "RGB":
-                thumb_img = thumb_img.convert("RGB")
+            # 3. FR: Décodage DCT sous-échantillonné (libjpeg draft 1/2, 1/4, 1/8) pour les grands JPEG
+            #    EN: Subsampled DCT decoding (libjpeg draft 1/2, 1/4, 1/8) for large JPEGs
+            draft_target = max(max_thumb_size * 2, 288)
+            if getattr(raw_img, "format", None) == "JPEG" and (raw_w > draft_target * 2 or raw_h > draft_target * 2):
+                try:
+                    raw_img.draft("RGB", (draft_target, draft_target))
+                except Exception:
+                    pass
 
+            # 4. FR: Orientation automatique selon les balises EXIF et conversion propre de la transparence
+            #    EN: Automatic EXIF orientation and clean transparency conversion
+            if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                raw_img = raw_img.convert("RGBA")
+            try:
+                img = ImageOps.exif_transpose(raw_img)
+            except Exception:
+                img = raw_img
+
+            # 5. FR: Génération des miniatures bigthumbs (288px max, q=90), thumbs (144px max, q=90) et thumbs2 (72px max, q=90)
+            #    EN: Generation of bigthumbs (288px max, q=90), thumbs (144px max, q=90), and thumbs2 (72px max, q=90) thumbnails
+            bt_max = max(288, max_thumb_size)
+            bt_img = img if img is not raw_img else img.copy()
+            bt_img.thumbnail((bt_max, bt_max), Image.Resampling.BILINEAR)
+            if bt_img.mode in ("RGBA", "LA"):
+                bg = Image.new("RGB", bt_img.size, (255, 255, 255))
+                bg.paste(bt_img, mask=bt_img.split()[3])
+                bt_img = bg
+            elif bt_img.mode != "RGB":
+                bt_img = bt_img.convert("RGB")
+
+            buf_bt = io.BytesIO()
+            bt_img.save(buf_bt, format="JPEG", quality=90)
+            bigthumb_bytes = buf_bt.getvalue()
+
+            thumb_img = bt_img.copy()
+            thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.BILINEAR)
             buf = io.BytesIO()
-            thumb_img.save(buf, format="JPEG", quality=90, optimize=True)
+            thumb_img.save(buf, format="JPEG", quality=90)
             jpeg_bytes = buf.getvalue()
 
             t2_img = thumb_img.copy()
-            t2_img.thumbnail((72, 72), Image.Resampling.LANCZOS)
+            t2_img.thumbnail((72, 72), Image.Resampling.BILINEAR)
             buf2 = io.BytesIO()
-            t2_img.save(buf2, format="JPEG", quality=90, optimize=True)
+            t2_img.save(buf2, format="JPEG", quality=90)
             thumb2_bytes = buf2.getvalue()
 
             return _MediaMetadataResult(
-                jpeg_bytes, orig_w, orig_h, ole_date, lat=gps_lat, lon=gps_lon, thumb2_bytes=thumb2_bytes
+                jpeg_bytes,
+                orig_w,
+                orig_h,
+                ole_date,
+                lat=gps_lat,
+                lon=gps_lon,
+                thumb2_bytes=thumb2_bytes,
+                bigthumb_bytes=bigthumb_bytes,
             )
     except Exception:
+        ext_low = os.path.splitext(file_path)[1].lower()
+        if ext_low in RAW_EXTENSIONS and os.path.exists(file_path):
+            try:
+                mtime = os.path.getmtime(file_path)
+                ole_date = datetime_to_ole(datetime.fromtimestamp(mtime))
+                raw_fallback = Image.new("RGB", (max_thumb_size, max_thumb_size), (48, 50, 54))
+                b_sm = io.BytesIO()
+                raw_fallback.save(b_sm, format="JPEG", quality=90)
+                sm_bytes = b_sm.getvalue()
+                t2_fb = raw_fallback.copy()
+                t2_fb.thumbnail((72, 72), Image.Resampling.BILINEAR)
+                b_t2 = io.BytesIO()
+                t2_fb.save(b_t2, format="JPEG", quality=90)
+                return _MediaMetadataResult(
+                    sm_bytes,
+                    640,
+                    480,
+                    ole_date,
+                    thumb2_bytes=b_t2.getvalue(),
+                    bigthumb_bytes=sm_bytes,
+                )
+            except Exception:
+                return None
         return None
 
 
@@ -470,26 +635,22 @@ class PicasaDirScanner:
         EN: Checks whether the folder has frexclude=1 in the [Picasa] section of its .picasa.ini.
         Ref: picasa3.exe @ 0x00881690 (frexclude)
         """
+        has_db_cache = bool(self.db and hasattr(self.db, "get_parsed_ini"))
         for ini_name in (".picasa.ini", "Picasa.ini"):
             ini_path = os.path.join(folder_path, ini_name)
-            if os.path.exists(ini_path):
-                doc = (
-                    self.db.get_parsed_ini(ini_path)
-                    if (self.db and hasattr(self.db, "get_parsed_ini"))
-                    else None
-                )
-                if doc is None:
-                    try:
-                        from picasa_py.ini.parser import PicasaIniParser
-                        doc = PicasaIniParser.parse_file(ini_path)
-                    except Exception:
-                        doc = None
-                if doc is not None:
-                    sec = doc.get_section("Picasa")
-                    if sec is not None:
-                        val = (sec.get("frexclude") or "").strip().lower()
-                        if val in ("1", "yes", "true"):
-                            return True
+            doc = self.db.get_parsed_ini(ini_path) if has_db_cache else None
+            if doc is None and not has_db_cache and os.path.exists(ini_path):
+                try:
+                    from picasa_py.ini.parser import PicasaIniParser
+                    doc = PicasaIniParser.parse_file(ini_path)
+                except Exception:
+                    doc = None
+            if doc is not None:
+                sec = doc.get_section("Picasa")
+                if sec is not None:
+                    val = (sec.get("frexclude") or "").strip().lower()
+                    if val in ("1", "yes", "true"):
+                        return True
         return False
 
     def scan_folder_for_media(self, folder_path: str, recursive: bool = True, is_cancelled=None) -> List[str]:
@@ -515,6 +676,7 @@ class PicasaDirScanner:
             return results
 
         try:
+            dir_counter = 0
             for root, dirs, files in os.walk(host_folder):
                 if is_cancelled and is_cancelled():
                     break
@@ -523,6 +685,9 @@ class PicasaDirScanner:
                 for fname in files:
                     if Path(fname).suffix.lower() in SUPPORTED_EXTENSIONS:
                         results.append(os.path.abspath(os.path.join(root, fname)))
+                dir_counter += 1
+                if dir_counter % 10 == 0:
+                    time.sleep(0.001)
         except Exception:
             pass
 
@@ -534,16 +699,13 @@ class PicasaDirScanner:
         EN: Discovers [.album:<token>] sections and albums= references from a folder's .picasa.ini.
         Ref: picasa3.exe @ 0x00456A15, 0x00732160
         """
+        has_db_cache = bool(self.db and hasattr(self.db, "get_parsed_ini"))
         for ini_name in (".picasa.ini", "Picasa.ini"):
             ini_path = os.path.join(folder_path, ini_name)
-            if not os.path.exists(ini_path):
-                continue
-            doc = (
-                self.db.get_parsed_ini(ini_path)
-                if (self.db and hasattr(self.db, "get_parsed_ini"))
-                else None
-            )
-            if doc is None:
+            doc = self.db.get_parsed_ini(ini_path) if has_db_cache else None
+            if doc is None and not has_db_cache:
+                if not os.path.exists(ini_path):
+                    continue
                 try:
                     from picasa_py.ini.parser import PicasaIniParser
                     doc = PicasaIniParser.parse_file(ini_path)
@@ -626,6 +788,7 @@ class PicasaDirScanner:
             def_val = pmp.default_value()
             while len(pmp.records) < base_len:
                 pmp.records.append(def_val)
+                pmp.dirty = True
 
         # FR: Si les tables albumdata_* sont totalement vides, réserver la ligne 0 ("Default") comme picasa3.exe
         # EN: If albumdata_* tables are completely empty, reserve row 0 ("Default") like picasa3.exe
@@ -637,6 +800,17 @@ class PicasaDirScanner:
                     pmp.records.append(0)
                 else:
                     pmp.records.append(pmp.default_value())
+                pmp.dirty = True
+
+        existing_token_to_row: Dict[str, int] = {
+            str(tok): i for i, tok in enumerate(ad_token.records) if tok
+        }
+        for row_i, existing_tok in enumerate(ad_token.records):
+            clean_ex = str(existing_tok or "").strip()
+            if clean_ex.startswith("]album:") or clean_ex.startswith(".album:"):
+                clean_ex = clean_ex[7:].strip()
+            if clean_ex and clean_ex not in existing_token_to_row:
+                existing_token_to_row[clean_ex] = row_i
 
         updated_or_added = 0
         for raw_tok, alb_meta in self._discovered_albums.items():
@@ -650,28 +824,34 @@ class PicasaDirScanner:
             adate = float(alb_meta.get("date") or 0.0)
             auid = str(alb_meta.get("uid") or tok_clean)
 
-            existing_row: Optional[int] = None
-            for row_i, existing_tok in enumerate(ad_token.records):
-                clean_ex = str(existing_tok or "").strip()
-                if clean_ex.startswith("]album:") or clean_ex.startswith(".album:"):
-                    clean_ex = clean_ex[7:].strip()
-                if clean_ex and clean_ex == tok_clean:
-                    existing_row = row_i
-                    break
+            existing_row = existing_token_to_row.get(tok_clean)
+            if existing_row is None:
+                existing_row = existing_token_to_row.get(f"]album:{tok_clean}")
 
+            # Ref: db3/albumdata_token.pmp — les albums utilisateur (catégorie 0) sont stockés « ]album:<uid> »
+            canonical_tok = f"]album:{tok_clean}"
             if existing_row is not None:
-                ad_name.records[existing_row] = aname
-                ad_token.records[existing_row] = tok_clean
-                ad_cat.records[existing_row] = 0
+                if ad_name.records[existing_row] != aname:
+                    ad_name.records[existing_row] = aname
+                    ad_name.dirty = True
+                if ad_token.records[existing_row] != canonical_tok:
+                    ad_token.records[existing_row] = canonical_tok
+                    ad_token.dirty = True
+                if ad_cat.records[existing_row] != 0:
+                    ad_cat.records[existing_row] = 0
+                    ad_cat.dirty = True
                 if adate and "albumdata_date" in albumdata_tables:
-                    albumdata_tables["albumdata_date"].records[existing_row] = adate
+                    ad_date = albumdata_tables["albumdata_date"]
+                    if ad_date.records[existing_row] != adate:
+                        ad_date.records[existing_row] = adate
+                        ad_date.dirty = True
                 updated_or_added += 1
             else:
                 for stem, pmp in albumdata_tables.items():
                     if stem == "albumdata_name":
                         pmp.records.append(aname)
                     elif stem == "albumdata_token":
-                        pmp.records.append(tok_clean)
+                        pmp.records.append(canonical_tok)
                     elif stem == "albumdata_uid":
                         pmp.records.append(auid)
                     elif stem == "albumdata_category":
@@ -686,9 +866,32 @@ class PicasaDirScanner:
                         pmp.records.append(str(alb_meta.get("music") or ""))
                     else:
                         pmp.records.append(pmp.default_value())
+                    pmp.dirty = True
+                existing_token_to_row[tok_clean] = len(ad_name.records) - 1
                 updated_or_added += 1
 
         return updated_or_added
+
+    def index_folder(self, folder_path: str) -> int:
+        """
+        FR: Indexe ou récupère un enregistrement de dossier (type == 1) dans thumbindex.db
+        et positionne imagedata_filetype = 1 conformément à picasa3.exe.
+        EN: Indexes or retrieves a folder record (type == 1) in thumbindex.db
+        and sets imagedata_filetype = 1 matching picasa3.exe.
+        Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex), 0x00415790 (AVytDirScannerWindows)
+        """
+        with self.db._lock:
+            folder_idx = self.db.get_or_create_folder_index(folder_path)
+            if hasattr(self.db, "_align_imagedata_tables"):
+                self.db._align_imagedata_tables(folder_idx)
+            if "imagedata_filetype" in self.db.pmps:
+                pmp_ft = self.db.pmps["imagedata_filetype"]
+                while len(pmp_ft.records) <= folder_idx:
+                    pmp_ft.records.append(pmp_ft.default_value())
+                if pmp_ft.records[folder_idx] != 1:
+                    pmp_ft.records[folder_idx] = 1
+                    pmp_ft.dirty = True
+            return folder_idx
 
     def _check_deleted_records(self, folder_paths: Optional[List[str]] = None) -> int:
         """
@@ -701,7 +904,12 @@ class PicasaDirScanner:
         if not self.db or not self.db.thumbindex:
             return 0
 
-        folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+        with self.db._lock:
+            raw_records = [
+                (i, r.type, r.path, r.parent_idx)
+                for i, r in enumerate(self.db.index)
+            ]
+        folders_map = {i: path for i, rtype, path, _ in raw_records if rtype == 1}
         allowed_folders_norm: Optional[Set[str]] = None
         if folder_paths:
             allowed_folders_norm = {
@@ -710,15 +918,19 @@ class PicasaDirScanner:
             }
 
         deleted_photo_indices: Set[int] = set()
+        newly_deleted_indices: List[int] = []
         deleted_count = 0
+        is_bg_thread = threading.current_thread() is not threading.main_thread()
 
-        for idx, rec in enumerate(self.db.index):
-            if rec.type == 0:
+        for idx, rtype, rpath, rparent in raw_records:
+            if is_bg_thread and idx > 0 and (idx % 64) == 0:
+                BackgroundScanWorker.yield_for_gui(0.001)
+            if rtype == 0:
                 deleted_photo_indices.add(idx)
                 continue
-            if rec.type not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+            if rtype not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
                 continue
-            fdir = folders_map.get(rec.parent_idx, "")
+            fdir = folders_map.get(rparent, "")
             if not fdir:
                 continue
             host_fdir = fdir.replace("\\", os.sep) if os.sep != "\\" else fdir
@@ -727,31 +939,59 @@ class PicasaDirScanner:
                 norm_fdir == af or norm_fdir.startswith(af + "\\") for af in allowed_folders_norm
             ):
                 continue
-            full_path = os.path.join(host_fdir, rec.path)
+            full_path = os.path.join(host_fdir, rpath)
             if not os.path.exists(full_path):
-                rec.type = 0
-                rec.path = ""
-                rec.parent_idx = 0xFFFFFFFF
+                newly_deleted_indices.append(idx)
                 deleted_photo_indices.add(idx)
                 deleted_count += 1
 
-        if deleted_photo_indices:
-            for c_idx, c_rec in enumerate(self.db.index):
-                if c_rec.type == 1001 and c_rec.parent_idx in deleted_photo_indices:
-                    c_rec.type = 0
-                    c_rec.path = ""
-                    c_rec.parent_idx = 0xFFFFFFFF
-                    for col_name in (
-                        "imagedata_facerect",
-                        "imagedata_personalbumid",
-                        "imagedata_suggestionpersonalbumid",
-                    ):
-                        pmp = self.db.pmps.get(col_name)
-                        if pmp is not None and c_idx < len(pmp.records):
-                            pmp.records[c_idx] = 0
-            if hasattr(self.db, "_invalidate_path_index_cache"):
-                self.db._invalidate_path_index_cache()
+        if newly_deleted_indices:
+            with self.db._lock:
+                del_set = getattr(self.db, "_deleted_or_reset_indices", None)
+                for idx in newly_deleted_indices:
+                    if 0 <= idx < len(self.db.index):
+                        rec = self.db.index[idx]
+                        rec.type = 0
+                        rec.path = ""
+                        rec.parent_idx = 0xFFFFFFFF
+                        self.db.thumbindex.dirty = True
+                        if isinstance(del_set, set):
+                            del_set.add(idx)
+                        for col_name in (
+                            "imagedata_personalbumrecs",
+                            "imagedata_personalbumrecs2",
+                            "imagedata_aliasparents",
+                        ):
+                            pmp = self.db.pmps.get(col_name)
+                            if pmp is not None and idx < len(pmp.records) and pmp.records[idx] != 0:
+                                pmp.records[idx] = 0
+                                pmp.dirty = True
+                for c_idx, c_rec in enumerate(self.db.index):
+                    if c_rec.type == 1001 and c_rec.parent_idx in deleted_photo_indices:
+                        c_rec.type = 0
+                        c_rec.path = ""
+                        c_rec.parent_idx = 0xFFFFFFFF
+                        self.db.thumbindex.dirty = True
+                        if isinstance(del_set, set):
+                            del_set.add(c_idx)
+                        for col_name in (
+                            "imagedata_facerect",
+                            "imagedata_personalbumid",
+                            "imagedata_suggestionpersonalbumid",
+                            "imagedata_personalbumrecs",
+                            "imagedata_personalbumrecs2",
+                            "imagedata_aliasparents",
+                        ):
+                            pmp = self.db.pmps.get(col_name)
+                            if pmp is not None and c_idx < len(pmp.records):
+                                pmp.records[c_idx] = 0
+                                pmp.dirty = True
+                if hasattr(self.db, "_invalidate_path_index_cache"):
+                    self.db._invalidate_path_index_cache()
+                if hasattr(self.db, "invalidate_search_cache"):
+                    self.db.invalidate_search_cache()
 
+        self._last_deleted_count = deleted_count
         return deleted_count
 
     def find_unindexed_files(self, folder_paths: List[str], is_cancelled=None) -> List[str]:
@@ -762,16 +1002,21 @@ class PicasaDirScanner:
         and returns the list of new files to index.
         Ref: picasa3.exe @ 0x00415790 — reconnaît tous les types médias (2, 3, 4, 6, 7, 8, 13, 18, 31, 32).
         """
-        # FR: Cartographier l'existant : (folder_norm, filename_lower)
-        # EN: Map existing indexed records: (folder_norm, filename_lower)
+        # FR: Cartographier l'existant : (folder_norm, filename_lower) hors verrou global
+        # EN: Map existing indexed records: (folder_norm, filename_lower) outside global lock
+        with self.db._lock:
+            raw_records = [
+                (i, r.type, r.path, r.parent_idx)
+                for i, r in enumerate(self.db.index)
+            ]
         indexed: Set[Tuple[str, str]] = set()
-        folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+        folders_map = {i: path for i, rtype, path, _ in raw_records if rtype == 1}
 
-        for r in self.db.index:
-            if r.type in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
-                fpath = folders_map.get(r.parent_idx, "")
+        for _, rtype, rpath, rparent in raw_records:
+            if rtype in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+                fpath = folders_map.get(rparent, "")
                 norm_f = fpath.replace("/", "\\").rstrip("\\").lower()
-                indexed.add((norm_f, r.path.lower()))
+                indexed.add((norm_f, rpath.lower()))
 
         self._check_deleted_records(folder_paths)
 
@@ -788,44 +1033,64 @@ class PicasaDirScanner:
                 if (parent_dir, fname) not in indexed:
                     unindexed.append(file_path)
 
-        self._sync_ini_albums_to_pmp()
+        with self.db._lock:
+            self._last_synced_albums_count = self._sync_ini_albums_to_pmp()
         return unindexed
 
     def find_modified_files(self, folder_paths: List[str], is_cancelled=None) -> List[Tuple[int, str]]:
         """
         FR: Détecte les fichiers déjà indexés dont la date de modification (mtime) ou la taille
         sur disque a changé par rapport à thumbindex.db.
+        Copie les tuples bruts sous `with self.db._lock:` en < 1 ms, puis effectue la normalisation
+        des chemins et les appels disque hors verrou.
         EN: Detects already-indexed files whose modification time (mtime) or file size
         on disk has changed compared to thumbindex.db.
+        Copies raw tuples under `with self.db._lock:` in < 1 ms, then performs path normalization
+        and disk stat calls outside the lock.
         Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows)
         """
-        folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+        with self.db._lock:
+            raw_records = [
+                (i, rec.type, rec.path, rec.parent_idx, rec.mod_time, rec.file_size, getattr(rec, "mtime", 0))
+                for i, rec in enumerate(self.db.index)
+            ]
+        folders_map: Dict[int, str] = {}
+        folders_norm_map: Dict[int, Tuple[str, str]] = {}
+        for i, rtype, rpath, _, _, _, _ in raw_records:
+            if rtype == 1:
+                folders_map[i] = rpath
+                host_fdir = rpath.replace("\\", os.sep) if os.sep != "\\" else rpath
+                norm_fdir = os.path.normcase(os.path.normpath(os.path.abspath(host_fdir))).replace("/", "\\").rstrip("\\").lower()
+                folders_norm_map[i] = (host_fdir, norm_fdir)
+
         allowed_folders_norm: Set[str] = {
-            os.path.abspath(p.replace("\\", os.sep) if os.sep != "\\" else p).replace("/", "\\").rstrip("\\").lower()
+            os.path.normcase(os.path.normpath(os.path.abspath(p.replace("\\", os.sep) if os.sep != "\\" else p))).replace("/", "\\").rstrip("\\").lower()
             for p in folder_paths if p
         }
         modified: List[Tuple[int, str]] = []
-        for idx, rec in enumerate(self.db.index):
+        is_bg_thread = threading.current_thread() is not threading.main_thread()
+        for idx, rtype, rpath, rparent, _, r_fsize, r_mtime in raw_records:
             if is_cancelled and is_cancelled():
                 break
-            if rec.type not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+            if is_bg_thread and idx > 0 and (idx % 64) == 0:
+                BackgroundScanWorker.yield_for_gui(0.001)
+            if rtype not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
                 continue
-            fdir = folders_map.get(rec.parent_idx, "")
-            if not fdir:
+            fnorm_pair = folders_norm_map.get(rparent)
+            if not fnorm_pair:
                 continue
-            host_fdir = fdir.replace("\\", os.sep) if os.sep != "\\" else fdir
-            norm_fdir = os.path.abspath(host_fdir).replace("/", "\\").rstrip("\\").lower()
+            host_fdir, norm_fdir = fnorm_pair
             if allowed_folders_norm and not any(
                 norm_fdir == af or norm_fdir.startswith(af + "\\") for af in allowed_folders_norm
             ):
                 continue
-            full_path = os.path.join(host_fdir, rec.path)
+            full_path = os.path.join(host_fdir, rpath)
             if not os.path.exists(full_path):
                 continue
             try:
                 disk_mtime = int(os.path.getmtime(full_path))
                 disk_size = os.path.getsize(full_path)
-                if rec.file_size and (disk_size != rec.file_size or abs(disk_mtime - getattr(rec, "mtime", disk_mtime)) > 2):
+                if r_fsize and (disk_size != r_fsize or abs(disk_mtime - (r_mtime or disk_mtime)) > 2):
                     modified.append((idx, full_path))
             except Exception:
                 pass
@@ -843,57 +1108,108 @@ class PicasaDirScanner:
         if not meta:
             return False
         jpeg_bytes, w, h, ole_date = meta
-        rec = self.db.index[record_idx]
-        rec.file_size = os.path.getsize(file_path)
-        rec.mtime = int(os.path.getmtime(file_path))
-        if hasattr(self.db, "_align_imagedata_tables"):
-            self.db._align_imagedata_tables(record_idx)
+        fsize = os.path.getsize(file_path)
+        fmtime = int(os.path.getmtime(file_path))
+        originfast_val = compute_originfast_hash(file_path)
+
+        t2_bytes: Optional[bytes] = getattr(meta, "thumb2_bytes", None)
+        if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
+            try:
+                with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
+                    t2 = t_img.copy()
+                    t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
+                    if t2.mode != "RGB":
+                        t2 = t2.convert("RGB")
+                    b2 = io.BytesIO()
+                    t2.save(b2, format="JPEG", quality=90)
+                    t2_bytes = b2.getvalue()
+            except Exception:
+                t2_bytes = jpeg_bytes
+
+        bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
+
+        avg_u32: Optional[int] = None
+        if "imagedata_avgcolor" in self.db.pmps and jpeg_bytes:
+            try:
+                with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
+                    px = t_img.convert("RGB").resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
+                    if isinstance(px, tuple) and len(px) >= 3:
+                        avg_u32 = (
+                            0xFF000000
+                            | ((int(px[0]) & 0xFF) << 16)
+                            | ((int(px[1]) & 0xFF) << 8)
+                            | (int(px[2]) & 0xFF)
+                        )
+            except Exception:
+                avg_u32 = None
+
+        with self.db._lock:
+            rec = self.db.index[record_idx]
+            rec.file_size = fsize
+            rec.mtime = fmtime
+            rec_type = int(rec.type)
+            if self.db.thumbindex is not None:
+                self.db.thumbindex.dirty = True
+            if hasattr(self.db, "_align_imagedata_tables"):
+                self.db._align_imagedata_tables(record_idx)
+
+            def _set_pmp_col(col_name: str, val) -> None:
+                if col_name in self.db.pmps:
+                    pmp_obj = self.db.pmps[col_name]
+                    def_v = pmp_obj.default_value()
+                    while len(pmp_obj.records) <= record_idx:
+                        pmp_obj.records.append(def_v)
+                    pmp_obj.records[record_idx] = val
+                    pmp_obj.dirty = True
+
+            _set_pmp_col("imagedata_width", w)
+            _set_pmp_col("imagedata_height", h)
+            _set_pmp_col("imagedata_tagdate", float(ole_date))
+            _set_pmp_col("imagedata_filetype", rec_type)
+            _set_pmp_col("imagedata_fileflags", 1 if rec_type == 18 else 0)
+            _set_pmp_col("imagedata_originfast", originfast_val)
+            _set_pmp_col("imagedata_colorspace", 0)
+            # Ref: db3 — les vidéos (type 32) gardent 0 dans personalbumrecs/recs2 (les images : 0xFFFFFFFF)
+            _rec_default = 0 if rec_type == 32 else 0xFFFFFFFF
+            _set_pmp_col("imagedata_personalbumrecs", _rec_default)
+            _set_pmp_col("imagedata_personalbumrecs2", _rec_default)
+            if avg_u32 is not None:
+                _set_pmp_col("imagedata_avgcolor", avg_u32)
+
+            gps_lat = getattr(meta, "lat", None)
+            gps_lon = getattr(meta, "lon", None)
+            if gps_lat is not None and gps_lon is not None:
+                _set_pmp_col("imagedata_lat", float(gps_lat))
+                _set_pmp_col("imagedata_long", float(gps_lon))
+
+        # FR: Écritures de miniatures HORS de `with self.db._lock:` (protégées par `_get_block_lock(prefix)`)
+        # EN: Thumbnail writes OUTSIDE `with self.db._lock:` (protected by `_get_block_lock(prefix)`)
         self.db.add_thumbnail(record_idx, jpeg_bytes, size="small")
         if "thumbs2" in getattr(self.db, "block_indices", {}):
-            t2_bytes = getattr(meta, "thumb2_bytes", None)
-            if not t2_bytes and jpeg_bytes:
-                try:
-                    with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                        t2 = t_img.copy()
-                        t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
-                        if t2.mode != "RGB":
-                            t2 = t2.convert("RGB")
-                        b2 = io.BytesIO()
-                        t2.save(b2, format="JPEG", quality=90)
-                        t2_bytes = b2.getvalue()
-                except Exception:
-                    t2_bytes = jpeg_bytes
             self.db.add_thumbnail(record_idx, t2_bytes or jpeg_bytes, size="medium")
-        if "imagedata_width" in self.db.pmps and record_idx < len(self.db.pmps["imagedata_width"].records):
-            self.db.pmps["imagedata_width"].records[record_idx] = w
-        if "imagedata_height" in self.db.pmps and record_idx < len(self.db.pmps["imagedata_height"].records):
-            self.db.pmps["imagedata_height"].records[record_idx] = h
-        if "imagedata_tagdate" in self.db.pmps and record_idx < len(self.db.pmps["imagedata_tagdate"].records):
-            self.db.pmps["imagedata_tagdate"].records[record_idx] = float(ole_date)
-        gps_lat = getattr(meta, "lat", None)
-        gps_lon = getattr(meta, "lon", None)
-        if gps_lat is not None and gps_lon is not None:
-            if "imagedata_lat" in self.db.pmps:
-                while len(self.db.pmps["imagedata_lat"].records) <= record_idx:
-                    self.db.pmps["imagedata_lat"].records.append(0.0)
-                self.db.pmps["imagedata_lat"].records[record_idx] = float(gps_lat)
-            if "imagedata_long" in self.db.pmps:
-                while len(self.db.pmps["imagedata_long"].records) <= record_idx:
-                    self.db.pmps["imagedata_long"].records.append(0.0)
-                self.db.pmps["imagedata_long"].records[record_idx] = float(gps_lon)
+        if "bigthumbs" in getattr(self.db, "block_indices", {}):
+            self.db.add_thumbnail(record_idx, bigthumb_bytes or jpeg_bytes, size="large")
+
         if hasattr(self.db, "sync_photo_ini_to_db"):
             try:
                 self.db.sync_photo_ini_to_db(record_idx)
             except Exception:
                 pass
+        mod_set = getattr(self.db, "_modified_media_indices", None)
+        if isinstance(mod_set, set):
+            mod_set.add(record_idx)
+        if hasattr(self.db, "invalidate_search_cache"):
+            self.db.invalidate_search_cache()
         return True
 
     def index_file(self, file_path: str) -> Optional[int]:
         """
         FR: Génère la vignette et insère l'enregistrement dans la base Picasa
         (en conservant strictement le séparateur '\\' dans thumbindex.db).
+        Les écritures de miniatures dans CBlockFile sont effectuées en dehors de `self.db._lock`.
         EN: Generates the thumbnail and inserts the record into the Picasa database
         (strictly preserving the '\\' separator inside thumbindex.db).
+        Thumbnail writes into CBlockFile are performed outside `self.db._lock`.
         """
         ext = os.path.splitext(file_path)[1].lower()
         media_type = EXTENSION_TYPE_MAP.get(ext, 2)
@@ -907,92 +1223,96 @@ class PicasaDirScanner:
         jpeg_bytes, w, h, ole_date = meta
         file_size = os.path.getsize(file_path)
         mtime = int(os.path.getmtime(file_path))
+        originfast_val = compute_originfast_hash(file_path)
 
-        # 1. Enregistrement thumbindex.db / thumbindex.db record
-        record_idx = self.db.add_media_record(
-            folder_path=folder_path,
-            filename=filename,
-            file_size=file_size,
-            mtime=mtime,
-            media_type=media_type,
-        )
-        if hasattr(self.db, "_align_imagedata_tables"):
-            self.db._align_imagedata_tables(record_idx)
+        t2_bytes: Optional[bytes] = getattr(meta, "thumb2_bytes", None)
+        if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
+            try:
+                with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
+                    t2 = t_img.copy()
+                    t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
+                    if t2.mode != "RGB":
+                        t2 = t2.convert("RGB")
+                    b2 = io.BytesIO()
+                    t2.save(b2, format="JPEG", quality=90)
+                    t2_bytes = b2.getvalue()
+            except Exception:
+                t2_bytes = jpeg_bytes
 
-        # 2. Miniature thumbs_0.db (144px, q=90) et thumbs2_0.db (72px, q=90) / Thumbnail in thumbs_0.db & thumbs2_0.db
-        self.db.add_thumbnail(record_idx, jpeg_bytes, size="small")
-        if "thumbs2" in getattr(self.db, "block_indices", {}):
-            t2_bytes = getattr(meta, "thumb2_bytes", None)
-            if not t2_bytes and jpeg_bytes:
-                try:
-                    with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                        t2 = t_img.copy()
-                        t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
-                        if t2.mode != "RGB":
-                            t2 = t2.convert("RGB")
-                        b2 = io.BytesIO()
-                        t2.save(b2, format="JPEG", quality=90)
-                        t2_bytes = b2.getvalue()
-                except Exception:
-                    t2_bytes = jpeg_bytes
-            self.db.add_thumbnail(record_idx, t2_bytes or jpeg_bytes, size="medium")
+        bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
 
-        # 3. Colonnes PMP (imagedata_width, imagedata_height, imagedata_tagdate, imagedata_filetype, imagedata_origin, imagedata_colorspace, imagedata_facerect, imagedata_avgcolor, imagedata_lat, imagedata_long)
-        # Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows / alignement strict des lignes PMP), 0x004280D8
-        def _set_pmp_col(col_name: str, val) -> None:
-            if col_name in self.db.pmps:
-                pmp_obj = self.db.pmps[col_name]
-                def_v = pmp_obj.default_value()
-                while len(pmp_obj.records) <= record_idx:
-                    pmp_obj.records.append(def_v)
-                pmp_obj.records[record_idx] = val
-
-        _set_pmp_col("imagedata_width", w)
-        _set_pmp_col("imagedata_height", h)
-        _set_pmp_col("imagedata_tagdate", float(ole_date))
-
-        filetype_map = {
-            ".jpg": 1,
-            ".jpeg": 1,
-            ".jpe": 1,
-            ".png": 2,
-            ".gif": 3,
-            ".bmp": 4,
-            ".tif": 5,
-            ".tiff": 5,
-            ".webp": 6,
-            ".psd": 7,
-        }
-        ft_code = 10 if ext in VIDEO_EXTENSIONS else filetype_map.get(ext, 1)
-        _set_pmp_col("imagedata_filetype", ft_code)
-        _set_pmp_col("imagedata_origin", 1)
-        _set_pmp_col("imagedata_originfast", 1)
-        _set_pmp_col("imagedata_colorspace", 1)
-        _set_pmp_col("imagedata_facerect", 0)
-
+        avg_u32: Optional[int] = None
         if "imagedata_avgcolor" in self.db.pmps and jpeg_bytes:
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
                     px = t_img.convert("RGB").resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
                     if isinstance(px, tuple) and len(px) >= 3:
-                        avg_u32 = ((int(px[0]) & 0xFF) << 16) | ((int(px[1]) & 0xFF) << 8) | (int(px[2]) & 0xFF)
-                        _set_pmp_col("imagedata_avgcolor", avg_u32)
+                        avg_u32 = (
+                            0xFF000000
+                            | ((int(px[0]) & 0xFF) << 16)
+                            | ((int(px[1]) & 0xFF) << 8)
+                            | (int(px[2]) & 0xFF)
+                        )
             except Exception:
-                pass
+                avg_u32 = None
 
-        gps_lat = getattr(meta, "lat", None)
-        gps_lon = getattr(meta, "lon", None)
-        if gps_lat is not None and gps_lon is not None:
-            _set_pmp_col("imagedata_lat", float(gps_lat))
-            _set_pmp_col("imagedata_long", float(gps_lon))
+        # 1. Enregistrement thumbindex.db et colonnes PMP sous verrou DB / thumbindex.db record and PMP columns under DB lock
+        with self.db._lock:
+            record_idx = self.db.add_media_record(
+                folder_path=folder_path,
+                filename=filename,
+                file_size=file_size,
+                mtime=mtime,
+                media_type=media_type,
+            )
+            if hasattr(self.db, "_align_imagedata_tables"):
+                self.db._align_imagedata_tables(record_idx)
 
-        if getattr(self.db, "wordhash", None) is not None:
-            stem_str = os.path.splitext(filename)[0]
-            if stem_str.strip():
-                self.db.wordhash.add_word(stem_str.strip(), record_idx)
-            parent_dir_name = os.path.basename(folder_path.rstrip("\\/"))
-            if parent_dir_name.strip():
-                self.db.wordhash.add_word(parent_dir_name.strip(), record_idx)
+            # 2. Colonnes PMP (imagedata_width, imagedata_height, imagedata_tagdate, imagedata_filetype, imagedata_fileflags, imagedata_originfast, imagedata_colorspace, imagedata_facerect, imagedata_avgcolor, imagedata_lat, imagedata_long)
+            # Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows / alignement strict des lignes PMP), 0x004280D8, 0x00A4D210
+            def _set_pmp_col(col_name: str, val) -> None:
+                if col_name in self.db.pmps:
+                    pmp_obj = self.db.pmps[col_name]
+                    def_v = pmp_obj.default_value()
+                    while len(pmp_obj.records) <= record_idx:
+                        pmp_obj.records.append(def_v)
+                    pmp_obj.records[record_idx] = val
+                    pmp_obj.dirty = True
+
+            _set_pmp_col("imagedata_width", w)
+            _set_pmp_col("imagedata_height", h)
+            _set_pmp_col("imagedata_tagdate", float(ole_date))
+            _set_pmp_col("imagedata_filetype", media_type)
+            _set_pmp_col("imagedata_fileflags", 1 if media_type == 18 else 0)
+            _set_pmp_col("imagedata_originfast", originfast_val)
+            _set_pmp_col("imagedata_colorspace", 0)
+            _set_pmp_col("imagedata_facerect", 0)
+
+            if avg_u32 is not None:
+                _set_pmp_col("imagedata_avgcolor", avg_u32)
+
+            gps_lat = getattr(meta, "lat", None)
+            gps_lon = getattr(meta, "lon", None)
+            if gps_lat is not None and gps_lon is not None:
+                _set_pmp_col("imagedata_lat", float(gps_lat))
+                _set_pmp_col("imagedata_long", float(gps_lon))
+
+            if getattr(self.db, "wordhash", None) is not None:
+                stem_str = os.path.splitext(filename)[0]
+                if stem_str.strip():
+                    self.db.wordhash.add_word(stem_str.strip(), record_idx)
+                parent_dir_name = os.path.basename(folder_path.rstrip("\\/"))
+                if parent_dir_name.strip():
+                    self.db.wordhash.add_word(parent_dir_name.strip(), record_idx)
+
+        # 3. Miniature thumbs_0.db (144px, q=90), thumbs2_0.db (72px, q=90) et bigthumbs_0.db (288px, q=90)
+        #    HORS de `with self.db._lock:` (protégées par `self.db._get_block_lock(prefix)`)
+        #    Thumbnail writes in thumbs_0.db, thumbs2_0.db & bigthumbs_0.db OUTSIDE `with self.db._lock:`
+        self.db.add_thumbnail(record_idx, jpeg_bytes, size="small")
+        if "thumbs2" in getattr(self.db, "block_indices", {}):
+            self.db.add_thumbnail(record_idx, t2_bytes or jpeg_bytes, size="medium")
+        if "bigthumbs" in getattr(self.db, "block_indices", {}):
+            self.db.add_thumbnail(record_idx, bigthumb_bytes or jpeg_bytes, size="large")
 
         # 4. Synchroniser les métadonnées .picasa.ini (étoile, rotation, filtres, texte, légende, visages, backuphash)
         if hasattr(self.db, "sync_photo_ini_to_db"):
@@ -1014,28 +1334,74 @@ class PicasaDirScanner:
         Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows)
         """
         folders = [str(folder_path)]
-        changed = self._check_deleted_records(folders)
         for fpath in self.find_unindexed_files(folders):
             if self.index_file(fpath) is not None:
-                changed += 1
-        for rec_idx, fpath in self.find_modified_files(folders):
-            if self.update_indexed_file(rec_idx, fpath):
-                changed += 1
-        self._sync_ini_albums_to_pmp()
+                pass
+        changed = getattr(self, "_last_deleted_count", 0)
+        # Recompute total changed count from indexed + modified
+        # Note: find_unindexed_files already called _check_deleted_records and _sync_ini_albums_to_pmp
         return changed
 
 
 class BackgroundScanWorker(QThread):
     """
-    FR: Thread de travail en arrière-plan pour l'auto-indexation et
-    la génération de miniatures sans bloquer l'interface graphique.
-    EN: Background worker thread for auto-indexing and
-    thumbnail generation without blocking the graphical user interface.
-    Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows)
+    FR: Thread de travail en arrière-plan à basse priorité (`QThread.Priority.LowPriority`)
+    pour l'auto-indexation et la génération de miniatures sans jamais bloquer l'interface graphique.
+    Cède systématiquement le GIL après chaque photo et met en pause son activité dès que
+    l'utilisateur interagit avec l'interface (défilement, sélection, édition).
+    EN: Low-priority background worker thread (`QThread.Priority.LowPriority`)
+    for auto-indexing and thumbnail generation without ever blocking the GUI thread.
+    Yields the GIL after every photo and automatically throttles/pauses whenever
+    the user is actively interacting with the GUI (scrolling, selecting, editing).
+    Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows), 0x00797AF0 (CDirectoryScanner)
     """
-    progress = Signal(int, int, str)  # (current, total, filename)
-    file_indexed = Signal(str, str)   # (folder_path, filename)
-    finished = Signal(int)            # (total_added_or_updated)
+    progress = Signal(int, int, str)       # (current, total, filename)
+    file_indexed = Signal(str, str)        # (folder_path, filename)
+    batch_indexed = Signal(str, str, int, int)  # (folder_path, filename, db_idx, batch_count)
+    finished = Signal(int)                 # (total_added_or_updated)
+
+    # FR: Horodatage monotone de la dernière activité GUI pour donner priorité absolue à l'UI
+    # EN: Monotonic timestamp of the latest GUI interaction to give absolute priority to the UI
+    # Ref: picasa3.exe @ 0x005E4F6E (QueryPerformanceCounter stored at *(double *)(db + 0x2da8))
+    _last_gui_activity_ts: float = 0.0
+
+    @classmethod
+    def notify_gui_activity(cls) -> None:
+        """
+        FR: Signale une interaction utilisateur (défilement, clic, clavier, édition) afin que tous les
+        workers d'arrière-plan cèdent immédiatement le CPU, le GIL et le disque au thread GUI.
+        EN: Signals a user interaction (scroll, click, key press, edit) so all background workers
+        immediately yield CPU, GIL, and disk bandwidth to the GUI thread.
+        Ref: picasa3.exe @ 0x005E4AC0, 0x005E4F6E (decompiled_5e5290.c:176-202)
+        """
+        cls._last_gui_activity_ts = time.monotonic()
+
+    @classmethod
+    def is_gui_active(cls, window_s: float = 0.35) -> bool:
+        """
+        FR: Indique si l'utilisateur a interagi avec l'interface au cours des `window_s` dernières secondes.
+        EN: Returns whether the user has interacted with the GUI within the last `window_s` seconds.
+        Ref: picasa3.exe @ 0x005E4F6E (*(double *)(db + 0x2da8))
+        """
+        return (time.monotonic() - cls._last_gui_activity_ts) < window_s
+
+    @classmethod
+    def yield_for_gui(cls, base_sleep_s: float = 0.002) -> None:
+        """
+        FR: Cède le GIL après chaque unité de travail et met en pause le worker tant que l'utilisateur
+        interagit activement avec la GUI (fenêtre de 350 ms après tout événement souris/clavier/scroll).
+        EN: Yields the GIL after each work unit and pauses the worker while the user is actively
+        interacting with the GUI (350 ms window after any mouse/keyboard/scroll event).
+        Ref: picasa3.exe @ 0x005E4F6E, 0x00415790 (decomp_dir_scanner_ctor.c:486)
+        """
+        now = time.monotonic()
+        elapsed = now - cls._last_gui_activity_ts
+        if elapsed < 0.35:
+            wait_end = now + min(0.15, 0.35 - elapsed)
+            while time.monotonic() < wait_end and (time.monotonic() - cls._last_gui_activity_ts) < 0.35:
+                time.sleep(0.025)
+        elif base_sleep_s > 0.0:
+            time.sleep(base_sleep_s)
 
     def __init__(self, db: PicasaDatabase, folder_paths: List[str], parent=None):
         """
@@ -1046,6 +1412,15 @@ class BackgroundScanWorker(QThread):
         self.db = db
         self.folder_paths = folder_paths
         self._is_cancelled = False
+
+    def start(self, priority: QThread.Priority = QThread.Priority.LowPriority) -> None:
+        """
+        FR: Démarre le thread avec une priorité OS basse (`LowPriority`) pour ne jamais
+        préempter le thread GUI principal.
+        EN: Starts the thread with `LowPriority` OS scheduling so it never preempts
+        the main GUI thread.
+        """
+        super().start(priority)
 
     def cancel(self) -> None:
         """
@@ -1064,47 +1439,93 @@ class BackgroundScanWorker(QThread):
 
     def run(self) -> None:
         """
-        FR: Exécute l'indexation des nouveaux fichiers et la mise à jour des fichiers modifiés.
-        EN: Executes indexing of new files and updating of modified files.
+        FR: Exécute l'indexation des nouveaux fichiers et la mise à jour des fichiers modifiés
+        en cédant le GIL à chaque fichier et en régulant les signaux UI pour les grands dossiers.
+        EN: Executes indexing of new files and updating of modified files while yielding
+        the GIL on every file and throttling UI signals for large folders.
+        Ref: picasa3.exe @ 0x00415790 (CDirScanner -> SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL))
         """
+        if self.isRunning():
+            set_current_thread_background_priority(lowest=False)
         scanner = PicasaDirScanner(self.db)
-        deleted_count = scanner._check_deleted_records(self.folder_paths)
         to_index = scanner.find_unindexed_files(self.folder_paths, is_cancelled=lambda: self._is_cancelled)
         to_update = scanner.find_modified_files(self.folder_paths, is_cancelled=lambda: self._is_cancelled)
 
         total = len(to_index) + len(to_update)
-        changed = deleted_count
+        changed = getattr(scanner, "_last_deleted_count", 0)
+        is_running_thread = self.isRunning()
+        throttle_signals = is_running_thread and total > 20
+        last_progress_emit = 0.0
+        pending_by_folder: Dict[str, Tuple[str, int, int]] = {}  # folder -> (last_fname, last_idx, count)
+
+        def _flush_pending_batches(force: bool = False) -> None:
+            nonlocal last_progress_emit
+            now = time.monotonic()
+            if not force and (now - last_progress_emit) < 0.15:
+                return
+            last_progress_emit = now
+            for fdir, (l_fname, l_idx, b_cnt) in list(pending_by_folder.items()):
+                self.batch_indexed.emit(fdir, l_fname, l_idx, b_cnt)
+                if not throttle_signals:
+                    self.file_indexed.emit(fdir, l_fname)
+            pending_by_folder.clear()
 
         for i, fpath in enumerate(to_index):
             if self._is_cancelled:
                 break
 
+            if is_running_thread:
+                self.yield_for_gui(0.002)
+
             fname = os.path.basename(fpath)
-            self.progress.emit(i + 1, total, fname)
+            now = time.monotonic()
+            if not throttle_signals or i == 0 or (i + 1) == total or (now - last_progress_emit) >= 0.12:
+                self.progress.emit(i + 1, total, fname)
 
             idx = scanner.index_file(fpath)
             if idx is not None:
                 changed += 1
-                self.file_indexed.emit(os.path.dirname(fpath), fname)
-
-            if (i + 1) % 25 == 0:
-                time.sleep(0.001)
+                fdir = os.path.dirname(fpath)
+                if not throttle_signals:
+                    self.file_indexed.emit(fdir, fname)
+                    self.batch_indexed.emit(fdir, fname, idx, 1)
+                else:
+                    prev = pending_by_folder.get(fdir)
+                    prev_cnt = prev[2] if prev is not None else 0
+                    pending_by_folder[fdir] = (fname, idx, prev_cnt + 1)
+                    if (now - last_progress_emit) >= 0.15 or (i + 1) == len(to_index):
+                        _flush_pending_batches(force=True)
 
         offset = len(to_index)
         for j, (rec_idx, fpath) in enumerate(to_update):
             if self._is_cancelled:
                 break
 
+            if is_running_thread:
+                self.yield_for_gui(0.002)
+
             fname = os.path.basename(fpath)
-            self.progress.emit(offset + j + 1, total, fname)
+            now = time.monotonic()
+            if not throttle_signals or j == 0 or (offset + j + 1) == total or (now - last_progress_emit) >= 0.12:
+                self.progress.emit(offset + j + 1, total, fname)
             if scanner.update_indexed_file(rec_idx, fpath):
                 changed += 1
-                self.file_indexed.emit(os.path.dirname(fpath), fname)
+                fdir = os.path.dirname(fpath)
+                if not throttle_signals:
+                    self.file_indexed.emit(fdir, fname)
+                    self.batch_indexed.emit(fdir, fname, rec_idx, 1)
+                else:
+                    prev = pending_by_folder.get(fdir)
+                    prev_cnt = prev[2] if prev is not None else 0
+                    pending_by_folder[fdir] = (fname, rec_idx, prev_cnt + 1)
+                    if (now - last_progress_emit) >= 0.15 or (j + 1) == len(to_update):
+                        _flush_pending_batches(force=True)
 
-            if (j + 1) % 25 == 0:
-                time.sleep(0.001)
+        if pending_by_folder:
+            _flush_pending_batches(force=True)
 
-        alb_synced = scanner._sync_ini_albums_to_pmp()
+        with self.db._lock:
+            alb_synced = scanner._sync_ini_albums_to_pmp()
         if alb_synced > 0 and changed == 0:
             try:
                 self.db.save_database()

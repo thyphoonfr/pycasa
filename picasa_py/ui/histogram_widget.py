@@ -12,6 +12,7 @@ Ref: AGENTS.md §4 bis (Fidélité de l'interface & performances)
 
 from __future__ import annotations
 import math
+import os
 from typing import Dict, List, Optional, Tuple, Any
 from PIL import Image
 from PySide6.QtWidgets import (
@@ -24,6 +25,30 @@ from PySide6.QtGui import (
 
 from picasa_py.ui.exif_reader import extract_full_metadata
 from picasa_py.ui.style import PicasaStyle
+
+_HIST_EXIF_META_CACHE: Dict[str, Tuple[float, Dict[str, Any]]] = {}
+
+
+def _get_cached_full_metadata(photo_path: str) -> Dict[str, Any]:
+    """
+    FR: Récupère les métadonnées EXIF complètes avec mise en cache par (chemin, mtime).
+    EN: Retrieves full EXIF metadata cached by (path, mtime).
+    Ref: picasa3.exe @ 0x00889210 (EXIF parsing & display)
+    """
+    if not photo_path or not os.path.exists(photo_path):
+        return extract_full_metadata(photo_path)
+    try:
+        mtime = os.path.getmtime(photo_path)
+        cached = _HIST_EXIF_META_CACHE.get(photo_path)
+        if cached is not None and cached[0] == mtime:
+            return cached[1]
+        meta = extract_full_metadata(photo_path)
+        if len(_HIST_EXIF_META_CACHE) >= 512:
+            _HIST_EXIF_META_CACHE.clear()
+        _HIST_EXIF_META_CACHE[photo_path] = (mtime, meta)
+        return meta
+    except Exception:
+        return extract_full_metadata(photo_path)
 
 
 class PicasaHistogramWidget(QWidget):
@@ -361,14 +386,16 @@ class PicasaCameraInfoCard(QWidget):
 
     def set_photo_path(self, photo_path: str) -> None:
         """
-        FR: Charge et extrait les métadonnées de la photo depuis son chemin disque.
-        EN: Loads and extracts photo metadata from its file path on disk.
+        FR: Charge et extrait les métadonnées de la photo depuis son chemin disque (avec cache RAM).
+        EN: Loads and extracts photo metadata from its file path on disk (with RAM cache).
         """
         if not photo_path:
             self.clear_info()
             return
-        meta = extract_full_metadata(photo_path)
+        meta = _get_cached_full_metadata(photo_path)
         self.update_with_metadata(meta)
+
+    set_photo_metadata = set_photo_path
 
     def update_with_metadata(self, meta: Dict[str, Any]) -> None:
         """

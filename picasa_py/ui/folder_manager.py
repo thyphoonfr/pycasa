@@ -139,6 +139,7 @@ class PicasaFolderManagerDialog(QDialog):
         for p, st in self.db.get_watched_folders().items():
             norm = os.path.abspath(p)
             self.folder_settings[norm] = st
+        self._initial_folder_settings: Dict[str, str] = self.folder_settings.copy()
 
         self.current_selected_path: Optional[str] = None
         self._init_ui()
@@ -600,7 +601,7 @@ class PicasaFolderManagerDialog(QDialog):
         for path, status in self.folder_settings.items():
             self.db.set_watched_folder(path, status)
             changed_folders.append(path)
-            if status in ("1", "2"):
+            if status in ("1", "2") and self._initial_folder_settings.get(path) not in ("1", "2"):
                 newly_watched.append(path)
 
         # FR: Persister l'option de détection des visages (frexclude=1 dans [Picasa] de .picasa.ini)
@@ -621,9 +622,13 @@ class PicasaFolderManagerDialog(QDialog):
             except Exception:
                 pass
 
-        # FR: Sauvegarde atomique du fichier repository.dat / EN: Atomic save of repository.dat
+        # FR: Sauvegarde atomique rapide du fichier repository.dat sans réécrire les 56 tables PMP sur le thread UI
+        # EN: Fast atomic save of repository.dat without rewriting all 56 PMP tables on the UI thread
         try:
-            self.db.save_database()
+            if hasattr(self.db, "save_repository_only"):
+                self.db.save_repository_only()
+            else:
+                self.db.save_database()
         except Exception:
             pass
 

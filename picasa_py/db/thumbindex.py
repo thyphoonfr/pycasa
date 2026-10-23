@@ -256,13 +256,15 @@ class ThumbIndexFile:
     Guarantees bit-exact serialization and deserialization.
     """
 
-    def __init__(self, magic: int = THUMBINDEX_MAGIC, records: List[ThumbIndexRecord] | None = None):
+    def __init__(self, magic: int = THUMBINDEX_MAGIC, records: List[ThumbIndexRecord] | None = None, dirty: bool = False):
         """
-        FR: Initialise une instance de ThumbIndexFile avec son magic number et ses enregistrements.
-        EN: Initializes a ThumbIndexFile instance with its magic number and records.
+        FR: Initialise une instance de ThumbIndexFile avec son magic number, ses enregistrements et son flag `dirty`.
+        EN: Initializes a ThumbIndexFile instance with its magic number, records, and `dirty` flag.
+        Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex)
         """
         self.magic = magic
         self.records: List[ThumbIndexRecord] = records if records is not None else []
+        self.dirty: bool = dirty
 
     def __len__(self) -> int:
         return len(self.records)
@@ -375,6 +377,7 @@ class ThumbIndexFile:
         with open(tmp_path, "wb") as f:
             f.write(data)
         os.replace(tmp_path, abs_path)
+        self.dirty = False
 
     @classmethod
     def read(cls, path: Union[str, Path], encoding: str = "utf-8") -> ThumbIndexFile:

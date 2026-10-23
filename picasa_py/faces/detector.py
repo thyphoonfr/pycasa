@@ -323,7 +323,11 @@ class PicasaFaceDetector:
             return True
 
         try:
-            creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            creationflags = (
+                getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000) | 0x00004000
+                if os.name == "nt"
+                else 0
+            )
             self._proc = subprocess.Popen(
                 [str(self._exe_path), str(self._dll_path), str(self._cfg_path)],
                 stdin=subprocess.PIPE,
@@ -408,7 +412,19 @@ class PicasaFaceDetector:
         try:
             if isinstance(img_or_path, (str, Path)):
                 with Image.open(img_or_path) as raw_img:
-                    pil_img = ImageOps.exif_transpose(raw_img).convert("L")
+                    try:
+                        exif_orient = raw_img.getexif().get(0x0112, 1)
+                    except Exception:
+                        exif_orient = 1
+                    if raw_img.format == "JPEG" and max(raw_img.size) > 1024:
+                        try:
+                            raw_img.draft("L" if exif_orient == 1 else "RGB", (1024, 1024))
+                        except Exception:
+                            pass
+                    if exif_orient and exif_orient != 1:
+                        pil_img = ImageOps.exif_transpose(raw_img).convert("L")
+                    else:
+                        pil_img = raw_img.convert("L")
             else:
                 pil_img = img_or_path.convert("L")
         except Exception:
@@ -457,6 +473,13 @@ class PicasaFaceDetector:
                         feature_vector=det.feature_vec_2000,
                     )
                     fr.template_blob = det.cue_blob_1044  # type: ignore[attr-defined]
+                    bw_py = max(0.0, float(det.right_norm) - float(det.left_norm))
+                    bh_py = max(0.0, float(det.bottom_norm) - float(det.top_norm))
+                    fr.confidence = float(det.confidence)  # type: ignore[attr-defined]
+                    fr.pan = float(det.pan)  # type: ignore[attr-defined]
+                    fr.leye = (float(det.left_norm) + 0.3625 * bw_py, float(det.top_norm) + 0.4790 * bh_py)  # type: ignore[attr-defined]
+                    fr.reye = (float(det.left_norm) + 0.6375 * bw_py, float(det.top_norm) + 0.4790 * bh_py)  # type: ignore[attr-defined]
+                    fr.mouth = (float(det.left_norm) + 0.5000 * bw_py, float(det.top_norm) + 0.7500 * bh_py)  # type: ignore[attr-defined]
                     results_py.append(fr)
                 return results_py
 
@@ -496,6 +519,13 @@ class PicasaFaceDetector:
                     # FR : Conserver aussi le blob brut 1044 octets pour l'écriture dans thumbs_index.db
                     # EN: Also retain the raw 1044-byte blob for writing into thumbs_index.db
                     fr.template_blob = blob  # type: ignore[attr-defined]
+                    bw_n = max(0.0, float(r_f) - float(l_f))
+                    bh_n = max(0.0, float(b_f) - float(t_f))
+                    fr.confidence = float(conf)  # type: ignore[attr-defined]
+                    fr.pan = float(_pan)  # type: ignore[attr-defined]
+                    fr.leye = (float(l_f) + 0.3625 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
+                    fr.reye = (float(l_f) + 0.6375 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
+                    fr.mouth = (float(l_f) + 0.5000 * bw_n, float(t_f) + 0.7500 * bh_n)  # type: ignore[attr-defined]
                     results.append(fr)
                 return results
             except Exception:
@@ -521,6 +551,13 @@ class PicasaFaceDetector:
                             feature_vector=det.feature_vec_2000,
                         )
                         fr.template_blob = det.cue_blob_1044  # type: ignore[attr-defined]
+                        bw_fb = max(0.0, float(det.right_norm) - float(det.left_norm))
+                        bh_fb = max(0.0, float(det.bottom_norm) - float(det.top_norm))
+                        fr.confidence = float(det.confidence)  # type: ignore[attr-defined]
+                        fr.pan = float(det.pan)  # type: ignore[attr-defined]
+                        fr.leye = (float(det.left_norm) + 0.3625 * bw_fb, float(det.top_norm) + 0.4790 * bh_fb)  # type: ignore[attr-defined]
+                        fr.reye = (float(det.left_norm) + 0.6375 * bw_fb, float(det.top_norm) + 0.4790 * bh_fb)  # type: ignore[attr-defined]
+                        fr.mouth = (float(det.left_norm) + 0.5000 * bw_fb, float(det.top_norm) + 0.7500 * bh_fb)  # type: ignore[attr-defined]
                         fallback_results.append(fr)
                     return fallback_results
                 return []

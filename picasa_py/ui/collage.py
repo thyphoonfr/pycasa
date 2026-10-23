@@ -91,17 +91,19 @@ class PicasaCollageCanvas(QWidget):
 
     def set_photos(self, paths: List[str]) -> None:
         self.items = []
+        max_size = 360 if len(paths) > 12 else 600
         for p in paths:
             if p and os.path.exists(p):
                 item = CollagePhotoItem(p)
-                self._load_thumbnail(item)
+                self._load_thumbnail(item, max_size=max_size)
                 self.items.append(item)
         self.randomize_layout()
 
-    def _load_thumbnail(self, item: CollagePhotoItem) -> None:
+    def _load_thumbnail(self, item: CollagePhotoItem, max_size: Optional[int] = None) -> None:
         try:
             from picasa_py.ui.image_processor import PicasaImageProcessor
-            im = PicasaImageProcessor.load_transformed_image(item.path, max_size=600)
+            target_max = max_size if max_size is not None else (360 if len(self.items) > 12 else 600)
+            im = PicasaImageProcessor.load_transformed_image(item.path, max_size=target_max)
             if im is not None:
                 item.pixmap = PicasaImageProcessor.pil_to_qpixmap(im)
             else:

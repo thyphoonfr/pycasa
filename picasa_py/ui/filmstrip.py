@@ -192,26 +192,42 @@ class PicasaFilmstrip(QWidget):
         pix: Optional[QPixmap] = None
         if raw:
             try:
-                with Image.open(io.BytesIO(raw)) as img:
-                    if img.mode in ("P", "PA") or "transparency" in img.info:
-                        img = img.convert("RGBA")
-                    if img.mode not in ("RGB", "RGBA"):
-                        img = img.convert("RGB")
-                    # FR: Redimensionner en carré centré / EN: Center-crop and resize to square
-                    w, h = img.size
-                    side = min(w, h)
-                    left = (w - side) // 2
-                    top = (h - side) // 2
-                    cropped = img.crop((left, top, left + side, top + side))
-                    cropped = cropped.resize((self.thumb_size, self.thumb_size), Image.Resampling.BILINEAR)
+                # Décodage C++ rapide via QImage.fromData (Ref: picasa3.exe @ 0x007301F0)
+                qimg_fast = QImage.fromData(raw)
+                if not qimg_fast.isNull():
+                    fw, fh = qimg_fast.width(), qimg_fast.height()
+                    side = min(fw, fh)
+                    if side > 0:
+                        left = (fw - side) // 2
+                        top = (fh - side) // 2
+                        sq_img = qimg_fast.copy(left, top, side, side).scaled(
+                            self.thumb_size,
+                            self.thumb_size,
+                            Qt.AspectRatioMode.IgnoreAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation,
+                        )
+                        pix = QPixmap.fromImage(sq_img)
+                if pix is None or pix.isNull():
+                    with Image.open(io.BytesIO(raw)) as img:
+                        if img.mode in ("P", "PA") or "transparency" in img.info:
+                            img = img.convert("RGBA")
+                        if img.mode not in ("RGB", "RGBA"):
+                            img = img.convert("RGB")
+                        # FR: Redimensionner en carré centré / EN: Center-crop and resize to square
+                        w, h = img.size
+                        side = min(w, h)
+                        left = (w - side) // 2
+                        top = (h - side) // 2
+                        cropped = img.crop((left, top, left + side, top + side))
+                        cropped = cropped.resize((self.thumb_size, self.thumb_size), Image.Resampling.BILINEAR)
 
-                    if cropped.mode == "RGBA":
-                        bgra_data = cropped.tobytes("raw", "BGRA")
-                        qimg = QImage(bgra_data, self.thumb_size, self.thumb_size, self.thumb_size * 4, QImage.Format.Format_ARGB32).copy()
-                    else:
-                        rgb_data = cropped.tobytes("raw", "RGB")
-                        qimg = QImage(rgb_data, self.thumb_size, self.thumb_size, self.thumb_size * 3, QImage.Format.Format_RGB888).copy()
-                    pix = QPixmap.fromImage(qimg)
+                        if cropped.mode == "RGBA":
+                            bgra_data = cropped.tobytes("raw", "BGRA")
+                            qimg = QImage(bgra_data, self.thumb_size, self.thumb_size, self.thumb_size * 4, QImage.Format.Format_ARGB32).copy()
+                        else:
+                            rgb_data = cropped.tobytes("raw", "RGB")
+                            qimg = QImage(rgb_data, self.thumb_size, self.thumb_size, self.thumb_size * 3, QImage.Format.Format_RGB888).copy()
+                        pix = QPixmap.fromImage(qimg)
             except Exception:
                 pass
 
@@ -252,14 +268,15 @@ class PicasaFilmstrip(QWidget):
         FR: Renvoie l'index en base de données de la miniature située au point donné, ou None.
         EN: Returns the database index of the thumbnail located at the given point, or None.
         """
-        for pos, idx in enumerate(self.indices):
+        if not self.indices:
+            return None
+        item_w = max(1, self._get_item_width())
+        start_pos = max(0, self.scroll_x // item_w)
+        end_pos = min(len(self.indices), (self.scroll_x + self.width()) // item_w + 2)
+        for pos in range(start_pos, end_pos):
             r = self._get_item_rect(pos)
-            if r.x() > self.width():
-                break
-            if r.x() + r.width() < 0:
-                continue
             if r.contains(point):
-                return idx
+                return self.indices[pos]
         return None
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -302,10 +319,13 @@ class PicasaFilmstrip(QWidget):
         # FR: Fond de la bande adapté au thème actif / EN: Strip background adapted to the active theme
         painter.fillRect(self.rect(), self.style.tray_bgcolor)
 
-        item_w = self._get_item_width()
+        item_w = max(1, self._get_item_width())
         y = (self.height() - self.thumb_size) // 2
 
-        for pos, idx in enumerate(self.indices):
+        start_pos = max(0, self.scroll_x // item_w)
+        end_pos = min(len(self.indices), (self.scroll_x + self.width()) // item_w + 2)
+        for pos in range(start_pos, end_pos):
+            idx = self.indices[pos]
             x = pos * item_w - self.scroll_x
             if x + self.thumb_size < 0:
                 continue

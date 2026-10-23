@@ -65,7 +65,9 @@ class PicasaPrintPreviewCanvas(QWidget):
         self.copies_per_photo: int = 1
         self.current_page: int = 0
         self._pixmap_cache: Dict[str, QPixmap] = {}
+        self._pixmap_max_size: int = 0
         self._dim_cache: dict[str, tuple[int, int]] = {}
+        self._ini_doc_cache: dict[str, object] = {}
 
     def set_data(
         self,
@@ -151,11 +153,15 @@ class PicasaPrintPreviewCanvas(QWidget):
         """
         if not path or not os.path.exists(path):
             return None
+        max_size = 288 if self.get_photos_per_page() > 4 else 640
+        if max_size > self._pixmap_max_size:
+            self._pixmap_cache.clear()
+            self._pixmap_max_size = max_size
         if path in self._pixmap_cache:
             return self._pixmap_cache[path]
         try:
             from picasa_py.ui.image_processor import PicasaImageProcessor
-            im = PicasaImageProcessor.load_transformed_image(path, max_size=1024)
+            im = PicasaImageProcessor.load_transformed_image(path, max_size=max_size)
             if im is not None:
                 pix = PicasaImageProcessor.pil_to_qpixmap(im)
                 self._pixmap_cache[path] = pix
@@ -204,19 +210,24 @@ class PicasaPrintPreviewCanvas(QWidget):
                         try:
                             from picasa_py.ini.parser import PicasaIniParser
                             from picasa_py.faces.facerect import decode_rect64_string
-                            doc = PicasaIniParser.parse_file(ini_path)
-                            base_name = os.path.basename(p)
-                            crop_hex = doc.get_crop(base_name)
-                            if crop_hex:
-                                left_f, top_f, right_f, bottom_f = decode_rect64_string(crop_hex)
-                                if right_f > left_f and bottom_f > top_f:
-                                    img_w = max(1, int(round(img_w * (right_f - left_f))))
-                                    img_h = max(1, int(round(img_h * (bottom_f - top_f))))
-                            rot = doc.get_rotate(base_name)
-                            if rot in (1, 3):
-                                img_w, img_h = img_h, img_w
+                            if ini_path in self._ini_doc_cache:
+                                doc = self._ini_doc_cache[ini_path]
+                            else:
+                                doc = PicasaIniParser.parse_file(ini_path)
+                                self._ini_doc_cache[ini_path] = doc
+                            if doc is not None:
+                                base_name = os.path.basename(p)
+                                crop_hex = doc.get_crop(base_name)
+                                if crop_hex:
+                                    left_f, top_f, right_f, bottom_f = decode_rect64_string(crop_hex)
+                                    if right_f > left_f and bottom_f > top_f:
+                                        img_w = max(1, int(round(img_w * (right_f - left_f))))
+                                        img_h = max(1, int(round(img_h * (bottom_f - top_f))))
+                                rot = doc.get_rotate(base_name)
+                                if rot in (1, 3):
+                                    img_w, img_h = img_h, img_w
                         except Exception:
-                            pass
+                            self._ini_doc_cache[ini_path] = None
                     w, h = img_w, img_h
                     self._dim_cache[p] = (w, h)
                 dpi_w = w / max(0.1, cw_in)

@@ -19,6 +19,7 @@ from typing import Dict, List, Optional, Set
 from PySide6.QtCore import QObject, QFileSystemWatcher, QTimer, Signal
 
 from picasa_py.db.database import PicasaDatabase
+from picasa_py.ini.writer import PicasaIniWriter
 
 
 class PicasaFolderWatcher(QObject):
@@ -51,6 +52,13 @@ class PicasaFolderWatcher(QObject):
 
         self.watcher.directoryChanged.connect(self._on_directory_changed)
         self.watcher.fileChanged.connect(self._on_file_changed)
+
+        # FR: File d'attente de découverte incrémentale des sous-dossiers pour ne jamais bloquer le thread GUI
+        # EN: Incremental subdirectory discovery queue so the GUI thread is never blocked on large folder trees
+        self._pending_walk_roots: List[str] = []
+        self._walk_chunk_timer = QTimer(self)
+        self._walk_chunk_timer.setInterval(8)
+        self._walk_chunk_timer.timeout.connect(self._process_next_walk_chunk)
 
         if self.db:
             self.reload_from_database()
@@ -116,12 +124,21 @@ class PicasaFolderWatcher(QObject):
 
     def set_watched_directories(self, paths: List[str]) -> None:
         """
-        FR: Remplace l'ensemble des répertoires surveillés (arborescence récursive hors dossiers exclus).
-        EN: Replaces the set of watched directories (recursive directory tree excluding filtered folders).
+        FR: Remplace l'ensemble des répertoires surveillés. Ajoute immédiatement les répertoires racines
+        sans bloquer le thread GUI, puis découvre et ajoute les sous-dossiers par petits lots via
+        `_walk_chunk_timer` si l'arborescence est vaste.
+        EN: Replaces the set of watched directories. Immediately adds root directories without blocking
+        the GUI thread, then discovers and registers subdirectories in small batches via `_walk_chunk_timer`
+        if the directory tree is large.
         Ref: picasa3.exe @ 0x00704F20 (ReadDirectoryChangesW avec bWatchSubtree = TRUE)
         """
+        self._walk_chunk_timer.stop()
+        self._pending_walk_roots.clear()
+
         current_dirs = set(self.watcher.directories())
         new_dirs: Set[str] = set()
+        deferred_roots: List[str] = []
+        sync_budget = 40
 
         for p in paths:
             host_p = p.replace("\\", os.sep) if os.sep != "\\" else p
@@ -129,10 +146,23 @@ class PicasaFolderWatcher(QObject):
             if os.path.isdir(norm):
                 new_dirs.add(norm)
                 try:
-                    for root, dirs, _ in os.walk(norm):
-                        dirs[:] = [d for d in dirs if not self._is_excluded_dir_name(d)]
-                        for d in dirs:
-                            new_dirs.add(os.path.abspath(os.path.join(root, d)))
+                    with os.scandir(norm) as it:
+                        for entry in it:
+                            if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                                sub_abs = os.path.abspath(entry.path)
+                                new_dirs.add(sub_abs)
+                                if sync_budget > 0:
+                                    sync_budget -= 1
+                                    try:
+                                        with os.scandir(sub_abs) as sub_it:
+                                            for sub_e in sub_it:
+                                                if sub_e.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(sub_e.name):
+                                                    new_dirs.add(os.path.abspath(sub_e.path))
+                                                    deferred_roots.append(os.path.abspath(sub_e.path))
+                                    except Exception:
+                                        pass
+                                else:
+                                    deferred_roots.append(sub_abs)
                 except Exception:
                     pass
 
@@ -145,6 +175,51 @@ class PicasaFolderWatcher(QObject):
             self.watcher.addPaths(list(to_add))
 
         self.watched_paths = new_dirs
+        if deferred_roots:
+            self._pending_walk_roots.extend(deferred_roots)
+            self._walk_chunk_timer.start()
+
+    def _process_next_walk_chunk(self) -> None:
+        """
+        FR: Parcourt un petit lot de sous-dossiers par tick d'horloge (max 25 répertoires)
+        afin d'enregistrer les sous-arborescences profondes sans aucun gel de l'interface.
+        EN: Processes a small batch of subdirectories per timer tick (max 25 directories)
+        to register deep directory trees without any UI freeze.
+        """
+        if not self._pending_walk_roots:
+            self._walk_chunk_timer.stop()
+            return
+
+        batch_added: List[str] = []
+        processed = 0
+        while self._pending_walk_roots and processed < 25:
+            curr = self._pending_walk_roots.pop(0)
+            processed += 1
+            if not os.path.isdir(curr):
+                continue
+            if curr not in self.watched_paths:
+                self.watched_paths.add(curr)
+                batch_added.append(curr)
+            try:
+                with os.scandir(curr) as it:
+                    for entry in it:
+                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                            sub_abs = os.path.abspath(entry.path)
+                            if sub_abs not in self.watched_paths:
+                                self.watched_paths.add(sub_abs)
+                                batch_added.append(sub_abs)
+                            self._pending_walk_roots.append(sub_abs)
+            except Exception:
+                pass
+
+        if batch_added:
+            try:
+                self.watcher.addPaths(batch_added)
+            except Exception:
+                pass
+
+        if not self._pending_walk_roots:
+            self._walk_chunk_timer.stop()
 
     def add_directory(self, path: str) -> None:
         """
@@ -170,19 +245,27 @@ class PicasaFolderWatcher(QObject):
 
     def _on_directory_changed(self, path: str) -> None:
         """
-        FR: Gère la notification de modification d'un dossier et enregistre récursivement les nouveaux sous-dossiers.
-        EN: Handles a directory change notification and recursively registers any newly created subdirectories.
+        FR: Gère la notification de modification d'un dossier et enregistre les nouveaux sous-dossiers directs.
+        Ignore immédiatement les notifications provoquées par une écriture `.picasa.ini` interne récente.
+        EN: Handles a directory change notification and registers any newly created direct subdirectories.
+        Immediately ignores notifications triggered by a recent internal `.picasa.ini` write.
+        Ref: picasa3.exe @ 0x00456A15, 0x0068BABA, 0x00704F20
         """
+        if PicasaIniWriter.is_recent_internal_write(path, 2.0):
+            return
         self.pending_changed_paths.add(path)
         if os.path.isdir(path):
             try:
-                for root, dirs, _ in os.walk(path):
-                    dirs[:] = [d for d in dirs if not self._is_excluded_dir_name(d)]
-                    for d in dirs:
-                        norm_sub = os.path.abspath(os.path.join(root, d))
-                        if norm_sub not in self.watched_paths:
-                            self.add_directory(norm_sub)
-                            self.pending_changed_paths.add(norm_sub)
+                with os.scandir(path) as it:
+                    for entry in it:
+                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                            norm_sub = os.path.abspath(entry.path)
+                            if norm_sub not in self.watched_paths:
+                                self.add_directory(norm_sub)
+                                self.pending_changed_paths.add(norm_sub)
+                                self._pending_walk_roots.append(norm_sub)
+                if self._pending_walk_roots and not self._walk_chunk_timer.isActive():
+                    self._walk_chunk_timer.start()
             except Exception:
                 pass
         self.directory_changed.emit(path)
@@ -194,6 +277,8 @@ class PicasaFolderWatcher(QObject):
         FR: Gère la notification de modification d'un fichier surveillé.
         EN: Handles a file change notification.
         """
+        if PicasaIniWriter.is_recent_internal_write(path, 2.0):
+            return
         parent_dir = os.path.dirname(path)
         if parent_dir:
             self.pending_changed_paths.add(parent_dir)

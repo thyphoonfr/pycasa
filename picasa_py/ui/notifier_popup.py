@@ -117,6 +117,7 @@ class PicasaNotifierPopup(QWidget):
 
         self.style_cfg = style or PicasaStyle.instance()
         self.res_mgr = PicasaResourceManager.get()
+        self.db: Optional[Any] = None
 
         self.cells: List[NotifierCell] = []
         self.is_collapsed: bool = False  # Ref: [ebp + 0x314]
@@ -174,18 +175,47 @@ class PicasaNotifierPopup(QWidget):
             self._click_to_view_label = "Click to view"
         self.update()
 
-    def _load_thumbnail_pixmap(self, file_path: str) -> Optional[QPixmap]:
+    def _load_thumbnail_pixmap(self, file_path: str, db: Optional[Any] = None, db_idx: int = -1) -> Optional[QPixmap]:
         """
-        FR: Charge et redimensionne la vignette de la photo aux dimensions 38x29 avec son orientation EXIF/INI.
-        EN: Loads and scales the photo thumbnail to 38x29 with its EXIF/INI orientation.
-        Ref: picasa3.exe @ 0x005718DF (get 256px thumb), 0x00659270 (scale to 38x29 / 0x26 x 0x1d)
+        FR: Charge et redimensionne la vignette de la photo aux dimensions 38x29 avec son orientation EXIF/INI,
+        en lisant en priorité la miniature déjà générée dans `CThumbDB` (`thumbs_0.db`) afin de ne jamais
+        bloquer le thread GUI par un décodage JPEG pleine résolution pendant un scan massif.
+        EN: Loads and scales the photo thumbnail to 38x29 with its EXIF/INI orientation,
+        reading first the precomputed thumbnail from `CThumbDB` (`thumbs_0.db`) so the GUI thread
+        is never blocked by full-resolution JPEG decoding during a large folder scan.
+        Ref: picasa3.exe @ 0x005718DF (get thumb from CThumbDB), 0x00659270 (scale to 38x29 / 0x26 x 0x1d)
         """
+        eff_db = db or getattr(self, "db", None)
+        if eff_db is not None:
+            try:
+                eff_idx = db_idx
+                if eff_idx < 0 and file_path and hasattr(eff_db, "find_media_index_by_path"):
+                    found = eff_db.find_media_index_by_path(file_path)
+                    if found is not None:
+                        eff_idx = int(found)
+                if eff_idx >= 0 and hasattr(eff_db, "get_thumbnail"):
+                    raw_thumb = eff_db.get_thumbnail(eff_idx, "small")
+                    if raw_thumb:
+                        qimg = QImage.fromData(raw_thumb)
+                        if not qimg.isNull():
+                            return QPixmap.fromImage(qimg).scaled(
+                                self.THUMB_WIDTH,
+                                self.THUMB_HEIGHT,
+                                Qt.AspectRatioMode.KeepAspectRatio,
+                                Qt.TransformationMode.SmoothTransformation,
+                            )
+            except Exception:
+                pass
+
         if not file_path or not os.path.exists(file_path):
             return None
         try:
             from picasa_py.ui.image_processor import PicasaImageProcessor
 
-            pil_img = PicasaImageProcessor.load_transformed_image(file_path)
+            pil_img = PicasaImageProcessor.load_transformed_image(
+                file_path,
+                max_size=max(self.THUMB_WIDTH * 3, self.THUMB_HEIGHT * 3, 128),
+            )
             if pil_img is not None:
                 pil_rgb = pil_img.convert("RGB")
                 pil_rgb.thumbnail((self.THUMB_WIDTH * 2, self.THUMB_HEIGHT * 2))
@@ -242,6 +272,8 @@ class PicasaNotifierPopup(QWidget):
         db_idx: int = -1,
         timeout_ms: int = DEFAULT_TIMEOUT_MS,
         show_popup: bool = True,
+        increment: int = 1,
+        db: Optional[Any] = None,
     ) -> NotifierCell:
         """
         FR: Ajoute ou met à jour une notification pour une photo nouvellement indexée ou modifiée.
@@ -259,7 +291,8 @@ class PicasaNotifierPopup(QWidget):
         norm_key = os.path.normcase(os.path.normpath(clean_folder)) if clean_folder else "__default__"
         folder_title = os.path.basename(clean_folder) or clean_folder or self._header_title
         full_path = file_path or (os.path.join(clean_folder, filename) if clean_folder and filename else "")
-        thumb = self._load_thumbnail_pixmap(full_path)
+        thumb = self._load_thumbnail_pixmap(full_path, db=db, db_idx=db_idx)
+        inc_val = max(1, int(increment))
 
         existing_cell: Optional[NotifierCell] = None
         for cell in self.cells:
@@ -269,7 +302,7 @@ class PicasaNotifierPopup(QWidget):
 
         if existing_cell is not None:
             # Ref: 0x0065949A (add dword ptr [eax + 8], 1 -> incrémente le compteur du dossier)
-            existing_cell.count += 1
+            existing_cell.count += inc_val
             existing_cell.filename = filename
             existing_cell.file_path = full_path
             existing_cell.db_idx = db_idx
@@ -286,8 +319,8 @@ class PicasaNotifierPopup(QWidget):
                 filename=filename,
                 file_path=full_path,
                 title=folder_title,
-                subtitle=self._format_cell_subtitle(filename, 1),
-                count=1,
+                subtitle=self._format_cell_subtitle(filename, inc_val),
+                count=inc_val,
                 db_idx=db_idx,
                 timeout_ms=timeout_ms,
                 thumbnail=thumb,

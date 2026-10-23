@@ -333,7 +333,10 @@ class PicasaZoomIcon(QWidget):
             painter.drawRect(r)
 
 
-def _resolve_item_pixmap(item: Any) -> Optional[QPixmap]:
+_ACTIVE_TRAY_DB: Optional[Any] = None
+
+
+def _resolve_item_pixmap(item: Any, db: Optional[Any] = None) -> Optional[QPixmap]:
     """
     FR: Récupère ou charge à la volée la miniature `QPixmap` réelle d'un élément sélectionné
     pour l'afficher dans le bac à photos (`thumbui/scratch`), sans jamais se contenter d'une icône générique.
@@ -356,6 +359,27 @@ def _resolve_item_pixmap(item: Any) -> Optional[QPixmap]:
             except Exception:
                 pass
             return p
+
+    # FR: 1 bis. Essayer depuis la miniature en mémoire de PicasaDatabase (< 0,2 ms)
+    # EN: 1 bis. Try from PicasaDatabase in-memory thumbnail (< 0.2 ms)
+    eff_db = db or getattr(item, "_db", None) or _ACTIVE_TRAY_DB
+    item_idx = getattr(item, "index", -1)
+    if eff_db is not None and isinstance(item_idx, int) and item_idx >= 0 and hasattr(eff_db, "get_thumbnail"):
+        try:
+            from PySide6.QtGui import QImage
+            raw_db = eff_db.get_thumbnail(item_idx, size="small") or eff_db.get_thumbnail(item_idx, size="large")
+            if raw_db:
+                qimg_db = QImage.fromData(raw_db)
+                if not qimg_db.isNull():
+                    p_db = QPixmap.fromImage(qimg_db)
+                    if not p_db.isNull():
+                        try:
+                            setattr(item, "pixmap", p_db)
+                        except Exception:
+                            pass
+                        return p_db
+        except Exception:
+            pass
 
     # FR: 2. Charger depuis le chemin disque avec QPixmap / PIL draft rapide
     # EN: 2. Load from disk path using fast QPixmap / PIL draft
@@ -877,6 +901,7 @@ class PicasaPhotoTray(QWidget):
         self.is_held: bool = False
         self.held_items: List[Any] = []
         self.active_items: List[Any] = []
+        self._db: Optional[Any] = None
 
         # FR: Hauteur authentique de basecontrolset : rect=(0, 429, 800, 534) -> 98-105 px
         # EN: Authentic height of basecontrolset: rect=(0, 429, 800, 534) -> 98-105 px
@@ -1252,6 +1277,15 @@ class PicasaPhotoTray(QWidget):
                     combined.append(it)
             return combined
         return list(self.active_items)
+
+    def set_database(self, db: Optional[Any]) -> None:
+        """
+        FR: Associe la base de données Picasa au bac à photos pour le chargement instantané des miniatures en RAM.
+        EN: Associates the Picasa database with the photo tray for instant in-memory thumbnail loading.
+        """
+        global _ACTIVE_TRAY_DB
+        self._db = db
+        _ACTIVE_TRAY_DB = db
 
     def set_selected_items(self, items: List[Any]) -> None:
         """

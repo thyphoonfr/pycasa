@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QStackedWidget, QRadioButton, QButtonGroup, QLineEdit, QCheckBox,
     QColorDialog, QSizePolicy
 )
-from PySide6.QtCore import Qt, Signal, QRectF, QSize
+from PySide6.QtCore import Qt, Signal, QRectF, QSize, QTimer
 from PySide6.QtGui import QFont, QIcon, QColor, QPixmap, QImage, QPainter, QPen
 
 from PIL import Image
@@ -1416,6 +1416,10 @@ class PicasaEditPanel(QWidget):
         self._effect_tiles_by_tab: dict[int, list[PicasaEffectTileButton]] = {2: [], 3: [], 4: []}
         self._base_fx_thumb: Optional[Image.Image] = None
         self._fx_preview_cache: dict[str, QPixmap] = {}
+        self._fx_tiles_debounce_timer = QTimer(self)
+        self._fx_tiles_debounce_timer.setSingleShot(True)
+        self._fx_tiles_debounce_timer.setInterval(60)
+        self._fx_tiles_debounce_timer.timeout.connect(self._on_debounced_fx_tiles_refresh)
 
         self.setFixedWidth(295)
         self.setObjectName("EditPanelRoot")
@@ -2489,18 +2493,30 @@ class PicasaEditPanel(QWidget):
                 self._fx_preview_cache[aid] = pix
             tile.set_preview_pixmap(pix)
 
+    def _on_debounced_fx_tiles_refresh(self) -> None:
+        """
+        FR: Rafraîchit de façon différée (60 ms) les miniatures d'effets de l'onglet actif après navigation.
+        EN: Refreshes effect thumbnails for the active tab after a 60 ms debounce following photo navigation.
+        Ref: picasa3.exe @ 0x00568A08 (FUN_00568A08, editpanel/fxthumbs)
+        """
+        cur_tab = self.tabs.currentIndex() if hasattr(self, "tabs") else 0
+        if cur_tab in (2, 3, 4):
+            self._refresh_effect_tiles_for_tab(cur_tab)
+
     def _on_main_tab_changed(self, tab_idx: int) -> None:
         """
         FR: Rafraîchit les miniatures d'aperçu d'effets lorsqu'un onglet d'effets (Effets 1/2/3) devient actif.
         EN: Refreshes effect preview thumbnails when an effects tab (Effects 1/2/3) becomes active.
         """
         if tab_idx in (2, 3, 4):
+            self._fx_tiles_debounce_timer.stop()
             self._refresh_effect_tiles_for_tab(tab_idx)
 
     def is_any_slider_down(self) -> bool:
         """
         FR: Indique si l'utilisateur maintient actuellement un curseur de réglage ou d'effet enfoncé à la souris.
         EN: Returns whether the user is currently holding down a tuning or effect slider with the mouse.
+        Ref: picasa3.exe @ 0x00760F40
         """
         for attr in ("sldr_basic_fill", "sldr_fill", "sldr_highlights", "sldr_shadows", "sldr_temp"):
             sldr = getattr(self, attr, None)
@@ -2510,8 +2526,9 @@ class PicasaEditPanel(QWidget):
             if self.straighten_subpanel.slider.isSliderDown():
                 return True
         if hasattr(self, "effect_subpanel") and hasattr(self.effect_subpanel, "_sliders"):
-            for sldr in self.effect_subpanel._sliders.values():
-                if hasattr(sldr, "isSliderDown") and sldr.isSliderDown():
+            for entry in self.effect_subpanel._sliders.values():
+                sldr_obj = entry[0] if isinstance(entry, tuple) else entry
+                if hasattr(sldr_obj, "isSliderDown") and sldr_obj.isSliderDown():
                     return True
         return False
 
@@ -2546,10 +2563,15 @@ class PicasaEditPanel(QWidget):
         except Exception:
             self._base_fx_thumb = None
 
-        # Met à jour immédiatement l'onglet d'effets uniquement s'il est actuellement ouvert
+        # FR: Planifie la mise à jour de l'onglet d'effets via un QTimer debouncé à 60 ms lors de la navigation
+        # EN: Schedules effect tab thumbnail refresh via a 60 ms debounced QTimer during photo navigation
         cur_tab = self.tabs.currentIndex() if hasattr(self, "tabs") else 0
         if cur_tab in (2, 3, 4):
-            self._refresh_effect_tiles_for_tab(cur_tab)
+            tiles = self._effect_tiles_by_tab.get(cur_tab, [])
+            if tiles and any(t.preview_pixmap is None for t in tiles):
+                self._refresh_effect_tiles_for_tab(cur_tab)
+            else:
+                self._fx_tiles_debounce_timer.start()
 
     def set_photo_metadata(self, file_path: str) -> None:
         """

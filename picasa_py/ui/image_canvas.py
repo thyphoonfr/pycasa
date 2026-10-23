@@ -242,15 +242,36 @@ class PicasaImageCanvas(QWidget):
         self.update()
         return False
 
-    def set_pixmap_direct(self, pixmap: QPixmap, rotation: int = 0) -> None:
+    def set_pixmap_direct(self, pixmap: QPixmap, rotation: int = 0, preserve_view: bool = False) -> None:
         """
-        FR: Définit directement le `QPixmap` affiché avec un angle de rotation optionnel.
-        EN: Directly sets the displayed `QPixmap` with an optional rotation angle.
+        FR: Définit directement le `QPixmap` affiché avec un angle de rotation optionnel,
+        en préservant optionnellement le zoom et le déplacement panoramique (`preserve_view=True`).
+        EN: Directly sets the displayed `QPixmap` with an optional rotation angle,
+        optionally preserving the current zoom and pan offset (`preserve_view=True`).
+        Ref: picasa3.exe @ 0x00760F40, OneUpUI (0x0094355C)
         """
+        if isinstance(rotation, bool):
+            preserve_view = rotation
+            rotation = self.rotation_degrees
         self.rotation_degrees = rotation % 360
+        prev_pix = (
+            self._raw_pixmap
+            if (self._raw_pixmap is not None and not self._raw_pixmap.isNull())
+            else self._original_pixmap
+        )
         self._raw_pixmap = pixmap
-        self.pan_offset = QPointF(0, 0)
-        self.fit_to_window = True
+        if preserve_view and prev_pix is not None and not prev_pix.isNull():
+            if (
+                not self.fit_to_window
+                and pixmap is not None
+                and not pixmap.isNull()
+                and pixmap.width() > 0
+                and prev_pix.width() != pixmap.width()
+            ):
+                self.zoom_level *= (prev_pix.width() / float(pixmap.width()))
+        else:
+            self.pan_offset = QPointF(0, 0)
+            self.fit_to_window = True
         self._update_display_pixmap()
         self.update()
 
@@ -382,8 +403,13 @@ class PicasaImageCanvas(QWidget):
         else:
             self._display_pixmap = self._raw_pixmap
 
-        # FR: Précalcul de la miniature de cadrage pour la Loupe (60 FPS garanti) / EN: Precompute Loupe framing thumbnail (60 FPS guaranteed)
-        if self._display_pixmap and not self._display_pixmap.isNull():
+        # FR: Précalcul de la miniature de cadrage pour la Loupe uniquement si zoomé (> 1.01) / EN: Precompute Loupe framing thumbnail only when zoomed (> 1.01)
+        if (
+            self._display_pixmap
+            and not self._display_pixmap.isNull()
+            and not self.fit_to_window
+            and self.zoom_level > 1.01
+        ):
             self._nav_thumbnail = self._display_pixmap.scaled(
                 180, 180,
                 Qt.AspectRatioMode.KeepAspectRatio,
@@ -875,6 +901,12 @@ class PicasaImageCanvas(QWidget):
             painter.drawLine(QPointF(cx2, cy1), QPointF(cx1, cy2))
 
         # 3. FR: Miniature de l'image / EN: Image thumbnail
+        if (self._nav_thumbnail is None or self._nav_thumbnail.isNull()) and self._display_pixmap and not self._display_pixmap.isNull():
+            self._nav_thumbnail = self._display_pixmap.scaled(
+                180, 180,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
         if self._nav_thumbnail and not self._nav_thumbnail.isNull():
             painter.drawPixmap(self._nav_img_rect, self._nav_thumbnail, QRectF(self._nav_thumbnail.rect()))
         elif self._display_pixmap:

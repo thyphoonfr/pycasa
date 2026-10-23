@@ -11,13 +11,16 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
-from typing import TYPE_CHECKING
+import threading
+import time
+from pathlib import Path
+from typing import Dict, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from picasa_py.ini.parser import PicasaIniDocument
 
 
-# Ref: picasa3.exe @ 0x0068AC80
+# Ref: picasa3.exe @ 0x0068AC80, 0x00456A15, 0x0068BABA
 class PicasaIniWriter:
     """
     FR: Sérialiseur fidèle pour les fichiers INI de Picasa 3.
@@ -25,6 +28,77 @@ class PicasaIniWriter:
     EN: Faithful serializer for Picasa 3 INI files.
     Guarantees byte-for-byte round-trip fidelity and cross-platform atomic disk writes.
     """
+
+    _recent_internal_writes: Dict[str, float] = {}
+    _write_lock: threading.Lock = threading.Lock()
+
+    @classmethod
+    def _normalize_folder_key(cls, file_or_dir_path: Union[str, Path]) -> str:
+        """
+        FR: Normalise un chemin de fichier `.picasa.ini` ou de dossier en clé canonique de répertoire.
+        EN: Normalizes a `.picasa.ini` file path or folder path into a canonical directory key.
+        """
+        raw_str = str(file_or_dir_path)
+        abs_path = os.path.abspath(raw_str)
+        bname = os.path.basename(abs_path).lower()
+        if (
+            bname in (".picasa.ini", "picasa.ini")
+            or bname.endswith((".ini", ".tmp"))
+            or (os.path.exists(abs_path) and os.path.isfile(abs_path))
+        ):
+            folder = os.path.dirname(abs_path)
+        else:
+            folder = abs_path
+        return os.path.normcase(os.path.normpath(str(folder)))
+
+    @classmethod
+    def mark_internal_write(cls, file_or_dir_path: Union[str, Path]) -> None:
+        """
+        FR: Enregistre l'horodatage monotone d'une écriture INI interne pour inhiber la boucle
+        d'auto-déclenchement de `PicasaFolderWatcher`.
+        EN: Records the monotonic timestamp of an internal INI write to suppress the
+        self-triggering loop in `PicasaFolderWatcher`.
+        Ref: picasa3.exe @ 0x00456A15, 0x0068BABA
+        """
+        if not file_or_dir_path:
+            return
+        now = time.monotonic()
+        folder_key = cls._normalize_folder_key(file_or_dir_path)
+        raw_str = str(file_or_dir_path)
+        bname = os.path.basename(raw_str).lower()
+        raw_folder = os.path.dirname(raw_str) if (bname.endswith((".ini", ".tmp")) and os.path.dirname(raw_str)) else raw_str
+        raw_key = os.path.normcase(os.path.normpath(str(raw_folder)))
+        with cls._write_lock:
+            if len(cls._recent_internal_writes) > 512:
+                cutoff = now - 60.0
+                cls._recent_internal_writes = {
+                    k: ts for k, ts in cls._recent_internal_writes.items() if ts >= cutoff
+                }
+            cls._recent_internal_writes[folder_key] = now
+            cls._recent_internal_writes[raw_key] = now
+
+    @classmethod
+    def is_recent_internal_write(cls, folder_path: Union[str, Path], window_s: float = 2.0) -> bool:
+        """
+        FR: Indique si le dossier spécifié a fait l'objet d'une écriture `.picasa.ini` interne
+        au cours des `window_s` dernières secondes.
+        EN: Returns whether the specified folder had an internal `.picasa.ini` write
+        within the last `window_s` seconds.
+        Ref: picasa3.exe @ 0x00456A15, 0x0068BABA
+        """
+        if not folder_path:
+            return False
+        now = time.monotonic()
+        folder_key = cls._normalize_folder_key(folder_path)
+        raw_key = os.path.normcase(os.path.normpath(str(folder_path)))
+        with cls._write_lock:
+            ts = cls._recent_internal_writes.get(folder_key)
+            if ts is not None and (now - ts) <= window_s:
+                return True
+            ts_raw = cls._recent_internal_writes.get(raw_key)
+            if ts_raw is not None and (now - ts_raw) <= window_s:
+                return True
+        return False
 
     @staticmethod
     def to_bytes(doc: PicasaIniDocument) -> bytes:
@@ -107,6 +181,7 @@ class PicasaIniWriter:
             except Exception:
                 kernel32 = None
 
+        cls.mark_internal_write(dir_name)
         fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".picasa_", suffix=".tmp")
         try:
             with os.fdopen(fd, "wb") as f:
@@ -124,6 +199,7 @@ class PicasaIniWriter:
                 attrs = kernel32.GetFileAttributesW(abs_path)
                 if attrs != -1:
                     kernel32.SetFileAttributesW(abs_path, attrs | 0x02)
+            cls.mark_internal_write(dir_name)
         except Exception:
             if os.path.exists(tmp_path):
                 try:
@@ -144,8 +220,18 @@ class PicasaIniWriter:
                         attrs = kernel32.GetFileAttributesW(abs_path)
                         if attrs != -1:
                             kernel32.SetFileAttributesW(abs_path, attrs | 0x02)
+                    cls.mark_internal_write(dir_name)
                     return
             except Exception:
                 pass
             raise
+
+    @classmethod
+    def write_file(cls, path: str, doc: PicasaIniDocument) -> None:
+        """
+        FR: Alias de `write_atomic` pour l'écriture atomique d'un document `.picasa.ini`.
+        EN: Alias for `write_atomic` to atomically write a `.picasa.ini` document.
+        Ref: picasa3.exe @ 0x0068AC80
+        """
+        cls.write_atomic(path, doc)
 

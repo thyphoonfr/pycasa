@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (
     QFrame
 )
 from PySide6.QtCore import Qt, QSize, Signal, QThread
-from PySide6.QtGui import QIcon, QPixmap, QImage
+from PySide6.QtGui import QIcon, QPixmap, QImage, QImageReader
 
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
@@ -432,13 +432,20 @@ class PicasaImportDialog(QDialog):
             else:
                 item.setCheckState(Qt.CheckState.Checked)
 
-            # Charger une miniature rapide pour les premiers fichiers
+            # FR: Charger une miniature rapide sous-échantillonnée via QImageReader pour les premiers fichiers
+            # EN: Load a fast sub-sampled thumbnail via QImageReader for the first files
             if self.list_widget.count() < 60:
                 try:
-                    pix = QPixmap(p)
-                    if not pix.isNull():
-                        thumb = pix.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
-                        item.setIcon(QIcon(thumb))
+                    reader = QImageReader(p)
+                    reader.setAutoTransform(True)
+                    orig_size = reader.size()
+                    if orig_size.isValid() and orig_size.width() > 0 and orig_size.height() > 0:
+                        reader.setScaledSize(orig_size.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio))
+                    else:
+                        reader.setScaledSize(QSize(120, 120))
+                    qimg = reader.read()
+                    if not qimg.isNull():
+                        item.setIcon(QIcon(QPixmap.fromImage(qimg)))
                 except Exception:
                     pass
 

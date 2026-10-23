@@ -11,6 +11,7 @@ Ref: AGENTS.md §4 bis (Disposition et fonctionnement identiques)
 from __future__ import annotations
 import os
 import sys
+import time
 import subprocess
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Set
@@ -20,8 +21,8 @@ from PySide6.QtWidgets import (
     QStackedWidget, QStatusBar, QMessageBox, QFileDialog, QDialog, QProgressDialog,
     QApplication, QInputDialog, QMenu
 )
-from PySide6.QtCore import Qt, QSize, QPoint, Signal, QTimer
-from PySide6.QtGui import QIcon, QImageReader, QPixmap, QPalette
+from PySide6.QtCore import Qt, QSize, QPoint, Signal, QTimer, QThread, QObject, QEvent
+from PySide6.QtGui import QIcon, QImage, QImageReader, QPixmap, QPalette
 
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
@@ -61,6 +62,38 @@ from picasa_py.version import (
 
 
 
+class _GuiActivityEventFilter(QObject):
+    """
+    FR: Moniteur global d'activité utilisateur (souris, molette, clavier) suspendant
+    immédiatement les workers d'arrière-plan pendant toute interaction de l'utilisateur.
+    EN: Global user activity monitor (mouse, wheel, keyboard) that immediately suspends
+    background workers during any user interaction.
+    Ref: picasa3.exe @ 0x005E4AC0, 0x005E4F6E (CSlowTaskManager User Activity Throttle)
+    """
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        """
+        FR: Intercepte les événements d'entrée utilisateur et notifie `BackgroundScanWorker`.
+        EN: Intercepts user input events and notifies `BackgroundScanWorker`.
+        """
+        etype = event.type()
+        if etype in (
+            QEvent.Type.MouseButtonPress,
+            QEvent.Type.MouseButtonRelease,
+            QEvent.Type.MouseButtonDblClick,
+            QEvent.Type.Wheel,
+            QEvent.Type.KeyPress,
+        ):
+            BackgroundScanWorker.notify_gui_activity()
+        elif etype == QEvent.Type.MouseMove:
+            try:
+                if getattr(event, "buttons", lambda: Qt.MouseButton.NoButton)() != Qt.MouseButton.NoButton:
+                    BackgroundScanWorker.notify_gui_activity()
+            except Exception:
+                pass
+        return False
+
+
 # Ref: picasa3.exe @ 0x00983940 (ytWindow)
 class PicasaMainWindow(QMainWindow):
     """
@@ -94,6 +127,12 @@ class PicasaMainWindow(QMainWindow):
         self._pending_scan_folders: Set[str] = set()
         self._pending_scan_notify: bool = False
         self._active_scan_notify: bool = True
+        self._gui_activity_filter = _GuiActivityEventFilter(self)
+        app_inst = QApplication.instance()
+        if app_inst is not None:
+            app_inst.installEventFilter(self._gui_activity_filter)
+        else:
+            self.installEventFilter(self._gui_activity_filter)
 
         # Fenêtre surgissante de notification Picasa (Ref: picasa3.exe @ 0x0040C339 [ebp+0x30f0], CNotifierPopup @ 0x00656FE0)
         self.notifier_popup = PicasaNotifierPopup(self.style, self)
@@ -440,6 +479,7 @@ class PicasaMainWindow(QMainWindow):
                 from picasa_py.db.preferences import PicasaPreferences
                 PicasaPreferences.set_repository_path(str(self.db.db3_dir))
 
+            self.photo_tray.set_database(self.db)
             self.photo_tray.held_items = []
             self.photo_tray.set_selected_items([])
             self.library_tree.populate_from_database(self.db)
@@ -499,6 +539,7 @@ class PicasaMainWindow(QMainWindow):
         FR: Bascule en mode visualiseur/retouche plein écran pour la photo sélectionnée.
         EN: Switches to full-pane viewer/editor mode (One-Up View) for the selected photo.
         """
+        BackgroundScanWorker.notify_gui_activity()
         if self.db is None or item_idx >= len(self.thumb_view.items):
             return
 
@@ -512,6 +553,35 @@ class PicasaMainWindow(QMainWindow):
         item = self.thumb_view.items[item_idx]
         f_indices = self.thumb_view.filtered_indices if self.thumb_view.filtered_indices is not None else range(len(self.thumb_view.items))
         available_indices = [self.thumb_view.items[i].index for i in f_indices if i < len(self.thumb_view.items)]
+
+        # FR: Étape 1 (Ref: picasa3.exe @ 0x00568E4A) : basculer immédiatement vers la vue 1-Up et afficher
+        #     l'aperçu déjà en mémoire (previews/bigthumbs CBlockFile ou vignette de la grille) avant le décodage HD.
+        # EN: Step 1 (Ref: picasa3.exe @ 0x00568E4A): switch to the One-Up view immediately and show the
+        #     in-memory preview (previews/bigthumbs CBlockFile or grid thumbnail) before the HD decode.
+        try:
+            preview_pix: Optional[QPixmap] = None
+            if item.index >= 0 and not item.has_edits:
+                for sz in ("preview", "large"):
+                    raw_prev = self.db.get_thumbnail(item.index, size=sz)
+                    if raw_prev:
+                        qimg_prev = QImage.fromData(raw_prev)
+                        if not qimg_prev.isNull():
+                            preview_pix = QPixmap.fromImage(qimg_prev)
+                            break
+            if preview_pix is None:
+                preview_pix = self.thumb_view._pixmap_cache.get(item_idx)
+            self.top_bar.hide()
+            self.photo_tray.hide()
+            self.stack.setCurrentIndex(1)
+            if preview_pix is not None and not preview_pix.isNull() and hasattr(self.one_up_view, "canvas"):
+                self.one_up_view.canvas.set_pixmap_direct(preview_pix)
+                if self.isVisible():
+                    self.one_up_view.repaint()
+        except Exception:
+            pass
+
+        # FR: Étape 2 : décodage 1600px + filtres .picasa.ini (l'état final reste identique)
+        # EN: Step 2: 1600px decode + .picasa.ini filters (final state unchanged)
         self.one_up_view.open_photo(self.db, item.index, available_indices, direct_path=item.path)
 
         if lib_drawer_was_open and hasattr(self.one_up_view, "right_drawer"):
@@ -530,6 +600,7 @@ class PicasaMainWindow(QMainWindow):
         FR: Revient à la grille de la photothèque en invalidant le cache de vignette de la photo éditée.
         EN: Returns to the library grid while invalidating the edited photo's thumbnail cache.
         """
+        BackgroundScanWorker.notify_gui_activity()
         oneup_drawer_open = False
         oneup_panel_name = "people"
         oneup_expanded_width = False
@@ -608,7 +679,14 @@ class PicasaMainWindow(QMainWindow):
             and self.thumb_view.current_folder_filter == "unnamed_faces"
         ):
             if self.db and getattr(self.db, "face_manager", None):
+                saved_scroll = self.thumb_view.scroll_y
                 self.thumb_view.filter_by_unnamed_faces(self.db.face_manager.unnamed_faces)
+                if saved_scroll > 0:
+                    max_scroll = max(0, self.thumb_view.total_content_height - self.thumb_view.height())
+                    clamped_scroll = min(saved_scroll, max_scroll)
+                    self.thumb_view.scroll_y = clamped_scroll
+                    self.thumb_view.scrollbar.set_value(clamped_scroll)
+                    self.thumb_view.update()
 
     def _on_person_filter_requested(self, contact_id: str, name: str) -> None:
         """
@@ -740,10 +818,21 @@ class PicasaMainWindow(QMainWindow):
         FR: Réagit à la sélection d'un dossier, d'un album ou d'une personne dans l'arborescence.
         EN: Handles selection of a folder, album, or person in the library tree.
         """
+        BackgroundScanWorker.notify_gui_activity()
         if target_type == "folder":
             self.thumb_view.scroll_to_folder(key)
-            indices = [i for i, it in enumerate(self.thumb_view.items) if it.folder_path == key]
-            paths = [self.thumb_view.items[i].path for i in indices]
+            # FR: Indices du dossier via sa section (O(sections)) au lieu de parcourir tous les items
+            # EN: Folder indices via its section (O(sections)) instead of scanning every item
+            norm_key = os.path.normcase(os.path.normpath(key)) if key else key
+            indices = []
+            for sec in self.thumb_view.sections:
+                sp = getattr(sec, "folder_path", "") or ""
+                if sp == key or (sp and os.path.normcase(os.path.normpath(sp)) == norm_key):
+                    indices = list(sec.item_indices)
+                    break
+            if not indices:
+                indices = [i for i, it in enumerate(self.thumb_view.items) if it.folder_path == key]
+            paths = [self.thumb_view.items[i].path for i in indices if i < len(self.thumb_view.items)]
             if self.db:
                 self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
                 if indices and self.right_drawer.isVisible():
@@ -825,15 +914,19 @@ class PicasaMainWindow(QMainWindow):
         """
         count = len(indices)
         selected_items = []
+        sync_decoded = 0
         for i in indices:
             if i < len(self.thumb_view.items):
                 item = self.thumb_view.items[i]
                 cur_pm = getattr(item, "pixmap", None)
                 if cur_pm is None or (hasattr(cur_pm, "isNull") and cur_pm.isNull()):
-                    cached_pm = self.thumb_view._pixmap_cache.get(i)
+                    cached_pm = self.thumb_view._pixmap_cache.get(i) or self.thumb_view._db_pixmap_cache.get(
+                        getattr(item, "index", -1)
+                    )
                     if cached_pm is not None and not cached_pm.isNull():
                         item.pixmap = cached_pm
-                    elif self.db is not None and getattr(item, "index", -1) >= 0:
+                    elif sync_decoded < 12 and self.db is not None and getattr(item, "index", -1) >= 0:
+                        sync_decoded += 1
                         try:
                             raw = self.db.get_thumbnail(item.index)
                             if raw:
@@ -844,6 +937,8 @@ class PicasaMainWindow(QMainWindow):
                             pass
                 selected_items.append(item)
 
+        if self.db is not None and hasattr(self.photo_tray, "set_database"):
+            self.photo_tray.set_database(self.db)
         self.photo_tray.set_selected_items(selected_items)
 
         if self.db is None:
@@ -1003,20 +1098,26 @@ class PicasaMainWindow(QMainWindow):
         if not self.db:
             return
 
-        doc_ids = set(self.db.search(query_stripped))
-        tokens = [t.lower() for t in query_stripped.split() if t]
-
+        idx_to_item = {it.index: i for i, it in enumerate(self.thumb_view.items) if it.index >= 0}
+        matched_doc_ids = self.db.search(query_stripped)
+        seen_items = set()
         matching_indices: List[int] = []
-        for i, item in enumerate(self.thumb_view.items):
-            if item.index in doc_ids:
-                matching_indices.append(i)
-            else:
+        for doc_id in matched_doc_ids:
+            item_pos = idx_to_item.get(doc_id)
+            if item_pos is not None and item_pos not in seen_items:
+                seen_items.add(item_pos)
+                matching_indices.append(item_pos)
+
+        if not matching_indices and len(self.thumb_view.items) <= 500:
+            tokens = [t.lower() for t in query_stripped.split() if t]
+            for i, item in enumerate(self.thumb_view.items):
                 fn = item.filename.lower()
                 fo = item.folder.lower()
                 combined = f"{fn} {fo}"
                 if all(t in combined for t in tokens):
                     matching_indices.append(i)
 
+        matching_indices.sort()
         self.thumb_view.filter_by_search(query_stripped, matching_indices)
         self.status_bar.showMessage(f"Recherche : {len(matching_indices)} résultat(s) pour « {query_stripped} »")
 
@@ -1254,9 +1355,6 @@ class PicasaMainWindow(QMainWindow):
                 direct_path=self.one_up_view.current_photo_path
             )
 
-        self.thumb_view._pixmap_cache.clear()
-        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
-            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         self.status_bar.showMessage(f"Effets appliqués à {len(paths)} photo(s) (Ctrl+Shift+V).")
 
@@ -1452,9 +1550,6 @@ class PicasaMainWindow(QMainWindow):
         if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
             self.one_up_view.filmstrip.clear_cache()
 
-        self.thumb_view._pixmap_cache.clear()
-        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
-            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         if self.right_drawer.isVisible():
             self._on_selection_changed(list(self.thumb_view.selected_indices))
@@ -1503,9 +1598,6 @@ class PicasaMainWindow(QMainWindow):
         if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
             self.one_up_view.filmstrip.clear_cache()
 
-        self.thumb_view._pixmap_cache.clear()
-        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
-            self.thumb_view._scaled_pixmap_cache.clear()
         self.thumb_view.update()
         if self.right_drawer.isVisible():
             self._on_selection_changed(list(self.thumb_view.selected_indices))
@@ -1598,7 +1690,6 @@ class PicasaMainWindow(QMainWindow):
         elif self.right_drawer.isVisible():
             self._on_selection_changed(list(self.thumb_view.selected_indices))
 
-        self.thumb_view._pixmap_cache.clear()
         self.thumb_view.update()
         if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "thumb_strip"):
             self.photo_tray.thumb_strip.update()
@@ -1761,7 +1852,8 @@ class PicasaMainWindow(QMainWindow):
         if self.stack.currentWidget() == self.one_up_view:
             ok = self.one_up_view.save_current_photo()
             if ok:
-                self.thumb_view._pixmap_cache.clear()
+                if self.one_up_view.current_photo_path:
+                    self.thumb_view.invalidate_item(self.one_up_view.current_photo_path)
                 self.thumb_view.update()
                 self.status_bar.showMessage("Modifications enregistrées (.picasaoriginals sauvegardé).")
             else:
@@ -2056,6 +2148,10 @@ class PicasaMainWindow(QMainWindow):
             if album_data.get("description"):
                 sec.set("caption", album_data["description"])
             doc.write_file(ini_path)
+            if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                self.db.invalidate_ini_cache(ini_path)
+            elif self.db and hasattr(self.db, "_ini_cache"):
+                self.db._ini_cache.pop(os.path.normcase(os.path.abspath(ini_path)), None)
 
         # Lier les photos à l'album
         if photos:
@@ -2158,6 +2254,10 @@ class PicasaMainWindow(QMainWindow):
                                     mod = True
                             if mod:
                                 doc.write_file(ini_p)
+                                if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                                    self.db.invalidate_ini_cache(ini_p)
+                                elif self.db and hasattr(self.db, "_ini_cache"):
+                                    self.db._ini_cache.pop(os.path.normcase(os.path.abspath(ini_p)), None)
                         except Exception:
                             pass
             self.notify_albums_changed()
@@ -3693,30 +3793,62 @@ class PicasaMainWindow(QMainWindow):
             return
 
         self._active_scan_notify = notify_popup
+        self._last_incremental_ui_sync = time.monotonic()
         self.scan_worker = BackgroundScanWorker(self.db, folder_paths, self)
         self.scan_worker.progress.connect(self._on_scan_progress)
-        self.scan_worker.file_indexed.connect(self._on_scan_file_indexed)
+        self.scan_worker.batch_indexed.connect(self._on_scan_batch_indexed)
         self.scan_worker.finished.connect(self._on_scan_finished)
-        self.scan_worker.start()
+        self.scan_worker.start(QThread.Priority.LowPriority)
 
-    def _on_scan_file_indexed(self, folder_path: str, filename: str) -> None:
+    def _on_scan_batch_indexed(self, folder_path: str, filename: str, db_idx: int, batch_count: int) -> None:
         """
-        FR: Appelé pour chaque fichier nouvellement indexé ou mis à jour par BackgroundScanWorker.
-        Affiche et met à jour la fenêtre surgissante Picasa Notifier en bas à droite de l'écran.
-        EN: Called for each newly indexed or updated file by BackgroundScanWorker.
-        Displays and updates the Picasa Notifier popup window at the bottom-right of the screen.
+        FR: Appelé par lots régulés (ou par fichier sur les petits dossiers) depuis `BackgroundScanWorker`.
+        Met à jour la fenêtre surgissante `PicasaNotifierPopup` en lisant directement la miniature
+        précalculée dans `CThumbDB` (`thumbs_0.db`) sans jamais décoder l'image haute résolution sur le thread GUI.
+        EN: Called in throttled batches (or per file on small folders) from `BackgroundScanWorker`.
+        Updates the `PicasaNotifierPopup` window by reading the precomputed thumbnail directly from
+        `CThumbDB` (`thumbs_0.db`) without ever decoding the full-resolution image on the GUI thread.
         Ref: picasa3.exe @ 0x00571850 (CThumbUI::NotifyPhotoAddedOrUpdated -> CNotifierPopup @ 0x00659340)
         """
         if getattr(self, "_is_closing", False):
             return
         full_path = os.path.join(folder_path, filename) if folder_path and filename else ""
         if getattr(self, "_active_scan_notify", True) and hasattr(self, "notifier_popup") and self.notifier_popup:
+            self.notifier_popup.db = self.db
             self.notifier_popup.notify_photo_indexed(
                 folder_path=folder_path,
                 filename=filename,
                 file_path=full_path,
+                db_idx=db_idx,
                 show_popup=self.isVisible() or self.isMinimized(),
+                increment=max(1, int(batch_count)),
+                db=self.db,
             )
+
+        now = time.monotonic()
+        last_sync = getattr(self, "_last_incremental_ui_sync", 0.0)
+        if (
+            self.db is not None
+            and (now - last_sync) >= 1.5
+            and (now - BackgroundScanWorker._last_gui_activity_ts) >= 0.4
+        ):
+            self._last_incremental_ui_sync = now
+            try:
+                self.library_tree.refresh_folders()
+                if self.stack.currentWidget() != self.one_up_view:
+                    self.thumb_view.sync_from_database_incremental(self.db)
+            except Exception:
+                pass
+
+    def _on_scan_file_indexed(self, folder_path: str, filename: str) -> None:
+        """
+        FR: Appelé pour un fichier nouvellement indexé ou mis à jour par BackgroundScanWorker.
+        Affiche et met à jour la fenêtre surgissante Picasa Notifier en bas à droite de l'écran.
+        EN: Called for a newly indexed or updated file by BackgroundScanWorker.
+        Displays and updates the Picasa Notifier popup window at the bottom-right of the screen.
+        Ref: picasa3.exe @ 0x00571850 (CThumbUI::NotifyPhotoAddedOrUpdated -> CNotifierPopup @ 0x00659340)
+        """
+        self._on_scan_batch_indexed(folder_path, filename, -1, 1)
 
     def _on_notifier_popup_clicked(self, file_path: str, folder_path: str) -> None:
         """
@@ -3754,8 +3886,12 @@ class PicasaMainWindow(QMainWindow):
         if getattr(self, "_is_closing", False):
             return
         if total_added > 0 and self.db:
-            self.library_tree.populate_from_database(self.db)
-            self.thumb_view.set_database(self.db)
+            self.library_tree.refresh_folders()
+            self.library_tree.refresh_albums()
+            if getattr(self.db, "_face_manager", None) is not None:
+                self.library_tree.refresh_people()
+            if not self.thumb_view.sync_from_database_incremental(self.db):
+                self.thumb_view.set_database(self.db, preserve_view_state=True)
             self.status_bar.showMessage(f"Indexation terminée : {total_added} photo(s) indexée(s)")
         else:
             self.status_bar.showMessage("Indexation terminée : photothèque à jour")
@@ -3790,13 +3926,13 @@ class PicasaMainWindow(QMainWindow):
         self.face_worker = BackgroundFaceDetectionWorker(
             self.db,
             folder_paths=folder_paths,
-            persist_ini=True,
+            persist_ini=False,
             parent=self,
         )
         self.face_worker.progress.connect(self._on_face_detect_progress)
         self.face_worker.people_updated.connect(self._on_people_changed)
         self.face_worker.finished.connect(self._on_face_detect_finished)
-        self.face_worker.start()
+        self.face_worker.start(QThread.Priority.LowestPriority)
 
     def _on_face_detect_progress(self, current: int, total: int, fname: str) -> None:
         """
