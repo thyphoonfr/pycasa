@@ -421,6 +421,64 @@ class WordHashFile:
                 self.words[clean_w] = new_entry.image_ids
                 self.dirty = True
 
+    def remove_word(self, word: str, record_id: int) -> None:
+        """
+        FR: Retire un `record_id` de l'entrée correspondant à `word` dans `wordhash.dat`.
+        EN: Removes a `record_id` from the entry matching `word` in `wordhash.dat`.
+        Ref: picasa3.exe @ 0x004D9EE0 (FUN_004d9ee0 -> RemoveWordFromDoc)
+        """
+        if record_id < 0:
+            return
+        if len(self.words) != len(self.entries):
+            self._sync_words_to_entries()
+        clean_w = word.strip().lower()
+        if not clean_w:
+            return
+        existing = self._word_map.get(clean_w)
+        if existing is None or not existing.image_ids:
+            return
+        ids = existing.image_ids
+        pos = bisect.bisect_left(ids, record_id)
+        if pos < len(ids) and ids[pos] == record_id:
+            ids.pop(pos)
+            self.words[existing.word] = ids
+            self.dirty = True
+
+    def remap_doc_ids(self, old_to_new: Dict[int, int], new_max_doc_id: int) -> None:
+        """
+        FR: Réindexe tous les identifiants de documents selon la table `old_to_new` lors du compactage
+        de la base de données (`FUN_004dda30` @ `0x004DDA30`), supprime les mots devenus vides et
+        reconstruit le pool de chaînes.
+        EN: Remaps all document IDs through `old_to_new` during database compaction
+        (`FUN_004dda30` @ `0x004DDA30`), drops empty words, and rebuilds the string pool.
+        Ref: picasa3.exe @ 0x004DDA30 (FUN_004dda30 -> CompactWordHash)
+        """
+        self._sync_words_to_entries()
+        new_pool = bytearray()
+        new_entries: List[WordEntry] = []
+        new_word_map: Dict[str, WordEntry] = {}
+        new_words_dict: Dict[str, List[int]] = {}
+        for entry in self.entries:
+            remapped = sorted({old_to_new[old_id] for old_id in entry.image_ids if old_id in old_to_new})
+            if not remapped:
+                continue
+            str_off = len(new_pool)
+            b_word = entry.word.encode("utf-8", errors="surrogateescape") + b"\x00"
+            new_pool.extend(b_word)
+            new_ent = WordEntry(word=entry.word, str_offset=str_off, image_ids=remapped)
+            new_entries.append(new_ent)
+            new_word_map[new_ent.word] = new_ent
+            new_word_map.setdefault(new_ent.word.lower(), new_ent)
+            new_words_dict[new_ent.word] = remapped
+        self._raw_pool_bytes = bytes(new_pool)
+        self._pool_buf = None
+        self.used_bytes = len(new_pool)
+        self.entries = new_entries
+        self._word_map = new_word_map
+        self.words = new_words_dict
+        self.max_doc_id = max(0, int(new_max_doc_id))
+        self.dirty = True
+
     def write(self, path: Union[str, Path]) -> None:
         """
         FR: Écrit `wordhash.dat` sur disque au format binaire exact de Picasa 3.

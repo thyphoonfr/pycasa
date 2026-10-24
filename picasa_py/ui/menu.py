@@ -82,6 +82,7 @@ MENU_I18N = {
         "ID_TOOLS_WRITE_FACETAGS": "Écrire les tags de visage dans &XMP...",
         "ID_MOVE_DATABASE": "&Déplacer la base de données...",
         "ID_COMPACT_DATABASE": "&Compacter la base de données...",
+        "ID_CLEAN_PICASA_TRACES": "&Nettoyer les traces Picasa (.picasa.ini)...",
         "ID_CREATE_DATABASE": "&Créer une nouvelle base de données...",
         "ID_OPEN_DATABASE": "&Ouvrir une base de données existante...",
         "ID_HELP_DEFAULT": "&Rubriques d'aide et index",
@@ -120,6 +121,7 @@ MENU_I18N = {
         "ID_TOOLS_OPTIONS": "&Opciones...",
         "ID_CREATE_DATABASE": "&Crear una nueva base de datos...",
         "ID_OPEN_DATABASE": "&Abrir una base de datos existente...",
+        "ID_CLEAN_PICASA_TRACES": "&Limpiar rastros de Picasa (.picasa.ini)...",
         "ID_VIEW_COLOR_THEME": "&Tema de color",
         "ID_HELP_ABOUT": "&Acerca de PyCasa...",
     },
@@ -141,6 +143,7 @@ MENU_I18N = {
         "ID_TOOLS_OPTIONS": "&Optionen...",
         "ID_CREATE_DATABASE": "&Neue Datenbank erstellen...",
         "ID_OPEN_DATABASE": "&Vorhandene Datenbank öffnen...",
+        "ID_CLEAN_PICASA_TRACES": "&Picasa-Spuren bereinigen (.picasa.ini)...",
         "ID_VIEW_COLOR_THEME": "&Farbschema",
         "ID_HELP_ABOUT": "Über &PyCasa...",
     },
@@ -351,6 +354,8 @@ class PicasaMenuBuilder:
         self._add_action(menu_tools, self._tr("ID_OPEN_DATABASE", "&Open Existing Database..."), "ID_OPEN_DATABASE", (lambda _checked=False: self.win.action_open_database()) if hasattr(self.win, "action_open_database") else None)
         self._add_action(menu_tools, self._tr("ID_MOVE_DATABASE", "&Move Database..."), "ID_MOVE_DATABASE", (lambda _checked=False: self.win.action_move_database()) if hasattr(self.win, "action_move_database") else None)
         self._add_action(menu_tools, self._tr("ID_COMPACT_DATABASE", "&Compact Database..."), "ID_COMPACT_DATABASE", (lambda _checked=False: self.win.action_compact_database()) if hasattr(self.win, "action_compact_database") else None)
+        menu_tools.addSeparator()
+        self._add_action(menu_tools, self._tr("ID_CLEAN_PICASA_TRACES", "Clean &Picasa Traces (.picasa.ini)..."), "ID_CLEAN_PICASA_TRACES", (lambda _checked=False: self.win.action_clean_picasa_traces()) if hasattr(self.win, "action_clean_picasa_traces") else None)
 
         # 8. &Help
         menu_help = mb.addMenu(self._tr("menu_help", "&Help"))

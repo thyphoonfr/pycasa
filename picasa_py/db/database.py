@@ -438,10 +438,11 @@ class PicasaDatabase:
             self.pmps[pmp_path.stem] = PmpFile.from_bytes(pmp_path.read_bytes())
 
         # 5. CBlockFile indices & conteneurs multi-blocs (*_0.db, *_1.db, ...)
-        # Ref: picasa3.exe @ 0x006B6AF0 (CBlockFile::OpenBlock "%s_%d.%s")
+        # Ref: picasa3.exe @ 0x006B6AF0 (CBlockFile::OpenBlock "%s_%d.%s"), 0x006B8AC0 (ValidateIndex)
         for idx_path in self.db3_dir.glob("*_index.db"):
             prefix = idx_path.stem.replace("_index", "")
-            self.block_indices[prefix] = BlockIndexFile.from_bytes(idx_path.read_bytes())
+            idx_obj = BlockIndexFile.from_bytes(idx_path.read_bytes())
+            self.block_indices[prefix] = idx_obj
 
             for cont_path in sorted(self.db3_dir.glob(f"{prefix}_*.db")):
                 if cont_path.stem.endswith("_index"):
@@ -453,6 +454,24 @@ class PicasaDatabase:
                     self.block_containers_by_block[(prefix, block_num)] = cont_obj
                     if block_num == 0:
                         self.block_containers[prefix] = cont_obj
+
+            # Ref: picasa3.exe @ 0x006B8AC0 (lines 308-320), 0x006B91F0 (line 65 : dirty=0) :
+            # invalide en mémoire les entrées du bloc actif dont offset + size dépasse la taille
+            # réelle du conteneur actif sur disque (ex. après compactage de bigthumbs_0.db / previews_0.db
+            # à 4 octets via 0x0041B77E-0x0041B7B0), tout en laissant dirty = False.
+            active_blk = idx_obj.active_block
+            active_cont = self.block_containers_by_block.get((prefix, active_blk))
+            if active_cont is not None:
+                cont_len = active_cont.byte_size()
+                for entry_idx in range(idx_obj.record_count):
+                    raw_sb = idx_obj.sizes_and_blocks[entry_idx]
+                    if ((raw_sb >> 24) & 0xFF) == active_blk:
+                        e_size = raw_sb & 0x00FFFFFF
+                        e_off = idx_obj.offsets[entry_idx]
+                        if (e_size != 0 or e_off != 0) and (e_off < 4 or e_off + e_size > cont_len):
+                            idx_obj.offsets[entry_idx] = 0
+                            idx_obj.sizes_and_blocks[entry_idx] = 0
+                            idx_obj.checksums[entry_idx] = 0
 
         # 6. contacts.xml (FR: Carnet de contacts / EN: Contacts address book)
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
@@ -1063,10 +1082,14 @@ class PicasaDatabase:
         _set_pmp("imagedata_crop64", crop_u64)
 
         # 4. Filters, Text, Keywords, Caption, BackupHash, DeferredFace, Geotag
+        edited_val = 0
+        lat_val: Optional[float] = None
+        lon_val: Optional[float] = None
         if sec is None:
+            edited_val = 1 if crop_u64 else (2 if rot > 0 else 0)
             _set_pmp("imagedata_filters", "")
             # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
-            _set_pmp("imagedata_edited", 1 if crop_u64 else (2 if rot > 0 else 0))
+            _set_pmp("imagedata_edited", edited_val)
             _set_pmp("imagedata_text", "")
             _set_pmp("imagedata_textactive", 0)
             _set_pmp("imagedata_tags", "")
@@ -1077,7 +1100,8 @@ class PicasaDatabase:
             filters_str = sec.get("filters", "") or ""
             _set_pmp("imagedata_filters", filters_str)
             # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
-            _set_pmp("imagedata_edited", 1 if (filters_str or crop_u64) else (2 if rot > 0 else 0))
+            edited_val = 1 if (filters_str or crop_u64) else (2 if rot > 0 else 0)
+            _set_pmp("imagedata_edited", edited_val)
 
             text_str = sec.get("text", "") or ""
             _set_pmp("imagedata_text", text_str)
@@ -1113,22 +1137,70 @@ class PicasaDatabase:
             if geotag_str and "," in geotag_str:
                 try:
                     lat_s, lon_s = geotag_str.split(",", 1)
-                    _set_pmp("imagedata_lat", float(lat_s.strip()))
-                    _set_pmp("imagedata_long", float(lon_s.strip()))
+                    lat_val = float(lat_s.strip())
+                    lon_val = float(lon_s.strip())
+                    _set_pmp("imagedata_lat", lat_val)
+                    _set_pmp("imagedata_long", lon_val)
                 except Exception:
                     pass
 
-            # Indexation dans wordhash.dat (Ref: FUN_00456a15 -> func_0x004d9aa0)
+            # Indexation dans wordhash.dat (Ref: FUN_00456a15 -> func_0x004d9aa0, CIndexer @ 0x00987DA0)
             if self.wordhash is not None:
+                from picasa_py.scanner.scanner import tokenize_indexer_text
                 words: List[str] = []
                 for kw in tags_val.split(","):
                     if kw.strip():
-                        words.append(kw.strip())
-                for w in (cap_val + " " + text_str).split():
-                    if w.strip():
-                        words.append(w.strip())
+                        words.extend(tokenize_indexer_text(kw.strip()))
+                words.extend(tokenize_indexer_text(cap_val))
+                words.extend(tokenize_indexer_text(text_str))
                 for tok in words:
                     self.wordhash.add_word(tok, idx)
+
+                # Jetons d'état spéciaux (Ref: picasa3.exe @ 0x0041D358..0x0041D704, 0x00415E5E..0x00415E8C, 0x004DD3CD)
+                is_star = (sec.get("star") or "").strip().lower() in ("yes", "1", "true")
+                if is_star:
+                    self.wordhash.add_word("]star", idx)
+                elif hasattr(self.wordhash, "remove_word"):
+                    self.wordhash.remove_word("]star", idx)
+
+                is_hidden = (sec.get("hidden") or "").strip().lower() in ("yes", "1", "true")
+                if is_hidden:
+                    self.wordhash.add_word("]hidden", idx)
+                elif hasattr(self.wordhash, "remove_word"):
+                    self.wordhash.remove_word("]hidden", idx)
+
+                alb_csv = sec.get("albums") or ""
+                if alb_csv:
+                    for raw_a in alb_csv.split(","):
+                        a_tok = raw_a.strip()
+                        if a_tok.startswith("]album:") or a_tok.startswith(".album:"):
+                            a_tok = a_tok[7:].strip()
+                        if a_tok:
+                            self.wordhash.add_word(f"]album:{a_tok}", idx)
+                            self.wordhash.add_word(f"]snapshot:]album:{a_tok}", idx)
+
+        if self.wordhash is not None:
+            if edited_val != 0:
+                self.wordhash.add_word("]edited", idx)
+            elif hasattr(self.wordhash, "remove_word"):
+                self.wordhash.remove_word("]edited", idx)
+
+            pmp_rev = self.pmps.get("imagedata_revertable")
+            rev_val = pmp_rev.records[idx] if pmp_rev is not None and idx < len(pmp_rev.records) else 0
+            if rev_val:
+                self.wordhash.add_word("]revertable", idx)
+            elif hasattr(self.wordhash, "remove_word"):
+                self.wordhash.remove_word("]revertable", idx)
+
+            if lat_val is None:
+                pmp_lat = self.pmps.get("imagedata_lat")
+                if pmp_lat is not None and idx < len(pmp_lat.records):
+                    try:
+                        lat_val = float(pmp_lat.records[idx] or 0.0)
+                    except Exception:
+                        lat_val = 0.0
+            if lat_val and lat_val != 0.0:
+                self.wordhash.add_word("]geo", idx)
         self.invalidate_search_cache()
 
     def _resolve_photo_record_index(self, idx: int) -> Optional[int]:
@@ -1277,9 +1349,9 @@ class PicasaDatabase:
             return False
         self._align_imagedata_tables(eff_idx)
         if self.wordhash is not None and caption:
-            for tok in caption.split():
-                if tok.strip():
-                    self.wordhash.add_word(tok.strip(), eff_idx)
+            from picasa_py.scanner.scanner import tokenize_indexer_text
+            for tok in tokenize_indexer_text(caption):
+                self.wordhash.add_word(tok, eff_idx)
         full_path = self.get_media_full_path(eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
             def _mut_cap(doc: Any, fn: str) -> None:
@@ -1338,10 +1410,10 @@ class PicasaDatabase:
         self._align_imagedata_tables(eff_idx)
         tag_list = [k.strip() for k in tags.split(",") if k.strip()] if isinstance(tags, str) else [str(k).strip() for k in tags if str(k).strip()]
         if self.wordhash is not None:
+            from picasa_py.scanner.scanner import tokenize_indexer_text
             for kw in tag_list:
-                for tok in kw.split():
-                    if tok.strip():
-                        self.wordhash.add_word(tok.strip(), eff_idx)
+                for tok in tokenize_indexer_text(kw):
+                    self.wordhash.add_word(tok, eff_idx)
         full_path = self.get_media_full_path(eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
             return self.update_photo_ini(full_path, lambda doc, fn: doc.set_keywords(fn, tag_list))
@@ -2516,10 +2588,12 @@ class PicasaDatabase:
     def get_or_create_folder_index(self, folder_path: str) -> int:
         """
         FR: Retrouve l'index de dossier (type == 1) dans thumbindex.db, ou en crée un nouveau
-        en conservant strictement le séparateur Picasa ('\\') dans la structure binaire.
+        en conservant strictement le séparateur Picasa ('\\') dans la structure binaire,
+        avec `ft1` (création) et `ft2` (modification) exacts au 100 ns et `imagedata_filetype = 1`.
         EN: Finds the folder index (type == 1) in thumbindex.db, or creates a new one
-        while strictly preserving the Picasa ('\\') separator in the binary structure.
-        Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex : flags=0x0100, parent_idx=0xFFFFFFFF)
+        while strictly preserving the Picasa ('\\') separator in the binary structure,
+        with exact 100 ns `ft1` (creation) and `ft2` (last write) and `imagedata_filetype = 1`.
+        Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex : flags=0x0100, parent_idx=0xFFFFFFFF), 0x00415790
         """
         if not self.thumbindex:
             self.thumbindex = ThumbIndexFile()
@@ -2538,18 +2612,21 @@ class PicasaDatabase:
                 self._folder_index_cache[norm_key] = idx
                 return idx
 
-        ft = 0
+        ft1_val = 0
+        ft2_val = 0
         host_folder = _to_host_path(folder_path)
         try:
             if os.path.exists(host_folder):
-                ft = unix_to_filetime(os.path.getmtime(host_folder))
+                from picasa_py.scanner.scanner import file_filetimes
+                ft1_val, ft2_val, _ = file_filetimes(host_folder)
         except Exception:
-            ft = 0
+            ft1_val = 0
+            ft2_val = 0
 
         new_rec = ThumbIndexRecord(
             path=norm,
-            ft1=ft,
-            ft2=ft,
+            ft1=ft1_val,
+            ft2=ft2_val,
             size=0,
             type=1,
             flags=THUMBINDEX_ACTIVE_FLAG,
@@ -2562,7 +2639,149 @@ class PicasaDatabase:
         self._path_index_version = len(self.thumbindex.records)
         self._parent_to_face_children_len = len(self.thumbindex.records)
         self._align_imagedata_tables(new_idx)
+        pmp_ft = self.pmps.get("imagedata_filetype")
+        if pmp_ft is not None and new_idx < len(pmp_ft.records):
+            if pmp_ft.records[new_idx] != 1:
+                pmp_ft.records[new_idx] = 1
+                pmp_ft.dirty = True
         return new_idx
+
+    def ensure_folder_album_row(self, folder_path: str) -> str:
+        """
+        FR: Garantit l'existence d'une ligne d'album de dossier (`albumdata_category == 2`) dans
+        `albumdata_*.pmp` pour `folder_path`, synchronise `albumdata_inisync` avec le `FILETIME`
+        exact (100 ns) de `.picasa.ini`, et retourne le jeton `]album:<uid>` du dossier.
+        EN: Ensures a folder album row (`albumdata_category == 2`) exists in `albumdata_*.pmp`
+        for `folder_path`, synchronizes `albumdata_inisync` with the exact 100 ns `FILETIME`
+        of `.picasa.ini`, and returns the folder's `]album:<uid>` token.
+        Ref: picasa3.exe @ 0x00415790, 0x00456A15, 0x008AAD76 (vérifié sur db3 : 206 dossiers cat=2)
+        """
+        ad_names = self.pmps.get("albumdata_name")
+        ad_cats = self.pmps.get("albumdata_category")
+        ad_tokens = self.pmps.get("albumdata_token")
+        ad_uids = self.pmps.get("albumdata_uid")
+        ad_fnames = self.pmps.get("albumdata_filename")
+        ad_dates = self.pmps.get("albumdata_date")
+        ad_inisync = self.pmps.get("albumdata_inisync")
+        if ad_names is None or ad_cats is None or ad_tokens is None:
+            return ""
+
+        norm = folder_path.replace("/", "\\").rstrip("\\") + "\\"
+        norm_low = norm.lower()
+        host_folder = _to_host_path(folder_path.rstrip("\\/"))
+
+        ini_ft2 = 0
+        ini_name_override: Optional[str] = None
+        ini_date_override: Optional[float] = None
+        if host_folder:
+            for ini_cand in (".picasa.ini", "Picasa.ini"):
+                ini_p = os.path.join(host_folder, ini_cand)
+                if os.path.exists(ini_p):
+                    try:
+                        from picasa_py.scanner.scanner import file_filetimes, datetime_to_ole
+                        from datetime import datetime
+                        _, ini_ft2, _ = file_filetimes(ini_p)
+                        doc = self.get_parsed_ini(ini_p)
+                        if doc is not None:
+                            sec_p = doc.get_section("Picasa")
+                            if sec_p is not None:
+                                n_val = sec_p.get("name")
+                                if n_val and n_val.strip():
+                                    ini_name_override = n_val.strip()
+                                d_val = sec_p.get("date")
+                                if d_val and d_val.strip():
+                                    try:
+                                        ini_date_override = float(d_val.strip())
+                                    except ValueError:
+                                        for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"):
+                                            try:
+                                                ini_date_override = datetime_to_ole(
+                                                    datetime.strptime(d_val.strip()[:19], fmt)
+                                                )
+                                                break
+                                            except Exception:
+                                                pass
+                    except Exception:
+                        pass
+                    break
+
+        if ad_fnames is not None:
+            for row_i, fn_val in enumerate(ad_fnames.records):
+                if row_i < len(ad_cats.records) and ad_cats.records[row_i] == 2:
+                    if str(fn_val or "").replace("/", "\\").rstrip("\\").lower() + "\\" == norm_low:
+                        if ad_inisync is not None and row_i < len(ad_inisync.records) and ini_ft2:
+                            if ad_inisync.records[row_i] != ini_ft2:
+                                ad_inisync.records[row_i] = ini_ft2
+                                ad_inisync.dirty = True
+                        if ini_name_override and row_i < len(ad_names.records) and ad_names.records[row_i] != ini_name_override:
+                            ad_names.records[row_i] = ini_name_override
+                            ad_names.dirty = True
+                        if ini_date_override is not None and ad_dates is not None and row_i < len(ad_dates.records) and ad_dates.records[row_i] != ini_date_override:
+                            ad_dates.records[row_i] = ini_date_override
+                            ad_dates.dirty = True
+                        tok = str(ad_tokens.records[row_i] or "") if row_i < len(ad_tokens.records) else ""
+                        return tok
+
+        import hashlib
+        uid_hex = hashlib.md5(norm_low.encode("utf-8", errors="surrogateescape")).hexdigest()
+        tok_str = f"]album:{uid_hex}"
+        folder_title = ini_name_override or os.path.basename(norm.rstrip("\\")) or norm
+        ole_dt = ini_date_override if ini_date_override is not None else 0.0
+        if ole_dt == 0.0 and host_folder and os.path.exists(host_folder):
+            try:
+                from picasa_py.scanner.scanner import datetime_to_ole
+                from datetime import datetime
+                ole_dt = datetime_to_ole(datetime.fromtimestamp(os.path.getmtime(host_folder)))
+            except Exception:
+                ole_dt = 0.0
+
+        albumdata_tables = {
+            stem: pmp
+            for stem, pmp in self.pmps.items()
+            if stem.startswith("albumdata_")
+        }
+        base_len = len(ad_names.records)
+        for pmp in albumdata_tables.values():
+            def_val = pmp.default_value()
+            while len(pmp.records) < base_len:
+                pmp.records.append(def_val)
+                pmp.dirty = True
+
+        # Ref: db3 — ligne 0 réservée à l'album des visages sans nom (category=8, token="]unknownface")
+        if len(ad_names.records) == 0:
+            u_uid = hashlib.md5(b"]unknownface").hexdigest()
+            for stem, pmp in albumdata_tables.items():
+                if stem == "albumdata_name":
+                    pmp.records.append("Sans nom")
+                elif stem == "albumdata_token":
+                    pmp.records.append("]unknownface")
+                elif stem == "albumdata_uid":
+                    pmp.records.append(u_uid)
+                elif stem == "albumdata_category":
+                    pmp.records.append(8)
+                else:
+                    pmp.records.append(pmp.default_value())
+                pmp.dirty = True
+
+        for stem, pmp in albumdata_tables.items():
+            if stem == "albumdata_name":
+                pmp.records.append(folder_title)
+            elif stem == "albumdata_filename":
+                pmp.records.append(norm)
+            elif stem == "albumdata_token":
+                pmp.records.append(tok_str)
+            elif stem == "albumdata_uid":
+                pmp.records.append(uid_hex)
+            elif stem == "albumdata_category":
+                pmp.records.append(2)
+            elif stem == "albumdata_date":
+                pmp.records.append(ole_dt)
+            elif stem == "albumdata_inisync":
+                pmp.records.append(ini_ft2)
+            else:
+                pmp.records.append(pmp.default_value())
+            pmp.dirty = True
+        return tok_str
 
     def add_media_record(
         self, folder_path: str, filename: str, file_size: int, mtime: int = 0, media_type: int = 2
@@ -2645,12 +2864,52 @@ class PicasaDatabase:
                 idx_file.append_entry(BlockEntry())
 
             existing = idx_file.get_entry(index) if index < idx_file.record_count else None
-            entry = container.write_blob(
-                jpeg_bytes,
-                existing_entry=existing,
-                checksum=checksum,
-                block_idx=active_blk,
-            )
+            blob_len = len(jpeg_bytes)
+
+            if blob_len == 0:
+                entry = BlockEntry(checksum=0, offset=0, size=0, block=0)
+            elif (
+                existing is not None
+                and not existing.is_empty
+                and existing.size >= blob_len
+                and existing.offset >= 4
+            ):
+                # Ref: picasa3.exe @ 0x006B75F0 (lines 381-386) : réécriture in-place dans le bloc
+                # de l'entrée existante (même si existing.block != active_blk).
+                target_cont = self._get_container_for_entry(prefix, existing.block)
+                if target_cont is not None and existing.offset + blob_len <= target_cont.byte_size():
+                    target_cont.write_blob_at(existing.offset, jpeg_bytes)
+                    entry = BlockEntry(
+                        checksum=checksum,
+                        offset=existing.offset,
+                        size=blob_len,
+                        block=existing.block,
+                    )
+                else:
+                    entry = container.write_blob(
+                        jpeg_bytes,
+                        existing_entry=None,
+                        checksum=checksum,
+                        block_idx=active_blk,
+                    )
+            else:
+                # Ref: picasa3.exe @ 0x006B767A (line 294) : rotation vers active_block + 1
+                # si la taille du conteneur actif + blob dépasse 0x7FFFFFFF (2 Go).
+                if container.byte_size() + blob_len > 0x7FFFFFFF and active_blk < 0xFF:
+                    active_blk += 1
+                    idx_file.active_block = active_blk
+                    idx_file.dirty = True
+                    new_cont = self.block_containers_by_block.get((prefix, active_blk))
+                    if new_cont is None:
+                        new_cont = BlockContainerFile(magic=container.magic)
+                        new_cont._fully_dirty = True
+                        self.block_containers_by_block[(prefix, active_blk)] = new_cont
+                    container = new_cont
+                entry = container.append_blob(
+                    jpeg_bytes,
+                    checksum=checksum,
+                    block_idx=active_blk,
+                )
 
             if index < idx_file.record_count:
                 idx_file.checksums[index] = entry.checksum
@@ -3156,6 +3415,86 @@ class PicasaDatabase:
         if self.contacts and self.contacts_dir:
             self.save_contacts()
 
+        # 7. Fichiers listes .txt auxiliaires (scanlist.txt, starlist.txt, saverlist.txt, facetags.txt, tags.txt)
+        # Ref: picasa3.exe @ 0x0041BA40, 0x004F61C0, 0x004755F0, 0x006BA000, 0x006C0E00
+        try:
+            self._write_auxiliary_txt_lists()
+        except Exception:
+            pass
+
+    def _write_auxiliary_txt_lists(self) -> None:
+        """
+        FR: Écrit les 5 fichiers textes auxiliaires de db3 (`scanlist.txt`, `starlist.txt`,
+        `saverlist.txt`, `facetags.txt`, `tags.txt`) conformément à `CThumbDB::Save` (`0x0041BA40`).
+        EN: Writes the 5 auxiliary text files in db3 (`scanlist.txt`, `starlist.txt`,
+        `saverlist.txt`, `facetags.txt`, `tags.txt`) matching `CThumbDB::Save` (`0x0041BA40`).
+        Ref: picasa3.exe @ 0x0041BA40, 0x004F61C0, 0x004755F0, 0x006BA000, 0x006C0E00
+        """
+        if not self.db3_dir or self.db3_dir == Path(".") or not self.db3_dir.exists():
+            return
+
+        # 1. scanlist.txt (Ref: 0x004F61C0 : "+<folder>\r\n" pour status 1/2, "-<folder>\r\n" pour status 0)
+        if self.repository is not None:
+            scan_lines: List[str] = []
+            for k, v in self.repository.pairs:
+                if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
+                    prefix_ch = "-" if v == "0" else "+"
+                    scan_lines.append(f"{prefix_ch}{k}\r\n")
+            if scan_lines or not (self.db3_dir / "scanlist.txt").exists():
+                (self.db3_dir / "scanlist.txt").write_bytes("".join(scan_lines).encode("utf-8", errors="surrogateescape"))
+
+        # 2. starlist.txt & saverlist.txt (Ref: 0x004755F0 : chemins des photos ]star et ]screensaver)
+        if self.wordhash is not None and self.thumbindex is not None:
+            recs = self.thumbindex.records
+            folders_map = {i: r.path for i, r in enumerate(recs) if r.type == 1}
+            for list_fname, token_key in (("starlist.txt", "]star"), ("saverlist.txt", "]screensaver")):
+                ent = self.wordhash._word_map.get(token_key)
+                paths_out: List[str] = []
+                if ent is not None and ent.image_ids:
+                    for doc_id in ent.image_ids:
+                        if 0 <= doc_id < len(recs):
+                            r = recs[doc_id]
+                            if r.type in MEDIA_RECORD_TYPES and r.is_active:
+                                fdir = folders_map.get(r.parent_idx, "")
+                                if fdir:
+                                    full_p = fdir.rstrip("\\/") + "\\" + r.path.lstrip("\\/")
+                                    paths_out.append(f"{full_p}\r\n")
+                target_txt = self.db3_dir / list_fname
+                if paths_out or not target_txt.exists():
+                    target_txt.write_bytes("".join(paths_out).encode("utf-8", errors="surrogateescape"))
+
+        # 3. facetags.txt (Ref: 0x006BA000 : un nom de personne par ligne pour les albums cat == 8)
+        ad_names = self.pmps.get("albumdata_name")
+        ad_cats = self.pmps.get("albumdata_category")
+        if ad_names is not None and ad_cats is not None:
+            face_names: List[str] = []
+            seen_fn: Set[str] = set()
+            for idx_a, name_a in enumerate(ad_names.records):
+                if idx_a > 0 and idx_a < len(ad_cats.records) and ad_cats.records[idx_a] == 8:
+                    clean_n = str(name_a or "").strip()
+                    if clean_n and clean_n.lower() not in ("sans nom", "unnamed") and clean_n not in seen_fn:
+                        seen_fn.add(clean_n)
+                        face_names.append(f"{clean_n}\r\n")
+            ft_path = self.db3_dir / "facetags.txt"
+            if face_names or not ft_path.exists():
+                ft_path.write_bytes("".join(face_names).encode("utf-8", errors="surrogateescape"))
+
+        # 4. tags.txt (Ref: 0x006C0E00 : mots-clés uniques présents dans imagedata_tags.pmp)
+        pmp_tags = self.pmps.get("imagedata_tags")
+        if pmp_tags is not None:
+            unique_tags: List[str] = []
+            seen_t: Set[str] = set()
+            for raw_t in pmp_tags.records:
+                if raw_t:
+                    for kw in str(raw_t).split(","):
+                        clean_kw = kw.strip()
+                        if clean_kw and clean_kw not in seen_t:
+                            seen_t.add(clean_kw)
+                            unique_tags.append(f"{clean_kw}\r\n")
+            tags_path = self.db3_dir / "tags.txt"
+            if unique_tags or not tags_path.exists():
+                tags_path.write_bytes("".join(unique_tags).encode("utf-8", errors="surrogateescape"))
+
     save_all = save_database
 
     @property
@@ -3184,53 +3523,216 @@ class PicasaDatabase:
 
     def compact(self) -> Tuple[int, int]:
         """
-        FR: Compacte la base de données en éliminant les vignettes orphelines
-        et les fragments non référencés dans l'ensemble des conteneurs CBlockFile.
-        Retourne (taille_initiale_octets, taille_apres_compactage_octets).
-        EN: Compacts the database by eliminating orphaned thumbnails
-        and unreferenced fragments across all CBlockFile containers.
-        Returns (initial_size_bytes, compacted_size_bytes).
-        Ref: picasa3.exe @ compacting.fen (0x0088C3EC)
+        FR: Compacte intégralement la base de données conformément à `CThumbDB::Compact` (`FUN_00419560` / `FUN_0041b580`) :
+        1. Construit `new_to_old` (indices actifs `rec.type != 0 and rec.is_active`) et `old_to_new` (`0x004F1F80`).
+        2. Compacte `thumbindex.records` et réindexe chaque `parent_idx` via `old_to_new` (`0x004F2170`).
+        3. Compacte toutes les colonnes `imagedata_*.pmp` selon `new_to_old` et réindexe `imagedata_aliasparents` (`0x006A8430`).
+        4. Compacte tous les conteneurs `CBlockFile` (`thumbs`, `thumbs2`, `bigthumbs`, `previews`, `facetemplatesV2`)
+           en copiant uniquement les entrées de `new_to_old` vers `*_0.db` (`active_block = 0`) et en supprimant
+           les anciens fichiers secondaires `*_1.db`, `*_2.db` (`0x006B9470`).
+        5. Compacte `wordhash.dat` en réindexant tous les `doc_id` via `old_to_new` et en mettant à jour `max_doc_id` (`0x004DDA30`).
+        Retourne `(taille_initiale_octets, taille_apres_compactage_octets)`.
+        EN: Fully compacts the database matching `CThumbDB::Compact` (`FUN_00419560` / `FUN_0041b580`).
+        Returns `(initial_size_bytes, compacted_size_bytes)`.
+        Ref: picasa3.exe @ 0x00419560, 0x0041B580, 0x004F1F80, 0x004F2170, 0x004DDA30, 0x006A8430, 0x006B9470
         """
         initial_bytes = 0
         final_bytes = 0
 
-        for prefix in list(self.block_indices.keys()):
-            idx_file = self.block_indices.get(prefix)
-            container = self.block_containers.get(prefix)
-            if not idx_file or not container:
-                continue
+        with self._lock:
+            new_to_old: Optional[List[int]] = None
+            old_to_new: Dict[int, int] = {}
 
-            initial_bytes += container.byte_size()
+            if self.thumbindex is not None and self.thumbindex.records:
+                self.thumbindex.sanitize_records()
+                old_records = self.thumbindex.records
+                new_to_old = [
+                    i for i, r in enumerate(old_records)
+                    if r.type != 0 and r.is_active
+                ]
+                old_to_new = {old_i: new_i for new_i, old_i in enumerate(new_to_old)}
 
-            new_container = BlockContainerFile(magic=container.magic)
-            new_entries: List[BlockEntry] = []
+                if len(new_to_old) < len(old_records):
+                    compacted_records: List[ThumbIndexRecord] = []
+                    for old_i in new_to_old:
+                        rec = old_records[old_i]
+                        if rec.parent_idx != 0xFFFFFFFF and rec.parent_idx >= 0:
+                            rec.parent_idx = old_to_new.get(rec.parent_idx, 0xFFFFFFFF)
+                        compacted_records.append(rec)
+                    self.thumbindex.records = compacted_records
+                    self.thumbindex.dirty = True
 
-            for i in range(idx_file.record_count):
-                old_entry = idx_file.get_entry(i)
-                if old_entry and not old_entry.is_empty:
-                    src_cont = self._get_container_for_entry(prefix, old_entry.block)
-                    if src_cont:
-                        try:
-                            blob = src_cont.get_blob(old_entry)
-                            if blob:
-                                entry = new_container.append_blob(blob, checksum=old_entry.checksum, block_idx=0)
-                                new_entries.append(entry)
-                                continue
-                        except Exception:
-                            pass
-                new_entries.append(BlockEntry())
+                    for stem, pmp_file in self.pmps.items():
+                        if not stem.startswith("imagedata_"):
+                            continue
+                        old_col = pmp_file.records
+                        def_val = self._pmp_new_row_default(stem, pmp_file)
+                        new_col = [
+                            old_col[old_i] if old_i < len(old_col) else def_val
+                            for old_i in new_to_old
+                        ]
+                        if stem == "imagedata_aliasparents":
+                            new_col = [
+                                old_to_new.get(int(v), 0) if v and int(v) != 0 else 0
+                                for v in new_col
+                            ]
+                        pmp_file.records = new_col
+                        pmp_file.dirty = True
 
-            new_container._fully_dirty = True
-            new_idx = BlockIndexFile.from_entries(new_entries, active_block=0)
-            new_idx.dirty = True
-            self.block_containers[prefix] = new_container
-            self.block_containers_by_block[(prefix, 0)] = new_container
-            self.block_indices[prefix] = new_idx
-            final_bytes += new_container.byte_size()
+                    if self.wordhash is not None and hasattr(self.wordhash, "remap_doc_ids"):
+                        self.wordhash.remap_doc_ids(old_to_new, len(new_to_old))
+
+                    self._deleted_or_reset_indices.clear()
+                    self._modified_media_indices.clear()
+                    self._min_aligned_idx = len(new_to_old) - 1
+                    self._invalidate_path_index_cache()
+
+            for prefix in list(self.block_indices.keys()):
+                idx_file = self.block_indices.get(prefix)
+                container = self.block_containers.get(prefix)
+                if not idx_file or not container:
+                    continue
+
+                for (p_key, blk_num), blk_cont in list(self.block_containers_by_block.items()):
+                    if p_key == prefix:
+                        initial_bytes += blk_cont.byte_size()
+                if (prefix, 0) not in self.block_containers_by_block:
+                    initial_bytes += container.byte_size()
+
+                new_container = BlockContainerFile(magic=container.magic)
+                new_entries: List[BlockEntry] = []
+
+                if prefix in ("thumbs", "thumbs2", "bigthumbs", "previews", "facetemplatesV2") and new_to_old is not None:
+                    iter_indices = new_to_old
+                else:
+                    iter_indices = list(range(idx_file.record_count))
+
+                # Ref: picasa3.exe @ 0x0041B77E-0x0041B7B0 : lors de CThumbDB::Compact (0x0041B580),
+                # bigthumbs et previews sont compactés avec un vecteur vide (réinitialisant bigthumbs_0.db
+                # et previews_0.db à 4 octets), tandis que thumbs, thumbs2, profilephotos et facetemplatesV2
+                # conservent et réindexent leurs entrées actives via new_to_old.
+                if prefix in ("bigthumbs", "previews"):
+                    new_entries = [BlockEntry() for _ in iter_indices]
+                else:
+                    for old_i in iter_indices:
+                        old_entry = idx_file.get_entry(old_i) if old_i < idx_file.record_count else None
+                        if old_entry and not old_entry.is_empty:
+                            src_cont = self._get_container_for_entry(prefix, old_entry.block)
+                            if src_cont:
+                                try:
+                                    blob = src_cont.get_blob(old_entry)
+                                    if blob:
+                                        entry = new_container.append_blob(blob, checksum=old_entry.checksum, block_idx=0)
+                                        new_entries.append(entry)
+                                        continue
+                                except Exception:
+                                    pass
+                        new_entries.append(BlockEntry())
+
+                new_container._fully_dirty = True
+                new_idx = BlockIndexFile.from_entries(new_entries, active_block=0)
+                new_idx.dirty = True
+
+                for (p_key, blk_num) in list(self.block_containers_by_block.keys()):
+                    if p_key == prefix and blk_num > 0:
+                        self.block_containers_by_block.pop((p_key, blk_num), None)
+                        if self.db3_dir and self.db3_dir != Path("."):
+                            stale_path = self.db3_dir / f"{prefix}_{blk_num}.db"
+                            try:
+                                stale_path.unlink(missing_ok=True)
+                            except Exception:
+                                pass
+
+                self.block_containers[prefix] = new_container
+                self.block_containers_by_block[(prefix, 0)] = new_container
+                self.block_indices[prefix] = new_idx
+                final_bytes += new_container.byte_size()
+
+        if self._face_manager is not None:
+            try:
+                self._face_manager.reload()
+            except Exception:
+                pass
 
         self.save_database(force_all=True)
         return (initial_bytes, final_bytes)
+
+    @staticmethod
+    def find_picasa_ini_traces(
+        root_dir: str | Path,
+        include_legacy_picasa_ini: bool = True,
+    ) -> List[Path]:
+        """
+        FR: Parcourt récursivement `root_dir` et retourne la liste triée de tous les fichiers
+        `.picasa.ini` (ainsi que `Picasa.ini` si `include_legacy_picasa_ini=True`) détectés.
+        EN: Recursively walks `root_dir` and returns the sorted list of all `.picasa.ini`
+        files (as well as `Picasa.ini` when `include_legacy_picasa_ini=True`) found.
+        Ref: picasa3.exe @ 0x0068AC80 (.picasa.ini / Picasa.ini)
+        """
+        base = Path(root_dir)
+        if not base.exists() or not base.is_dir():
+            return []
+        target_names = {".picasa.ini", "picasa.ini"} if include_legacy_picasa_ini else {".picasa.ini"}
+        found: List[Path] = []
+        for dirpath, _dirnames, filenames in os.walk(str(base)):
+            for fname in filenames:
+                if fname.lower() in target_names:
+                    found.append(Path(dirpath) / fname)
+        found.sort(key=lambda p: str(p).lower())
+        return found
+
+    def clean_picasa_ini_traces(
+        self,
+        root_dir: str | Path,
+        include_legacy_picasa_ini: bool = True,
+    ) -> Tuple[List[Path], List[Tuple[Path, str]]]:
+        """
+        FR: Supprime récursivement tous les fichiers `.picasa.ini` (et `Picasa.ini` si demandé)
+        présents sous `root_dir`, en levant au préalable les attributs Windows `HIDDEN` / `READONLY`,
+        marque la suppression comme écriture interne pour éviter les rebonds du `PicasaFolderWatcher`,
+        et invalide les caches INI/albums/favoris de la base de données.
+        Retourne `(fichiers_supprimes, [(fichier_en_echec, message_erreur), ...])`.
+        EN: Recursively deletes all `.picasa.ini` (and `Picasa.ini` if requested) files under
+        `root_dir`, clearing Windows `HIDDEN` / `READONLY` attributes beforehand, marking internal
+        writes to prevent `PicasaFolderWatcher` feedback loops, and invalidating DB caches.
+        Returns `(deleted_files, [(failed_file, error_message), ...])`.
+        Ref: picasa3.exe @ 0x0068AC80, AGENTS.md §4 bis.3
+        """
+        import stat
+        from picasa_py.ini.writer import PicasaIniWriter
+
+        targets = self.find_picasa_ini_traces(root_dir, include_legacy_picasa_ini=include_legacy_picasa_ini)
+        deleted: List[Path] = []
+        failed: List[Tuple[Path, str]] = []
+
+        for ini_path in targets:
+            path_str = str(ini_path)
+            try:
+                PicasaIniWriter.mark_internal_write(path_str)
+                if sys.platform == "win32":
+                    try:
+                        import ctypes
+                        # FILE_ATTRIBUTE_NORMAL = 0x80 (lève HIDDEN 0x02, SYSTEM 0x04, READONLY 0x01)
+                        ctypes.windll.kernel32.SetFileAttributesW(path_str, 0x80)
+                    except Exception:
+                        pass
+                try:
+                    os.chmod(path_str, stat.S_IWRITE | stat.S_IREAD)
+                except Exception:
+                    pass
+                ini_path.unlink()
+                self.invalidate_ini_cache(path_str, invalidate_albums_starred=False)
+                deleted.append(ini_path)
+            except Exception as exc:
+                failed.append((ini_path, str(exc)))
+
+        if deleted:
+            self._albums_cache = None
+            self._starred_cache = None
+            self.invalidate_search_cache()
+
+        return deleted, failed
+
 
 
 

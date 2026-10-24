@@ -240,3 +240,127 @@ def test_database_selector_dialog_and_menu_trigger(qapp, tmp_path: Path, monkeyp
         win.stop_background_tasks()
         win.close()
         qapp.processEvents()
+
+
+def test_clean_picasa_traces_recursive_and_menu_alerts(qapp, tmp_path: Path, monkeypatch) -> None:
+    """FR: Vérifie la fonctionnalité Outils > Nettoyer les traces Picasa (.picasa.ini)... :
+    1. Présence de l'action ID_CLEAN_PICASA_TRACES dans le menu Outils (&Tools).
+    2. Détection récursive des fichiers .picasa.ini (y compris cachés sur Windows) et Picasa.ini.
+    3. Alerte de confirmation QMessageBox.warning (annulation avec No, suppression avec Yes)
+       et alerte d'information de fin sans toucher aux photos originales.
+    EN: Verifies Tools > Clean Picasa Traces (.picasa.ini)...:
+    1. Presence of the ID_CLEAN_PICASA_TRACES action in the Tools (&Tools) menu.
+    2. Recursive detection of .picasa.ini (including hidden on Windows) and Picasa.ini files.
+    3. QMessageBox.warning confirmation dialog (cancel with No, delete with Yes)
+       and completion QMessageBox.information dialog while leaving original photos untouched.
+    """
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+    from picasa_py.ini.parser import PicasaIniDocument
+
+    db_root = tmp_path / "db_clean_test"
+    db = PicasaDatabase.create_new(db_root)
+
+    # Construire une arborescence de dossiers avec des photos et des .picasa.ini (dont cachés)
+    photos_root = tmp_path / "Phototheque"
+    sub_a = photos_root / "2025" / "Vacances"
+    sub_b = photos_root / "2026" / "Famille"
+    sub_a.mkdir(parents=True)
+    sub_b.mkdir(parents=True)
+
+    img_a = sub_a / "plage.jpg"
+    img_b = sub_b / "portrait.jpg"
+    Image.new("RGB", (32, 32), (100, 150, 200)).save(img_a, "JPEG")
+    Image.new("RGB", (32, 32), (200, 120, 80)).save(img_b, "JPEG")
+
+    ini_root = photos_root / ".picasa.ini"
+    ini_a = sub_a / ".picasa.ini"
+    ini_b = sub_b / "Picasa.ini"
+
+    for ini_p in (ini_root, ini_a, ini_b):
+        doc = PicasaIniDocument()
+        sec = doc.get_or_create_section("Picasa")
+        sec.set("name", ini_p.parent.name)
+        doc.write_file(str(ini_p))
+
+    found = PicasaDatabase.find_picasa_ini_traces(photos_root)
+    assert len(found) == 3
+
+    win = PicasaMainWindow(db_path=str(db_root), auto_scan=False)
+    _KEEP_REFS.append(win)
+    try:
+        # 1. Vérifier que l'action ID_CLEAN_PICASA_TRACES est bien présente dans le menu Outils
+        clean_action = None
+        for menu_act in win.menuBar().actions():
+            menu = menu_act.menu()
+            if menu:
+                for act in menu.actions():
+                    if act.objectName() == "ID_CLEAN_PICASA_TRACES":
+                        clean_action = act
+                        break
+        assert clean_action is not None
+
+        # 2. Simuler un refus (StandardButton.No) dans l'alerte d'avertissement : rien ne doit être supprimé
+        warnings_shown: List[str] = []
+        infos_shown: List[str] = []
+
+        monkeypatch.setattr(
+            QFileDialog,
+            "getExistingDirectory",
+            lambda *args, **kwargs: str(photos_root),
+        )
+        monkeypatch.setattr(
+            QMessageBox,
+            "warning",
+            lambda _parent, title, text, *_a, **_kw: (
+                warnings_shown.append(f"{title}: {text}"),
+                QMessageBox.StandardButton.No,
+            )[1],
+        )
+        monkeypatch.setattr(
+            QMessageBox,
+            "information",
+            lambda _parent, title, text, *_a, **_kw: (
+                infos_shown.append(f"{title}: {text}"),
+                QMessageBox.StandardButton.Ok,
+            )[1],
+        )
+
+        deleted_no = win.action_clean_picasa_traces()
+        assert deleted_no == 0
+        assert len(warnings_shown) == 1
+        assert "3 fichier(s)" in warnings_shown[0]
+        assert len(PicasaDatabase.find_picasa_ini_traces(photos_root)) == 3
+
+        # 3. Simuler la confirmation (StandardButton.Yes) via le déclenchement du menu
+        warnings_shown.clear()
+        infos_shown.clear()
+        monkeypatch.setattr(
+            QMessageBox,
+            "warning",
+            lambda _parent, title, text, *_a, **_kw: (
+                warnings_shown.append(f"{title}: {text}"),
+                QMessageBox.StandardButton.Yes,
+            )[1],
+        )
+
+        clean_action.trigger()
+        qapp.processEvents()
+
+        assert len(warnings_shown) == 1
+        assert len(infos_shown) == 1
+        assert "3 fichier(s) .picasa.ini ont été supprimés" in infos_shown[0]
+        assert len(PicasaDatabase.find_picasa_ini_traces(photos_root)) == 0
+        # Les photos originales doivent être intactes
+        assert img_a.exists() and img_b.exists()
+
+        # 4. Relancer sur le dossier déjà propre : alerte « Aucune trace Picasa détectée »
+        infos_shown.clear()
+        deleted_empty = win.action_clean_picasa_traces(photos_root, confirm=True)
+        assert deleted_empty == 0
+        assert len(infos_shown) == 1
+        assert "Aucun fichier .picasa.ini" in infos_shown[0]
+    finally:
+        win.stop_background_tasks()
+        win.close()
+        qapp.processEvents()
+

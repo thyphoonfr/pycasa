@@ -18,7 +18,9 @@ from __future__ import annotations
 import ctypes
 import hashlib
 import io
+import math
 import os
+import re
 import struct
 import sys
 import threading
@@ -174,6 +176,226 @@ def datetime_to_ole(dt: datetime) -> float:
     """
     delta = dt - OLE_BASE_DATETIME
     return delta.days + (delta.seconds + delta.microseconds / 1e6) / 86400.0
+
+
+_FILETIME_EPOCH_OFFSET = 116444736000000000
+
+
+def file_filetimes(file_path: Union[str, Path]) -> Tuple[int, int, int]:
+    """
+    FR: Retourne (ft1 = création, ft2 = dernière écriture, taille) au format FILETIME Windows exact
+    (précision 100 ns, sans troncature à la seconde). Vérifié sur db3 : ft2 identique au 100 ns près
+    sur 362/800 fichiers inchangés depuis l'indexation.
+    EN: Returns (ft1 = creation, ft2 = last write, size) as exact Windows FILETIME values
+    (100 ns precision, no truncation to seconds). Verified on db3: ft2 identical to the 100 ns
+    on 362/800 files unchanged since indexing.
+    Ref: picasa3.exe @ 0x004F25F0 (« Name,Creation Time,Access Time,Size,... »), 0x004F54B0
+    """
+    st = os.stat(file_path)
+    birth_ns = getattr(st, "st_birthtime_ns", None)
+    if birth_ns is None:
+        birth_ns = st.st_ctime_ns
+    ft1 = birth_ns // 100 + _FILETIME_EPOCH_OFFSET
+    ft2 = st.st_mtime_ns // 100 + _FILETIME_EPOCH_OFFSET
+    return ft1, ft2, st.st_size
+
+
+_WORDHASH_SPLIT_RE = re.compile(r"[\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+")
+# Ref: picasa3.exe @ 0x00987DA0 (bitmap 0xD30BD0 : ':' 0x3A est conservé comme caractère de mot)
+_INDEXER_TEXT_SPLIT_RE = re.compile(r"[\x00-\x2f\x3b-\x40\x5b-\x60\x7b-\x7f]+")
+
+
+def tokenize_indexer_text(text: str) -> List[str]:
+    """
+    FR: Découpe un texte (légende, texte sur image, mot-clé) selon la table de caractères exacte
+    de `CIndexer::Tokenize` (`FUN_00987da0` @ `0x00987DA0`, bitmap `0xD30BD0`) :
+    conserve `'0'-'9'`, `'a'-'z'`, `':'` (`0x3A`) et tous les octets UTF-8 `>= 0x80` en minuscules.
+    EN: Splits text (caption, photo text, keyword) using the exact character bitmap of
+    `CIndexer::Tokenize` (`FUN_00987da0` @ `0x00987DA0`, bitmap `0xD30BD0`):
+    keeps `'0'-'9'`, `'a'-'z'`, `':'` (`0x3A`), and all UTF-8 bytes `>= 0x80` in lowercase.
+    Ref: picasa3.exe @ 0x00987DA0, 0x00D30BD0
+    """
+    if not text:
+        return []
+    return [tok for tok in _INDEXER_TEXT_SPLIT_RE.split(text.lower()) if tok]
+
+
+_COLOR_BUCKET_TOKENS: Tuple[str, ...] = (
+    "color:red",
+    "color:orange",
+    "color:yellow",
+    "color:green",
+    "color:blue",
+    "color:purple",
+    "color:pink",
+)
+
+
+def classify_image_color_tokens(img_or_bytes: Union[Image.Image, bytes]) -> List[str]:
+    """
+    FR: Classifie la couleur dominante d'une miniature en jetons `color:*` pour `wordhash.dat`
+    conformément à `FUN_00428566` -> `FUN_00424c20` -> `FUN_009dbd10` :
+    - Pour chaque pixel `(R, G, B)` de la vignette :
+      - `V = max(R, G, B)`, `m = min(R, G, B)`, `delta = V - m`
+      - Si `V > 0`, `S = (delta * 255) // V`
+      - Si `S > 50` (`0x32`) et `delta > 0` :
+        - Calcule la teinte `hue_255` sur `[0..255]` (`h_raw // 6`), puis `b24 = hue_255 // 10`
+        - Associe `b24` au seau `0..6` (`red`, `orange`, `yellow`, `green`, `blue`, `purple`, `pink`)
+        - Accumule `hist[bucket] += S`
+    - Retourne le jeton du seau ayant le score maximal (`> 0`), ou les 3 jetons
+      `["color:black", "color:white", "color:gray"]` si aucun pixel saturé ne domine.
+    EN: Classifies a thumbnail's dominant color into `color:*` tokens for `wordhash.dat`
+    matching `FUN_00428566` -> `FUN_00424c20` -> `FUN_009dbd10`.
+    Ref: picasa3.exe @ 0x00428566, 0x00424C20, 0x009DBD10, 0x00C85220
+    """
+    try:
+        if isinstance(img_or_bytes, (bytes, bytearray)):
+            with Image.open(io.BytesIO(img_or_bytes)) as opened:
+                rgb = opened.convert("RGB")
+                raw = rgb.tobytes()
+        elif isinstance(img_or_bytes, Image.Image):
+            rgb = img_or_bytes if img_or_bytes.mode == "RGB" else img_or_bytes.convert("RGB")
+            raw = rgb.tobytes()
+        else:
+            return []
+        if not raw:
+            return []
+        hist = [0, 0, 0, 0, 0, 0, 0]
+        # Échantillonnage rapide (pas de 3 octets = 1 pixel ; pas de 12 octets si très grande image)
+        step = 3 if len(raw) <= 144 * 144 * 3 else 12
+        for off in range(0, len(raw) - 2, step):
+            r = raw[off]
+            g = raw[off + 1]
+            b = raw[off + 2]
+            v = r if r >= g else g
+            if b > v:
+                v = b
+            if v == 0:
+                continue
+            m = r if r <= g else g
+            if b < m:
+                m = b
+            delta = v - m
+            if delta == 0:
+                continue
+            s = (delta * 255) // v
+            if s <= 50:
+                continue
+            if r == v:
+                h_raw = ((g - b) * 255) // delta
+            elif g == v:
+                h_raw = 510 + ((b - r) * 255) // delta
+            else:
+                h_raw = 1020 + ((r - g) * 255) // delta
+            if h_raw < 0:
+                h_raw += 1530
+            hue_255 = h_raw // 6
+            b24 = hue_255 // 10
+            if b24 == 0 or b24 >= 24:
+                bucket = 0
+            elif b24 <= 3:
+                bucket = 1
+            elif b24 == 4:
+                bucket = 2
+            elif b24 <= 11:
+                bucket = 3
+            elif b24 <= 17:
+                bucket = 4
+            elif b24 <= 21:
+                bucket = 5
+            else:
+                bucket = 6
+            hist[bucket] += s
+        best_bucket = -1
+        best_val = 0
+        for idx_b, val in enumerate(hist):
+            if val > best_val:
+                best_val = val
+                best_bucket = idx_b
+        if best_bucket >= 0 and best_val > 0:
+            return [_COLOR_BUCKET_TOKENS[best_bucket]]
+        return ["color:black", "color:white", "color:gray"]
+    except Exception:
+        return []
+
+
+def wordhash_tokens_for_media(
+    filename: str,
+    width: int,
+    height: int,
+    media_type: int = 2,
+    folder_album_token: str = "",
+    color_tokens: Optional[List[str]] = None,
+) -> List[str]:
+    """
+    FR: Mots indexés dans wordhash.dat à l'indexation d'un média : jetons du nom de fichier complet
+    (extension comprise) en minuscules, découpés sur les caractères ASCII non alphanumériques, puis
+    largeur et hauteur (pour les JPEG), le jeton d'album du dossier parent (`]album:<uid>`) et
+    les jetons de couleur (`color:<teinte>`). Le nom du dossier n'est PAS indexé directement.
+    Vérifié sur db3 : jetons du nom 800/800, largeur/hauteur 2093/2093 JPEG, `]album:<uid>` 2931/2931 images.
+    EN: Words indexed in wordhash.dat when indexing a media file: lowercase tokens of the full file name
+    (extension included), split on ASCII non-alphanumeric characters, then width and height (for JPEGs),
+    parent folder album token (`]album:<uid>`), and dominant color tokens (`color:<hue>`).
+    Ref: picasa3.exe @ 0x00987DA0, 0x00428566, 0x00424C20, 0x009DBD10
+    """
+    out: List[str] = []
+    seen: Set[str] = set()
+    for tok in _WORDHASH_SPLIT_RE.split(filename.lower()):
+        if tok and tok not in seen:
+            seen.add(tok)
+            out.append(tok)
+    # Ref: db3 — largeur/hauteur indexées pour les JPEG uniquement (type 2 : 2093/2093 ; autres types : 2/1037)
+    if media_type == 2:
+        for dim in (width, height):
+            if dim and dim > 0:
+                s = str(int(dim))
+                if s not in seen:
+                    seen.add(s)
+                    out.append(s)
+    if media_type != 32:
+        if folder_album_token:
+            ftok = folder_album_token.strip().lower()
+            if ftok and ftok not in seen:
+                seen.add(ftok)
+                out.append(ftok)
+        if color_tokens:
+            for ctok in color_tokens:
+                c_low = ctok.strip().lower()
+                if c_low and c_low not in seen:
+                    seen.add(c_low)
+                    out.append(c_low)
+    return out
+
+
+def detect_media_type(file_path: Union[str, Path]) -> int:
+    """
+    FR: Détermine le code `type` de thumbindex.db. Les RAW et vidéos gardent le type de leur extension ;
+    pour les autres images, la signature du fichier prime sur l'extension.
+    EN: Determines the thumbindex.db `type` code. RAW and video files keep their extension's type;
+    for other images, the file signature takes precedence over the extension.
+    Ref: db3 (enregistrement 17176 : « *.jpg.jpg » de signature RIFF/WEBP indexé type 31).
+    TODO(unverified): routine de détection de signature non localisée dans le désassemblage.
+    """
+    ext = os.path.splitext(str(file_path))[1].lower()
+    ext_type = EXTENSION_TYPE_MAP.get(ext, 2)
+    if ext_type in (18, 32) or ext in VIDEO_EXTENSIONS:
+        return ext_type
+    try:
+        with open(file_path, "rb") as f:
+            head = f.read(12)
+    except OSError:
+        return ext_type
+    if head[:3] == b"\xff\xd8\xff":
+        return 2
+    if head[:8] == b"\x89PNG\r\n\x1a\n" or head[:6] in (b"GIF87a", b"GIF89a") or (head[:4] == b"RIFF" and head[8:12] == b"WEBP"):
+        return 31
+    if head[:2] == b"BM":
+        return 6
+    if head[:4] == b"8BPS":
+        return 7
+    if head[:4] in (b"II*\x00", b"MM\x00*"):
+        return 13
+    return ext_type
 
 
 def extract_video_metadata_and_thumb(
@@ -409,6 +631,34 @@ def _extract_exif_gps(raw_img: Image.Image, exif_data) -> Tuple[Optional[float],
     return lat, lon
 
 
+def _fit_long_side(img: Image.Image, target: int, src_size: Optional[Tuple[int, int]] = None) -> Image.Image:
+    """
+    FR: Redimensionne pour que le plus grand côté vaille exactement `target` (agrandissement compris),
+    le petit côté étant arrondi à l'entier supérieur. Vérifié sur db3 : 2000/2000 vignettes `thumbs` ont un
+    grand côté de 144 px (y compris les sources plus petites), `thumbs2` 72 px.
+    EN: Resizes so the longest side is exactly `target` (upscaling included), the short side rounded
+    up. Verified on db3: 2000/2000 `thumbs` have a 144 px long side (smaller sources included),
+    `thumbs2` 72 px.
+    Ref: picasa3.exe @ 0x00424CA0 ; db3 : plafond (ceil) exact sur 1950/2006 (thumbs) et 1969/2006 (thumbs2),
+    contre 1537 / 1168 avec un arrondi au plus proche.
+    TODO(unverified): les ~3 % restants (valeurs très proches d'un entier) suggèrent un calcul sur
+    l'image intermédiaire décodée ; routine non localisée.
+    """
+    w, h = img.size
+    if w <= 0 or h <= 0:
+        return img.copy()
+    # FR: Proportions calculées sur les dimensions d'origine (évite un double arrondi via l'intermédiaire)
+    # EN: Aspect computed from the original dimensions (avoids double rounding through the intermediate)
+    sw, sh = src_size if (src_size and src_size[0] > 0 and src_size[1] > 0) else (w, h)
+    if sw >= sh:
+        nw, nh = target, max(1, int(math.ceil(target * sh / float(sw))))
+    else:
+        nw, nh = max(1, int(math.ceil(target * sw / float(sh)))), target
+    if (nw, nh) == (w, h):
+        return img.copy()
+    return img.resize((nw, nh), Image.Resampling.BILINEAR)
+
+
 def extract_image_metadata_and_thumb(
     file_path: str, max_thumb_size: int = 144
 ) -> Optional[Tuple[bytes, int, int, float]]:
@@ -500,14 +750,12 @@ def extract_image_metadata_and_thumb(
             bt_img.save(buf_bt, format="JPEG", quality=90)
             bigthumb_bytes = buf_bt.getvalue()
 
-            thumb_img = bt_img.copy()
-            thumb_img.thumbnail((max_thumb_size, max_thumb_size), Image.Resampling.BILINEAR)
+            thumb_img = _fit_long_side(bt_img, max_thumb_size, (orig_w, orig_h))
             buf = io.BytesIO()
             thumb_img.save(buf, format="JPEG", quality=90)
             jpeg_bytes = buf.getvalue()
 
-            t2_img = thumb_img.copy()
-            t2_img.thumbnail((72, 72), Image.Resampling.BILINEAR)
+            t2_img = _fit_long_side(thumb_img, 72, (orig_w, orig_h))
             buf2 = io.BytesIO()
             t2_img.save(buf2, format="JPEG", quality=90)
             thumb2_bytes = buf2.getvalue()
@@ -1108,9 +1356,10 @@ class PicasaDirScanner:
         if not meta:
             return False
         jpeg_bytes, w, h, ole_date = meta
-        fsize = os.path.getsize(file_path)
-        fmtime = int(os.path.getmtime(file_path))
-        originfast_val = compute_originfast_hash(file_path)
+        ft1_val, ft2_val, fsize = file_filetimes(file_path)
+        is_video_rec = int(self.db.index[record_idx].type) == 32 or os.path.splitext(file_path)[1].lower() in VIDEO_EXTENSIONS
+        # Ref: db3 — originfast = 0 pour les vidéos (199/199)
+        originfast_val = 0 if is_video_rec else compute_originfast_hash(file_path)
 
         t2_bytes: Optional[bytes] = getattr(meta, "thumb2_bytes", None)
         if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
@@ -1129,24 +1378,30 @@ class PicasaDirScanner:
         bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
 
         avg_u32: Optional[int] = None
-        if "imagedata_avgcolor" in self.db.pmps and jpeg_bytes:
+        color_toks: List[str] = []
+        if jpeg_bytes:
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                    px = t_img.convert("RGB").resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                    if isinstance(px, tuple) and len(px) >= 3:
-                        avg_u32 = (
-                            0xFF000000
-                            | ((int(px[0]) & 0xFF) << 16)
-                            | ((int(px[1]) & 0xFF) << 8)
-                            | (int(px[2]) & 0xFF)
-                        )
+                    rgb_t = t_img.convert("RGB")
+                    if "imagedata_avgcolor" in self.db.pmps:
+                        px = rgb_t.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
+                        if isinstance(px, tuple) and len(px) >= 3:
+                            avg_u32 = (
+                                0xFF000000
+                                | ((int(px[0]) & 0xFF) << 16)
+                                | ((int(px[1]) & 0xFF) << 8)
+                                | (int(px[2]) & 0xFF)
+                            )
+                    if not is_video_rec:
+                        color_toks = classify_image_color_tokens(rgb_t)
             except Exception:
                 avg_u32 = None
 
         with self.db._lock:
             rec = self.db.index[record_idx]
             rec.file_size = fsize
-            rec.mtime = fmtime
+            rec.ft1 = ft1_val
+            rec.ft2 = ft2_val
             rec_type = int(rec.type)
             if self.db.thumbindex is not None:
                 self.db.thumbindex.dirty = True
@@ -1164,7 +1419,9 @@ class PicasaDirScanner:
 
             _set_pmp_col("imagedata_width", w)
             _set_pmp_col("imagedata_height", h)
-            _set_pmp_col("imagedata_tagdate", float(ole_date))
+            # Ref: db3 — imagedata_tagdate = 0 pour les images au scan (2931/2931), date de modification
+            # en heure locale pour les vidéos (199/199)
+            _set_pmp_col("imagedata_tagdate", float(ole_date) if is_video_rec else 0.0)
             _set_pmp_col("imagedata_filetype", rec_type)
             _set_pmp_col("imagedata_fileflags", 1 if rec_type == 18 else 0)
             _set_pmp_col("imagedata_originfast", originfast_val)
@@ -1182,13 +1439,33 @@ class PicasaDirScanner:
                 _set_pmp_col("imagedata_lat", float(gps_lat))
                 _set_pmp_col("imagedata_long", float(gps_lon))
 
+            if getattr(self.db, "wordhash", None) is not None:
+                folder_p = os.path.dirname(file_path).replace("/", "\\").rstrip("\\") + "\\"
+                folder_alb_tok = (
+                    self.db.ensure_folder_album_row(folder_p)
+                    if hasattr(self.db, "ensure_folder_album_row") and not is_video_rec
+                    else ""
+                )
+                for tok in wordhash_tokens_for_media(
+                    os.path.basename(file_path), w, h, rec_type, folder_alb_tok, color_toks
+                ):
+                    self.db.wordhash.add_word(tok, record_idx)
+                if gps_lat is not None and gps_lon is not None and (float(gps_lat) != 0.0 or float(gps_lon) != 0.0):
+                    self.db.wordhash.add_word("]geo", record_idx)
+
         # FR: Écritures de miniatures HORS de `with self.db._lock:` (protégées par `_get_block_lock(prefix)`)
         # EN: Thumbnail writes OUTSIDE `with self.db._lock:` (protected by `_get_block_lock(prefix)`)
         self.db.add_thumbnail(record_idx, jpeg_bytes, size="small")
-        if "thumbs2" in getattr(self.db, "block_indices", {}):
+        # Ref: db3 — pas de thumbs2 pour les vidéos (199/199 absents)
+        if "thumbs2" in getattr(self.db, "block_indices", {}) and not is_video_rec:
             self.db.add_thumbnail(record_idx, t2_bytes or jpeg_bytes, size="medium")
-        if "bigthumbs" in getattr(self.db, "block_indices", {}):
-            self.db.add_thumbnail(record_idx, bigthumb_bytes or jpeg_bytes, size="large")
+        # Ref: db3 — bigthumbs/previews ne sont créés qu'à la demande (476/3130) : on ne rafraîchit
+        # qu'une entrée bigthumbs déjà existante.
+        bt_idx = getattr(self.db, "block_indices", {}).get("bigthumbs")
+        if bt_idx is not None and record_idx < bt_idx.record_count and bigthumb_bytes:
+            bt_entry = bt_idx.get_entry(record_idx)
+            if bt_entry is not None and bt_entry.offset:
+                self.db.add_thumbnail(record_idx, bigthumb_bytes, size="large")
 
         if hasattr(self.db, "sync_photo_ini_to_db"):
             try:
@@ -1212,7 +1489,7 @@ class PicasaDirScanner:
         Thumbnail writes into CBlockFile are performed outside `self.db._lock`.
         """
         ext = os.path.splitext(file_path)[1].lower()
-        media_type = EXTENSION_TYPE_MAP.get(ext, 2)
+        media_type = detect_media_type(file_path)
         folder_path = os.path.dirname(file_path).replace("/", "\\").rstrip("\\") + "\\"
         filename = os.path.basename(file_path)
 
@@ -1221,9 +1498,10 @@ class PicasaDirScanner:
             return None
 
         jpeg_bytes, w, h, ole_date = meta
-        file_size = os.path.getsize(file_path)
-        mtime = int(os.path.getmtime(file_path))
-        originfast_val = compute_originfast_hash(file_path)
+        ft1_val, ft2_val, file_size = file_filetimes(file_path)
+        is_video_rec = media_type == 32
+        # Ref: db3 — originfast = 0 pour les vidéos (199/199)
+        originfast_val = 0 if is_video_rec else compute_originfast_hash(file_path)
 
         t2_bytes: Optional[bytes] = getattr(meta, "thumb2_bytes", None)
         if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
@@ -1242,17 +1520,22 @@ class PicasaDirScanner:
         bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
 
         avg_u32: Optional[int] = None
-        if "imagedata_avgcolor" in self.db.pmps and jpeg_bytes:
+        color_toks: List[str] = []
+        if jpeg_bytes:
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                    px = t_img.convert("RGB").resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                    if isinstance(px, tuple) and len(px) >= 3:
-                        avg_u32 = (
-                            0xFF000000
-                            | ((int(px[0]) & 0xFF) << 16)
-                            | ((int(px[1]) & 0xFF) << 8)
-                            | (int(px[2]) & 0xFF)
-                        )
+                    rgb_t = t_img.convert("RGB")
+                    if "imagedata_avgcolor" in self.db.pmps:
+                        px = rgb_t.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
+                        if isinstance(px, tuple) and len(px) >= 3:
+                            avg_u32 = (
+                                0xFF000000
+                                | ((int(px[0]) & 0xFF) << 16)
+                                | ((int(px[1]) & 0xFF) << 8)
+                                | (int(px[2]) & 0xFF)
+                            )
+                    if not is_video_rec:
+                        color_toks = classify_image_color_tokens(rgb_t)
             except Exception:
                 avg_u32 = None
 
@@ -1262,9 +1545,14 @@ class PicasaDirScanner:
                 folder_path=folder_path,
                 filename=filename,
                 file_size=file_size,
-                mtime=mtime,
+                mtime=ft2_val,
                 media_type=media_type,
             )
+            # FR: ft1 = date de création exacte (FILETIME), ft2 = dernière écriture exacte
+            # EN: ft1 = exact creation time (FILETIME), ft2 = exact last write time
+            new_rec = self.db.index[record_idx]
+            new_rec.ft1 = ft1_val
+            new_rec.ft2 = ft2_val
             if hasattr(self.db, "_align_imagedata_tables"):
                 self.db._align_imagedata_tables(record_idx)
 
@@ -1281,12 +1569,18 @@ class PicasaDirScanner:
 
             _set_pmp_col("imagedata_width", w)
             _set_pmp_col("imagedata_height", h)
-            _set_pmp_col("imagedata_tagdate", float(ole_date))
+            # Ref: db3 — imagedata_tagdate = 0 pour les images au scan (2931/2931), date de modification
+            # en heure locale pour les vidéos (199/199)
+            _set_pmp_col("imagedata_tagdate", float(ole_date) if is_video_rec else 0.0)
             _set_pmp_col("imagedata_filetype", media_type)
             _set_pmp_col("imagedata_fileflags", 1 if media_type == 18 else 0)
             _set_pmp_col("imagedata_originfast", originfast_val)
             _set_pmp_col("imagedata_colorspace", 0)
             _set_pmp_col("imagedata_facerect", 0)
+            # Ref: db3 — les vidéos (type 32) gardent 0 dans personalbumrecs/recs2 (les images : 0xFFFFFFFF)
+            _rec_default = 0 if is_video_rec else 0xFFFFFFFF
+            _set_pmp_col("imagedata_personalbumrecs", _rec_default)
+            _set_pmp_col("imagedata_personalbumrecs2", _rec_default)
 
             if avg_u32 is not None:
                 _set_pmp_col("imagedata_avgcolor", avg_u32)
@@ -1297,22 +1591,26 @@ class PicasaDirScanner:
                 _set_pmp_col("imagedata_lat", float(gps_lat))
                 _set_pmp_col("imagedata_long", float(gps_lon))
 
+            folder_alb_tok = (
+                self.db.ensure_folder_album_row(folder_path)
+                if hasattr(self.db, "ensure_folder_album_row") and not is_video_rec
+                else ""
+            )
             if getattr(self.db, "wordhash", None) is not None:
-                stem_str = os.path.splitext(filename)[0]
-                if stem_str.strip():
-                    self.db.wordhash.add_word(stem_str.strip(), record_idx)
-                parent_dir_name = os.path.basename(folder_path.rstrip("\\/"))
-                if parent_dir_name.strip():
-                    self.db.wordhash.add_word(parent_dir_name.strip(), record_idx)
+                for tok in wordhash_tokens_for_media(
+                    filename, w, h, media_type, folder_alb_tok, color_toks
+                ):
+                    self.db.wordhash.add_word(tok, record_idx)
+                if gps_lat is not None and gps_lon is not None and (float(gps_lat) != 0.0 or float(gps_lon) != 0.0):
+                    self.db.wordhash.add_word("]geo", record_idx)
 
-        # 3. Miniature thumbs_0.db (144px, q=90), thumbs2_0.db (72px, q=90) et bigthumbs_0.db (288px, q=90)
-        #    HORS de `with self.db._lock:` (protégées par `self.db._get_block_lock(prefix)`)
-        #    Thumbnail writes in thumbs_0.db, thumbs2_0.db & bigthumbs_0.db OUTSIDE `with self.db._lock:`
+        # 3. Miniatures thumbs_0.db (144px, q=90) et thumbs2_0.db (72px, q=90), HORS de `with self.db._lock:`
+        #    Ref: db3 — pas de thumbs2 pour les vidéos ; bigthumbs/previews créés à la demande seulement (476/3130)
+        #    EN: thumbs_0.db (144px) and thumbs2_0.db (72px) thumbnails OUTSIDE `with self.db._lock:`;
+        #    no thumbs2 for videos, bigthumbs/previews created on demand only.
         self.db.add_thumbnail(record_idx, jpeg_bytes, size="small")
-        if "thumbs2" in getattr(self.db, "block_indices", {}):
+        if "thumbs2" in getattr(self.db, "block_indices", {}) and not is_video_rec:
             self.db.add_thumbnail(record_idx, t2_bytes or jpeg_bytes, size="medium")
-        if "bigthumbs" in getattr(self.db, "block_indices", {}):
-            self.db.add_thumbnail(record_idx, bigthumb_bytes or jpeg_bytes, size="large")
 
         # 4. Synchroniser les métadonnées .picasa.ini (étoile, rotation, filtres, texte, légende, visages, backuphash)
         if hasattr(self.db, "sync_photo_ini_to_db"):

@@ -564,6 +564,9 @@ class PicasaFaceManager:
                 u_b = max(v & 0xFFFF for v in child_rects)
                 _setc("imagedata_facerect", parent_db_idx, (u_l << 48) | (u_t << 32) | (u_r << 16) | u_b)
                 _setc("imagedata_facerectdata", parent_db_idx, "1")
+            if getattr(self.db, "wordhash", None) is not None:
+                self.db.wordhash.add_word("]face", parent_db_idx)
+                self.db.wordhash.add_word("]unknownface", child_idx)
         try:
             parent_path = self.db.get_media_full_path(parent_db_idx) or ""
             if source_img is not None or (parent_path and os.path.exists(parent_path)):
@@ -1982,19 +1985,37 @@ class PicasaFaceManager:
                 pmp.dirty = True
 
         if len(ad_names.records) == 0:
+            import hashlib
+            u_uid = hashlib.md5(b"]unknownface").hexdigest()
             for stem, pmp in albumdata_tables.items():
                 if stem == "albumdata_name":
-                    pmp.records.append("Default")
+                    pmp.records.append("Sans nom")
+                elif stem == "albumdata_token":
+                    pmp.records.append("]unknownface")
+                elif stem == "albumdata_uid":
+                    pmp.records.append(u_uid)
                 elif stem == "albumdata_category":
-                    pmp.records.append(0)
+                    pmp.records.append(8)
                 else:
                     pmp.records.append(pmp.default_value())
                 pmp.dirty = True
 
         new_alb_idx = len(ad_names.records)
+        import hashlib
+        from datetime import datetime
+        from picasa_py.scanner.scanner import datetime_to_ole
+        p_tok = f"]facealbum:{new_alb_idx}"
+        p_uid = hashlib.md5(f"{contact_id}:{new_alb_idx}".encode("utf-8", errors="surrogateescape")).hexdigest()
+        p_date = datetime_to_ole(datetime.now())
         for stem, pmp in albumdata_tables.items():
             if stem == "albumdata_name":
                 pmp.records.append(contact_name.strip())
+            elif stem == "albumdata_token":
+                pmp.records.append(p_tok)
+            elif stem == "albumdata_uid":
+                pmp.records.append(p_uid)
+            elif stem == "albumdata_date":
+                pmp.records.append(p_date)
             elif stem == "albumdata_category":
                 pmp.records.append(8)
             elif stem == "albumdata_albumcontactids":
@@ -2235,6 +2256,13 @@ class PicasaFaceManager:
                             pmp_pa.records.append(0)
                         pmp_pa.records[pa_target_idx] = alb_idx
                         pmp_pa.dirty = True
+                        if getattr(self.db, "wordhash", None) is not None:
+                            if hasattr(self.db.wordhash, "remove_word"):
+                                self.db.wordhash.remove_word("]unknownface", pa_target_idx)
+                                self.db.wordhash.remove_word("]ignoreface", pa_target_idx)
+                            self.db.wordhash.add_word(f"]facealbum:{alb_idx}", pa_target_idx)
+                            if parent_photo_idx is not None and parent_photo_idx >= 0:
+                                self.db.wordhash.add_word("]face", parent_photo_idx)
                 if pmp_sug is not None:
                     for t_idx in target_indices:
                         if 0 <= t_idx < len(pmp_sug.records):
@@ -2497,8 +2525,16 @@ class PicasaFaceManager:
             for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
                 pmp = self.db.pmps.get(col_name)
                 if pmp is not None and 0 <= face_rec_idx < len(pmp.records):
+                    old_alb = pmp.records[face_rec_idx]
                     pmp.records[face_rec_idx] = 0
                     pmp.dirty = True
+                    if col_name == "imagedata_personalbumid" and old_alb and getattr(self.db, "wordhash", None) is not None:
+                        if hasattr(self.db.wordhash, "remove_word"):
+                            self.db.wordhash.remove_word(f"]facealbum:{old_alb}", face_rec_idx)
+            if getattr(self.db, "wordhash", None) is not None:
+                if hasattr(self.db.wordhash, "remove_word"):
+                    self.db.wordhash.remove_word("]unknownface", face_rec_idx)
+                self.db.wordhash.add_word("]ignoreface", face_rec_idx)
 
         # FR : Mise à jour du .picasa.ini
         # EN: Update .picasa.ini

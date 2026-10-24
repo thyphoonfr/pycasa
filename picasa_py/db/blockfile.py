@@ -736,6 +736,8 @@ class BlockContainerFile:
         Ref: picasa3.exe @ 0x006B75F0 (CBlockFile::WriteEntry)
         """
         size = len(blob)
+        if size == 0:
+            return BlockEntry(checksum=0, offset=0, size=0, block=0)
         if size > 0x00FFFFFF:
             raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
         if self._payload is None:
@@ -757,13 +759,17 @@ class BlockContainerFile:
     ) -> BlockEntry:
         """
         FR: Écrit un blob dans le conteneur conformément à CBlockFile::WriteEntry (FUN_006b75f0 @ 0x006B75F0) :
+        - Si len(blob) == 0, retourne une entrée vide BlockEntry(0, 0, 0, 0) (Ref: 0x006B7732).
         - Si existing_entry est dans le même bloc et a une taille >= len(blob), réécrit sur place.
         - Sinon, ajoute en fin de conteneur.
         EN: Writes a blob into the container in accordance with CBlockFile::WriteEntry (FUN_006b75f0 @ 0x006B75F0):
+        - If len(blob) == 0, returns an empty BlockEntry(0, 0, 0, 0) (Ref: 0x006B7732).
         - If existing_entry is in the same block and has size >= len(blob), overwrites in place.
         - Otherwise, appends at the end of the container.
         """
         size = len(blob)
+        if size == 0:
+            return BlockEntry(checksum=0, offset=0, size=0, block=0)
         if size > 0x00FFFFFF:
             raise ValueError(f"Taille de blob supérieure à 24 bits (max 16 Mo) : {size}")
         if (

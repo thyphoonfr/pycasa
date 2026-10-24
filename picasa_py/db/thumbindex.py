@@ -338,7 +338,12 @@ class ThumbIndexFile:
         for rec in self.records:
             if rec.type == 0 or rec.flags_hi == 0:
                 rec.mark_deleted()
-            elif rec.type == 4 and (rec.parent_idx < 0 or rec.parent_idx >= count or rec.parent_idx == 0xFFFFFFFF):
+            elif rec.type == 4 and (
+                rec.parent_idx < 0
+                or rec.parent_idx >= count
+                or rec.parent_idx == 0xFFFFFFFF
+                or self.records[rec.parent_idx].type not in (1, 0x19)
+            ):
                 rec.mark_deleted()
 
     # Ref: picasa3.exe @ 0x004F54B0
@@ -357,7 +362,12 @@ class ThumbIndexFile:
                     and (getattr(rec, "_flags_hi_modified", False) or getattr(rec, "_flags_hi_explicit", False) or rec.path == "")
                 ):
                     rec.mark_deleted()
-                elif rec.type == 4 and (rec.parent_idx < 0 or rec.parent_idx >= count or rec.parent_idx == 0xFFFFFFFF):
+                elif rec.type == 4 and (
+                    rec.parent_idx < 0
+                    or rec.parent_idx >= count
+                    or rec.parent_idx == 0xFFFFFFFF
+                    or self.records[rec.parent_idx].type not in (1, 0x19)
+                ):
                     rec.mark_deleted()
         parts: List[bytes] = [HEADER_STRUCT.pack(self.magic, len(self.records))]
         for rec in self.records:

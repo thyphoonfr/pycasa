@@ -98,8 +98,14 @@ def test_real_db3_blockfile_checksums_100_percent() -> None:
             expected = db.compute_entry_checksum(i, prefix)
             if expected == entry.checksum:
                 matched += 1
-        assert total_valid > 0
-        assert matched == total_valid, f"{prefix}_index.db : {matched}/{total_valid} checksums identiques"
+        cont_file = db.block_containers_by_block.get((prefix, idx_file.active_block)) or db.block_containers.get(prefix)
+        if cont_file is not None and cont_file.byte_size() <= 4:
+            # Ref: picasa3.exe @ 0x0041B77E-0x0041B7B0, 0x006B8AC0 : après compactage de bigthumbs_0.db /
+            # previews_0.db à 4 octets, ValidateIndex invalide les entrées hors-limites en mémoire.
+            assert total_valid == 0
+        else:
+            assert total_valid > 0
+            assert matched == total_valid, f"{prefix}_index.db : {matched}/{total_valid} checksums identiques"
 
 
 @pytest.mark.skipif(not REAL_DB3_DIR.exists(), reason="Base réelle Picasa2/db3 absente sur cette machine")
@@ -446,3 +452,105 @@ def test_glimmer_filterdesc_xml_exact_operations() -> None:
         assert out.mode == "RGB"
         if out.size == img.size:
             assert not np.array_equal(np.array(out), np.array(img)), f"Le filtre {fstr} n'a eu aucun effet"
+
+
+def test_database_compact_remaps_indices_and_blockfile_invariants(tmp_path: Path) -> None:
+    """FR: Vérifie les mécanismes désassemblés de :
+    - compactage complet avec réindexation (`new_to_old`, `old_to_new`, `parent_idx`, `imagedata_aliasparents`,
+      `wordhash` doc IDs, purge de `bigthumbs`/`previews` à 4 octets @ 0x0041B77E-0x0041B7B0) ;
+    - `CBlockFile` : blob de taille 0 -> `BlockEntry(0, 0, 0, 0)` (0x006B75F0), réécriture en place
+      inter-blocs (0x006B7753) et invalidation au chargement des entrées hors limites (0x006B8AC0) ;
+    - `ensure_folder_album_row` (`albumdata_category = 2`), réservation de la ligne 0 (`]unknownface`),
+      jetons `color:*` (`classify_image_color_tokens` @ 0x009DBD10), tokeniseur `tokenize_indexer_text`
+      (0x00987DA0) et fichiers auxiliaires `.txt` (`scanlist.txt`, `starlist.txt`, `saverlist.txt`,
+      `facetags.txt`, `tags.txt` @ 0x0041BA40).
+    EN: Verifies the disassembled mechanisms of:
+    - full index-remapping compaction (`new_to_old`, `old_to_new`, `parent_idx`, `imagedata_aliasparents`,
+      `wordhash` doc IDs, `bigthumbs`/`previews` reset to 4 bytes @ 0x0041B77E-0x0041B7B0);
+    - `CBlockFile`: zero-size blob -> `BlockEntry(0, 0, 0, 0)` (0x006B75F0), cross-block in-place overwrite
+      (0x006B7753), and truncated entry invalidation on load (0x006B8AC0);
+    - `ensure_folder_album_row` (`albumdata_category = 2`), row 0 reservation (`]unknownface`),
+      `color:*` tokens (`classify_image_color_tokens` @ 0x009DBD10), `tokenize_indexer_text` (0x00987DA0),
+      and auxiliary `.txt` files (`scanlist.txt`, `starlist.txt`, `saverlist.txt`, `facetags.txt`, `tags.txt` @ 0x0041BA40).
+    """
+    from picasa_py.scanner.scanner import classify_image_color_tokens, tokenize_indexer_text
+    from picasa_py.faces.face_manager import FaceManager, FaceRect
+
+    # 1. Tokeniseur 0x00987DA0 (':' préservé pour color:*, ]album:*) & classifieur de couleurs 0x009DBD10
+    assert tokenize_indexer_text("Vacances_Été-2026: Plage & Mer!") == [
+        "vacances", "été", "2026:", "plage", "mer"
+    ]
+    bw_img = Image.new("RGB", (32, 32), (128, 128, 128))
+    assert classify_image_color_tokens(bw_img) == ["color:black", "color:white", "color:gray"]
+    red_img = Image.new("RGB", (32, 32), (240, 20, 20))
+    assert "color:red" in classify_image_color_tokens(red_img)
+
+    # 2. Scanner + dossier album (category=2) + ligne 0 ]unknownface + visages 1001
+    photos_dir = tmp_path / "AlbumVacances"
+    photos_dir.mkdir(parents=True)
+    p1 = photos_dir / "img_delete_me.jpg"
+    p2 = photos_dir / "img_keep_me.jpg"
+    red_img.save(p1, format="JPEG")
+    bw_img.save(p2, format="JPEG")
+
+    db_root = tmp_path / "picasa_root"
+    db = PicasaDatabase.create_new(db_root)
+    db.set_watched_folder(str(photos_dir), "1")
+
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(str(photos_dir))
+
+    # Vérifier la ligne d'album de dossier (category = 2)
+    ad_cats = db.pmps["albumdata_category"].records
+    ad_tokens = db.pmps["albumdata_token"].records
+    assert ad_cats[0] == 8 and ad_tokens[0] == "]unknownface"
+    assert 2 in ad_cats
+
+    idx1 = db.find_photo_index(str(p1))
+    idx2 = db.find_photo_index(str(p2))
+    assert idx1 is not None and idx2 is not None and idx1 < idx2
+
+    # Marquer p2 favori, ajouter un mot-clé et un visage nommé
+    db.set_starred(idx2, True)
+    db.add_keyword(idx2, "Montagne")
+    fm = FaceManager(db)
+    fm.add_face(
+        str(p2),
+        FaceRect.from_rect64("rect64(2000200080008000)", "aabbccddeeff0011"),
+        "Alice Martin",
+        db_idx=idx2,
+    )
+    db.add_thumbnail(idx2, b"\xff\xd8\xff\xd9", size="bigthumbs")
+
+    # Supprimer p1 pour créer un trou (type=0) avant idx2, puis compacter
+    assert db.delete_photo(idx1)
+    assert db.thumbindex.records[idx1].type == 0
+    old_total = len(db.thumbindex.records)
+
+    db.compact()
+    assert len(db.thumbindex.records) < old_total
+
+    new_idx2 = db.find_photo_index(str(p2))
+    assert new_idx2 is not None and new_idx2 < idx2
+    # Vérifier que le sous-enregistrement de visage 1001 pointe vers new_idx2
+    face_recs = [r for r in db.thumbindex.records if r.type == 1001]
+    assert len(face_recs) == 1 and face_recs[0].parent_idx == new_idx2
+    # Vérifier que wordhash a réindexé ]star et montagne vers new_idx2
+    assert db.wordhash is not None
+    assert new_idx2 in db.wordhash.words.get("]star", [])
+    assert new_idx2 in db.wordhash.words.get("montagne", [])
+    # Vérifier que bigthumbs_0.db a été purgé à 4 octets lors du compactage (0x0041B793)
+    assert (db.db3_dir / "bigthumbs_0.db").stat().st_size == 4
+
+    # Vérifier les 5 fichiers .txt auxiliaires écrits dans db3
+    for txt_name in ("scanlist.txt", "starlist.txt", "saverlist.txt", "facetags.txt", "tags.txt"):
+        assert (db.db3_dir / txt_name).exists(), f"{txt_name} manquant"
+    assert "img_keep_me.jpg" in (db.db3_dir / "starlist.txt").read_text(encoding="utf-8")
+    assert "Alice Martin" in (db.db3_dir / "facetags.txt").read_text(encoding="utf-8")
+    assert "Montagne" in (db.db3_dir / "tags.txt").read_text(encoding="utf-8")
+
+    # 3. CBlockFile : blob de taille 0 -> (0,0,0,0) et invalidation d'entrée hors-limites au chargement
+    cont_test = BlockContainerFile()
+    zero_entry = cont_test.append_blob(b"", checksum=12345, block_idx=0)
+    assert zero_entry.is_empty and zero_entry.offset == 0 and zero_entry.size == 0 and zero_entry.checksum == 0
+

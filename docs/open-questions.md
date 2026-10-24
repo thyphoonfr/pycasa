@@ -181,3 +181,30 @@ Conformément à la règle §8 de `AGENTS.md`, les points suivants disposent d'u
    - *État* : Les 84 identifiants de filtres, leurs paramètres et leur sérialisation dans `.picasa.ini` (`filters=...`) ainsi que les tables de correspondance (`Sixties`, `CrossProcess`, `Cinemascope`, `HeatMap`, `NightVision`, `Polaroid`, `QuantizePalette`) extraites de `filterdesc.xml` sont exacts. Les shaders internes de certains effets Picnik (`MuseumMatte`, `ReanimatedEyeColor`, `PicnikFocalPixelate`, etc.) sont reproduits par approximation matricielle NumPy et marqués `# TODO(unverified)`.
 
 
+
+---
+
+## 13. Écarts relevés par comparaison différentielle avec une base réelle `db3` (17 196 enregistrements)
+
+Méthode : recalcul avec `picasa_py` des valeurs écrites par `picasa3.exe` pour des fichiers présents sur disque
+(scripts de vérification en lecture seule). Points corrigés : `tagdate` (0 pour les images, heure locale de
+modification pour les vidéos), `originfast` = 0 et pas de `thumbs2` pour les vidéos, `bigthumbs`/`previews` non
+créés au scan, grand côté des vignettes forcé à 144 / 72 px avec petit côté arrondi au supérieur, `ft1`/`ft2`
+FILETIME exacts (100 ns), type détecté par signature, jetons `wordhash` (nom de fichier + dimensions JPEG).
+
+Points non résolus (`# TODO(unverified)`) :
+
+1. **Arrondi du petit côté des vignettes** : `ceil` exact sur 97–98 % des cas ; les cas restants (valeur très
+   proche d'un entier, ex. 96,009 → 96) suggèrent un calcul sur l'image intermédiaire décodée. Routine à localiser
+   autour de `0x00424CA0`.
+2. **`imagedata_avgcolor`** : écart > 2 niveaux sur ~70 % de l'échantillon. L'original ne moyenne pas comme
+   `resize((1,1), BILINEAR)` sur la vignette 144 px (espace, gamma ou source différents). Routine non localisée.
+3. **Jetons `wordhash` non reproduits** : `]album:<jeton du dossier>` (album de dossier, catégorie 2),
+   `color:<teinte>` (10 teintes), mots EXIF/IPTC (`adobe`, `photoshop`, `iptc`…), étiquettes `]face`, `]star`,
+   `]edited`, `]updated`, `]geo`, `]hidden`… Algorithmes à localiser (indexeur de mots, classification de couleur).
+4. **Albums de dossier dans `albumdata_*`** : chaque dossier semble disposer d'une ligne `albumdata` de catégorie 2
+   (ex. « Pictures » → `]album:3926…`). Création et maintien de ces lignes non reproduits.
+5. **Dimensions des RAW** (`.PEF`…) : l'original stocke la taille capteur (ex. 4309×2868) ; `picasa_py` ne sait
+   pas décoder ces fichiers et écrit 640×480.
+6. **Détection par signature** : observée sur un seul enregistrement (WEBP nommé `.jpg` → type 31) ; routine de
+   détection non localisée dans le désassemblage.

@@ -2506,6 +2506,141 @@ class PicasaMainWindow(QMainWindow):
             QApplication.restoreOverrideCursor()
             QMessageBox.critical(self, "Erreur de compactage", f"Impossible de compacter la base : {e}")
 
+    def action_clean_picasa_traces(
+        self,
+        target_dir: Optional[str | Path] = None,
+        confirm: bool = True,
+    ) -> int:
+        """
+        FR: Permet de choisir un répertoire et de supprimer récursivement tous les fichiers
+        `.picasa.ini` (ainsi que `Picasa.ini`) qu'il contient, avec alertes de pré-vérification,
+        d'avertissement détaillé avant suppression et de bilan final (`ID_CLEAN_PICASA_TRACES`).
+        Retourne le nombre de fichiers `.picasa.ini` supprimés.
+        EN: Lets the user choose a directory and recursively delete all `.picasa.ini` (and
+        `Picasa.ini`) files under it, with pre-check, detailed warning confirmation, and
+        completion summary alerts (`ID_CLEAN_PICASA_TRACES`).
+        Returns the number of deleted `.picasa.ini` files.
+        Ref: picasa3.exe @ 0x0068AC80 (.picasa.ini), AGENTS.md §4 bis.3
+        """
+        if isinstance(target_dir, bool):
+            target_dir = None
+
+        interactive = target_dir is None
+        if target_dir is None:
+            default_dir = str(Path.home())
+            cur_filter = getattr(self.thumb_view, "current_folder_filter", None)
+            if cur_filter and not str(cur_filter).startswith(("album:", "person:", "starred")) and os.path.isdir(str(cur_filter)):
+                default_dir = str(cur_filter)
+            chosen = QFileDialog.getExistingDirectory(
+                self,
+                "Choisir le répertoire dont supprimer récursivement les traces Picasa (.picasa.ini)",
+                default_dir,
+            )
+            if not chosen:
+                return 0
+            target_dir = chosen
+
+        root_path = Path(target_dir)
+        if not root_path.exists() or not root_path.is_dir():
+            if interactive or confirm:
+                QMessageBox.warning(
+                    self,
+                    "Nettoyer les traces Picasa",
+                    f"Le répertoire sélectionné est introuvable ou invalide :\n{root_path}",
+                )
+            return 0
+
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        try:
+            traces = PicasaDatabase.find_picasa_ini_traces(root_path)
+        finally:
+            QApplication.restoreOverrideCursor()
+
+        if not traces:
+            self.status_bar.showMessage(f"Aucune trace .picasa.ini trouvée dans {root_path}")
+            if interactive or confirm:
+                QMessageBox.information(
+                    self,
+                    "Aucune trace Picasa détectée",
+                    f"Aucun fichier .picasa.ini n'a été trouvé dans le répertoire :\n{root_path}\n"
+                    "ni dans ses sous-dossiers.",
+                )
+            return 0
+
+        if confirm:
+            preview_lines: List[str] = []
+            for p in traces[:8]:
+                try:
+                    preview_lines.append(f"  • {p.relative_to(root_path)}")
+                except Exception:
+                    preview_lines.append(f"  • {p}")
+            if len(traces) > 8:
+                preview_lines.append(f"  • ... et {len(traces) - 8} autre(s) fichier(s)")
+            preview_block = "\n".join(preview_lines)
+
+            warn_msg = (
+                f"Attention : vous êtes sur le point de supprimer définitivement "
+                f"{len(traces)} fichier(s) « .picasa.ini » dans :\n{root_path}\n"
+                f"(ainsi que tous ses sous-dossiers).\n\n"
+                f"Fichiers détectés :\n{preview_block}\n\n"
+                "Conséquences de cette suppression :\n"
+                "• Vos fichiers photos et vidéos originaux NE SERONT PAS touchés ni supprimés.\n"
+                "• En revanche, les métadonnées locales Picasa stockées uniquement dans ces fichiers "
+                ".picasa.ini (retouches non enregistrées sur le disque, étoiles/favoris, albums virtuels, "
+                "descriptions de dossiers et tags de visages non écrits en XMP) seront effacées.\n\n"
+                "Voulez-vous vraiment supprimer tous ces fichiers .picasa.ini ?"
+            )
+            rep = QMessageBox.warning(
+                self,
+                "Confirmation — Nettoyer les traces Picasa (.picasa.ini)",
+                warn_msg,
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if rep != QMessageBox.StandardButton.Yes:
+                self.status_bar.showMessage("Nettoyage des traces Picasa annulé.")
+                return 0
+
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        try:
+            if self.db is not None:
+                deleted, failed = self.db.clean_picasa_ini_traces(root_path)
+            else:
+                temp_db = PicasaDatabase()
+                deleted, failed = temp_db.clean_picasa_ini_traces(root_path)
+        finally:
+            QApplication.restoreOverrideCursor()
+
+        if deleted:
+            self.notify_folders_changed()
+            self.notify_albums_changed()
+            self.thumb_view.update()
+
+        del_count = len(deleted)
+        fail_count = len(failed)
+        self.status_bar.showMessage(
+            f"Nettoyage Picasa terminé : {del_count} fichier(s) .picasa.ini supprimé(s) dans {root_path}."
+        )
+
+        if interactive or confirm:
+            if fail_count == 0:
+                QMessageBox.information(
+                    self,
+                    "Nettoyage Picasa terminé",
+                    f"Nettoyage terminé avec succès !\n\n"
+                    f"{del_count} fichier(s) .picasa.ini ont été supprimés récursivement dans :\n{root_path}",
+                )
+            else:
+                err_preview = "\n".join(f"• {p} : {err}" for p, err in failed[:5])
+                QMessageBox.warning(
+                    self,
+                    "Nettoyage Picasa partiel",
+                    f"{del_count} fichier(s) .picasa.ini supprimé(s), mais {fail_count} fichier(s) "
+                    f"n'ont pas pu être supprimés :\n\n{err_preview}",
+                )
+
+        return del_count
+
     def action_import(self) -> None:
         """
         FR: Ouvre l'écran d'importation depuis une carte mémoire, un appareil ou un dossier (ACQUIREPANEL_TEXT_FR.XML).
