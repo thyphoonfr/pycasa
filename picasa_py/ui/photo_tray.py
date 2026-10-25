@@ -12,9 +12,9 @@ Ref: AGENTS.md §4 bis (Disposition et fonctionnement identiques à l'original)
 
 from __future__ import annotations
 import os
-from typing import List, Optional, Any, Tuple
+from typing import List, Optional, Any, Tuple, Set
 from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSlider, QFrame,
+    QWidget, QHBoxLayout, QVBoxLayout, QGridLayout, QPushButton, QLabel, QSlider, QFrame,
     QScrollArea, QMenu, QSizePolicy, QDialog, QListWidget, QListWidgetItem
 )
 from PySide6.QtCore import Qt, Signal, QRect, QSize, QPoint
@@ -421,28 +421,67 @@ def _resolve_item_pixmap(item: Any, db: Optional[Any] = None) -> Optional[QPixma
 
 class PicasaTrayThumbnailItemWidget(QWidget):
     """
-    FR: Vignette individuelle miniature au sein du bac à photos (Picture Tray).
-    EN: Individual miniature thumbnail widget inside the Picture Tray.
-    Ref: picasa3.exe @ Picture Tray, 0x0088C3EC
+    FR: Vignette individuelle miniature au sein du bac à photos (`thumbui/scratch`, `CSelectionNode` @ `0x00714990`).
+    Reproduit le comportement exact désassemblé dans `CSelectionNode::HandleMouseAndKeyMessage` (`0x007199B0`) :
+    - Clic gauche simple (`WM_LBUTTONDOWN` @ `0x00719C37`) : sélectionne/focalise la miniature dans le bac
+      (avec support `Ctrl` et `Shift`) sans jamais supprimer les autres miniatures du bac (`0x00570C62`).
+    - Double-clic gauche (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) : ouvre la photo en mode Édition
+      (`thumbui/fullview`) tout en conservant toutes les miniatures dans le bac.
+    - Clic droit (`WM_RBUTTONDOWN` @ `0x00719ACE` -> `0x00732EE0`) : ouvre le menu contextuel à 7 entrées du bac.
+    EN: Individual miniature thumbnail widget inside the Picture Tray (`thumbui/scratch`, `CSelectionNode` @ `0x00714990`).
+    Reproduces the exact disassembled behavior in `CSelectionNode::HandleMouseAndKeyMessage` (`0x007199B0`):
+    - Single left-click (`WM_LBUTTONDOWN` @ `0x00719C37`): selects/focuses the thumbnail in the tray
+      (with `Ctrl` and `Shift` support) without ever removing other thumbnails from the tray (`0x00570C62`).
+    - Double left-click (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`): opens the photo in Edit mode
+      (`thumbui/fullview`) while keeping all thumbnails in the tray.
+    - Right-click (`WM_RBUTTONDOWN` @ `0x00719ACE` -> `0x00732EE0`): opens the 7-item tray context menu.
+    Ref: picasa3.exe @ 0x00714990, 0x007199B0, 0x0071DAC0, 0x0056BFD0, 0x00732EE0
     """
     clicked = Signal(object)
+    clicked_with_modifiers = Signal(object, object)
+    double_clicked = Signal(object)
+    context_menu_requested = Signal(object, QPoint)
     remove_clicked = Signal(object)
 
-    def __init__(self, item: Any, is_held: bool = False, parent: Optional[QWidget] = None):
+    def __init__(
+        self,
+        item: Any,
+        is_held: bool = False,
+        is_selected: bool = False,
+        is_focused: bool = False,
+        cell_size: int = 46,
+        parent: Optional[QWidget] = None,
+    ):
         """
         FR: Initialise la vignette d'un élément dans le bac à photos.
         EN: Initializes an item thumbnail widget in the photo tray.
         """
         super().__init__(parent)
         self.item = item
-        self.is_held = is_held
+        self.is_held: bool = is_held
+        self.is_selected: bool = is_selected
+        self.is_focused: bool = is_focused
         self.is_hovered: bool = False
+        self.cell_size: int = max(16, int(cell_size))
 
-        self.setFixedSize(46, 46)
+        self.setFixedSize(self.cell_size, self.cell_size)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         fname = getattr(item, "filename", "") or os.path.basename(getattr(item, "path", ""))
-        self.setToolTip(f"{fname}\n(Clic pour afficher, clic-droit pour retirer du bac)")
+        self.setToolTip(
+            f"{fname}\n(Clic : sélectionner, Double-clic : modifier, Clic droit : menu)"
+        )
+
+    def set_cell_size(self, cell_size: int) -> None:
+        """
+        FR: Met à jour la taille de la cellule selon l'algorithme `LayoutMode9` (`0x0071DAC0`).
+        EN: Updates the cell size according to the `LayoutMode9` (`0x0071DAC0`) algorithm.
+        """
+        new_sz = max(16, int(cell_size))
+        if new_sz != self.cell_size:
+            self.cell_size = new_sz
+            self.setFixedSize(self.cell_size, self.cell_size)
+            self.update()
 
     def enterEvent(self, event: Any) -> None:
         """
@@ -464,267 +503,153 @@ class PicasaTrayThumbnailItemWidget(QWidget):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """
-        FR: Gère le clic gauche (sélection ou suppression sur le badge) et le clic droit (retrait du bac).
-        EN: Handles left-click (selection or removal on badge) and right-click (remove from tray).
+        FR: Gère le clic gauche (`WM_LBUTTONDOWN` @ `0x00719C37` : sélection interne au bac sans suppression)
+        et le clic droit (`WM_RBUTTONDOWN` @ `0x00719ACE` -> menu contextuel `0x00732EE0`).
+        EN: Handles left-click (`WM_LBUTTONDOWN` @ `0x00719C37`: in-tray selection without removal)
+        and right-click (`WM_RBUTTONDOWN` @ `0x00719ACE` -> context menu `0x00732EE0`).
         """
         if event.button() == Qt.MouseButton.LeftButton:
-            # FR: Vérifier si clic sur la zone de fermeture en haut à droite
-            # EN: Check if click is inside the top-right close area
-            if self.is_hovered and event.pos().x() >= 30 and event.pos().y() <= 14:
-                self.remove_clicked.emit(self.item)
-            else:
-                self.clicked.emit(self.item)
+            self.clicked_with_modifiers.emit(self.item, event.modifiers())
+            self.clicked.emit(self.item)
         elif event.button() == Qt.MouseButton.RightButton:
-            self.remove_clicked.emit(self.item)
+            self.context_menu_requested.emit(self.item, event.globalPosition().toPoint())
         super().mousePressEvent(event)
+
+    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
+        """
+        FR: Gère le double-clic gauche (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) pour basculer
+        en mode Édition (`thumbui/fullview`) tout en conservant toutes les miniatures dans le bac.
+        EN: Handles double left-click (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) to switch
+        to Edit mode (`thumbui/fullview`) while keeping all thumbnails in the tray.
+        """
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.double_clicked.emit(self.item)
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
 
     def paintEvent(self, event: QPaintEvent) -> None:
         """
-        FR: Dessine la miniature, son cadre blanc de tirage photo et les badges d'état.
-        EN: Paints the thumbnail, its white photo print border, and state badges.
+        FR: Dessine la miniature, son cadre blanc de tirage photo, la bordure de sélection (`#009EFF`)
+        et l'indicateur vert de maintien (`Hold` @ `[pItem + 0xBC]`).
+        EN: Paints the thumbnail, its white photo-print border, selection border (`#009EFF`),
+        and green Hold indicator (`Hold` @ `[pItem + 0xBC]`).
+        Ref: picasa3.exe @ 0x00714990, 0x0071DAC0, 0x0088C3EC
         """
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
 
-        # FR: 1. Cadre de fond type tirage photo (bordure blanche Picasa)
-        # EN: 1. Photo-print background frame (Picasa white border)
-        rect = QRect(2, 2, 42, 42)
+        sz = self.cell_size
+        pad = 2 if sz >= 28 else 1
+        inner_box = max(8, sz - 2 * pad)
+        rect = QRect(pad, pad, inner_box, inner_box)
         painter.fillRect(rect, QColor("#22252A"))
 
-        # FR: 2. Image miniature réelle
-        # EN: 2. Actual thumbnail image
-        scaled = getattr(self.item, "_tray_scaled_38", None)
+        img_max = max(6, inner_box - (4 if sz >= 28 else 2))
+        cache_attr = f"_tray_scaled_{img_max}"
+        scaled = getattr(self.item, cache_attr, None)
         if not isinstance(scaled, QPixmap) or scaled.isNull():
             pix = _resolve_item_pixmap(self.item)
             if pix and not pix.isNull():
-                scaled = pix.scaled(38, 38, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                scaled = pix.scaled(
+                    img_max,
+                    img_max,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
                 try:
-                    setattr(self.item, "_tray_scaled_38", scaled)
+                    setattr(self.item, cache_attr, scaled)
                 except Exception:
                     pass
         if scaled and not scaled.isNull():
-            x_off = 2 + (42 - scaled.width()) // 2
-            y_off = 2 + (42 - scaled.height()) // 2
+            x_off = pad + (inner_box - scaled.width()) // 2
+            y_off = pad + (inner_box - scaled.height()) // 2
             frame_r = QRect(x_off - 1, y_off - 1, scaled.width() + 2, scaled.height() + 2)
             painter.fillRect(frame_r, QColor("#FFFFFF"))
             painter.drawPixmap(x_off, y_off, scaled)
         else:
             painter.setPen(QColor("#777E8C"))
-            painter.setFont(QFont("Segoe UI", 12))
+            painter.setFont(QFont("Segoe UI", max(7, sz // 4)))
             is_vid = getattr(self.item, "is_video", False)
             painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, "🎬" if is_vid else "🖼️")
 
-        # FR: 3. Bordure selon état (Normal, Survol, Held)
-        # EN: 3. Border according to state (Normal, Hover, Held)
-        if self.is_held:
-            pen = QPen(QColor("#4CAF50"), 1.8)
+        # FR: 3. Bordure selon état (Sélectionné/Focalisé dans le bac `#009EFF`, Survol `#3D85B3`, Maintenu `#4CAF50`, Normal)
+        # EN: 3. Border according to state (Selected/Focused in tray `#009EFF`, Hover `#3D85B3`, Held `#4CAF50`, Normal)
+        if self.is_selected or self.is_focused:
+            pen = QPen(QColor("#009EFF"), 2.0)
         elif self.is_hovered:
-            pen = QPen(QColor("#3D85B3"), 1.5)
+            pen = QPen(QColor("#3D85B3"), 1.6)
+        elif self.is_held:
+            pen = QPen(QColor("#4CAF50"), 1.6)
         else:
-            pen = QPen(QColor("#D0D4DC"), 1)
+            pen = QPen(QColor("#D0D4DC"), 1.0)
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(rect)
 
-        # FR: 4. Petit badge de suppression en survol
-        # EN: 4. Small close/remove badge on hover
-        if self.is_hovered:
-            close_r = QRect(31, 2, 13, 13)
-            painter.fillRect(close_r, QColor(0, 0, 0, 190))
-            painter.setPen(QColor("#FF5555"))
-            painter.setFont(QFont("Arial", 8, QFont.Weight.Bold))
-            painter.drawText(close_r, Qt.AlignmentFlag.AlignCenter, "✕")
-
-        # FR: 5. Badge d'épingle si 'Held'
-        # EN: 5. Pin badge if 'Held'
+        # FR: 4. Indicateur d'épingle verte si l'élément est maintenu (`holdCount > 0` @ `[pItem + 0xBC]`)
+        # EN: 4. Green pin indicator if item is held (`holdCount > 0` @ `[pItem + 0xBC]`)
         if self.is_held:
-            pin_r = QRect(3, 3, 10, 10)
-            painter.setPen(QColor("#4CAF50"))
-            painter.setFont(QFont("Segoe UI Emoji", 7))
-            painter.drawText(pin_r, Qt.AlignmentFlag.AlignCenter, "📌")
+            if sz >= 28:
+                pin_r = QRect(pad + 1, pad + 1, 10, 10)
+                painter.setPen(QColor("#4CAF50"))
+                painter.setFont(QFont("Segoe UI Emoji", 7))
+                painter.drawText(pin_r, Qt.AlignmentFlag.AlignCenter, "📌")
+            else:
+                painter.fillRect(QRect(pad + 1, pad + 1, 5, 5), QColor("#4CAF50"))
 
 
 class PicasaTrayThumbnailStackWidget(QWidget):
     """
-    FR: Affichage regroupé en pile / éventail (`CScratchPad` @ 0x0088C3EC) lorsque de nombreuses
-    photos (> 4) sont sélectionnées dans le bac à photos (`thumbui/scratch`).
-    Affiche les miniatures chevauchées avec cadre photo blanc, ombre portée et badge du total.
-    EN: Stacked / fanned display (`CScratchPad` @ 0x0088C3EC) when many photos (> 4)
-    are selected in the photo tray (`thumbui/scratch`).
-    Displays overlapping thumbnails with white photo border, drop shadow, and total count badge.
+    FR: Widget conservé pour compatibilité ascendante des imports éventuels.
+    Dans `picasa3.exe` (`CSelectionNode::LayoutMode9` @ `0x0071DAC0`), `thumbui/scratch` utilise
+    une grille multi-colonnes / multi-lignes auto-réductrice où chaque miniature reste visible.
+    EN: Widget retained for backward import compatibility.
+    In `picasa3.exe` (`CSelectionNode::LayoutMode9` @ `0x0071DAC0`), `thumbui/scratch` uses
+    an auto-scaling multi-column / multi-row grid where every thumbnail remains individually visible.
     """
     clicked = Signal(object)
+    double_clicked = Signal(object)
     remove_clicked = Signal(object)
 
     def __init__(self, items: List[Any], is_held: bool = False, parent: Optional[QWidget] = None):
-        """
-        FR: Initialise le widget de pile de miniatures avec la liste des éléments sélectionnés.
-        EN: Initializes the thumbnail stack widget with the list of selected items.
-        """
         super().__init__(parent)
         self.items = list(items)
         self.is_held = is_held
-        self.hovered_index: int = -1
-        self.setMinimumWidth(190)
-        self.setFixedHeight(48)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.setMouseTracking(True)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setToolTip(f"{len(self.items)} photos sélectionnées dans le bac\n(Clic pour afficher la photo survolée)")
-
-    def _visible_cards(self) -> List[Tuple[int, Any, QRect]]:
-        """
-        FR: Calcule les positions chevauchées des cartes de la pile dans la largeur disponible.
-        EN: Computes the overlapping card positions of the stack within the available width.
-        """
-        n = len(self.items)
-        if n == 0:
-            return []
-        max_cards = min(n, 12)
-        avail_w = max(160, self.width() - 8)
-        card_sz = 42
-        if max_cards == 1:
-            step = 0
-        else:
-            step = max(8, min(32, (avail_w - card_sz - 12) // (max_cards - 1)))
-        cards: List[Tuple[int, Any, QRect]] = []
-        for idx in range(max_cards):
-            item = self.items[idx]
-            x = 4 + idx * step
-            y = 3 + ((idx % 3) - 1)  # FR: léger décalage vertical naturel d'une pile Picasa / EN: natural vertical offset of a Picasa stack
-            cards.append((idx, item, QRect(x, y, card_sz, card_sz)))
-        return cards
-
-    def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        """
-        FR: Met à jour la carte survolée et l'infobulle lors du déplacement de la souris sur la pile.
-        EN: Updates the hovered card and tooltip when moving the mouse over the stack.
-        """
-        pos = event.pos()
-        hit = -1
-        for idx, _, r in reversed(self._visible_cards()):
-            if r.contains(pos):
-                hit = idx
-                break
-        if hit != self.hovered_index:
-            self.hovered_index = hit
-            if 0 <= hit < len(self.items):
-                it = self.items[hit]
-                fname = getattr(it, "filename", "") or os.path.basename(getattr(it, "path", ""))
-                self.setToolTip(f"{fname} ({hit + 1}/{len(self.items)} dans la pile)")
-            self.update()
-        super().mouseMoveEvent(event)
-
-    def leaveEvent(self, event: Any) -> None:
-        """
-        FR: Réinitialise l'indice de carte survolée lorsque la souris quitte la pile.
-        EN: Resets the hovered card index when the mouse leaves the stack.
-        """
-        self.hovered_index = -1
-        self.update()
-        super().leaveEvent(event)
-
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        """
-        FR: Émet le signal de clic ou de retrait pour la carte survolée dans la pile.
-        EN: Emits the click or remove signal for the hovered card in the stack.
-        """
-        if not self.items:
-            return
-        idx = self.hovered_index if 0 <= self.hovered_index < len(self.items) else (len(self.items) - 1)
-        target = self.items[idx]
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit(target)
-        elif event.button() == Qt.MouseButton.RightButton:
-            self.remove_clicked.emit(target)
-        super().mousePressEvent(event)
-
-    def paintEvent(self, event: QPaintEvent) -> None:
-        """
-        FR: Dessine les cartes chevauchées de la pile ainsi que le badge du nombre total d'éléments.
-        EN: Paints the overlapping cards of the stack as well as the total item count badge.
-        """
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-
-        cards = self._visible_cards()
-        for idx, item, rect in cards:
-            # FR: Ombre portée sous chaque vignette de la pile
-            # EN: Drop shadow under each thumbnail in the stack
-            shadow_r = rect.adjusted(2, 2, 2, 2)
-            painter.fillRect(shadow_r, QColor(0, 0, 0, 110))
-
-            # FR: Fond blanc de tirage photo
-            # EN: White photo-print background
-            painter.fillRect(rect, QColor("#F4F5F7"))
-            inner_r = rect.adjusted(2, 2, -2, -2)
-            painter.fillRect(inner_r, QColor("#22252A"))
-
-            pix = _resolve_item_pixmap(item)
-            if pix and not pix.isNull():
-                scaled = pix.scaled(
-                    inner_r.width(),
-                    inner_r.height(),
-                    Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                    Qt.TransformationMode.SmoothTransformation,
-                )
-                sx = max(0, (scaled.width() - inner_r.width()) // 2)
-                sy = max(0, (scaled.height() - inner_r.height()) // 2)
-                painter.drawPixmap(inner_r.topLeft(), scaled, QRect(sx, sy, inner_r.width(), inner_r.height()))
-
-            if idx == self.hovered_index:
-                pen = QPen(QColor("#3D85B3"), 2.0)
-            elif self.is_held:
-                pen = QPen(QColor("#4CAF50"), 1.6)
-            else:
-                pen = QPen(QColor("#FFFFFF"), 1.2)
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRect(rect)
-
-        # FR: Badge du nombre total de photos empilées en bas à droite de la pile
-        # EN: Total stacked photo count badge at the bottom right of the stack
-        if cards:
-            last_rect = cards[-1][2]
-            badge_text = f"×{len(self.items)}"
-            badge_w = max(26, 8 + len(badge_text) * 7)
-            badge_r = QRect(
-                min(self.width() - badge_w - 2, last_rect.right() - badge_w // 2),
-                last_rect.bottom() - 15,
-                badge_w,
-                16,
-            )
-            painter.setPen(QPen(QColor("#FFFFFF"), 1))
-            painter.setBrush(QBrush(QColor("#2B6DA8" if not self.is_held else "#2E7D32")))
-            painter.drawRoundedRect(badge_r, 7, 7)
-            painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
-            painter.drawText(badge_r, Qt.AlignmentFlag.AlignCenter, badge_text)
 
 
 class PicasaTrayThumbnailStrip(QScrollArea):
     """
-    FR: Ruban horizontal de prévisualisation des miniatures dans le bac à photos (`thumbui/scratch`),
-    avec filigrane « Sélection » (`thumbui/scratchlabel`) lorsqu'il est vide, et regroupement
-    automatique en pile (`CScratchPad`) lorsque plus de 4 photos sont sélectionnées.
-    EN: Horizontal thumbnail preview strip in the photo tray (`thumbui/scratch`),
-    with "Selection" watermark (`thumbui/scratchlabel`) when empty, and automatic
-    stack grouping (`CScratchPad`) when more than 4 photos are selected.
+    FR: Conteneur de miniatures du bac de sélection (`thumbui/scratch`, `CSelectionNode` @ `0x00714990`),
+    avec filigrane « Sélection » (`thumbui/scratchlabel`) lorsqu'il est vide, et mise en page
+    en grille adaptative multi-lignes / multi-colonnes fidèle à `CSelectionNode::LayoutMode9` (`0x0071DAC0`).
+    Chaque miniature reste individuellement visible, cliquable (sélection dans le bac sans vider les autres),
+    double-cliquable (passage en Édition One-Up) et cliquable avec le bouton droit (menu contextuel du bac).
+    EN: Selection tray thumbnail container (`thumbui/scratch`, `CSelectionNode` @ `0x00714990`),
+    with "Selection" watermark (`thumbui/scratchlabel`) when empty, and adaptive multi-row / multi-column
+    grid layout faithful to `CSelectionNode::LayoutMode9` (`0x0071DAC0`).
+    Every thumbnail remains individually visible, clickable (in-tray selection without clearing others),
+    double-clickable (switches to One-Up Edit mode), and right-clickable (tray context menu).
     Ref: respack.yt @ thumbui/scratch (rect 8, 455, 223, 515), thumbui/scratchlabel (rect 13, 480, 218, 499)
+    Ref: picasa3.exe @ 0x00714990, 0x007199B0, 0x0071DAC0, 0x005709A0, 0x0056BFD0, 0x00732EE0
     """
     item_clicked = Signal(object)
+    item_double_clicked = Signal(object)
+    item_context_menu_requested = Signal(object, QPoint)
     item_remove_requested = Signal(object)
+    subselection_changed = Signal()
 
     def __init__(self, parent: Optional[QWidget] = None):
         """
-        FR: Initialise le ruban défilant de miniatures et son filigrane « Sélection ».
-        EN: Initializes the scrollable thumbnail strip and its "Selection" watermark.
+        FR: Initialise le conteneur de miniatures `thumbui/scratch` et son filigrane « Sélection ».
+        EN: Initializes the `thumbui/scratch` thumbnail container and its "Selection" watermark.
         """
         super().__init__(parent)
         self.setFixedHeight(60)
         self.setMinimumWidth(140)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setWidgetResizable(True)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.setStyleSheet("""
@@ -735,23 +660,25 @@ class PicasaTrayThumbnailStrip(QScrollArea):
                 border-right: 1px solid #3C414B;
                 border-radius: 3px;
             }
-            QScrollBar:horizontal {
+            QScrollBar:horizontal, QScrollBar:vertical {
                 height: 4px;
+                width: 4px;
                 background: #1D2025;
                 border: none;
             }
-            QScrollBar::handle:horizontal {
+            QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
                 background: #555B66;
                 border-radius: 2px;
                 min-width: 16px;
+                min-height: 12px;
             }
         """)
 
         self.container = QWidget()
         self.container.setStyleSheet("background: transparent;")
         self.layout_h = QHBoxLayout(self.container)
-        self.layout_h.setContentsMargins(4, 4, 4, 4)
-        self.layout_h.setSpacing(4)
+        self.layout_h.setContentsMargins(3, 3, 3, 3)
+        self.layout_h.setSpacing(2)
 
         # FR: Filigrane « Sélection » (thumbui/scratchlabel) affiché quand le bac est vide
         # EN: "Selection" watermark (thumbui/scratchlabel) displayed when the tray is empty
@@ -760,11 +687,31 @@ class PicasaTrayThumbnailStrip(QScrollArea):
             "color: #555B66; font-size: 13px; font-weight: bold; font-style: italic; padding-left: 8px;"
         )
         self.layout_h.addWidget(self.watermark_label)
+
+        self.grid_host = QWidget(self.container)
+        self.grid_host.setStyleSheet("background: transparent;")
+        self.grid_layout = QGridLayout(self.grid_host)
+        self.grid_layout.setContentsMargins(0, 0, 0, 0)
+        self.grid_layout.setHorizontalSpacing(2)
+        self.grid_layout.setVerticalSpacing(2)
+        self.layout_h.addWidget(self.grid_host)
         self.layout_h.addStretch(1)
 
         self.setWidget(self.container)
         self.items: List[Any] = []
+        self.item_widgets: List[PicasaTrayThumbnailItemWidget] = []
         self.is_held: bool = False
+        self.held_paths: Set[str] = set()
+        # FR: Sous-sélection interne au bac (`[pItem + 0x5D]` et `focusedItemId` @ `[this + 0x390]`)
+        # EN: In-tray sub-selection (`[pItem + 0x5D]` and `focusedItemId` @ `[this + 0x390]`)
+        self.selected_paths: Set[str] = set()
+        self.focused_path: Optional[str] = None
+        self.anchor_idx: int = -1
+
+    @staticmethod
+    def _item_key(item: Any) -> str:
+        p = getattr(item, "path", None)
+        return str(p) if p else f"id:{id(item)}"
 
     def apply_style(self, style: PicasaStyle) -> None:
         """
@@ -783,57 +730,246 @@ class PicasaTrayThumbnailStrip(QScrollArea):
                 border-right: 1px solid {border_bot};
                 border-radius: 3px;
             }}
-            QScrollBar:horizontal {{
+            QScrollBar:horizontal, QScrollBar:vertical {{
                 height: 4px;
+                width: 4px;
                 background: {strip_bg};
                 border: none;
             }}
-            QScrollBar::handle:horizontal {{
+            QScrollBar::handle:horizontal, QScrollBar::handle:vertical {{
                 background: {style.topbar_btn_border.name()};
                 border-radius: 2px;
                 min-width: 16px;
+                min-height: 12px;
             }}
         """)
         self.watermark_label.setStyleSheet(
             f"color: {wm_color}; font-size: 13px; font-weight: bold; font-style: italic; padding-left: 8px;"
         )
 
-
-    def set_items(self, items: List[Any], is_held: bool = False) -> None:
+    def _compute_layout_mode_9(self, n_items: int) -> Tuple[int, int]:
         """
-        FR: Met à jour les éléments affichés dans le ruban (vignettes individuelles ou pile chevauchée).
-        EN: Updates the items displayed in the strip (individual thumbnails or overlapping stack).
+        FR: Calcule `(cell_size, cols)` selon l'algorithme exact `CSelectionNode::LayoutMode9` (`0x0071DAC0`) :
+        décrémente la taille de cellule `cell_sz` depuis `46px` jusqu'à ce que toutes les lignes
+        `rows = ceil(n_items / cols)` tiennent dans la hauteur du bac (`avail_h`), avec un plancher
+        lisible de `18px` pour que chaque miniature reste individuellement visible et cliquable.
+        EN: Computes `(cell_size, cols)` following the exact `CSelectionNode::LayoutMode9` (`0x0071DAC0`) algorithm:
+        decrements `cell_sz` from `46px` until all rows `rows = ceil(n_items / cols)` fit within the tray
+        height (`avail_h`), with a readable floor of `18px` so every thumbnail stays visible and clickable.
+        Ref: picasa3.exe @ 0x0071DAC0 (LayoutMode9)
+        """
+        if n_items <= 0:
+            return 46, 1
+        avail_w = max(180, (self.viewport().width() if self.viewport() else self.width()) - 8)
+        avail_h = max(48, (self.viewport().height() if self.viewport() else self.height()) - 6)
+        gap = 2
+        for cell_sz in range(46, 17, -1):
+            cols = max(1, (avail_w + gap) // (cell_sz + gap))
+            rows = (n_items + cols - 1) // cols
+            if rows * (cell_sz + gap) - gap <= avail_h:
+                return cell_sz, cols
+        cell_sz = 18
+        cols = max(1, (avail_w + gap) // (cell_sz + gap))
+        return cell_sz, cols
+
+    def set_items(
+        self,
+        items: List[Any],
+        is_held: bool = False,
+        held_paths: Optional[Set[str]] = None,
+    ) -> None:
+        """
+        FR: Met à jour les éléments affichés dans le bac (`thumbui/scratch`) sous forme de grille
+        de vignettes individuelles (`LayoutMode9` @ `0x0071DAC0`).
+        EN: Updates the items displayed in the tray (`thumbui/scratch`) as a grid of individual
+        thumbnails (`LayoutMode9` @ `0x0071DAC0`).
         """
         self.items = list(items)
         self.is_held = is_held
-
-        # FR: Nettoyage des widgets de miniatures existants (en préservant watermark_label et le stretch)
-        # EN: Clean up existing thumbnail widgets (preserving watermark_label and stretch)
-        for i in reversed(range(self.layout_h.count())):
-            w_item = self.layout_h.itemAt(i)
-            w = w_item.widget() if w_item else None
-            if w and w is not self.watermark_label:
-                self.layout_h.takeAt(i)
-                w.deleteLater()
-
-        self.watermark_label.setVisible(len(self.items) == 0)
-
-        # Ref: picasa3.exe @ 0x0088C3EC (CScratchPad) :
-        # FR: - Jusqu'à 4 photos : affichage côte à côte des miniatures
-        # FR: - Plus de 4 photos : regroupement visuel en pile chevauchée (PicasaTrayThumbnailStackWidget)
-        # EN: - Up to 4 photos: side-by-side thumbnail display
-        # EN: - More than 4 photos: visual grouping in an overlapping stack (PicasaTrayThumbnailStackWidget)
-        if len(self.items) > 4:
-            stack_w = PicasaTrayThumbnailStackWidget(self.items, is_held=self.is_held, parent=self.container)
-            stack_w.clicked.connect(self.item_clicked.emit)
-            stack_w.remove_clicked.connect(self.item_remove_requested.emit)
-            self.layout_h.insertWidget(self.layout_h.count() - 1, stack_w, 1)
+        if held_paths is not None:
+            self.held_paths = set(held_paths)
+        elif is_held:
+            self.held_paths = {self._item_key(it) for it in self.items}
         else:
-            for it in self.items:
-                w = PicasaTrayThumbnailItemWidget(it, is_held=self.is_held, parent=self.container)
-                w.clicked.connect(self.item_clicked.emit)
-                w.remove_clicked.connect(self.item_remove_requested.emit)
-                self.layout_h.insertWidget(self.layout_h.count() - 1, w)
+            self.held_paths.clear()
+
+        valid_keys = {self._item_key(it) for it in self.items}
+        self.selected_paths &= valid_keys
+        if self.focused_path not in valid_keys:
+            self.focused_path = self._item_key(self.items[0]) if self.items else None
+
+        for w in self.item_widgets:
+            self.grid_layout.removeWidget(w)
+            w.deleteLater()
+        self.item_widgets.clear()
+
+        has_items = len(self.items) > 0
+        self.watermark_label.setVisible(not has_items)
+        self.grid_host.setVisible(has_items)
+        if not has_items:
+            return
+
+        cell_sz, cols = self._compute_layout_mode_9(len(self.items))
+        for idx, it in enumerate(self.items):
+            key = self._item_key(it)
+            it_held = self.is_held or (key in self.held_paths)
+            it_sel = key in self.selected_paths
+            it_foc = (key == self.focused_path) and (len(self.selected_paths) <= 1)
+            w = PicasaTrayThumbnailItemWidget(
+                it,
+                is_held=it_held,
+                is_selected=it_sel,
+                is_focused=it_foc,
+                cell_size=cell_sz,
+                parent=self.grid_host,
+            )
+            w.clicked_with_modifiers.connect(self._on_widget_clicked_with_modifiers)
+            w.double_clicked.connect(self._on_widget_double_clicked)
+            w.context_menu_requested.connect(self._on_widget_context_menu)
+            w.remove_clicked.connect(self.item_remove_requested.emit)
+            row = idx // cols
+            col = idx % cols
+            self.grid_layout.addWidget(w, row, col)
+            self.item_widgets.append(w)
+
+    def resizeEvent(self, event: Any) -> None:
+        """
+        FR: Recalcule la grille `LayoutMode9` (`0x0071DAC0`) lors du redimensionnement du bac.
+        EN: Recomputes the `LayoutMode9` (`0x0071DAC0`) grid when the tray is resized.
+        """
+        super().resizeEvent(event)
+        if self.item_widgets and self.items:
+            cell_sz, cols = self._compute_layout_mode_9(len(self.items))
+            for idx, w in enumerate(self.item_widgets):
+                w.set_cell_size(cell_sz)
+                self.grid_layout.removeWidget(w)
+                self.grid_layout.addWidget(w, idx // cols, idx % cols)
+
+    def _sync_widget_states(self) -> None:
+        """
+        FR: Rafraîchit les états visuels (`is_selected`, `is_focused`, `is_held`) de chaque miniature du bac.
+        EN: Refreshes the visual states (`is_selected`, `is_focused`, `is_held`) of each tray thumbnail.
+        """
+        for w in self.item_widgets:
+            key = self._item_key(w.item)
+            w.is_held = self.is_held or (key in self.held_paths)
+            w.is_selected = key in self.selected_paths
+            w.is_focused = (key == self.focused_path)
+            w.update()
+
+    def set_focused_path(self, path: Optional[str], select_only_focused: bool = False) -> None:
+        """
+        FR: Met en évidence la miniature correspondant à `path` dans le bac (`focusedItemId` @ `[this + 0x390]`).
+        EN: Highlights the thumbnail matching `path` in the tray (`focusedItemId` @ `[this + 0x390]`).
+        """
+        if not path:
+            self.focused_path = None
+            if select_only_focused:
+                self.selected_paths.clear()
+            self._sync_widget_states()
+            return
+        norm_target = os.path.normcase(os.path.normpath(path))
+        matched_key: Optional[str] = None
+        for idx, it in enumerate(self.items):
+            k = self._item_key(it)
+            if k == path or os.path.normcase(os.path.normpath(k)) == norm_target:
+                matched_key = k
+                self.anchor_idx = idx
+                break
+        if matched_key is not None:
+            self.focused_path = matched_key
+            if select_only_focused:
+                self.selected_paths = {matched_key}
+            self._sync_widget_states()
+
+    def _on_widget_clicked_with_modifiers(self, item: Any, modifiers: Any) -> None:
+        """
+        FR: Gère le clic gauche simple sur une miniature du bac (`WM_LBUTTONDOWN` @ `0x00719C37..0x00719DA2`) :
+        - Sans modificateur : sélectionne uniquement cette miniature à l'intérieur du bac (`selected_paths = {key}`)
+          sans retirer aucune autre miniature du bac (`0x00570C62`).
+        - `Ctrl+Clic` : inverse la sous-sélection de cette miniature dans le bac (`0x00719CC3`).
+        - `Shift+Clic` : sélectionne la plage continue depuis `anchor_idx` dans le bac (`0x00719C9C`).
+        EN: Handles single left-click on a tray thumbnail (`WM_LBUTTONDOWN` @ `0x00719C37..0x00719DA2`).
+        """
+        key = self._item_key(item)
+        clicked_idx = next((i for i, it in enumerate(self.items) if self._item_key(it) == key), -1)
+
+        if modifiers & Qt.KeyboardModifier.ShiftModifier and 0 <= self.anchor_idx < len(self.items) and clicked_idx >= 0:
+            lo = min(self.anchor_idx, clicked_idx)
+            hi = max(self.anchor_idx, clicked_idx)
+            if not (modifiers & Qt.KeyboardModifier.ControlModifier):
+                self.selected_paths.clear()
+            for i in range(lo, hi + 1):
+                self.selected_paths.add(self._item_key(self.items[i]))
+            self.focused_path = key
+        elif modifiers & Qt.KeyboardModifier.ControlModifier:
+            if key in self.selected_paths and len(self.selected_paths) > 1:
+                self.selected_paths.remove(key)
+            else:
+                self.selected_paths.add(key)
+            self.focused_path = key
+            if clicked_idx >= 0:
+                self.anchor_idx = clicked_idx
+        else:
+            self.selected_paths = {key}
+            self.focused_path = key
+            if clicked_idx >= 0:
+                self.anchor_idx = clicked_idx
+
+        self._sync_widget_states()
+        self.subselection_changed.emit()
+        self.item_clicked.emit(item)
+
+    def _on_widget_double_clicked(self, item: Any) -> None:
+        """
+        FR: Gère le double-clic gauche sur une miniature du bac (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) :
+        focalise la miniature et demande le basculement en mode Édition (`thumbui/fullview`).
+        EN: Handles double left-click on a tray thumbnail (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`):
+        focuses the thumbnail and requests switching to Edit mode (`thumbui/fullview`).
+        """
+        key = self._item_key(item)
+        self.selected_paths = {key}
+        self.focused_path = key
+        self._sync_widget_states()
+        self.subselection_changed.emit()
+        self.item_double_clicked.emit(item)
+
+    def _on_widget_context_menu(self, item: Any, global_pos: QPoint) -> None:
+        """
+        FR: Gère le clic droit sur une miniature du bac (`WM_RBUTTONDOWN` @ `0x00719ACE` -> `0x00732EE0`) :
+        si la miniature n'est pas déjà dans la sous-sélection du bac, la sélectionne sans retirer les autres,
+        puis ouvre le menu contextuel du bac.
+        EN: Handles right-click on a tray thumbnail (`WM_RBUTTONDOWN` @ `0x00719ACE` -> `0x00732EE0`).
+        """
+        key = self._item_key(item)
+        if key not in self.selected_paths:
+            self.selected_paths = {key}
+            self.focused_path = key
+            clicked_idx = next((i for i, it in enumerate(self.items) if self._item_key(it) == key), -1)
+            if clicked_idx >= 0:
+                self.anchor_idx = clicked_idx
+            self._sync_widget_states()
+            self.subselection_changed.emit()
+            self.item_clicked.emit(item)
+        else:
+            self.focused_path = key
+            self._sync_widget_states()
+        self.item_context_menu_requested.emit(item, global_pos)
+
+    def get_subselected_items(self) -> List[Any]:
+        """
+        FR: Retourne les éléments actuellement sous-sélectionnés dans le bac (ou tous si aucun n'est sous-sélectionné).
+        EN: Returns the items currently sub-selected inside the tray (or all items if none is sub-selected).
+        """
+        if self.selected_paths:
+            sub = [it for it in self.items if self._item_key(it) in self.selected_paths]
+            if sub:
+                return sub
+        if self.focused_path:
+            foc = [it for it in self.items if self._item_key(it) == self.focused_path]
+            if foc:
+                return foc
+        return list(self.items)
 
 
 class PicasaPhotoTray(QWidget):
@@ -886,6 +1022,8 @@ class PicasaPhotoTray(QWidget):
     action_clear = Signal()
     action_add_to_album = Signal()
     action_thumbnail_clicked = Signal(object)
+    action_thumbnail_double_clicked = Signal(object)
+    tray_context_action_requested = Signal(str, list)
     panel_toggled = Signal(str)
     upload_requested = Signal()
 
@@ -943,7 +1081,10 @@ class PicasaPhotoTray(QWidget):
         # EN: Thumbnail strip (thumbui/scratch rect=(8, 455, 223, 515))
         self.thumb_strip = PicasaTrayThumbnailStrip(self.scratchpad_frame)
         self.thumb_strip.item_clicked.connect(self.action_thumbnail_clicked.emit)
+        self.thumb_strip.item_double_clicked.connect(self.action_thumbnail_double_clicked.emit)
+        self.thumb_strip.item_context_menu_requested.connect(self._on_strip_context_menu)
         self.thumb_strip.item_remove_requested.connect(self._on_remove_item)
+        self.thumb_strip.subselection_changed.connect(self._sync_hold_button_state)
         scratch_h.addWidget(self.thumb_strip, 1)
 
         # FR: Colonne verticale des 3 boutons du bac à droite (X=244..278) :
@@ -1210,33 +1351,81 @@ class PicasaPhotoTray(QWidget):
         if dlg.exec():
             self.apply_button_configuration(dlg.get_active_keys())
 
-    def _toggle_hold(self) -> None:
+    @staticmethod
+    def _item_key(item: Any) -> str:
+        p = getattr(item, "path", None)
+        return str(p) if p else f"id:{id(item)}"
+
+    def _get_held_keys(self) -> Set[str]:
+        return {self._item_key(it) for it in self.held_items}
+
+    def _sync_hold_button_state(self) -> None:
         """
-        FR: Active ou désactive le mode 'Hold' (maintien du bac à photos).
-        EN: Toggles the 'Hold' mode (retaining items in the photo tray).
+        FR: Synchronise l'état visuel du bouton Maintenir (`thumbui/scratchhold` @ `0x00577BA0`)
+        selon que les éléments ciblés dans le bac sont maintenus (`holdCount > 0` @ `[pItem + 0xBC]`).
+        EN: Synchronizes the visual state of the Hold button (`thumbui/scratchhold` @ `0x00577BA0`)
+        based on whether the targeted items in the tray are held (`holdCount > 0` @ `[pItem + 0xBC]`).
         """
-        self.is_held = not self.is_held
+        held_keys = self._get_held_keys()
+        self.is_held = bool(self.held_items)
+        targets = self.thumb_strip.get_subselected_items() if hasattr(self, "thumb_strip") else []
+        all_targets_held = bool(targets) and all(self._item_key(it) in held_keys for it in targets)
+        checked = all_targets_held if targets else self.is_held
         self.btn_hold.blockSignals(True)
-        self.btn_hold.setChecked(self.is_held)
+        self.btn_hold.setChecked(checked)
         self.btn_hold.blockSignals(False)
-        if self.is_held:
+        if checked or self.is_held:
             self.btn_hold.setText("📌")
             self.btn_hold.setObjectName("HeldBtn")
             self.btn_hold.setStyleSheet("background-color: #2E5C38; border: 1px solid #4CAF50; color: #FFFFFF;")
-            self.held_items = list(self.active_items)
         else:
             self.btn_hold.setText("📌")
             self.btn_hold.setObjectName("TrayStackBtn")
             self.btn_hold.setStyleSheet("")
-            self.held_items.clear()
 
-        self.thumb_strip.set_items(self.get_effective_items(), is_held=self.is_held)
+    def _toggle_hold(self) -> None:
+        """
+        FR: Maintient ou relâche les photos dans le bac (`thumbui/scratchhold` @ `0x00577BA0` / `0x0071A110`).
+        Si une sous-sélection existe dans le bac, bascule uniquement ces éléments ; sinon bascule tous les éléments.
+        EN: Holds or releases photos in the tray (`thumbui/scratchhold` @ `0x00577BA0` / `0x0071A110`).
+        If a sub-selection exists in the tray, toggles only those items; otherwise toggles all items.
+        """
+        effective = self.get_effective_items()
+        sub = (
+            [it for it in effective if self._item_key(it) in self.thumb_strip.selected_paths]
+            if (self.thumb_strip.selected_paths and len(self.thumb_strip.selected_paths) < len(effective))
+            else list(effective)
+        )
+        if not sub:
+            self.is_held = not self.is_held
+            if not self.is_held:
+                self.held_items.clear()
+        else:
+            held_keys = self._get_held_keys()
+            all_sub_held = all(self._item_key(it) in held_keys for it in sub)
+            if all_sub_held:
+                remove_keys = {self._item_key(it) for it in sub}
+                self.held_items = [it for it in self.held_items if self._item_key(it) not in remove_keys]
+            else:
+                for it in sub:
+                    k = self._item_key(it)
+                    if k not in held_keys:
+                        self.held_items.append(it)
+                        held_keys.add(k)
+            self.is_held = bool(self.held_items)
+
+        self._sync_hold_button_state()
+        self.thumb_strip.set_items(
+            self.get_effective_items(),
+            is_held=self.is_held,
+            held_paths=self._get_held_keys(),
+        )
         self.action_hold.emit(self.is_held)
 
     def _on_clear_clicked(self) -> None:
         """
-        FR: Vide le bac à photos et réinitialise l'état Hold.
-        EN: Clears the photo tray and resets the Hold state.
+        FR: Vide le bac à photos (`thumbui/scratchclear` @ `0x00577FD0`).
+        EN: Clears the photo tray (`thumbui/scratchclear` @ `0x00577FD0`).
         """
         self.is_held = False
         self.btn_hold.blockSignals(True)
@@ -1247,31 +1436,170 @@ class PicasaPhotoTray(QWidget):
         self.btn_hold.setStyleSheet("")
         self.held_items.clear()
         self.active_items.clear()
+        self.thumb_strip.selected_paths.clear()
+        self.thumb_strip.focused_path = None
         self.set_selected_items([])
         self.action_clear.emit()
+
+    def remove_items_from_tray(self, items_to_remove: List[Any]) -> None:
+        """
+        FR: Retire uniquement les éléments spécifiés du bac à photos (`Tray::ID_REMOVE_SELECTION` @ `0x00733224`).
+        EN: Removes only the specified items from the photo tray (`Tray::ID_REMOVE_SELECTION` @ `0x00733224`).
+        """
+        rem_keys = {self._item_key(it) for it in items_to_remove}
+        self.held_items = [it for it in self.held_items if self._item_key(it) not in rem_keys]
+        self.active_items = [it for it in self.active_items if self._item_key(it) not in rem_keys]
+        self.is_held = bool(self.held_items)
+        self.thumb_strip.selected_paths -= rem_keys
+        effective = self.get_effective_items()
+        self._sync_hold_button_state()
+        self.thumb_strip.set_items(effective, is_held=self.is_held, held_paths=self._get_held_keys())
+        self.set_selected_count(len(effective))
+        paths = [getattr(it, "path", None) for it in items_to_remove if getattr(it, "path", None)]
+        if paths:
+            self.tray_context_action_requested.emit("remove_selection", paths)
 
     def _on_remove_item(self, item: Any) -> None:
         """
         FR: Supprime une photo individuelle du bac.
         EN: Removes an individual photo from the tray.
         """
-        if item in self.held_items:
-            self.held_items.remove(item)
-        if item in self.active_items:
-            self.active_items.remove(item)
-        self.thumb_strip.set_items(self.get_effective_items(), is_held=self.is_held)
-        self.set_selected_count(len(self.get_effective_items()))
+        self.remove_items_from_tray([item])
+
+    def _on_strip_context_menu(self, item: Any, global_pos: QPoint) -> None:
+        """
+        FR: Ouvre le menu contextuel authentique à 7 entrées du bac de sélection (`TrayContextMenu` @ `0x00732EE0`).
+        EN: Opens the authentic 7-item selection tray context menu (`TrayContextMenu` @ `0x00732EE0`).
+        Ref: picasa3.exe @ 0x00732EE0, 0x005E7870, 0x005E7D10, MENU_FR.XML (Tray::ID_*)
+        """
+        sub_items = self.thumb_strip.get_subselected_items()
+        if not sub_items:
+            sub_items = [item]
+        sub_paths = [getattr(it, "path", "") for it in sub_items if getattr(it, "path", "")]
+        held_keys = self._get_held_keys()
+        any_unheld = any(self._item_key(it) not in held_keys for it in sub_items)
+
+        rm = PicasaResourceManager.get()
+        menu = QMenu(self)
+        m_bg = "#2D3139" if self.style.is_dark else self.style.window_bgcolor.name()
+        m_txt = "#FFFFFF" if self.style.is_dark else self.style.alayout_titleColor.name()
+        m_brd = "#4B5260" if self.style.is_dark else self.style.splitter_color.name()
+        m_acc = self.style.accent_color.name()
+        menu.setStyleSheet(f"""
+            QMenu {{
+                background-color: {m_bg};
+                color: {m_txt};
+                border: 1px solid {m_brd};
+                padding: 4px;
+            }}
+            QMenu::item {{
+                padding: 5px 20px 5px 24px;
+                font-size: 11px;
+            }}
+            QMenu::item:selected {{
+                background-color: {m_acc};
+                color: #FFFFFF;
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background-color: {m_brd};
+                margin: 4px 8px;
+            }}
+        """)
+
+        # 1. Afficher et modifier (AlbumPhoto::ID_PICTURE_VIEW, 0x9CA0)
+        lbl_view = rm.get_xml_string("AlbumPhoto::ID_PICTURE_VIEW", "Afficher et modifier").replace("&", "")
+        act_view = menu.addAction(lbl_view)
+        act_view.triggered.connect(lambda: self.action_thumbnail_double_clicked.emit(item))
+
+        # 2. Maintenir la sélection / Relâcher les éléments sélectionnés (Tray::ID_PICTURE_HOLDINPICTURETRAY, 0x9CCA)
+        if any_unheld:
+            lbl_hold = rm.get_xml_string("Tray::ID_PICTURE_HOLDINPICTURETRAY", "Maintenir la sélection\tH").replace("&", "")
+        else:
+            lbl_hold = "Relâcher les éléments sélectionnés\tH"
+        act_hold = menu.addAction(lbl_hold)
+        act_hold.triggered.connect(lambda: self._toggle_hold_for_items(sub_items))
+
+        # 3. Supprimer la sélection (Tray::ID_REMOVE_SELECTION, 0x9CC9)
+        lbl_rem = rm.get_xml_string("Tray::ID_REMOVE_SELECTION", "Supprimer la sélection").replace("&", "")
+        act_rem = menu.addAction(lbl_rem)
+        act_rem.triggered.connect(lambda: self.remove_items_from_tray(sub_items))
+
+        menu.addSeparator()
+
+        # 4. Faire pivoter dans le sens des aiguilles d'une montre (AlbumPhoto::ID_PICTURE_ROTATECLOCKWISE, 0x9CA2)
+        lbl_cw = rm.get_xml_string(
+            "AlbumPhoto::ID_PICTURE_ROTATECLOCKWISE",
+            "Faire pivoter dans le sens des aiguilles d'une montre\tR",
+        ).replace("&", "")
+        act_cw = menu.addAction(lbl_cw)
+        act_cw.triggered.connect(lambda: self.tray_context_action_requested.emit("rotate_cw", sub_paths))
+
+        # 5. Faire pivoter dans le sens inverse des aiguilles d'une montre (AlbumPhoto::ID_PICTURE_ROTATECOUNTERCLOCKWISE, 0x9CA3)
+        lbl_ccw = rm.get_xml_string(
+            "AlbumPhoto::ID_PICTURE_ROTATECOUNTERCLOCKWISE",
+            "Faire pivoter dans le sens inverse des aiguilles d'une montre",
+        ).replace("&", "")
+        act_ccw = menu.addAction(lbl_ccw)
+        act_ccw.triggered.connect(lambda: self.tray_context_action_requested.emit("rotate_ccw", sub_paths))
+
+        menu.addSeparator()
+
+        # 6. Localiser sur le disque (FolderPhotoWin::ID_FILE_LOCATEONDISK, 0x9C99)
+        lbl_loc = rm.get_xml_string("FolderPhotoWin::ID_FILE_LOCATEONDISK", "Localiser sur le disque").replace("&", "")
+        act_loc = menu.addAction(lbl_loc)
+        act_loc.triggered.connect(lambda: self.tray_context_action_requested.emit("locate_on_disk", sub_paths))
+
+        # 7. Propriétés (AlbumPhotoWin::ID_PICTURE_PROPERTIES, 0x9CA8)
+        lbl_props = rm.get_xml_string("AlbumPhotoWin::ID_PICTURE_PROPERTIES", "Propriétés").replace("&", "")
+        act_props = menu.addAction(lbl_props)
+        act_props.triggered.connect(lambda: self.tray_context_action_requested.emit("properties", sub_paths))
+
+        menu.exec(global_pos)
+
+    def _toggle_hold_for_items(self, target_items: List[Any]) -> None:
+        """
+        FR: Maintient ou relâche spécifiquement les éléments `target_items` dans le bac (`0x00733172`).
+        EN: Specifically holds or releases `target_items` in the tray (`0x00733172`).
+        """
+        held_keys = self._get_held_keys()
+        any_unheld = any(self._item_key(it) not in held_keys for it in target_items)
+        if any_unheld:
+            for it in target_items:
+                k = self._item_key(it)
+                if k not in held_keys:
+                    self.held_items.append(it)
+                    held_keys.add(k)
+        else:
+            rem_keys = {self._item_key(it) for it in target_items}
+            self.held_items = [it for it in self.held_items if self._item_key(it) not in rem_keys]
+        self.is_held = bool(self.held_items)
+        self._sync_hold_button_state()
+        self.thumb_strip.set_items(
+            self.get_effective_items(),
+            is_held=self.is_held,
+            held_paths=self._get_held_keys(),
+        )
+        self.action_hold.emit(self.is_held)
+
+    def set_focused_path(self, path: Optional[str], select_only_focused: bool = False) -> None:
+        """
+        FR: Met en surbrillance dans le bac la miniature correspondant au chemin `path`.
+        EN: Highlights in the tray the thumbnail matching `path`.
+        """
+        if hasattr(self, "thumb_strip") and self.thumb_strip is not None:
+            self.thumb_strip.set_focused_path(path, select_only_focused=select_only_focused)
 
     def get_effective_items(self) -> List[Any]:
         """
-        FR: Renvoie les éléments actifs du bac en évitant les doublons.
-        EN: Returns the active items in the tray while avoiding duplicates.
+        FR: Renvoie les éléments actifs du bac en évitant les doublons (`held_items` + `active_items`).
+        EN: Returns the active items in the tray while avoiding duplicates (`held_items` + `active_items`).
         """
-        if self.is_held:
+        if self.is_held or self.held_items:
             seen = set()
             combined = []
             for it in self.held_items + self.active_items:
-                p = getattr(it, "path", None) or str(it)
+                p = self._item_key(it)
                 if p not in seen:
                     seen.add(p)
                     combined.append(it)
@@ -1289,12 +1617,17 @@ class PicasaPhotoTray(QWidget):
 
     def set_selected_items(self, items: List[Any]) -> None:
         """
-        FR: Met à jour les éléments sélectionnés et affiche les miniatures.
-        EN: Updates the selected items and displays their thumbnails.
+        FR: Met à jour les éléments sélectionnés depuis la grille et affiche leurs miniatures dans le bac.
+        EN: Updates the selected items from the grid and displays their thumbnails in the tray.
         """
         self.active_items = list(items)
         effective = self.get_effective_items()
-        self.thumb_strip.set_items(effective, is_held=self.is_held)
+        self._sync_hold_button_state()
+        self.thumb_strip.set_items(
+            effective,
+            is_held=self.is_held,
+            held_paths=self._get_held_keys(),
+        )
         self.set_selected_count(len(effective))
 
         # FR: État du bouton favori

@@ -56,6 +56,7 @@ class PicasaOneUpView(QWidget):
     slideshow_requested = Signal()
     people_changed = Signal()
     star_toggled = Signal(str, bool)  # file_path, is_starred (Ref: ID_PICTURE_STAR, star=yes)
+    current_photo_changed = Signal(int, str)  # db_index, file_path (Ref: 0x005683A0 RefreshOneUpView)
 
     @property
     def current_photo_path(self) -> Optional[str]:
@@ -861,6 +862,9 @@ class PicasaOneUpView(QWidget):
         # EN: 3. Bottom transport bar (`thumbui/basecontrolset` @ 0x0057BD12, `thumbui/buttonbarsets` @ 0x0057BCF6)
         if hasattr(self, "transport_bar") and self.transport_bar is not None:
             self.transport_bar.setEnabled(en)
+        win = self.window()
+        if win is not None and win is not self and hasattr(win, "photo_tray") and win.photo_tray is not None:
+            win.photo_tray.setEnabled(en)
         for attr in (
             "zoom_slider",
             "btn_1to1",
@@ -1644,6 +1648,7 @@ class PicasaOneUpView(QWidget):
                 pass
             pos_str = f"Vidéo {curr_pos + 1} sur {total}" if curr_pos >= 0 else ""
             self.lbl_top_info.setText(f"🎬 {pos_str}  •  {filename}")
+            self.current_photo_changed.emit(self.current_index, full_path or "")
             return
 
         # FR: Photo normale
@@ -1733,6 +1738,7 @@ class PicasaOneUpView(QWidget):
             self.caption_edit.blockSignals(False)
 
         self._update_top_bar_info()
+        self.current_photo_changed.emit(self.current_index, full_path or "")
 
     def _on_canvas_context_menu(self, global_pos: QPoint) -> None:
         """

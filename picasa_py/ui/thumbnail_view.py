@@ -2326,11 +2326,14 @@ class PicasaThumbnailView(QWidget):
                     self._select_range(item_idx)
                 else:
                     if item_idx in self.selected_indices and len(self.selected_indices) > 1:
-                        # Préserver la sélection multiple pour un éventuel glisser-déposer,
+                        # Préserver la sélection multiple pour un éventuel glisser-déposer ou double-clic,
                         # et réduire à 1 élément au relâchement si aucun glisser n'a eu lieu.
+                        import time as _time
+                        self._pre_release_multi_selection = (set(self.selected_indices), item_idx, _time.monotonic())
                         self._deferred_single_select_idx = item_idx
                         self.focus_index = item_idx
                     else:
+                        self._pre_release_multi_selection = None
                         self.selected_indices = {item_idx}
                         self.anchor_index = item_idx
                         self.focus_index = item_idx
@@ -2568,11 +2571,26 @@ class PicasaThumbnailView(QWidget):
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
         """
         FR: Gère le double-clic sur une vignette pour ouvrir l'éditeur One-Up, valider une suggestion ou nommer un visage.
+        Préserve la sélection multiple active si le double-clic porte sur l'une des vignettes sélectionnées
+        (Ref: picasa3.exe @ 0x00719A44 -> 0x0056BFD0, `thumbui/scratch` conserve toutes les photos sélectionnées).
         EN: Handles double-clicking a thumbnail to open the One-Up editor, confirm a suggestion, or name a face.
+        Preserves the active multi-selection when double-clicking one of the selected thumbnails
+        (Ref: picasa3.exe @ 0x00719A44 -> 0x0056BFD0, `thumbui/scratch` retains all selected photos).
         """
         if event.button() == Qt.MouseButton.LeftButton:
             item_idx = self._find_item_at(event.position().toPoint())
             if item_idx is not None and 0 <= item_idx < len(self.items):
+                self._deferred_single_select_idx = None
+                pre_multi = getattr(self, "_pre_release_multi_selection", None)
+                if pre_multi is not None:
+                    import time as _time
+                    saved_sel, saved_idx, saved_t = pre_multi
+                    self._pre_release_multi_selection = None
+                    if saved_idx == item_idx and (_time.monotonic() - saved_t) <= 0.75 and len(saved_sel) > 1:
+                        self.selected_indices = set(saved_sel)
+                        self.focus_index = item_idx
+                        self.selection_changed.emit(sorted(self.selected_indices))
+                        self.update()
                 item = self.items[item_idx]
                 if getattr(item, "is_synthetic_suggestion", False):
                     sec = self.visible_sections[0] if self.visible_sections else None

@@ -141,7 +141,7 @@ def test_main_window_one_up_switching(qapp):
         win._open_one_up_view(0)
         assert win.stack.currentIndex() == 1  # One-Up
         assert win.top_bar.isHidden()
-        assert win.photo_tray.isHidden()
+        assert not win.photo_tray.isHidden()  # Ref: 0x0057BB80 (thumbui/basecontrolset reste visible en Édition)
 
         # Retour à la bibliothèque en cliquant sur le bouton « Retour à la photothèque » (`btn_back`)
         win.one_up_view.edit_panel.btn_back.click()

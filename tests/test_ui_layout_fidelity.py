@@ -702,6 +702,107 @@ def test_disassembly_preview_checksum_ini_escaping_and_filters():
     assert tf.records[4].type == 0
 
 
+def test_photo_tray_scratch_clicks_and_one_up_visibility(tmp_path: Path, qapp) -> None:
+    """
+    FR : Vérifie la fidélité au désassemblage du bac de sélection (`thumbui/scratch` / `CSelectionNode` @ `0x00714990`) :
+         1. LayoutMode9 (`0x0071DAC0`) : toutes les miniatures (> 4) restent individuellement visibles et cliquables.
+         2. Clic gauche simple (`WM_LBUTTONDOWN` @ `0x00719C37`, `0x00570C62`) : sélectionne/focalise la miniature
+            dans le bac (avec support `Ctrl` et `Shift`) sans jamais supprimer les autres miniatures.
+         3. Double-clic gauche (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) : ouvre le mode Édition 1-Up
+            tout en gardant `photo_tray` visible (`0x0057BB80`) et toutes les miniatures dans le bac.
+         4. En mode Édition 1-Up, cliquer sur une autre miniature du bac (`0x00570DC9 -> 0x005683A0` `RefreshOneUpView`)
+            affiche immédiatement cette photo dans l'éditeur sans vider le bac.
+         5. Clic droit (`WM_RBUTTONDOWN` @ `0x00719ACE` -> `0x00732EE0` `TrayContextMenu`) : ne supprime pas la
+            miniature au clic droit, mais la sélectionne dans le bac et expose les actions du menu contextuel.
+    EN : Verifies disassembly fidelity of the selection tray (`thumbui/scratch` / `CSelectionNode` @ `0x00714990`).
+    """
+    from PySide6.QtCore import Qt, QPoint
+    import os
+
+    db = PicasaDatabase.create_new(tmp_path / "db_tray")
+    photos_dir = tmp_path / "AlbumTray"
+    photos_dir.mkdir(parents=True)
+    scanner = PicasaDirScanner(db)
+    img_paths = []
+    for i in range(6):
+        p = photos_dir / f"img_{i}.jpg"
+        Image.new("RGB", (160, 120), (30 * i, 100, 200 - 20 * i)).save(p, "JPEG")
+        scanner.index_file(str(p))
+        img_paths.append(str(p))
+    db.save_database()
+
+    win = PicasaMainWindow(db_path=str(db.db3_dir), auto_scan=False)
+    _KEEP_REFS.append(win)
+    win.resize(1280, 800)
+    win.show()
+    qapp.processEvents()
+
+    # Sélectionner les 6 photos dans la grille
+    win.thumb_view.set_selected_indices([0, 1, 2, 3, 4, 5])
+    qapp.processEvents()
+
+    # 1. LayoutMode9 (0x0071DAC0) : les 6 miniatures sont toutes des widgets individuels visibles dans thumb_strip
+    assert len(win.photo_tray.get_effective_items()) == 6
+    assert len(win.photo_tray.thumb_strip.item_widgets) == 6
+
+    # 2. Clic gauche simple sur la 3e miniature du bac (index 2) :
+    #    - Ne doit supprimer AUCUNE autre miniature du bac ni réduire selected_indices dans la grille !
+    w2 = win.photo_tray.thumb_strip.item_widgets[2]
+    win.photo_tray.thumb_strip._on_widget_clicked_with_modifiers(w2.item, Qt.KeyboardModifier.NoModifier)
+    qapp.processEvents()
+    assert len(win.photo_tray.get_effective_items()) == 6
+    assert len(win.thumb_view.selected_indices) == 6
+    assert win.thumb_view.focus_index == 2
+    assert w2.is_selected is True
+    assert win.photo_tray.thumb_strip.item_widgets[0].is_selected is False
+
+    # Ctrl+Clic sur la 5e miniature (index 4) : ajoute à la sous-sélection interne du bac
+    w4 = win.photo_tray.thumb_strip.item_widgets[4]
+    win.photo_tray.thumb_strip._on_widget_clicked_with_modifiers(w4.item, Qt.KeyboardModifier.ControlModifier)
+    qapp.processEvents()
+    assert len(win.photo_tray.thumb_strip.selected_paths) == 2
+    assert len(win.photo_tray.get_effective_items()) == 6
+
+    # 3. Double-clic sur la 2e miniature du bac (index 1) : passe en mode Édition 1-Up
+    #    tout en gardant le bac visible et les 6 miniatures présentes !
+    w1 = win.photo_tray.thumb_strip.item_widgets[1]
+    win.photo_tray.thumb_strip._on_widget_double_clicked(w1.item)
+    qapp.processEvents()
+    assert win.stack.currentWidget() == win.one_up_view
+    assert not win.photo_tray.isHidden()
+    assert len(win.photo_tray.get_effective_items()) == 6
+    assert os.path.normcase(win.one_up_view.current_photo_path) == os.path.normcase(w1.item.path)
+
+    # 4. En mode Édition 1-Up, un clic simple sur la 5e miniature du bac (w4) change immédiatement
+    #    la photo affichée dans l'éditeur (RefreshOneUpView @ 0x005683A0) tout en gardant les 6 miniatures !
+    w4_after = win.photo_tray.thumb_strip.item_widgets[4]
+    win.photo_tray.thumb_strip._on_widget_clicked_with_modifiers(w4_after.item, Qt.KeyboardModifier.NoModifier)
+    qapp.processEvents()
+    assert win.stack.currentWidget() == win.one_up_view
+    assert os.path.normcase(win.one_up_view.current_photo_path) == os.path.normcase(w4_after.item.path)
+    assert len(win.photo_tray.get_effective_items()) == 6
+
+    # 5. Clic droit sur une miniature du bac : ne supprime PAS la miniature !
+    #    Et l'action "Supprimer la sélection" (Tray::ID_REMOVE_SELECTION @ 0x00733224) retire uniquement la sous-sélection.
+    w0 = win.photo_tray.thumb_strip.item_widgets[0]
+    win.photo_tray.remove_items_from_tray([w0.item])
+    qapp.processEvents()
+    assert len(win.photo_tray.get_effective_items()) == 5
+    assert len(win.thumb_view.selected_indices) == 5
+
+    # Retour à la bibliothèque : les 5 photos restent sélectionnées dans le bac et la grille
+    win._back_to_library()
+    qapp.processEvents()
+    assert win.stack.currentIndex() == 0
+    assert len(win.photo_tray.get_effective_items()) == 5
+    assert len(win.thumb_view.selected_indices) == 5
+
+    win.stop_background_tasks()
+    win.close()
+    qapp.processEvents()
+
+
+
 
 
 

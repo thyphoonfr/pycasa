@@ -385,6 +385,7 @@ class PicasaMainWindow(QMainWindow):
         self.one_up_view.back_to_library_requested.connect(self._back_to_library)
         self.one_up_view.slideshow_requested.connect(self.action_slideshow)
         self.one_up_view.photo_edited.connect(self._on_photo_edited)
+        self.one_up_view.current_photo_changed.connect(self._on_one_up_photo_changed)
 
         # Curseur de zoom du plateau
         self.photo_tray.zoom_changed.connect(self.thumb_view.set_thumb_size)
@@ -413,6 +414,8 @@ class PicasaMainWindow(QMainWindow):
         self.photo_tray.upload_requested.connect(self.action_web_export)
         self.photo_tray.action_add_to_album.connect(self._on_tray_add_to_album)
         self.photo_tray.action_thumbnail_clicked.connect(self._on_tray_thumbnail_clicked)
+        self.photo_tray.action_thumbnail_double_clicked.connect(self._on_tray_thumbnail_double_clicked)
+        self.photo_tray.tray_context_action_requested.connect(self._on_tray_context_action_requested)
 
         # Synchronisation de l'étoile / favori entre vues
         self.thumb_view.star_toggled.connect(self._on_thumb_star_toggled)
@@ -572,6 +575,16 @@ class PicasaMainWindow(QMainWindow):
         f_indices = self.thumb_view.filtered_indices if self.thumb_view.filtered_indices is not None else range(len(self.thumb_view.items))
         available_indices = [self.thumb_view.items[i].index for i in f_indices if i < len(self.thumb_view.items)]
 
+        # FR: Conserver le bac de sélection (`thumbui/basecontrolset` / `thumbui/scratch`) visible en mode Édition 1-Up
+        #     (Ref: picasa3.exe @ 0x0057BB80..0x0057C228 CThumbUI::SetEditModeVisibility)
+        # EN: Keep the selection tray (`thumbui/basecontrolset` / `thumbui/scratch`) visible in One-Up Edit mode
+        #     (Ref: picasa3.exe @ 0x0057BB80..0x0057C228 CThumbUI::SetEditModeVisibility)
+        if not self.photo_tray.get_effective_items():
+            if self.db is not None and hasattr(self.photo_tray, "set_database"):
+                self.photo_tray.set_database(self.db)
+            self.photo_tray.set_selected_items([item])
+        self.photo_tray.set_focused_path(item.path, select_only_focused=True)
+
         # FR: Étape 1 (Ref: picasa3.exe @ 0x00568E4A) : basculer immédiatement vers la vue 1-Up et afficher
         #     l'aperçu déjà en mémoire (previews/bigthumbs CBlockFile ou vignette de la grille) avant le décodage HD.
         # EN: Step 1 (Ref: picasa3.exe @ 0x00568E4A): switch to the One-Up view immediately and show the
@@ -589,7 +602,7 @@ class PicasaMainWindow(QMainWindow):
             if preview_pix is None:
                 preview_pix = self.thumb_view._pixmap_cache.get(item_idx)
             self.top_bar.hide()
-            self.photo_tray.hide()
+            self.photo_tray.show()
             self.stack.setCurrentIndex(1)
             if preview_pix is not None and not preview_pix.isNull() and hasattr(self.one_up_view, "canvas"):
                 self.one_up_view.canvas.set_pixmap_direct(preview_pix)
@@ -608,15 +621,18 @@ class PicasaMainWindow(QMainWindow):
             self.one_up_view._update_drawer_buttons_state()
 
         self.top_bar.hide()
-        self.photo_tray.hide()
+        self.photo_tray.show()
+        self.photo_tray.set_focused_path(item.path, select_only_focused=True)
         self.stack.setCurrentIndex(1)
         self.one_up_view.setFocus()
         self.status_bar.showMessage(f"Éditeur Picasa : {item.filename}")
 
     def _back_to_library(self) -> None:
         """
-        FR: Revient à la grille de la photothèque en invalidant le cache de vignette de la photo éditée.
-        EN: Returns to the library grid while invalidating the edited photo's thumbnail cache.
+        FR: Revient à la grille de la photothèque en invalidant le cache de vignette de la photo éditée
+        tout en préservant la sélection multiple active dans le bac et la grille (`thumbui/scratch`).
+        EN: Returns to the library grid while invalidating the edited photo's thumbnail cache
+        and preserving any active multi-selection in the tray and grid (`thumbui/scratch`).
         """
         BackgroundScanWorker.notify_gui_activity()
         oneup_drawer_open = False
@@ -634,6 +650,7 @@ class PicasaMainWindow(QMainWindow):
         self.stack.setCurrentIndex(0)
         self.top_bar.show()
         self.photo_tray.show()
+        self.photo_tray.setEnabled(True)
         if hasattr(self.one_up_view, "video_player"):
             self.one_up_view.video_player.stop()
         if self.one_up_view.current_photo_path:
@@ -649,9 +666,16 @@ class PicasaMainWindow(QMainWindow):
         if curr_db_idx >= 0:
             found = [i for i, it in enumerate(self.thumb_view.items) if it.index == curr_db_idx]
             if found:
-                self.thumb_view.selected_indices = {found[0]}
-                self.thumb_view.update()
-                self._on_selection_changed([found[0]])
+                foc_idx = found[0]
+                if len(self.thumb_view.selected_indices) > 1 or len(self.photo_tray.get_effective_items()) > 1:
+                    self.thumb_view.focus_index = foc_idx
+                    self.thumb_view.update()
+                    self.photo_tray.set_focused_path(self.thumb_view.items[foc_idx].path, select_only_focused=True)
+                else:
+                    self.thumb_view.selected_indices = {foc_idx}
+                    self.thumb_view.focus_index = foc_idx
+                    self.thumb_view.update()
+                    self._on_selection_changed([foc_idx])
         self._on_drawer_state_changed()
         self.thumb_view.setFocus()
         self.library_tree.refresh_people()
@@ -1049,17 +1073,112 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_tray_thumbnail_clicked(self, item: Any) -> None:
         """
-        FR: Focalise la photo cliquée dans le bac sur la grille.
-        EN: Focuses the photo clicked in the tray within the thumbnail grid.
+        FR: Gère le clic gauche simple sur une miniature du bac à photos (`thumbui/scratch`) :
+        - Ne supprime JAMAIS les autres miniatures du bac ni la sélection multiple de la grille
+          (`CThumbUI::OnSelectionChanged` @ `0x00570C62 -> je 0x00570D58`, `PruneUnheldItems` ignoré).
+        - En mode Bibliothèque : focalise et fait défiler jusqu'à cette photo dans la grille et met à jour
+          le tiroir droit (`SetCurrentItem` @ `0x0056B6F0`).
+        - En mode Édition 1-Up (`0x00570DC9 -> 0x005683A0` `RefreshOneUpView`) : affiche immédiatement
+          la photo cliquée dans l'éditeur tout en conservant toutes les miniatures dans le bac.
+        EN: Handles single left-click on a thumbnail in the photo tray (`thumbui/scratch`):
+        - NEVER removes other thumbnails from the tray or clears the grid's multi-selection
+          (`CThumbUI::OnSelectionChanged` @ `0x00570C62 -> je 0x00570D58`, skips `PruneUnheldItems`).
+        - In Library mode: focuses and scrolls to that photo in the grid and updates the right drawer.
+        - In One-Up Edit mode (`0x00570DC9 -> 0x005683A0` `RefreshOneUpView`): immediately loads and
+          displays the clicked photo in the editor while keeping all thumbnails in the tray.
+        Ref: picasa3.exe @ 0x00719C37, 0x005709A0..0x00570E10, 0x005683A0
         """
         target_path = getattr(item, "path", "")
         if not target_path:
             return
+        norm_target = os.path.normcase(os.path.normpath(target_path))
+        matched_idx: Optional[int] = None
         for idx, it in enumerate(self.thumb_view.items):
-            if it.path == target_path:
-                self.thumb_view.set_selected_indices([idx])
-                self.thumb_view.scroll_to_index(idx)
+            if it.path == target_path or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target):
+                matched_idx = idx
                 break
+
+        if matched_idx is not None:
+            self.thumb_view.focus_index = matched_idx
+            self.thumb_view.scroll_to_index(matched_idx)
+            self.thumb_view.update()
+            grid_item = self.thumb_view.items[matched_idx]
+            self.photo_tray.update_star_state(bool(getattr(grid_item, "starred", False)))
+            if self.db is not None:
+                self.right_drawer.set_current_photo(self.db, grid_item.index, grid_item.path)
+
+        if self.stack.currentWidget() == self.one_up_view:
+            if not getattr(self.one_up_view, "_is_tool_locked", False) and self.db is not None:
+                db_idx = getattr(item, "index", -1)
+                if (db_idx is None or db_idx < 0) and matched_idx is not None:
+                    db_idx = self.thumb_view.items[matched_idx].index
+                avail = list(self.one_up_view.available_indices) if self.one_up_view.available_indices else []
+                if db_idx is not None and db_idx >= 0 and db_idx not in avail:
+                    avail.append(db_idx)
+                self.one_up_view.open_photo(self.db, db_idx if db_idx is not None else -1, avail, direct_path=target_path)
+                self.photo_tray.set_focused_path(target_path)
+
+    def _on_tray_thumbnail_double_clicked(self, item: Any) -> None:
+        """
+        FR: Gère le double-clic gauche sur une miniature du bac (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`) :
+        bascule en mode Édition 1-Up (`thumbui/fullview` @ `0x0056C0D4`) sur cette photo tout en conservant
+        intégralement le contenu du bac de sélection.
+        EN: Handles double left-click on a tray thumbnail (`WM_LBUTTONDBLCLK` @ `0x00719A44` -> `0x0056BFD0`):
+        switches to One-Up Edit mode (`thumbui/fullview` @ `0x0056C0D4`) on that photo while preserving
+        all items in the selection tray.
+        Ref: picasa3.exe @ 0x00719A44, 0x0056BFD0, 0x0056C0D4
+        """
+        target_path = getattr(item, "path", "")
+        if not target_path:
+            return
+        norm_target = os.path.normcase(os.path.normpath(target_path))
+        for idx, it in enumerate(self.thumb_view.items):
+            if it.path == target_path or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target):
+                self.thumb_view.focus_index = idx
+                self._open_one_up_view(idx)
+                return
+
+    def _on_one_up_photo_changed(self, db_idx: int, file_path: str) -> None:
+        """
+        FR: Synchronise la miniature focalisée et l'état d'étoile dans le bac de sélection lorsque
+        l'utilisateur change de photo dans l'éditeur 1-Up (flèches Gauche/Droite, pellicule ou clic bac).
+        EN: Synchronizes the focused thumbnail and star state in the selection tray when the user
+        switches photos in the One-Up editor (Left/Right arrows, filmstrip, or tray click).
+        Ref: picasa3.exe @ 0x005683A0 (RefreshOneUpView), 0x00570DC9
+        """
+        if file_path and hasattr(self, "photo_tray") and self.photo_tray is not None:
+            self.photo_tray.set_focused_path(file_path, select_only_focused=True)
+            if hasattr(self.one_up_view, "_is_starred"):
+                self.photo_tray.update_star_state(bool(getattr(self.one_up_view, "_is_starred", False)))
+
+    def _on_tray_context_action_requested(self, action_id: str, paths: List[str]) -> None:
+        """
+        FR: Exécute les commandes du menu contextuel à 7 entrées du bac de sélection (`TrayContextMenu` @ `0x00732EE0`).
+        EN: Executes commands from the 7-item selection tray context menu (`TrayContextMenu` @ `0x00732EE0`).
+        Ref: picasa3.exe @ 0x00732EE0..0x007332AD
+        """
+        if action_id == "remove_selection":
+            if paths:
+                norm_rem = {os.path.normcase(os.path.normpath(p)) for p in paths if p}
+                kept_indices = [
+                    idx
+                    for idx in sorted(self.thumb_view.selected_indices)
+                    if idx < len(self.thumb_view.items)
+                    and os.path.normcase(os.path.normpath(self.thumb_view.items[idx].path)) not in norm_rem
+                ]
+                self.thumb_view.selected_indices = set(kept_indices)
+                self.thumb_view.update()
+            return
+        if not paths:
+            return
+        if action_id == "rotate_cw":
+            self.action_rotate_clockwise(paths)
+        elif action_id == "rotate_ccw":
+            self.action_rotate_counterclockwise(paths)
+        elif action_id == "locate_on_disk":
+            self.action_locate_on_disk(paths[0])
+        elif action_id == "properties":
+            self._on_tray_panel_toggled("properties")
 
     def _on_tray_panel_toggled(self, panel_name: str) -> None:
         """
