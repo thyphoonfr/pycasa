@@ -40,6 +40,23 @@ class Contact:
     local_contact: str = "1"
     extra_attrs: Dict[str, str] = field(default_factory=dict)
 
+    @property
+    def email(self) -> str:
+        """
+        FR: Retourne l'adresse courriel principale (`email0` ou `email`) du contact.
+        EN: Returns the contact's primary email address (`email0` or `email`).
+        Ref: picasa3.exe @ 0x00580403, 0x00580DB5
+        """
+        return self.extra_attrs.get("email0") or self.extra_attrs.get("email") or ""
+
+    @email.setter
+    def email(self, value: str) -> None:
+        if value:
+            self.extra_attrs["email0"] = value
+        else:
+            self.extra_attrs.pop("email0", None)
+            self.extra_attrs.pop("email", None)
+
 
 class ContactsFile:
     """
@@ -89,12 +106,19 @@ class ContactsFile:
         """
         root = ET.fromstring(xml_text.strip())
         contacts: List[Contact] = []
-        known_keys = {"id", "name", "modified_time", "local_contact"}
+        known_keys = {"id", "name", "display", "modified_time", "local_contact"}
         for elem in root.findall("contact"):
             extra = {k: v for k, v in elem.attrib.items() if k not in known_keys}
+            # Ref: picasa3.exe @ 0x00580403 (email0="..."), 0x00580DB5 (email%d / email)
+            if "email" in extra and "email0" not in extra:
+                extra["email0"] = extra.pop("email")
+            for child_idx, email_child in enumerate(elem.findall("email")):
+                addr = email_child.get("address") or email_child.text or ""
+                if addr.strip() and f"email{child_idx}" not in extra:
+                    extra[f"email{child_idx}"] = addr.strip()
             contacts.append(Contact(
                 id=elem.get("id", ""),
-                name=elem.get("name", ""),
+                name=elem.get("name") or elem.get("display", ""),
                 modified_time=elem.get("modified_time", ""),
                 local_contact=elem.get("local_contact", "1"),
                 extra_attrs=extra,

@@ -1374,19 +1374,43 @@ class PicasaPhotoTray(QWidget):
             style = PicasaStyle.instance()
         self.style = style
         tray_bg = style.tray_bgcolor.name()
+        tray_bg_end = getattr(style, "tray_bgcolor_end", style.tray_bgcolor).name()
+        tray_root_bg = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {tray_bg}, stop:1 {tray_bg_end})"
+            if tray_bg != tray_bg_end
+            else tray_bg
+        )
         scratch_bg = style.tray_grad_end.darker(112).name() if style.is_dark else style.tray_grad_end.lighter(104).name()
         btn_start = style.tray_grad_start.name() if style.is_dark else style.topbar_btn_bg_start.name()
         btn_end = style.tray_grad_end.name() if style.is_dark else style.topbar_btn_bg_end.name()
-        btn_border = "#555B66" if style.is_dark else style.topbar_btn_border.name()
+        btn_border = style.topbar_btn_border.name()
         txt_col = style.tray_text_color.name()
-        sub_txt = "#B0B8C4" if style.is_dark else style.alayout_subtitleColor.name()
-        dis_txt = "#777C85" if style.is_dark else "#8E8E8E"
-        dis_bg = "#2E3138" if style.is_dark else style.window_bgcolor.darker(104).name()
-        dis_border = "#3E424B" if style.is_dark else style.splitter_color.name()
-        top_border = "#1E2024" if style.is_dark else style.topbar_border_color.name()
-        sep_top = "#202328" if style.is_dark else style.splitter_color.name()
-        sep_bot = "#454A54" if style.is_dark else "#FFFFFF"
+        sub_txt = style.alayout_subtitleColor.name()
+        dis_txt = style.alayout_subtitleColor.darker(120).name() if style.is_dark else "#8E8E8E"
+        dis_bg = style.tray_bgcolor.darker(112).name() if style.is_dark else style.window_bgcolor.darker(104).name()
+        dis_border = style.splitter_color.darker(115).name() if style.is_dark else style.splitter_color.name()
+        top_border = style.splitter_color.name() if style.is_dark else style.topbar_border_color.name()
+        sep_top = style.splitter_color.darker(120).name() if style.is_dark else style.splitter_color.name()
+        sep_bot = style.splitter_color.lighter(120).name() if style.is_dark else "#FFFFFF"
         accent = style.accent_color.name()
+        accent_end = getattr(style, "accent_grad_end", style.accent_color).name()
+        accent_bg = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {accent}, stop:1 {accent_end})"
+            if accent != accent_end
+            else accent
+        )
+        has_grad_accent = accent != accent_end
+        upload_grad = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {accent}, stop:1 {accent_end})"
+            if has_grad_accent
+            else "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5CB85C, stop:1 #3D8B3D)"
+        )
+        upload_hover = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {style.accent_color.lighter(115).name()}, stop:1 {getattr(style, 'accent_grad_end', style.accent_color).lighter(115).name()})"
+            if has_grad_accent
+            else "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6EC46E, stop:1 #489B48)"
+        )
+        upload_border = accent_end if has_grad_accent else "#2D672D"
 
         if hasattr(self, "thumb_strip") and self.thumb_strip:
             self.thumb_strip.apply_style(style)
@@ -1395,7 +1419,7 @@ class PicasaPhotoTray(QWidget):
 
         self.setStyleSheet(f"""
             QWidget#TrayRoot {{
-                background-color: {tray_bg};
+                background: {tray_root_bg};
                 border-top: 1px solid {top_border};
             }}
             QLabel#TraySelectionLabel {{
@@ -1427,7 +1451,7 @@ class PicasaPhotoTray(QWidget):
                 border-color: {accent};
             }}
             QPushButton:pressed, QPushButton:checked {{
-                background-color: {accent};
+                background: {accent_bg};
                 color: #FFFFFF;
                 border-color: {accent};
             }}
@@ -1437,9 +1461,8 @@ class PicasaPhotoTray(QWidget):
                 border-color: {dis_border};
             }}
             QPushButton#GreenUploadBtn {{
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #5CB85C, stop:1 #3D8B3D);
-                border: 1px solid #2D672D;
+                background: {upload_grad};
+                border: 1px solid {upload_border};
                 color: #FFFFFF;
                 font-size: 11px;
                 font-weight: bold;
@@ -1447,8 +1470,7 @@ class PicasaPhotoTray(QWidget):
                 padding: 4px 12px;
             }}
             QPushButton#GreenUploadBtn:hover {{
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #6EC46E, stop:1 #489B48);
+                background: {upload_hover};
             }}
             QPushButton#OutputBtn {{
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -1461,6 +1483,11 @@ class PicasaPhotoTray(QWidget):
                 color: {txt_col};
             }}
             QPushButton#OutputBtn:hover {{
+                border-color: {accent};
+            }}
+            QPushButton#OutputBtn:pressed, QPushButton#OutputBtn:checked {{
+                background: {accent_bg};
+                color: #FFFFFF;
                 border-color: {accent};
             }}
             QPushButton#OutputBtn:disabled {{

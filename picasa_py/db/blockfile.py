@@ -83,23 +83,81 @@ def compute_thumb_checksum(folder_path: str, filename: str, ft2: int, file_size:
     return (h ^ edx) & 0xFFFFFFFF
 
 
-# Ref: picasa3.exe @ 0x006B9B26 (FUN_006b99f0, full_hash=0) & 0x0042AD1E (FUN_0042a800)
+# Ref: picasa3.exe @ 0x0042A96A, 0x0042ACAA, 0x0042AD9A (FUN_0042a800 case-sensitive string hash)
 # Ghidra project: ghidra/picasa3.gpr
-def compute_preview_checksum(ft2: int, rotate_step: int = 0, flip: int = 0) -> int:
+def hash_picasa_string_case_sensitive(text: str) -> int:
     """
-    FR: Calcule le checksum 32 bits exact stocké dans bigthumbs_index.db et previews_index.db.
-    Arrondit le FILETIME ft2 à la seconde la plus proche ((ft2 + 5_000_000) // 10_000_000),
-    applique les rotations ROL 13 et ROL 17, puis applique le masque d'orientation (((flip * 4) ^ rotate_step) << 4).
-    EN: Computes the exact 32-bit checksum stored in bigthumbs_index.db and previews_index.db.
-    Rounds FILETIME ft2 to the nearest second ((ft2 + 5_000_000) // 10_000_000),
-    applies ROL 13 and ROL 17 rotations, then XORs the orientation mask (((flip * 4) ^ rotate_step) << 4).
+    FR: Calcule le hachage 32 bits sensible à la casse utilisé par `GetThumbnailChecksum` (`0x0042A800`)
+    sur `imagedata_filters`, `imagedata_text`, `imagedata_caption` et les mots-clés :
+    seed `0x12345678`, extension de signe `movsx ecx, cl` sur les octets `>= 0x80`,
+    et `h ^= (h << 5) + (h >> 2) + c`.
+    EN: Computes the 32-bit case-sensitive hash used by `GetThumbnailChecksum` (`0x0042A800`)
+    on `imagedata_filters`, `imagedata_text`, `imagedata_caption`, and keywords:
+    seed `0x12345678`, sign extension `movsx ecx, cl` on bytes `>= 0x80`,
+    and `h ^= (h << 5) + (h >> 2) + c`.
+    """
+    h = 0x12345678
+    raw = text.encode("utf-8", errors="surrogateescape")
+    for b in raw:
+        if b == 0:
+            break
+        c = b - 256 if b >= 0x80 else b
+        term = ((h << 5) + (h >> 2) + c) & 0xFFFFFFFF
+        h = (h ^ term) & 0xFFFFFFFF
+    return h
+
+
+# Ref: picasa3.exe @ 0x006B9B26 (FUN_006b99f0, full_hash=0) & 0x0042A800..0x0042ADBD (FUN_0042a800)
+# Ghidra project: ghidra/picasa3.gpr
+def compute_preview_checksum(
+    ft2: int,
+    rotate_step: int = 0,
+    flip: int = 0,
+    filters: str = "",
+    crop64: int = 0,
+    width: int = 0,
+    height: int = 0,
+    text: str = "",
+    text_active: int = 0,
+) -> int:
+    """
+    FR: Calcule le checksum 32 bits exact stocké dans bigthumbs_index.db et previews_index.db
+    conformément à `GetThumbnailChecksum` (`0x0042A800`, `arg_c=0`) :
+    1. Arrondit le FILETIME ft2 à la seconde la plus proche ((ft2 + 5_000_000) // 10_000_000) et applique ROL 13 ^ ROL 17.
+    2. Combine par XOR le hachage de `imagedata_filters` (`0x0042AC8F`), le rectangle de recadrage en pixels (`0x00429DC0` / `0x0042AD01`),
+       le masque d'orientation `(((flip * 4) ^ rotate_step) << 4)` (`0x0042AD1E`), et le hachage de `imagedata_text` si `text_active != 0` (`0x0042AD7C`).
+    EN: Computes the exact 32-bit checksum stored in bigthumbs_index.db and previews_index.db
+    matching `GetThumbnailChecksum` (`0x0042A800`, `arg_c=0`).
     """
     q = ((ft2 & 0xFFFFFFFFFFFFFFFF) + 0x4C4B40) // 0x989680
     q_lo = q & 0xFFFFFFFF
     q_hi = (q >> 32) & 0xFFFFFFFF
     base = (_rol32(q_lo, 0x0D) ^ _rol32(q_hi, 0x11)) & 0xFFFFFFFF
+
+    acc = 0
+    if filters:
+        acc ^= hash_picasa_string_case_sensitive(filters)
+
+    if crop64 and 0 < crop64 < 0xFFFF000000000000 and width > 0 and height > 0:
+        x0 = (crop64 >> 48) & 0xFFFF
+        y0 = (crop64 >> 32) & 0xFFFF
+        x1 = (crop64 >> 16) & 0xFFFF
+        y1 = crop64 & 0xFFFF
+        left = int(width * (x0 / 65536.0) + 0.5)
+        top = int(height * (y0 / 65536.0) + 0.5)
+        right = int(width * (x1 / 65536.0) + 0.5)
+        bottom = int(height * (y1 / 65536.0) + 0.5)
+        if not (left == 0 and top == 0 and right == width and bottom == height):
+            crop_val = (bottom + 2 * (top + 2 * (right + 2 * left))) & 0xFFFFFFFF
+            acc ^= crop_val
+
     orient_mask = ((((1 if flip else 0) * 4) ^ (rotate_step & 3)) << 4) & 0xFFFFFFFF
-    return (base ^ orient_mask) & 0xFFFFFFFF
+    acc ^= orient_mask
+
+    if text_active and text:
+        acc ^= hash_picasa_string_case_sensitive(text)
+
+    return (base ^ acc) & 0xFFFFFFFF
 
 
 # Ref: Red.dll @ 0x1003E510 (template consistency check) & 0x10102020 (vqc_Cue::exportArr)
@@ -433,8 +491,12 @@ class BlockIndexFile:
         if pos != len(data):
             raise ValueError(f"Données résiduelles dans *_index.db : {len(data) - pos} octets non consommés")
 
+        # Ref: picasa3.exe @ 0x006B8AC0 (CBlockFile::InitTable : tronque à min(c1, c2, c3) si les tailles diffèrent)
         if not (c1 == c2 == c3):
-            raise ValueError(f"Incohérence du nombre d'éléments entre les vecteurs : c1={c1}, c2={c2}, c3={c3}")
+            min_c = min(c1, c2, c3)
+            checksums = checksums[:min_c]
+            offsets = offsets[:min_c]
+            sizes_and_blocks = sizes_and_blocks[:min_c]
 
         return cls(
             magic=magic,

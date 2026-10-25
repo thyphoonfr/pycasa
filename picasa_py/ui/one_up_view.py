@@ -720,28 +720,26 @@ class PicasaOneUpView(QWidget):
 
     def _toggle_star_current(self) -> None:
         """
-        FR: Bascule l'étoile sur la photo actuellement ouverte dans One-Up (Ctrl+T).
-        EN: Toggles the star status on the photo currently open in One-Up (Ctrl+T).
+        FR: Bascule l'étoile sur la photo actuellement ouverte dans One-Up (Ctrl+T)
+        en synchronisant `.picasa.ini`, `imagedata_star.pmp` et `wordhash.dat` (`]star`).
+        EN: Toggles the star status on the photo currently open in One-Up (Ctrl+T),
+        synchronizing `.picasa.ini`, `imagedata_star.pmp`, and `wordhash.dat` (`]star`).
 
-        Ref: picasa3.exe @ ID_PICTURE_STAR, star=yes
+        Ref: picasa3.exe @ ID_PICTURE_STAR, star=yes, 0x00456A15
         """
         target_path = self.current_photo_path
         if not target_path or not os.path.exists(target_path):
             return
-        parent_dir = os.path.dirname(target_path)
-        ini_path = os.path.join(parent_dir, ".picasa.ini")
-        if not os.path.exists(ini_path):
-            alt = os.path.join(parent_dir, "Picasa.ini")
-            if os.path.exists(alt):
-                ini_path = alt
-        from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-        doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
-        fname = os.path.basename(target_path)
-        new_starred = not doc.is_starred(fname)
-        doc.set_starred(fname, new_starred)
-        doc.write_file(ini_path)
-        self.update_star_button(new_starred)
-        self.star_toggled.emit(target_path, new_starred)
+        state = {"starred": False}
+
+        def _toggle(doc, fname: str) -> None:
+            new_s = not doc.is_starred(fname)
+            doc.set_starred(fname, new_s)
+            state["starred"] = new_s
+
+        self._update_ini(target_path, _toggle)
+        self.update_star_button(state["starred"])
+        self.star_toggled.emit(target_path, state["starred"])
 
     def _on_drawer_closed(self) -> None:
         """
@@ -1107,23 +1105,22 @@ class PicasaOneUpView(QWidget):
 
     def _on_neutral_color_picked(self, rgb: Tuple[int, int, int]) -> None:
         """
-        FR: Applique la balance des blancs calculée depuis le pixel échantillonné (filter_whitept).
-        EN: Applies the white balance computed from the sampled neutral pixel (filter_whitept).
+        FR: Enregistre le point neutre échantillonné (`neutral_rgb` `0x00RRGGBB`, `[edi + 0x40]` @ `0x008F8002`)
+            et réapplique le pipeline non-cumulatif `finetune2` (`0x008F7EE0` / `0x008FAC40`).
+        EN: Stores the sampled neutral point (`neutral_rgb` `0x00RRGGBB`, `[edi + 0x40]` @ `0x008F8002`)
+            and reapplies the non-cumulative `finetune2` pipeline (`0x008F7EE0` / `0x008FAC40`).
+
+        Ref: picasa3.exe @ 0x008F8002, 0x0090EDA0, 0x008FAC40
         """
         if not self._history or self._history_idx < 0:
             return
-        curr_img = self._history[self._history_idx]
-        new_img = PicasaImageProcessor.neutral_color_balance(curr_img, rgb)
-        self._push_history(new_img)
-        self.canvas.set_display_image(new_img)
-        self.edit_panel.set_image(new_img)
+        r, g, b = int(rgb[0]) & 0xFF, int(rgb[1]) & 0xFF, int(rgb[2]) & 0xFF
+        neutral_rgb = (r << 16) | (g << 8) | b
+        if hasattr(self.edit_panel, "set_tuning_neutral_rgb"):
+            self.edit_panel.set_tuning_neutral_rgb(neutral_rgb)
         if hasattr(self.edit_panel, "btn_neutral_color"):
             self.edit_panel.btn_neutral_color.setChecked(False)
-        r, g, b = int(rgb[0]), int(rgb[1]), int(rgb[2])
-        self._append_filter_to_ini(f"whitept=1,{r},{g},{b};")
-        self._sync_current_thumbnails_to_db(new_img)
-        if self.current_photo_path:
-            self.photo_edited.emit(self.current_photo_path)
+        self._on_apply_effect("color_temp", {})
 
     @staticmethod
     def _resolve_db_photo_index(db: Optional[PicasaDatabase], idx: int) -> int:
@@ -1490,7 +1487,7 @@ class PicasaOneUpView(QWidget):
                             if sec:
                                 filters_str = sec.get("filters", "")
                                 if filters_str:
-                                    pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str)
+                                    pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str, skip_geom=True)
 
                             # Ref: editpanel/edittextpanel (0x00658900)
                             txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
@@ -1917,6 +1914,7 @@ class PicasaOneUpView(QWidget):
                 highlights=float(tp.get("highlights", 0.0)),
                 shadows=float(tp.get("shadows", 0.0)),
                 colortemp=float(tp.get("colortemp", 0.0)),
+                neutral_rgb=int(tp.get("neutral_rgb", 0)),
             )
             self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
         elif kind == "effect" and self._effect_preview_base_img is not None:
@@ -1945,7 +1943,7 @@ class PicasaOneUpView(QWidget):
         Always computes from `self._tuning_base_img` so moving a slider back and forth never stacks
         the effect onto itself, and returning to 0 restores the exact base image.
 
-        Ref: picasa3.exe @ filterdesc.xml (finetune2, mode="soft", flightslider1), 0x00760F40
+        Ref: picasa3.exe @ filterdesc.xml (finetune2, mode="soft", flightslider1), 0x008F7EE0
         """
         if self._history_idx < 0 or not self._history:
             return
@@ -1959,6 +1957,7 @@ class PicasaOneUpView(QWidget):
             highlights=float(tuning_params.get("highlights", 0.0)),
             shadows=float(tuning_params.get("shadows", 0.0)),
             colortemp=float(tuning_params.get("colortemp", 0.0)),
+            neutral_rgb=int(tuning_params.get("neutral_rgb", 0)),
         )
         self._display_pil_on_canvas(preview_img, is_live_preview=True, preserve_view=True)
         if src_img is not self._tuning_base_img:
@@ -1975,7 +1974,7 @@ class PicasaOneUpView(QWidget):
         EN: Explicitly commits lighting adjustments ("Apply adjustments") as the new base image
         and resets sliders to 0 for subsequent edits.
 
-        Ref: picasa3.exe @ filterdesc.xml (finetune2)
+        Ref: picasa3.exe @ 0x008FAC40, 0x008F7EE0, filterdesc.xml (finetune2)
         """
         if self._history_idx < 0 or not self._history:
             return
@@ -1984,10 +1983,11 @@ class PicasaOneUpView(QWidget):
         hl_v = float(tuning_params.get("highlights", 0.0))
         sh_v = float(tuning_params.get("shadows", 0.0))
         ct_v = float(tuning_params.get("colortemp", 0.0))
-        if abs(fill_v) < 1e-4 and abs(hl_v) < 1e-4 and abs(sh_v) < 1e-4 and abs(ct_v) < 1e-4:
+        neutral_rgb = int(tuning_params.get("neutral_rgb", 0)) & 0x00FFFFFF
+        if abs(fill_v) < 1e-4 and abs(hl_v) < 1e-4 and abs(sh_v) < 1e-4 and abs(ct_v) < 1e-4 and neutral_rgb == 0:
             return
 
-        new_img = PicasaImageProcessor.finetune(base_img, fill_v, hl_v, sh_v, ct_v)
+        new_img = PicasaImageProcessor.finetune(base_img, fill_v, hl_v, sh_v, ct_v, neutral_rgb=neutral_rgb)
         if self._tuning_history_slot == self._history_idx and self._tuning_history_slot > 0:
             self._history[self._history_idx] = new_img.copy()
             self._display_current_history(preserve_view=True)
@@ -1999,7 +1999,8 @@ class PicasaOneUpView(QWidget):
 
         target_path = self.current_photo_path
         if target_path and os.path.exists(target_path):
-            token = f"finetune2=1,{fill_v:.6f},{hl_v:.6f},{sh_v:.6f},{ct_v:.6f}"
+            # Ref: picasa3.exe @ 0x008FAC40 : finetune2=1,<fill:%f>,<highlights:%f>,<shadows:%f>,<neutral_rgb:%08x>,<colortemp:%f>
+            token = f"finetune2=1,{fill_v:.6f},{hl_v:.6f},{sh_v:.6f},{neutral_rgb:08x},{ct_v:.6f}"
             self._update_ini_tuning_token(target_path, token)
             self._sync_current_thumbnails_to_db(new_img)
             self.photo_edited.emit(target_path)
@@ -2011,7 +2012,7 @@ class PicasaOneUpView(QWidget):
         EN: Updates lighting adjustment tokens in `.picasa.ini` without stacking duplicates
         when the user adjusts a slider multiple times.
         """
-        tuning_prefixes = ("backlight=", "highlights=", "shadows=", "colortemp=", "finetune=", "finetune2=")
+        tuning_prefixes = ("fill=", "backlight=", "highlights=", "shadows=", "colortemp=", "finetune=", "finetune2=")
 
         def _replace_tuning(doc, fname: str) -> None:
             """
@@ -2098,16 +2099,29 @@ class PicasaOneUpView(QWidget):
         self._full_res_preview_timer.stop()
         self._pending_full_res_preview = None
 
-        # FR: --- Cas 1 : Curseurs d'éclairage (Tab 1 Lumière d'appoint / Tab 2 Réglages) ---
+        # FR: --- Cas 1 : Curseurs d'éclairage et baguettes magiques (Tab 1 Lumière d'appoint / Tab 2 Réglages) ---
         # Calculés de façon NON-CUMULATIVE depuis `self._tuning_base_img` !
-        # EN: --- Case 1: Lighting sliders (Tab 1 Fill Light / Tab 2 Tuning) ---
+        # EN: --- Case 1: Lighting sliders and magic wands (Tab 1 Fill Light / Tab 2 Tuning) ---
         # Computed NON-CUMULATIVELY from `self._tuning_base_img`!
-        if effect_name in ("fill_light", "highlights", "shadows", "color_temp"):
+        if effect_name in ("fill_light", "highlights", "shadows", "color_temp", "autotune_lighting", "autotune_color"):
             if self._tuning_base_img is None:
                 self._tuning_base_img = self._history[self._history_idx].copy()
 
             t_params = self.edit_panel.get_tuning_params()
-            if effect_name == "fill_light" and "amount" in params:
+            if effect_name == "autotune_lighting":
+                hl_auto, sh_auto = PicasaImageProcessor.compute_autotune_lighting(
+                    self._tuning_base_img, current_fill=float(t_params.get("fill", 0.0))
+                )
+                if hasattr(self.edit_panel, "set_tuning_sliders_from_params"):
+                    self.edit_panel.set_tuning_sliders_from_params(hl_auto, sh_auto)
+                t_params["highlights"] = hl_auto
+                t_params["shadows"] = sh_auto
+            elif effect_name == "autotune_color":
+                n_rgb = PicasaImageProcessor.compute_autotune_color(self._tuning_base_img)
+                if hasattr(self.edit_panel, "set_tuning_neutral_rgb"):
+                    self.edit_panel.set_tuning_neutral_rgb(n_rgb)
+                t_params["neutral_rgb"] = n_rgb
+            elif effect_name == "fill_light" and "amount" in params:
                 t_params["fill"] = float(params["amount"])
             elif effect_name == "highlights" and "amount" in params:
                 t_params["highlights"] = float(params["amount"])
@@ -2116,12 +2130,14 @@ class PicasaOneUpView(QWidget):
             elif effect_name == "color_temp" and "temp" in params:
                 t_params["colortemp"] = float(params["temp"])
 
+            neutral_rgb = int(t_params.get("neutral_rgb", 0)) & 0x00FFFFFF
             new_img = PicasaImageProcessor.finetune(
                 self._tuning_base_img,
                 fill=t_params["fill"],
                 highlights=t_params["highlights"],
                 shadows=t_params["shadows"],
                 colortemp=t_params["colortemp"],
+                neutral_rgb=neutral_rgb,
             )
             # FR: Mettre à jour le créneau d'historique de réglage en place au lieu d'empiler à chaque mouvement de curseur
             # EN: Update the tuning history slot in place instead of stacking on every slider movement
@@ -2138,14 +2154,13 @@ class PicasaOneUpView(QWidget):
                 hl_v = t_params["highlights"]
                 sh_v = t_params["shadows"]
                 ct_v = t_params["colortemp"]
-                if abs(fill_v) < 1e-4 and abs(hl_v) < 1e-4 and abs(sh_v) < 1e-4 and abs(ct_v) < 1e-4:
+                if abs(fill_v) < 1e-4 and abs(hl_v) < 1e-4 and abs(sh_v) < 1e-4 and abs(ct_v) < 1e-4 and neutral_rgb == 0:
                     self._update_ini_tuning_token(target_path, None)
-                elif effect_name == "fill_light" and abs(hl_v) < 1e-4 and abs(sh_v) < 1e-4 and abs(ct_v) < 1e-4:
-                    self._update_ini_tuning_token(target_path, f"backlight=1,{fill_v:.6f}")
                 else:
+                    # Ref: picasa3.exe @ 0x008FAC40 : finetune2=1,<fill:%f>,<highlights:%f>,<shadows:%f>,<neutral_rgb:%08x>,<colortemp:%f>
                     self._update_ini_tuning_token(
                         target_path,
-                        f"finetune2=1,{fill_v:.6f},{hl_v:.6f},{sh_v:.6f},{ct_v:.6f}",
+                        f"finetune2=1,{fill_v:.6f},{hl_v:.6f},{sh_v:.6f},{neutral_rgb:08x},{ct_v:.6f}",
                     )
                 self._schedule_thumb_db_sync(new_img, target_path)
             return
@@ -2214,7 +2229,7 @@ class PicasaOneUpView(QWidget):
         if effect_name == "lucky":
             return "enhance=1"
         if effect_name == "autocolor":
-            return "colorfix=1"
+            return "autocolor=1"
         if effect_name == "whitept":
             r, g, b = self._extract_rgb(p.get("color", (128, 128, 128)), (128, 128, 128))
             return f"whitept=1,{r},{g},{b}"
@@ -2223,107 +2238,125 @@ class PicasaOneUpView(QWidget):
         if effect_name == "sepia":
             return "sepia=1"
         if effect_name == "warmify":
-            return "warmify=1"
+            return "warm=1"
         if effect_name == "sharpen":
-            return f"sharpen=1,{float(p.get('amount', 0.5)):.6f}"
+            return f"unsharp2=1,{float(p.get('amount', 0.6)):.6f}"
         if effect_name in ("grain", "film_grain"):
-            return f"filmgrain=1,{float(p.get('intensity', 18.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"PicnikGrain=1,{int(round(float(p.get('intensity', 18.0))))},{int(round(float(p.get('fade', 0.0))))},0"
         if effect_name == "tint":
             r, g, b = self._extract_rgb(p.get("color", (220, 190, 150)), (220, 190, 150))
-            return f"tint=1,{float(p.get('intensity', 0.4)):.4f},{r},{g},{b}"
+            fade_pct = max(0.0, min(100.0, (1.0 - float(p.get("intensity", 0.4))) * 100.0))
+            return f"PicnikTint=1,{fade_pct:.6f},{(r << 16) | (g << 8) | b:08x}"
         if effect_name == "saturation":
-            return f"saturation=1,{float(p.get('factor', 1.4)):.6f}"
+            return f"sat=1,{float(p.get('factor', p.get('amount', 0.1618))):.6f}"
         if effect_name == "soft_focus":
-            return f"softfocus=1,{float(p.get('amount', 0.4)):.4f},{float(p.get('size', 0.35)):.4f}"
+            cx = float(p.get("cx", 0.5))
+            cy = float(p.get("cy", 0.5))
+            size = float(p.get("size", 0.35))
+            amount = float(p.get("amount", 0.4))
+            return f"radblur=1,{cx:.6f},{cy:.6f},{size:.6f},{amount:.6f}"
         if effect_name == "glow":
-            return f"glow=1,{float(p.get('intensity', 0.45)):.4f},{float(p.get('radius', 8.0)):.2f}"
+            return f"glow2=1,{float(p.get('intensity', 0.65)):.6f},{float(p.get('radius', 3.0)):.6f}"
         if effect_name == "focal_bw":
-            return f"focalbw=1,{float(p.get('size', 0.35)):.4f},{float(p.get('sharpness', 0.4)):.4f}"
+            cx = float(p.get("cx", 0.5))
+            cy = float(p.get("cy", 0.5))
+            size = float(p.get("size", 0.35))
+            sharp = float(p.get("sharpness", 0.4))
+            return f"radsat=1,{cx:.6f},{cy:.6f},{size:.6f},{sharp:.6f}"
         if effect_name == "graduated_tint":
-            r, g, b = self._extract_rgb(p.get("color", (255, 140, 50)), (255, 140, 50))
-            return f"gradtint=1,{float(p.get('shade', 0.5)):.4f},{float(p.get('feather', 0.5)):.4f},{r},{g},{b}"
+            r, g, b = self._extract_rgb(p.get("color", (123, 180, 216)), (123, 180, 216))
+            cx = float(p.get("cx", 0.5))
+            cy = float(p.get("cy", 0.5))
+            feather = float(p.get("feather", 0.5))
+            shade = float(p.get("shade", 0.5))
+            angle = float(p.get("angle", 0.0))
+            return f"dir_tint=1,{cx:.6f},{cy:.6f},{feather:.6f},{shade:.6f},{0xFF000000 | (r << 16) | (g << 8) | b:08x},{angle:.6f}"
         if effect_name == "filtered_bw":
             r, g, b = self._extract_rgb(p.get("color", (255, 85, 85)), (255, 85, 85))
-            return f"ansel=1,{r},{g},{b}"
+            return f"ansel=1,{0xFF000000 | (r << 16) | (g << 8) | b:08x}"
         if effect_name == "hdr":
-            return f"hdrish=1,{float(p.get('radius', 20.0)):.2f},{float(p.get('strength', 3.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"HDR=1,{float(p.get('radius', 20.0)):.2f},{float(p.get('strength', 3.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "lomo":
-            return f"lomo=1,{float(p.get('blur', 50.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"Lomo=1,{float(p.get('blur', 50.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "orton":
-            return f"orton=1,{float(p.get('bloom', 25.0)):.2f},{float(p.get('brightness', 50.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"Orton=1,{float(p.get('bloom', 25.0)):.2f},{float(p.get('brightness', 50.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "sixties":
-            return f"1960s=1,{float(p.get('fade', 20.0)):.2f}"
+            return f"Sixties=1,{float(p.get('fade', 20.0)):.2f},00ffffff,1"
         if effect_name == "cross_process":
-            return f"crossprocess=1,{float(p.get('fade', 0.0)):.2f}"
+            return f"CrossProcess=1,{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "infrared":
-            return f"infrared=1,{float(p.get('fade', 0.0)):.2f}"
+            return f"IR=1,{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "holga":
-            return f"holga=1,{float(p.get('blur', 70.0)):.2f},{float(p.get('grain', 30.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"Holga=1,{float(p.get('blur', 70.0)):.2f},{float(p.get('grain', 30.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "cinemascope":
-            return f"cinemascope=1,{float(p.get('color_boost', 0.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"Cinemascope=1,{float(p.get('color_boost', 0.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "night_vision":
             r, g, b = self._extract_rgb(p.get("color", (87, 204, 41)), (87, 204, 41))
-            return f"nightvision=1,{float(p.get('grain', 20.0)):.2f},{float(p.get('fade', 0.0)):.2f},{r},{g},{b}"
+            return f"NightVision=1,{float(p.get('grain', 20.0)):.2f},{float(p.get('fade', 0.0)):.2f},{(r << 16) | (g << 8) | b:08x}"
         if effect_name == "heat_map":
-            return f"heatmap=1,{float(p.get('shift', 0.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
+            return f"HeatMap=1,{float(p.get('shift', 0.0)):.2f},{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "polaroid":
-            return f"Polaroid=1,{float(p.get('angle', 5.0)):.2f}"
+            return f"Polaroid=1,{float(p.get('angle', 5.0)):.2f},00e2e2e2"
         if effect_name == "quantize_palette":
-            return f"QuantizePalette=1,{int(round(float(p.get('steps', 8))))}"
+            return f"QuantizePalette=1,{int(round(float(p.get('steps', 8))))},80.00,0.00"
         if effect_name == "boost":
-            return f"boost=1,{float(p.get('impact', 50.0)):.2f}"
+            return f"Boost=1,{float(p.get('impact', 50.0)):.2f}"
         if effect_name == "vignette":
             r, g, b = self._extract_rgb(p.get("color", (0, 0, 0)), (0, 0, 0))
-            return f"vignette=1,{float(p.get('amount', 0.5)):.4f},{float(p.get('size', 0.25)):.4f},{r},{g},{b}"
+            return f"Vignette=1,{float(p.get('amount', 0.5)):.4f},{float(p.get('size', 0.25)):.4f},{(r << 16) | (g << 8) | b:08x}"
         if effect_name == "two_tone":
             b_val = float(p.get("brightness", 0.0))
             c_val = float(p.get("contrast", 0.0))
             f_val = float(p.get("fade", 0.0))
             sr, sg, sb = self._extract_rgb(p.get("shadow_color", (0, 68, 136)), (0, 68, 136))
             hr, hg, hb = self._extract_rgb(p.get("highlight_color", (255, 255, 0)), (255, 255, 0))
-            return f"duotone=1,{b_val:.1f},{c_val:.1f},{f_val:.1f},{sr},{sg},{sb},{hr},{hg},{hb}"
+            return f"TwoTone=1,{b_val:.1f},{c_val:.1f},{f_val:.1f},{(sr << 16) | (sg << 8) | sb:08x},{(hr << 16) | (hg << 8) | hb:08x}"
         if effect_name == "pixelate":
-            return f"pixelate=1,{int(round(float(p.get('block_size', 14))))},{float(p.get('fade', 0.0)):.2f}"
+            return f"Pixelate=1,{int(round(float(p.get('block_size', 14))))},9.00,{float(p.get('fade', 0.0)):.2f}"
         if effect_name == "focal_pixelate":
-            return f"focalpixelate=1,{float(p.get('block_size', 15.0)):.2f},{float(p.get('size', 0.35)):.4f},{float(p.get('hardness', 50.0)):.2f}"
+            cx = float(p.get("cx", 0.5))
+            cy = float(p.get("cy", 0.5))
+            return f"PicnikFocalPixelate=1,{cx:.6f},{cy:.6f},{float(p.get('block_size', 15.0)):.2f},{float(p.get('size', 0.35)):.4f},{float(p.get('hardness', 50.0)):.2f},0"
         if effect_name == "invert":
-            return "invert=1"
+            return "Invert=1"
         if effect_name == "focal_zoom":
-            return f"focalzoom=1,{float(p.get('zoom_amount', 30.0)):.2f},{float(p.get('size', 0.25)):.4f},{float(p.get('hardness', 50.0)):.2f}"
+            cx = float(p.get("cx", 0.5))
+            cy = float(p.get("cy", 0.5))
+            return f"FocalZoom=1,{cx:.6f},{cy:.6f},{float(p.get('zoom_amount', 30.0)):.2f},{float(p.get('size', 0.25)):.4f},{float(p.get('hardness', 50.0)):.2f},0.00"
         if effect_name == "soften":
-            return f"soften=1,{float(p.get('impact', 50.0)):.2f},{float(p.get('fade', 50.0)):.2f}"
+            return f"Soften=1,{float(p.get('impact', 50.0)):.2f},{float(p.get('fade', 50.0)):.2f}"
         if effect_name == "comic":
-            return f"comicbook=1,{float(p.get('radius', 40.0)):.2f},{float(p.get('strength', 75.0)):.2f}"
+            return f"Comicize=1,{float(p.get('radius', 40.0)):.2f},{float(p.get('strength', 75.0)):.2f},50.00"
         if effect_name == "neon":
             fade = float(p.get("fade", 0.0))
             r, g, b = self._extract_rgb(p.get("color", (0, 255, 255)), (0, 255, 255))
-            return f"neon=1,{fade:.2f},{r},{g},{b}"
+            return f"Neon=1,{fade:.2f},{(r << 16) | (g << 8) | b:08x}"
         if effect_name == "pencil_sketch":
-            return f"pencilsketch=1,{float(p.get('radius', 2.0)):.2f},{float(p.get('contrast', 100.0)):.2f}"
+            return f"PencilSketch=1,{float(p.get('radius', 2.0)):.2f},{float(p.get('contrast', 100.0)):.2f},0.00"
         if effect_name == "border":
             outer_t = float(p.get("outer_thickness", 15.0))
             inner_t = float(p.get("inner_thickness", 3.0))
             rad = float(p.get("corner_radius", 0.0))
             or_, og, ob = self._extract_rgb(p.get("outer_color", (26, 26, 26)), (26, 26, 26))
             ir, ig, ib = self._extract_rgb(p.get("inner_color", (255, 255, 255)), (255, 255, 255))
-            return f"border=1,{outer_t:.1f},{inner_t:.1f},{rad:.1f},{or_},{og},{ob},{ir},{ig},{ib}"
+            return f"Border=1,{outer_t:.1f},{inner_t:.1f},{rad:.1f},{(or_ << 16) | (og << 8) | ob:08x},{(ir << 16) | (ig << 8) | ib:08x},0.00"
         if effect_name == "museum_matte":
             in_t = float(p.get("inner_thickness", 12.0))
             out_t = float(p.get("outer_thickness", 7.0))
             ir, ig, ib = self._extract_rgb(p.get("inner_color", (240, 234, 228)), (240, 234, 228))
             or_, og, ob = self._extract_rgb(p.get("outer_color", (26, 14, 3)), (26, 14, 3))
-            return f"MuseumMatte=1,{in_t:.2f},0,0,{out_t:.2f},{ir},{ig},{ib},{or_},{og},{ob}"
+            return f"MuseumMatte=1,{in_t:.2f},0,0,{out_t:.2f},{(ir << 16) | (ig << 8) | ib:08x},{(or_ << 16) | (og << 8) | ob:08x}"
         if effect_name == "drop_shadow":
             dist = float(p.get("distance", 6.0))
             ang = float(p.get("angle", 45.0))
             blur = float(p.get("blur", 8.0))
             fade = float(p.get("fade", 50.0))
             br, bg_g, bb = self._extract_rgb(p.get("bg_color", (255, 255, 255)), (255, 255, 255))
-            return f"DropShadow=1,{dist:.1f},{ang:.1f},{blur:.1f},{fade:.1f},{br},{bg_g},{bb}"
+            return f"DropShadow=1,{dist:.1f},{ang:.1f},{blur:.1f},00000000,{(br << 16) | (bg_g << 8) | bb:08x},{fade:.1f}"
         if effect_name == "rounded_edges":
             rr = float(p.get("corner_radius", 10.0)) / 100.0
             or_, og, ob = self._extract_rgb(p.get("outer_color", (255, 255, 255)), (255, 255, 255))
-            return f"RoundedEdges=1,{rr:.4f},{or_},{og},{ob}"
+            return f"RoundedEdges=1,{rr:.4f},{(or_ << 16) | (og << 8) | ob:08x}"
         if effect_name == "local_contrast":
             return f"LocalContrast=1,{float(p.get('radius', 15.0)):.2f},{float(p.get('strength', 1.5)):.2f},{float(p.get('fade', 0.0)):.2f}"
         return None
@@ -2481,7 +2514,15 @@ class PicasaOneUpView(QWidget):
             if 0 <= prev_idx < len(self._history_ini_snapshots)
             else self._read_current_ini_snapshot(target_path)
         )
-        self._update_ini(target_path, lambda doc, fname: doc.set_crop(fname, crop_str))
+        def _apply_crop_doc(doc, fname: str) -> None:
+            doc.set_crop(fname, crop_str)
+            clean_hex = crop_str.strip()
+            if clean_hex.lower().startswith("rect64(") and clean_hex.endswith(")"):
+                clean_hex = clean_hex[7:-1]
+            if clean_hex:
+                doc.append_filter(fname, f"crop64=1,{clean_hex}")
+
+        self._update_ini(target_path, _apply_crop_doc)
         if 0 <= prev_idx < len(self._history_ini_snapshots):
             self._history_ini_snapshots[prev_idx] = prev_snap
         if self.db is not None and hasattr(self.db, "_ini_cache") and isinstance(self.db._ini_cache, dict):
@@ -2658,7 +2699,16 @@ class PicasaOneUpView(QWidget):
             )
             self._push_history(new_img)
 
-        text_token = f"Arial;{size};0;0;0;400;0;0;{r},{g},{b};{px:.4f},{py:.4f};{int(bool(shadow))};{txt}"
+        # Ref: picasa3.exe @ 0x00A4DB30, 0x00A4E3A0 (CTextItemList exact format)
+        utf8_len = len(txt.encode("utf-8"))
+        scale = max(0.02, min(0.5, float(size) / 360.0))
+        fill_argb = 0xFF000000 | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF)
+        outline_w = 2.0 if shadow else 0.0
+        outline_argb = 0xFF000000
+        text_token = (
+            f"1;{utf8_len};{txt};Arial;{px:.6f},{py:.6f},{scale:.6f},0.000000;"
+            f"v1,400,400,128.000000,{outline_w:.6f},1.000000,1.000000,{outline_argb},{fill_argb},32768;"
+        )
         self._update_ini(target_path, lambda doc, fname: doc.set_text(fname, text_token))
         self._sync_current_thumbnails_to_db()
         self.photo_edited.emit(target_path)
@@ -2668,8 +2718,10 @@ class PicasaOneUpView(QWidget):
 
     def _on_redeye_apply(self) -> None:
         """
-        FR: Applique l'atténuation automatique des yeux rouges et déverrouille l'interface.
-        EN: Applies automatic red-eye reduction and unlocks the UI.
+        FR: Applique l'atténuation automatique des yeux rouges, persiste `redeye=1` dans `.picasa.ini` et déverrouille l'interface.
+        EN: Applies automatic red-eye reduction, persists `redeye=1` in `.picasa.ini`, and unlocks the UI.
+
+        Ref: picasa3.exe @ 0x008FAC40, filterdesc.xml @ redeye
         """
         self._set_modal_tool_lock(False, 0, "")
         self.canvas.cancel_redeye()
@@ -2678,6 +2730,7 @@ class PicasaOneUpView(QWidget):
         curr_img = self._history[self._history_idx]
         new_img = PicasaImageProcessor.remove_red_eye(curr_img)
         self._push_history(new_img)
+        self._append_filter_to_ini("redeye=1")
         self._sync_current_thumbnails_to_db(new_img)
         target_path = self.current_photo_path
         if target_path:
@@ -2685,8 +2738,10 @@ class PicasaOneUpView(QWidget):
 
     def _on_retouch_apply(self, radius: float) -> None:
         """
-        FR: Applique le lissage local de retouche d'imperfections et déverrouille l'interface.
-        EN: Applies local blemish healing smoothing and unlocks the UI.
+        FR: Applique le lissage local de retouche d'imperfections, persiste `retouch=1,...` dans `.picasa.ini` et déverrouille l'interface.
+        EN: Applies local blemish healing smoothing, persists `retouch=1,...` in `.picasa.ini`, and unlocks the UI.
+
+        Ref: picasa3.exe @ 0x008FAC40, filterdesc.xml @ retouch
         """
         self._set_modal_tool_lock(False, 0, "")
         self.canvas.cancel_retouch()
@@ -2695,6 +2750,7 @@ class PicasaOneUpView(QWidget):
         curr_img = self._history[self._history_idx]
         new_img = PicasaImageProcessor.retouch_heal(curr_img, (0.5, 0.5), radius)
         self._push_history(new_img)
+        self._append_filter_to_ini(f"retouch=1,0.500000,0.500000,{float(radius):.6f}")
         self._sync_current_thumbnails_to_db(new_img)
         target_path = self.current_photo_path
         if target_path:
@@ -2702,14 +2758,17 @@ class PicasaOneUpView(QWidget):
 
     def _on_canvas_retouch(self, nx: float, ny: float, radius: float) -> None:
         """
-        FR: Applique une retouche locale à la position cliquée sur la photo.
-        EN: Applies a local blemish retouch at the clicked normalized position on the photo.
+        FR: Applique une retouche locale à la position cliquée sur la photo et la persiste dans `.picasa.ini`.
+        EN: Applies a local blemish retouch at the clicked normalized position on the photo and persists it in `.picasa.ini`.
+
+        Ref: picasa3.exe @ 0x008FAC40, filterdesc.xml @ retouch
         """
         if self._history_idx < 0 or not self._history:
             return
         curr_img = self._history[self._history_idx]
         new_img = PicasaImageProcessor.retouch_heal(curr_img, (nx, ny), radius)
         self._push_history(new_img)
+        self._append_filter_to_ini(f"retouch=1,{float(nx):.6f},{float(ny):.6f},{float(radius):.6f}")
         self._sync_current_thumbnails_to_db(new_img)
         target_path = self.current_photo_path
         if target_path:
@@ -2717,8 +2776,10 @@ class PicasaOneUpView(QWidget):
 
     def _on_canvas_redeye_point(self, nx: float, ny: float) -> None:
         """
-        FR: Applique la suppression des yeux rouges sur le point cliqué.
-        EN: Applies red-eye removal around the clicked point.
+        FR: Applique la suppression des yeux rouges sur le point cliqué et la persiste dans `.picasa.ini`.
+        EN: Applies red-eye removal around the clicked point and persists it in `.picasa.ini`.
+
+        Ref: picasa3.exe @ 0x008FAC40, filterdesc.xml @ redeye
         """
         if self._history_idx < 0 or not self._history:
             return
@@ -2726,6 +2787,7 @@ class PicasaOneUpView(QWidget):
         box = (max(0.0, nx - 0.025), max(0.0, ny - 0.025), min(1.0, nx + 0.025), min(1.0, ny + 0.025))
         new_img = PicasaImageProcessor.remove_red_eye(curr_img, box)
         self._push_history(new_img)
+        self._append_filter_to_ini(f"redeye=1,{box[0]:.6f},{box[1]:.6f},{box[2]:.6f},{box[3]:.6f}")
         self._sync_current_thumbnails_to_db(new_img)
         target_path = self.current_photo_path
         if target_path:
@@ -2733,8 +2795,10 @@ class PicasaOneUpView(QWidget):
 
     def _on_canvas_redeye_box(self, rect: QRectF) -> None:
         """
-        FR: Applique la suppression des yeux rouges sur le rectangle sélectionné.
-        EN: Applies red-eye removal within the selected bounding rectangle.
+        FR: Applique la suppression des yeux rouges sur le rectangle sélectionné et la persiste dans `.picasa.ini`.
+        EN: Applies red-eye removal within the selected bounding rectangle and persists it in `.picasa.ini`.
+
+        Ref: picasa3.exe @ 0x008FAC40, filterdesc.xml @ redeye
         """
         if self._history_idx < 0 or not self._history:
             return
@@ -2742,6 +2806,7 @@ class PicasaOneUpView(QWidget):
         box = (rect.left(), rect.top(), rect.right(), rect.bottom())
         new_img = PicasaImageProcessor.remove_red_eye(curr_img, box)
         self._push_history(new_img)
+        self._append_filter_to_ini(f"redeye=1,{box[0]:.6f},{box[1]:.6f},{box[2]:.6f},{box[3]:.6f}")
         self._sync_current_thumbnails_to_db(new_img)
         target_path = self.current_photo_path
         if target_path:
@@ -2883,14 +2948,16 @@ class PicasaOneUpView(QWidget):
 
     def save_current_photo(self) -> bool:
         """
-        FR: Enregistre les modifications apportées à la photo active sur le disque.
-        Crée une copie de sauvegarde dans le dossier caché .picasaoriginals/
-        exactement comme picasa3.exe, puis nettoie les jetons de retouche dans .picasa.ini.
-        EN: Saves modifications made to the active photo to disk.
-        Creates a backup copy in the hidden .picasaoriginals/ directory
-        exactly like picasa3.exe, then clears baked edit tokens from .picasa.ini.
+        FR: Enregistre les modifications apportées à la photo active sur le disque en pleine résolution.
+        Crée une copie de sauvegarde dans le dossier caché `.picasaoriginals/` exactement comme
+        `picasa3.exe`, préserve les métadonnées EXIF/ICC, écrit `backuphash` et nettoie les jetons
+        de retouche dans `.picasa.ini`.
+        EN: Saves modifications made to the active photo to disk at full resolution.
+        Creates a backup copy in the hidden `.picasaoriginals/` directory exactly like
+        `picasa3.exe`, preserves EXIF/ICC metadata, writes `backuphash`, and clears baked edit
+        tokens from `.picasa.ini`.
 
-        Ref: picasa3.exe @ .picasaoriginals (0x008814AC, 0x009B9290)
+        Ref: picasa3.exe @ .picasaoriginals (0x008814AC, 0x009B9290, 0x00456A15)
         """
         self._flush_pending_thumb_db_sync()
         if not self._history or self._history_idx < 0:
@@ -2922,27 +2989,85 @@ class PicasaOneUpView(QWidget):
                 import shutil
                 shutil.copy2(target_path, str(backup_file))
 
+            # FR: Si l'image disque est plus grande que l'aperçu 1600px et que .picasa.ini contient des retouches,
+            #     rendre en pleine résolution (max_size=0) avant d'écraser le fichier.
+            # EN: If the disk image is larger than the 1600px preview and .picasa.ini has edits,
+            #     render at full resolution (max_size=0) before overwriting the file.
+            img_to_save = current_img
+            exif_bytes = None
+            icc_profile = None
+            try:
+                with Image.open(target_path) as meta_im:
+                    raw_w, raw_h = meta_im.size
+                    icc_profile = meta_im.info.get("icc_profile")
+                    raw_exif = meta_im.getexif()
+                    if raw_exif:
+                        if 0x0112 in raw_exif:
+                            raw_exif[0x0112] = 1
+                        exif_bytes = raw_exif.tobytes()
+                if max(raw_w, raw_h) > max(current_img.size):
+                    from picasa_py.ini.parser import PicasaIniParser
+                    ini_p = folder / ".picasa.ini"
+                    if not ini_p.exists():
+                        alt_p = folder / "Picasa.ini"
+                        if alt_p.exists():
+                            ini_p = alt_p
+                    if ini_p.exists():
+                        doc_check = PicasaIniParser.parse_file(ini_p)
+                        sec_check = doc_check.get_section(target_p.name)
+                        if sec_check and any(
+                            sec_check.get(k)
+                            for k in ("filters", "crop", "rotate", "tilt", "text", "autolight", "backlight", "colorfix", "redeye", "retouch")
+                        ):
+                            full_rendered = PicasaImageProcessor.load_transformed_image(
+                                target_path, max_size=0, parsed_ini=doc_check
+                            )
+                            if full_rendered is not None:
+                                img_to_save = full_rendered
+            except Exception:
+                pass
+
+            save_kwargs: dict = {}
+            if exif_bytes:
+                save_kwargs["exif"] = exif_bytes
+            if icc_profile:
+                save_kwargs["icc_profile"] = icc_profile
+
             ext = target_p.suffix.lower()
             if ext in (".jpg", ".jpeg"):
-                current_img.convert("RGB").save(target_path, format="JPEG", quality=95)
+                img_to_save.convert("RGB").save(target_path, format="JPEG", quality=95, **save_kwargs)
             elif ext == ".png":
-                current_img.save(target_path, format="PNG")
+                img_to_save.save(target_path, format="PNG", **save_kwargs)
             else:
-                current_img.save(target_path)
+                img_to_save.save(target_path, **save_kwargs)
+
+            # Ref: picasa3.exe @ 0x00429CA0, 0x004548B1, 0x004851C3, 0x0098B6E0 :
+            # backuphash est le XOR des quatre mots 16 bits du double IEEE-754 de la date OLE Automation courante
+            import struct
+            from datetime import datetime
+            from picasa_py.scanner.scanner import datetime_to_ole
+            try:
+                ole_now = datetime_to_ole(datetime.now())
+                w0, w1, w2, w3 = struct.unpack("<4H", struct.pack("<d", ole_now))
+                b_hash = ((w0 ^ w1 ^ w2 ^ w3) & 0xFFFF) or 1
+            except Exception:
+                b_hash = 1
 
             def _clear_baked_edits(doc, fname: str) -> None:
                 """
-                FR: Nettoie les clés de retouches non-destructives désormais gravées dans les pixels.
-                EN: Clears non-destructive edit keys that have been baked into pixels.
+                FR: Nettoie les clés de retouches non-destructives désormais gravées dans les pixels
+                    et enregistre `backuphash` comme `picasa3.exe` (`0x00456A15`).
+                EN: Clears non-destructive edit keys that have been baked into pixels
+                    and records `backuphash` like `picasa3.exe` (`0x00456A15`).
                 """
                 doc.set_crop(fname, None)
                 doc.set_rotate(fname, 0)
                 doc.set_tilt(fname, None)
                 doc.set_text(fname, None)
-                sec = doc.get_section(fname)
-                if sec:
-                    for k in ("filters", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch"):
-                        sec.remove(k)
+                sec = doc.get_or_create_section(fname)
+                for k in ("filters", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch"):
+                    sec.remove(k)
+                sec.set("backuphash", str(b_hash))
 
             self._update_ini(target_path, _clear_baked_edits)
             self._active_crop_rect = None
@@ -2950,10 +3075,41 @@ class PicasaOneUpView(QWidget):
             self._active_tilt = 0.0
             self.canvas.set_active_transform(None, 0.0, 0)
 
-            self._original_pil_img = current_img.copy()
+            self._orig_backup_path = str(backup_file)
+            if self._original_pil_img is None:
+                self._original_pil_img = current_img.copy()
             if self.canvas.view_mode == "A_A":
                 orig_pix = self._pil_to_pixmap(self._original_pil_img)
                 self.canvas.set_original_pixmap(orig_pix)
+
+            # FR : Mettre à jour ft2, file_size, width, height, originfast et revertable dans db3/
+            # avant de régénérer les vignettes (pour que compute_thumb_checksum @ 0x006B99F0 soit exact)
+            # EN: Update ft2, file_size, width, height, originfast, and revertable in db3/
+            # before regenerating thumbnails (so compute_thumb_checksum @ 0x006B99F0 is exact)
+            if self.db is not None and os.path.exists(target_path):
+                try:
+                    from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
+                    rec_idx = self.db.find_photo_index(target_path) if hasattr(self.db, "find_photo_index") else None
+                    if rec_idx is not None and self.db.thumbindex is not None and 0 <= rec_idx < len(self.db.thumbindex.records):
+                        _, ft2_new, fsize_new = file_filetimes(Path(target_path))
+                        rec = self.db.thumbindex.records[rec_idx]
+                        rec.ft2 = ft2_new
+                        rec.size = fsize_new
+                        rec.file_size = fsize_new
+                        self.db.thumbindex.dirty = True
+                        for col_n, col_v in (
+                            ("imagedata_width", int(current_img.width)),
+                            ("imagedata_height", int(current_img.height)),
+                            ("imagedata_originfast", compute_originfast_hash(Path(target_path))),
+                            ("imagedata_revertable", 1),
+                        ):
+                            pmp_c = self.db.pmps.get(col_n)
+                            if pmp_c is not None and rec_idx < len(pmp_c.records):
+                                pmp_c.records[rec_idx] = col_v
+                                pmp_c.dirty = True
+                except Exception:
+                    pass
+
             self._sync_current_thumbnails_to_db(current_img)
             self.photo_edited.emit(target_path)
             return True
@@ -2962,20 +3118,45 @@ class PicasaOneUpView(QWidget):
 
     def save_current_photo_as(self, output_path: str) -> bool:
         """
-        FR: Enregistre l'image active vers un nouvel emplacement (ID_FILE_SAVEAS).
-        EN: Saves the active image to a new file path (ID_FILE_SAVEAS).
+        FR: Enregistre l'image active vers un nouvel emplacement en pleine résolution avec métadonnées EXIF/ICC (ID_FILE_SAVEAS).
+        EN: Saves the active image to a new file path at full resolution with EXIF/ICC metadata (ID_FILE_SAVEAS).
         """
         if not self._history or self._history_idx < 0:
             return False
         try:
             current_img = self._history[self._history_idx]
+            img_to_save = current_img
+            exif_bytes = None
+            icc_profile = None
+            target_path = getattr(self, "_current_photo_path", None)
+            if target_path and os.path.exists(target_path):
+                try:
+                    with Image.open(target_path) as meta_im:
+                        raw_w, raw_h = meta_im.size
+                        icc_profile = meta_im.info.get("icc_profile")
+                        raw_exif = meta_im.getexif()
+                        if raw_exif:
+                            if 0x0112 in raw_exif:
+                                raw_exif[0x0112] = 1
+                            exif_bytes = raw_exif.tobytes()
+                    if max(raw_w, raw_h) > max(current_img.size):
+                        full_rendered = PicasaImageProcessor.load_transformed_image(target_path, max_size=0)
+                        if full_rendered is not None:
+                            img_to_save = full_rendered
+                except Exception:
+                    pass
+            save_kwargs: dict = {}
+            if exif_bytes:
+                save_kwargs["exif"] = exif_bytes
+            if icc_profile:
+                save_kwargs["icc_profile"] = icc_profile
             ext = Path(output_path).suffix.lower()
             if ext in (".jpg", ".jpeg"):
-                current_img.convert("RGB").save(output_path, format="JPEG", quality=95)
+                img_to_save.convert("RGB").save(output_path, format="JPEG", quality=95, **save_kwargs)
             elif ext == ".png":
-                current_img.save(output_path, format="PNG")
+                img_to_save.save(output_path, format="PNG", **save_kwargs)
             else:
-                current_img.save(output_path)
+                img_to_save.save(output_path, **save_kwargs)
             return True
         except Exception:
             return False

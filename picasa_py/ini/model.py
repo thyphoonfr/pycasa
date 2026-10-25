@@ -14,6 +14,34 @@ from typing import Dict, List, Optional, Tuple, Iterator
 import re
 
 
+# Ref: picasa3.exe @ 0x0099ABC0 & table @ 0x00D3AE14 (INI value entity escaping/unescaping)
+def escape_ini_value(value: str) -> str:
+    """
+    FR: Échappe les retours à la ligne `\n` et `\r` en `&#010;` et `&#013;` pour l'écriture dans `.picasa.ini`.
+    EN: Escapes `\n` and `\r` line breaks into `&#010;` and `&#013;` when writing to `.picasa.ini`.
+    Ref: picasa3.exe @ 0x0099ABC0, 0x00D3AE14 ('&#010;', '&#013;', '&#091;', '&#093;')
+    """
+    if "\n" not in value and "\r" not in value:
+        return value
+    return value.replace("\r", "&#013;").replace("\n", "&#010;")
+
+
+def unescape_ini_value(value: str) -> str:
+    """
+    FR: Déséchappe les séquences `&#010;`, `&#013;`, `&#091;` et `&#093;` lues depuis `.picasa.ini`.
+    EN: Unescapes `&#010;`, `&#013;`, `&#091;`, and `&#093;` sequences read from `.picasa.ini`.
+    Ref: picasa3.exe @ 0x0099ABC0, 0x00D3AE14
+    """
+    if "&#0" not in value:
+        return value
+    return (
+        value.replace("&#010;", "\n")
+        .replace("&#013;", "\r")
+        .replace("&#091;", "[")
+        .replace("&#093;", "]")
+    )
+
+
 # Ref: picasa3.exe @ 0x0068BABA ("faces=%s\r\n")
 # Format: rect64(<hex16>),<contact_id_hex>
 @dataclass
@@ -164,6 +192,9 @@ class Rect64:
             return cls.from_uint64(int(m.group(1), 16))
         if re.match(r"^[0-9a-fA-F]{1,16}$", clean):
             return cls.from_uint64(int(clean, 16))
+        # Ref: picasa3.exe @ 0x004569B0 : support legacy crop=rect(l,t,r,b)
+        if clean.lower().startswith("rect(") and clean.endswith(")"):
+            clean = clean[5:-1].strip()
         parts = [p.strip() for p in clean.split(",")]
         if len(parts) == 4:
             try:
@@ -307,14 +338,16 @@ class IniSection:
         """
         self._modified = True
         target = self._ci_key(key)
+        raw_val = escape_ini_value(value)
+        clean_val = unescape_ini_value(value)
         found_idx: Optional[int] = None
         to_remove: List[int] = []
         for i, entry in enumerate(self.entries):
             if entry.key is not None and self._ci_key(entry.key) == target:
                 if found_idx is None:
                     found_idx = i
-                    entry.value = value
-                    entry.raw_line = f"{entry.key}={value}\r\n"
+                    entry.value = clean_val
+                    entry.raw_line = f"{entry.key}={raw_val}\r\n"
                 else:
                     to_remove.append(i)
         for idx in reversed(to_remove):
@@ -322,7 +355,7 @@ class IniSection:
         if found_idx is not None:
             return
         # FR: Nouvelle entrée / EN: New entry
-        new_entry = IniEntry(key=key, value=value, raw_line=f"{key}={value}\r\n")
+        new_entry = IniEntry(key=key, value=clean_val, raw_line=f"{key}={raw_val}\r\n")
         self.entries.append(new_entry)
 
     def remove(self, key: str) -> bool:

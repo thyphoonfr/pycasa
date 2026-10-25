@@ -410,12 +410,8 @@ class PicasaAdjustTimeDialog(QDialog):
 
                 new_ts = final_dt.timestamp()
 
-                # FR: 2. Mise à jour de l'horodatage sur disque
-                # EN: 2. Update timestamp on disk
-                os.utime(str(p), (new_ts, new_ts))
-
-                # FR: 3. Mise à jour EXIF si JPEG
-                # EN: 3. Update EXIF if JPEG
+                # FR: 2. Mise à jour EXIF si JPEG (avant os.utime pour ne pas écraser st_mtime)
+                # EN: 2. Update EXIF if JPEG (before os.utime so st_mtime is not overwritten)
                 if p.suffix.lower() in (".jpg", ".jpeg"):
                     try:
                         exif_str = final_dt.strftime("%Y:%m:%d %H:%M:%S")
@@ -428,21 +424,54 @@ class PicasaAdjustTimeDialog(QDialog):
                     except Exception:
                         pass
 
-                # FR: 4. Mise à jour de la base de données si active
-                # EN: 4. Update database if active
+                # FR: 3. Mise à jour de l'horodatage sur disque
+                # EN: 3. Update timestamp on disk
+                os.utime(str(p), (new_ts, new_ts))
+
+                # FR: 4. Mise à jour de la base de données si active (thumbindex.db, imagedata_originfast, thumbs_index.db)
+                # EN: 4. Update database if active (thumbindex.db, imagedata_originfast, thumbs_index.db)
                 if self.db and self.db.thumbindex:
+                    from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
+                    from picasa_py.db.blockfile import compute_thumb_checksum
                     ft = unix_to_filetime(new_ts)
-                    norm_path = os.path.abspath(str(p)).lower()
-                    imagedata_tbl = self.db.pmp_tables.get("imagedata") if hasattr(self.db, "pmp_tables") else None
-                    col_fdate = imagedata_tbl.columns.get("filedate") if imagedata_tbl else None
-                    for idx, rec in enumerate(self.db.thumbindex.records):
-                        full = self.db.get_media_full_path(idx)
-                        if full and os.path.abspath(full).lower() == norm_path:
-                            rec.ft1 = ft
-                            rec.ft2 = ft
-                            if col_fdate and idx < len(col_fdate.values):
-                                col_fdate.values[idx] = ft
-                            break
+                    _, ft2_disk, fsize_disk = file_filetimes(p)
+                    idx = self.db.find_photo_index(str(p)) if hasattr(self.db, "find_photo_index") else None
+                    if idx is None:
+                        norm_path = os.path.abspath(str(p)).lower()
+                        for r_i, r_cand in enumerate(self.db.thumbindex.records):
+                            full = self.db.get_media_full_path(r_i)
+                            if full and os.path.abspath(full).lower() == norm_path:
+                                idx = r_i
+                                break
+                    if idx is not None and 0 <= idx < len(self.db.thumbindex.records):
+                        rec = self.db.thumbindex.records[idx]
+                        rec.ft1 = ft
+                        rec.ft2 = ft2_disk or ft
+                        rec.size = fsize_disk
+                        rec.file_size = fsize_disk
+                        self.db.thumbindex.dirty = True
+                        pmp_of = self.db.pmps.get("imagedata_originfast") if hasattr(self.db, "pmps") else None
+                        if pmp_of is not None and idx < len(pmp_of.records):
+                            pmp_of.records[idx] = compute_originfast_hash(p)
+                            pmp_of.dirty = True
+                        folder_p = ""
+                        if 0 <= rec.parent_idx < len(self.db.thumbindex.records):
+                            folder_p = self.db.thumbindex.records[rec.parent_idx].path
+                        new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
+                        indices_to_update = [idx]
+                        if hasattr(self.db, "_get_face_children"):
+                            indices_to_update.extend(self.db._get_face_children(idx))
+                        for stem in ("thumbs", "thumbs2", "bigthumbs", "previews"):
+                            b_idx = getattr(self.db, "block_indices", {}).get(stem)
+                            if b_idx is not None:
+                                for u_idx in indices_to_update:
+                                    b_ent = b_idx.get_entry(u_idx) if hasattr(b_idx, "get_entry") else None
+                                    if b_ent is not None and not b_ent.is_empty:
+                                        if stem in ("thumbs", "thumbs2"):
+                                            b_idx.checksums[u_idx] = new_cs
+                                        elif hasattr(self.db, "compute_entry_checksum"):
+                                            b_idx.checksums[u_idx] = self.db.compute_entry_checksum(u_idx, stem)
+                                        b_idx.dirty = True
 
                 results.append((str(p), final_dt))
 
@@ -451,7 +480,12 @@ class PicasaAdjustTimeDialog(QDialog):
 
         # FR: Sauvegarde de la base via PicasaDatabase
         # EN: Save database via PicasaDatabase
-        if self.db and hasattr(self.db, "save_all"):
+        if self.db and hasattr(self.db, "save_database"):
+            try:
+                self.db.save_database()
+            except Exception:
+                pass
+        elif self.db and hasattr(self.db, "save_all"):
             try:
                 self.db.save_all()
             except Exception:

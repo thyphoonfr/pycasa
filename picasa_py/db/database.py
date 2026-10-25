@@ -19,6 +19,7 @@ Provides high-level access to all photo library data:
 """
 
 from __future__ import annotations
+import math
 import os
 import struct
 import sys
@@ -973,6 +974,24 @@ class PicasaDatabase:
                     if ad_names.records[alb_idx] != aname:
                         ad_names.records[alb_idx] = aname
                         ad_names.dirty = True
+                adesc = sec.get("description") or sec.get("caption")
+                ad_descs = self.pmps.get("albumdata_description")
+                if adesc is not None and ad_descs is not None and alb_idx < len(ad_descs.records):
+                    if ad_descs.records[alb_idx] != adesc:
+                        ad_descs.records[alb_idx] = adesc
+                        ad_descs.dirty = True
+                aloc = sec.get("location")
+                ad_locs = self.pmps.get("albumdata_location")
+                if aloc is not None and ad_locs is not None and alb_idx < len(ad_locs.records):
+                    if ad_locs.records[alb_idx] != aloc:
+                        ad_locs.records[alb_idx] = aloc
+                        ad_locs.dirty = True
+                amusic = sec.get("music")
+                ad_musics = self.pmps.get("albumdata_music")
+                if amusic is not None and ad_musics is not None and alb_idx < len(ad_musics.records):
+                    if ad_musics.records[alb_idx] != amusic:
+                        ad_musics.records[alb_idx] = amusic
+                        ad_musics.dirty = True
                 date_str = sec.get("date")
                 if date_str is not None and ad_dates is not None:
                     d_clean = date_str.strip()
@@ -980,13 +999,21 @@ class PicasaDatabase:
                     try:
                         ole_val = float(d_clean)
                     except ValueError:
+                        import datetime
+                        ole_epoch = datetime.datetime(1899, 12, 30)
                         try:
-                            import datetime
                             dt = datetime.datetime.fromisoformat(d_clean)
-                            ole_epoch = datetime.datetime(1899, 12, 30)
+                            if dt.tzinfo is not None:
+                                dt = dt.replace(tzinfo=None)
                             ole_val = (dt - ole_epoch).total_seconds() / 86400.0
                         except Exception:
-                            ole_val = None
+                            for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y/%m/%d"):
+                                try:
+                                    dt = datetime.datetime.strptime(d_clean[:19], fmt)
+                                    ole_val = (dt - ole_epoch).total_seconds() / 86400.0
+                                    break
+                                except ValueError:
+                                    continue
                     if ole_val is not None and ad_dates.records[alb_idx] != ole_val:
                         ad_dates.records[alb_idx] = ole_val
                         ad_dates.dirty = True
@@ -1088,6 +1115,7 @@ class PicasaDatabase:
         if sec is None:
             edited_val = 1 if crop_u64 else (2 if rot > 0 else 0)
             _set_pmp("imagedata_filters", "")
+            _set_pmp("imagedata_redo", "")
             # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
             _set_pmp("imagedata_edited", edited_val)
             _set_pmp("imagedata_text", "")
@@ -1096,21 +1124,64 @@ class PicasaDatabase:
             _set_pmp("imagedata_caption", "")
             _set_pmp("imagedata_deferredface", "")
             _set_pmp("imagedata_backuphash", 0)
+            has_orig_backup = bool(
+                photo_path_str
+                and fname
+                and os.path.exists(os.path.join(os.path.dirname(photo_path_str), ".picasaoriginals", fname))
+            )
+            if has_orig_backup:
+                _set_pmp("imagedata_revertable", 1)
+            elif photo_path_str and os.path.exists(photo_path_str):
+                _set_pmp("imagedata_revertable", 0)
+            if self.wordhash is not None and hasattr(self.wordhash, "remove_word"):
+                for st_tok in ("]star", "]hidden", "]screensaver", "]rating"):
+                    self.wordhash.remove_word(st_tok, idx)
+                ad_uids_col = self.pmps.get("albumdata_uid")
+                ad_toks_col = self.pmps.get("albumdata_token")
+                known_albs: Set[str] = set()
+                for col in (ad_uids_col, ad_toks_col):
+                    if col is not None:
+                        for v in col.records:
+                            s = str(v or "").strip()
+                            if s.startswith("]album:") or s.startswith(".album:"):
+                                s = s[7:].strip()
+                            if s and not s.startswith("]"):
+                                known_albs.add(s)
+                for ka in known_albs:
+                    self.wordhash.remove_word(f"]album:{ka}", idx)
+                    self.wordhash.remove_word(f"]snapshot:]album:{ka}", idx)
         else:
             filters_str = sec.get("filters", "") or ""
+            # Ref: func_00456a15.c:3352-3460 — legacy fix=1 / bw=1 synthesis when filters= is absent
+            if not filters_str:
+                synth_parts: List[str] = []
+                if (sec.get("fix") or "").strip().lower() in ("1", "yes", "true"):
+                    synth_parts.append("autolight=1;")
+                if (sec.get("bw") or "").strip().lower() in ("1", "yes", "true"):
+                    synth_parts.append("bw=1;")
+                if synth_parts:
+                    filters_str = "".join(synth_parts)
+            # Correction du bug de picasa3.exe @ 0x00459DE3 -> LAB_00459e21 :
+            # si crop=rect64(...) est présent sans crop64= dans filters=, on préserve crop_u64 et on le synchronise.
+            if crop_u64 and "crop64=" not in filters_str.lower():
+                base_f = filters_str.strip(";")
+                filters_str = f"{base_f};crop64=1,{crop_u64:x};" if base_f else f"crop64=1,{crop_u64:x};"
             _set_pmp("imagedata_filters", filters_str)
-            # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres, 2 si rotation seule (db3 : 23/23)
-            edited_val = 1 if (filters_str or crop_u64) else (2 if rot > 0 else 0)
-            _set_pmp("imagedata_edited", edited_val)
+            _set_pmp("imagedata_redo", sec.get("redo", "") or "")
 
             text_str = sec.get("text", "") or ""
             _set_pmp("imagedata_text", text_str)
             raw_ta = sec.get("textactive")
+            # Ref: func_00456a15.c:3189 — strict check on textactive == "1"
             if raw_ta is not None:
                 text_active = 1 if raw_ta.strip().lower() in ("1", "yes", "true") else 0
             else:
-                text_active = 1 if bool(text_str) else 0
+                text_active = 0
             _set_pmp("imagedata_textactive", text_active)
+
+            # Ref: picasa3.exe @ 0x00476680 — edited=1 si recadrage/filtres/texte actif, 2 si rotation seule (db3 : 23/23)
+            edited_val = 1 if (filters_str or crop_u64 or text_active) else (2 if rot > 0 else 0)
+            _set_pmp("imagedata_edited", edited_val)
 
             tags_val = sec.get("keywords", "") or ""
             _set_pmp("imagedata_tags", tags_val if tags_val else "")
@@ -1118,19 +1189,52 @@ class PicasaDatabase:
             cap_val = sec.get("caption", "") or ""
             _set_pmp("imagedata_caption", cap_val if cap_val else "")
 
+            # Ref: func_00456a15.c:809-862 (onlinechecksum -> uint16 dans imagedata_peoplealbumchecksum.pmp)
+            ocs = sec.get("onlinechecksum")
+            if ocs:
+                try:
+                    ocs_s = ocs.strip()
+                    try:
+                        ocs_int = (int(ocs_s, 16) if ocs_s.lower().startswith("0x") else int(ocs_s, 10)) & 0xFFFF
+                    except ValueError:
+                        ocs_int = int(ocs_s, 16) & 0xFFFF
+                    _set_pmp("imagedata_peoplealbumchecksum", ocs_int)
+                except Exception:
+                    pass
+
             # Ref: func_00456a15.c:3471 (backuphash -> uint16 decimal ou 0x hex)
             bhash = sec.get("backuphash")
+            bhash_int = 0
             if bhash:
                 try:
                     bh_s = bhash.strip()
-                    bh_int = int(bh_s, 16) if bh_s.lower().startswith("0x") else int(bh_s, 10)
-                    _set_pmp("imagedata_backuphash", bh_int & 0xFFFF)
+                    bhash_int = (int(bh_s, 16) if bh_s.lower().startswith("0x") else int(bh_s, 10)) & 0xFFFF
+                    _set_pmp("imagedata_backuphash", bhash_int)
                 except Exception:
                     _set_pmp("imagedata_backuphash", 0)
             else:
                 _set_pmp("imagedata_backuphash", 0)
 
-            faces_str = sec.get("faces") or ""
+            has_orig_backup = bool(
+                photo_path_str
+                and fname
+                and os.path.exists(os.path.join(os.path.dirname(photo_path_str), ".picasaoriginals", fname))
+            )
+            if bhash_int != 0 or has_orig_backup:
+                _set_pmp("imagedata_revertable", 1)
+            elif photo_path_str and os.path.exists(photo_path_str):
+                _set_pmp("imagedata_revertable", 0)
+
+            raw_faces = sec.get("faces") or ""
+            if raw_faces:
+                valid_faces = [
+                    fp.strip()
+                    for fp in raw_faces.split(";")
+                    if fp.strip() and not fp.strip().endswith(",0")
+                ]
+                faces_str = ";".join(valid_faces)
+            else:
+                faces_str = ""
             _set_pmp("imagedata_deferredface", faces_str)
 
             geotag_str = sec.get("geotag", "") or ""
@@ -1169,15 +1273,57 @@ class PicasaDatabase:
                 elif hasattr(self.wordhash, "remove_word"):
                     self.wordhash.remove_word("]hidden", idx)
 
+                # Ref: picasa3.exe @ 0x00458F9B (func_00456a15.c:2829-2860) :
+                # Correction du bug original (qui ignorait la valeur de screensaver=) :
+                # active ]screensaver pour "yes"/"1"/"true" et le retire pour "no"/"0"/"false"/vide.
+                raw_ss = sec.get("screensaver")
+                is_screensaver = raw_ss is not None and raw_ss.strip().lower() not in ("", "no", "0", "false")
                 alb_csv = sec.get("albums") or ""
+                active_alb_tokens: Set[str] = set()
                 if alb_csv:
                     for raw_a in alb_csv.split(","):
                         a_tok = raw_a.strip()
                         if a_tok.startswith("]album:") or a_tok.startswith(".album:"):
                             a_tok = a_tok[7:].strip()
                         if a_tok:
+                            active_alb_tokens.add(a_tok)
+                            if a_tok.lower() == "screensaver":
+                                is_screensaver = True
                             self.wordhash.add_word(f"]album:{a_tok}", idx)
                             self.wordhash.add_word(f"]snapshot:]album:{a_tok}", idx)
+                if hasattr(self.wordhash, "remove_word"):
+                    ad_uids_col = self.pmps.get("albumdata_uid")
+                    ad_toks_col = self.pmps.get("albumdata_token")
+                    known_albs_rm: Set[str] = set()
+                    for col in (ad_uids_col, ad_toks_col):
+                        if col is not None:
+                            for v in col.records:
+                                s = str(v or "").strip()
+                                if s.startswith("]album:") or s.startswith(".album:"):
+                                    s = s[7:].strip()
+                                if s and not s.startswith("]"):
+                                    known_albs_rm.add(s)
+                    for ka in known_albs_rm:
+                        if ka not in active_alb_tokens:
+                            self.wordhash.remove_word(f"]album:{ka}", idx)
+                            self.wordhash.remove_word(f"]snapshot:]album:{ka}", idx)
+                if is_screensaver:
+                    self.wordhash.add_word("]screensaver", idx)
+                elif hasattr(self.wordhash, "remove_word"):
+                    self.wordhash.remove_word("]screensaver", idx)
+
+                # Ref: func_00456a15.c:285-369 (rating -> ]rating dans wordhash.dat)
+                raw_rating = (sec.get("rating") or "").strip()
+                has_rating = False
+                if raw_rating:
+                    try:
+                        has_rating = int(raw_rating) != 0
+                    except Exception:
+                        has_rating = False
+                if has_rating:
+                    self.wordhash.add_word("]rating", idx)
+                elif hasattr(self.wordhash, "remove_word"):
+                    self.wordhash.remove_word("]rating", idx)
 
         if self.wordhash is not None:
             if edited_val != 0:
@@ -1201,6 +1347,8 @@ class PicasaDatabase:
                         lat_val = 0.0
             if lat_val and lat_val != 0.0:
                 self.wordhash.add_word("]geo", idx)
+            elif hasattr(self.wordhash, "remove_word"):
+                self.wordhash.remove_word("]geo", idx)
         self.invalidate_search_cache()
 
     def _resolve_photo_record_index(self, idx: int) -> Optional[int]:
@@ -1572,6 +1720,16 @@ class PicasaDatabase:
             except Exception:
                 pass
 
+        # Transférer la sauvegarde .picasaoriginals/<fname> si présente (Ref: picasa3.exe @ 0x0068AC80)
+        src_orig_backup = os.path.join(src_dir, ".picasaoriginals", fname)
+        if os.path.exists(src_orig_backup):
+            try:
+                dest_orig_dir = os.path.join(dest_dir_str, ".picasaoriginals")
+                os.makedirs(dest_orig_dir, exist_ok=True)
+                shutil.move(src_orig_backup, os.path.join(dest_orig_dir, fname))
+            except Exception:
+                pass
+
         # Transférer la section [fname] du .picasa.ini source vers le .picasa.ini destination
         src_ini = os.path.join(src_dir, ".picasa.ini")
         dest_ini = os.path.join(dest_dir_str, ".picasa.ini")
@@ -1607,6 +1765,119 @@ class PicasaDatabase:
             self.thumbindex.records[rec_idx].path = fname
             self.thumbindex.dirty = True
             self._modified_media_indices.add(rec_idx)
+            # Mettre à jour le checksum CBlockFile (0x006B99F0) pour le nouveau dossier parent
+            rec_obj = self.thumbindex.records[rec_idx]
+            folder_p = self.thumbindex.records[new_parent_idx].path if 0 <= new_parent_idx < len(self.thumbindex.records) else ""
+            new_cs = compute_thumb_checksum(folder_p, rec_obj.path, rec_obj.ft2, rec_obj.size)
+            for pref in ("thumbs", "thumbs2"):
+                idx_f = self.block_indices.get(pref)
+                if idx_f is not None:
+                    if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
+                        idx_f.checksums[rec_idx] = new_cs
+                        idx_f.dirty = True
+                    for c_idx in self._get_face_children(rec_idx):
+                        if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
+                            idx_f.checksums[c_idx] = new_cs
+                            idx_f.dirty = True
+
+        self._invalidate_path_index_cache()
+        self.invalidate_search_cache()
+        self._albums_cache = None
+        self._starred_cache = None
+        return True
+
+    def rename_photo(self, idx_or_src: int | str | Path, new_filename_or_path: str | Path) -> bool:
+        """
+        FR: Renomme une photo sur le disque (si ce n'est pas déjà fait) et migre sa section
+        `[old_name]` -> `[new_name]` dans `.picasa.ini`, sa copie `.picasaoriginals/<old_name>`,
+        son enregistrement `thumbindex.db` (`records[rec_idx].path`) et `wordhash.dat`.
+        EN: Renames a photo on disk (if not already renamed) and migrates its `[old_name]` ->
+        `[new_name]` section in `.picasa.ini`, its `.picasaoriginals/<old_name>` backup, its
+        `thumbindex.db` record (`records[rec_idx].path`), and `wordhash.dat`.
+
+        Ref: picasa3.exe @ ID_FILE_RENAME (0x0068AC80, 0x00456A15)
+        """
+        from picasa_py.ini.parser import PicasaIniParser
+
+        rec_idx: Optional[int] = None
+        src_full_path: Optional[str] = None
+        if isinstance(idx_or_src, int):
+            rec_idx = self._resolve_photo_record_index(idx_or_src)
+            if rec_idx is not None:
+                src_full_path = self.get_media_full_path(rec_idx)
+        else:
+            src_full_path = str(idx_or_src)
+            rec_idx = self.find_photo_index(src_full_path)
+
+        if not src_full_path:
+            return False
+
+        parent_dir = os.path.dirname(src_full_path)
+        old_fname = os.path.basename(src_full_path)
+        new_fname = os.path.basename(str(new_filename_or_path))
+        if not new_fname or old_fname == new_fname:
+            return False
+        new_full_path = os.path.join(parent_dir, new_fname)
+
+        if os.path.exists(src_full_path) and not os.path.exists(new_full_path):
+            try:
+                os.rename(src_full_path, new_full_path)
+            except Exception:
+                return False
+
+        # Migrer .picasaoriginals/<old_fname> -> .picasaoriginals/<new_fname>
+        orig_old = os.path.join(parent_dir, ".picasaoriginals", old_fname)
+        orig_new = os.path.join(parent_dir, ".picasaoriginals", new_fname)
+        if os.path.exists(orig_old) and not os.path.exists(orig_new):
+            try:
+                os.rename(orig_old, orig_new)
+            except Exception:
+                pass
+
+        # Migrer [old_fname] -> [new_fname] dans .picasa.ini
+        for ini_name in (".picasa.ini", "Picasa.ini"):
+            ini_path = os.path.join(parent_dir, ini_name)
+            if os.path.exists(ini_path):
+                try:
+                    doc = PicasaIniParser.parse_file(ini_path)
+                    old_sec = doc.get_section(old_fname)
+                    if old_sec is not None:
+                        new_sec = doc.get_or_create_section(new_fname)
+                        for k, v in old_sec.items():
+                            new_sec.set(k, v)
+                        doc.remove_section(old_fname)
+                        doc.write_file(ini_path)
+                        self.invalidate_ini_cache(ini_path)
+                except Exception:
+                    pass
+                break
+
+        if rec_idx is not None and self.thumbindex and 0 <= rec_idx < len(self.thumbindex.records):
+            self.thumbindex.records[rec_idx].path = new_fname
+            self.thumbindex.dirty = True
+            self._modified_media_indices.add(rec_idx)
+            # Mettre à jour le checksum CBlockFile (0x006B99F0) pour le nouveau nom de fichier
+            rec_obj = self.thumbindex.records[rec_idx]
+            p_idx = rec_obj.parent_idx
+            folder_p = self.thumbindex.records[p_idx].path if 0 <= p_idx < len(self.thumbindex.records) else ""
+            new_cs = compute_thumb_checksum(folder_p, rec_obj.path, rec_obj.ft2, rec_obj.size)
+            for pref in ("thumbs", "thumbs2"):
+                idx_f = self.block_indices.get(pref)
+                if idx_f is not None:
+                    if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
+                        idx_f.checksums[rec_idx] = new_cs
+                        idx_f.dirty = True
+                    for c_idx in self._get_face_children(rec_idx):
+                        if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
+                            idx_f.checksums[c_idx] = new_cs
+                            idx_f.dirty = True
+            if self.wordhash is not None:
+                from picasa_py.scanner.scanner import tokenize_indexer_text
+                if hasattr(self.wordhash, "remove_word"):
+                    for old_tok in tokenize_indexer_text(old_fname):
+                        self.wordhash.remove_word(old_tok, rec_idx)
+                for tok in tokenize_indexer_text(new_fname):
+                    self.wordhash.add_word(tok, rec_idx)
 
         self._invalidate_path_index_cache()
         self.invalidate_search_cache()
@@ -1706,6 +1977,8 @@ class PicasaDatabase:
         albums: Dict[str, Dict[str, Any]] = {}
 
         # 1. Albums dans les tables PMP (cat == 0 dans albumdata_category)
+        ad_musics = self.pmps.get("albumdata_music")
+        ad_dates = self.pmps.get("albumdata_date")
         if ad_names and ad_cats:
             names = ad_names.records
             cats = ad_cats.records
@@ -1717,17 +1990,25 @@ class PicasaDatabase:
                         continue
                     raw_tok = str(tokens[i]) if i < len(tokens) and tokens[i] else f"pmp_{i}"
                     token = raw_tok.strip()
+                    # FR : Ignorer les collections dynamiques internes comme ]updated ('Récemment mis à jour')
+                    # EN: Skip internal dynamic collections such as ]updated ('Recently Updated')
+                    if token.startswith("]") and not token.startswith("]album:"):
+                        continue
+                    if not aname.strip() and token.startswith("pmp_"):
+                        continue
                     if token.startswith("]album:") or token.startswith(".album:"):
                         token = token[7:].strip()
                     if aname.startswith("Album ]album:"):
                         aname = aname.replace("Album ]album:", "Album ")
+                    pmp_music = str(ad_musics.records[i] or "") if (ad_musics is not None and i < len(ad_musics.records) and ad_musics.records[i]) else None
+                    pmp_date = ad_dates.records[i] if (ad_dates is not None and i < len(ad_dates.records) and ad_dates.records[i]) else None
                     albums[token] = {
                         "token": token,
                         "name": aname,
                         "photo_paths": [],
                         "photo_indices": [],
-                        "music": None,
-                        "date": None,
+                        "music": pmp_music,
+                        "date": pmp_date,
                         "source": "pmp",
                     }
 
@@ -1814,6 +2095,21 @@ class PicasaDatabase:
                             albums[tok]["photo_indices"].append(rec_idx)
             except Exception:
                 pass
+
+        # 3. Compléter les photos des albums via wordhash.dat (]album:<token>)
+        if self.wordhash is not None and hasattr(self.wordhash, "search"):
+            for tok, alb_info in albums.items():
+                try:
+                    wh_indices = self.wordhash.search(f"]album:{tok}")
+                    for r_idx in wh_indices:
+                        if 0 <= r_idx < len(self.index) and not self.is_face_record(r_idx):
+                            if r_idx not in alb_info["photo_indices"]:
+                                alb_info["photo_indices"].append(r_idx)
+                            p_full = self.get_media_full_path(r_idx)
+                            if p_full and p_full not in alb_info["photo_paths"]:
+                                alb_info["photo_paths"].append(p_full)
+                except Exception:
+                    pass
 
         res_list = list(albums.values())
         self._albums_cache = [
@@ -1963,6 +2259,12 @@ class PicasaDatabase:
                                 pmp_col.records[row_idx] = def_v
                             pmp_col.dirty = True
             deleted = True
+
+        if self.wordhash is not None and hasattr(self.wordhash, "words"):
+            for w_key in (f"]album:{clean_target}", f"]snapshot:]album:{clean_target}"):
+                if w_key in self.wordhash.words:
+                    self.wordhash.words.pop(w_key, None)
+                    self.wordhash.dirty = True
 
         # Supprimer le fichier .pal éventuel dans db3/albums/
         if self.db3_dir:
@@ -2518,7 +2820,43 @@ class PicasaDatabase:
                         rot_step = int(s_rot) & 3
                     except ValueError:
                         rot_step = 0
-            return compute_preview_checksum(rec.ft2, rotate_step=rot_step, flip=0)
+            flip_step = 0
+            pmp_flip = self.pmps.get("imagedata_flipped")
+            if pmp_flip and target_idx < len(pmp_flip.records):
+                raw_flip = pmp_flip.records[target_idx]
+                if isinstance(raw_flip, int):
+                    flip_step = 1 if raw_flip > 0 else 0
+                elif isinstance(raw_flip, str) and raw_flip:
+                    s_fl = raw_flip.strip()
+                    if s_fl.startswith("flipped(") and s_fl.endswith(")"):
+                        s_fl = s_fl[8:-1].strip()
+                    try:
+                        flip_step = 1 if int(s_fl) > 0 else 0
+                    except ValueError:
+                        flip_step = 0
+            pmp_filt = self.pmps.get("imagedata_filters")
+            filt_str = str(pmp_filt.records[target_idx] or "") if (pmp_filt and target_idx < len(pmp_filt.records)) else ""
+            pmp_c64 = self.pmps.get("imagedata_crop64")
+            c64_val = int(pmp_c64.records[target_idx] or 0) if (pmp_c64 and target_idx < len(pmp_c64.records)) else 0
+            pmp_w = self.pmps.get("imagedata_width")
+            w_val = int(pmp_w.records[target_idx] or 0) if (pmp_w and target_idx < len(pmp_w.records)) else 0
+            pmp_h = self.pmps.get("imagedata_height")
+            h_val = int(pmp_h.records[target_idx] or 0) if (pmp_h and target_idx < len(pmp_h.records)) else 0
+            pmp_txt = self.pmps.get("imagedata_text")
+            txt_str = str(pmp_txt.records[target_idx] or "") if (pmp_txt and target_idx < len(pmp_txt.records)) else ""
+            pmp_ta = self.pmps.get("imagedata_textactive")
+            ta_val = int(pmp_ta.records[target_idx] or 0) if (pmp_ta and target_idx < len(pmp_ta.records)) else 0
+            return compute_preview_checksum(
+                rec.ft2,
+                rotate_step=rot_step,
+                flip=flip_step,
+                filters=filt_str,
+                crop64=c64_val,
+                width=w_val,
+                height=h_val,
+                text=txt_str,
+                text_active=ta_val,
+            )
 
         folder_path = ""
         if 0 <= rec.parent_idx < len(self.thumbindex.records):
@@ -2526,9 +2864,9 @@ class PicasaDatabase:
         cs = compute_thumb_checksum(folder_path, rec.path, rec.ft2, rec.size)
         t1 = self.block_indices.get("thumbs")
         t2 = self.block_indices.get("thumbs2")
-        if t1 is not None and t2 is not None and 0 <= index < min(t1.record_count, t2.record_count):
-            e1 = t1.get_entry(index)
-            e2 = t2.get_entry(index)
+        if t1 is not None and t2 is not None and 0 <= target_idx < min(t1.record_count, t2.record_count):
+            e1 = t1.get_entry(target_idx)
+            e2 = t2.get_entry(target_idx)
             if e1 is not None and e2 is not None and e1.checksum != 0 and e1.checksum == e2.checksum and e1.checksum != cs:
                 return e1.checksum
         return cs
@@ -2966,10 +3304,14 @@ class PicasaDatabase:
                 return False
 
             def _encode_scaled_jpeg(max_dim: int, quality: int = 90) -> bytes:
+                # Ref: picasa3.exe @ 0x00424CA0 (FUN_00424ca0 -> ceil(max_dim * min_side / max_side))
                 if w > max_dim or h > max_dim:
-                    scale = min(float(max_dim) / w, float(max_dim) / h)
-                    tw = max(1, int(round(w * scale)))
-                    th = max(1, int(round(h * scale)))
+                    if w >= h:
+                        tw = max_dim
+                        th = max(1, int(math.ceil(max_dim * h / float(w))))
+                    else:
+                        th = max_dim
+                        tw = max(1, int(math.ceil(max_dim * w / float(h))))
                     sub = rgb_img.resize((tw, th), Image.Resampling.BILINEAR)
                 else:
                     sub = rgb_img
@@ -2977,19 +3319,29 @@ class PicasaDatabase:
                 sub.save(buf, format="JPEG", quality=quality)
                 return buf.getvalue()
 
+            def _has_existing_block_entry(stem: str, r_idx: int) -> bool:
+                b_idx = self.block_indices.get(stem)
+                if b_idx is None:
+                    return False
+                entry = b_idx.get_entry(r_idx)
+                return entry is not None and not entry.is_empty
+
             # FR: Compression JPEG et calcul de la couleur moyenne HORS verrou global (Ref: 0x00414C90 CThumbMaker)
+            # bigthumbs_0.db et previews_0.db ne sont mis à jour que si l'enregistrement possède déjà une entrée
+            # (dans db3/, bigthumbs_0.db est réservé aux visages 1001 et seules quelques photos ont un preview)
             # EN: JPEG compression and average color computation OUTSIDE the global lock (Ref: 0x00414C90 CThumbMaker)
+            # bigthumbs_0.db and previews_0.db are only updated if the record already has an entry
             encoded_small = _encode_scaled_jpeg(144, 90) if "thumbs" in self.block_indices else None
             encoded_med = _encode_scaled_jpeg(72, 90) if "thumbs2" in self.block_indices else None
-            encoded_large = _encode_scaled_jpeg(288, 90) if "bigthumbs" in self.block_indices else None
-            encoded_prev = _encode_scaled_jpeg(640, 90) if "previews" in self.block_indices else None
+            encoded_large = _encode_scaled_jpeg(288, 90) if _has_existing_block_entry("bigthumbs", resolved_idx) else None
+            encoded_prev = _encode_scaled_jpeg(640, 90) if _has_existing_block_entry("previews", resolved_idx) else None
 
             avg_u32: Optional[int] = None
             if "imagedata_avgcolor" in self.pmps:
                 try:
                     avg_px = rgb_img.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
                     if isinstance(avg_px, tuple) and len(avg_px) >= 3:
-                        avg_u32 = ((int(avg_px[0]) & 0xFF) << 16) | ((int(avg_px[1]) & 0xFF) << 8) | (int(avg_px[2]) & 0xFF)
+                        avg_u32 = 0xFF000000 | ((int(avg_px[0]) & 0xFF) << 16) | ((int(avg_px[1]) & 0xFF) << 8) | (int(avg_px[2]) & 0xFF)
                 except Exception:
                     avg_u32 = None
 
@@ -3012,10 +3364,10 @@ class PicasaDatabase:
                 if encoded_prev is not None:
                     self.add_thumbnail(resolved_idx, encoded_prev, size="preview")
 
-                # 5. Colonnes PMP imagedata_edit_width, imagedata_edit_height, imagedata_avgcolor
+                # 5. Colonnes PMP imagedata_edit_width, imagedata_edit_height (toujours 0 dans db3/), imagedata_avgcolor
                 for col_name, col_val in (
-                    ("imagedata_edit_width", int(w)),
-                    ("imagedata_edit_height", int(h)),
+                    ("imagedata_edit_width", 0),
+                    ("imagedata_edit_height", 0),
                 ):
                     pmp = self.pmps.get(col_name)
                     if pmp is not None:
@@ -3237,7 +3589,7 @@ class PicasaDatabase:
                 if not stem.startswith("imagedata_"):
                     continue
                 if self.thumbindex is not None:
-                    def_val = pmp_file.default_value()
+                    def_val = self._pmp_new_row_default(stem, pmp_file)
                     while len(pmp_file.records) < target_img_len:
                         pmp_file.records.append(def_val)
                         pmp_file.dirty = True

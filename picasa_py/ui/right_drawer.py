@@ -3701,6 +3701,18 @@ class PicasaRightDrawer(QWidget):
         btn_end = style.tray_grad_end.name() if style.is_dark else style.topbar_btn_bg_end.name()
         btn_border = "#484D56" if style.is_dark else style.topbar_btn_border.name()
         accent = style.accent_color.name()
+        accent_end = getattr(style, "accent_grad_end", style.accent_color).name()
+        drawer_end = getattr(style, "drawer_bgcolor_end", style.drawer_bgcolor).name()
+        drawer_bg_css = (
+            f"qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {bg}, stop:1 {drawer_end})"
+            if bg != drawer_end
+            else bg
+        )
+        accent_bg_css = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {accent}, stop:1 {accent_end})"
+            if accent != accent_end
+            else accent
+        )
         sb_bg = "#1B1D21" if style.is_dark else style.alist_catcolor.name()
         sb_handle = (
             style.topbar_btn_border.lighter(130).name()
@@ -3711,7 +3723,7 @@ class PicasaRightDrawer(QWidget):
 
         self.setStyleSheet(f"""
             QWidget#RightDrawerRoot {{
-                background-color: {bg};
+                background: {drawer_bg_css};
                 border-left: 1px solid {border_col};
             }}
             QWidget#RightDrawerRoot QWidget {{
@@ -3755,7 +3767,7 @@ class PicasaRightDrawer(QWidget):
                 border-color: {accent};
             }}
             QWidget#RightDrawerRoot QPushButton:checked {{
-                background-color: {accent};
+                background: {accent_bg_css};
                 color: #FFFFFF;
                 border-color: {accent};
             }}

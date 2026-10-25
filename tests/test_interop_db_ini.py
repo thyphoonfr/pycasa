@@ -283,9 +283,11 @@ def test_cross_interoperability_alternating_db_and_ini(tmp_path: Path) -> None:
     assert db.pmps["imagedata_tags"].records[idx1] == "vacances,plage,soleil"
     assert idx1 in db.search("vacances soleil")
 
-    # Après rotation rotate=1, une mise à jour de preview doit intégrer rotate_step=1 dans son checksum
+    # Après rotation rotate=1 et filtres, une mise à jour de preview doit intégrer rotate_step=1 et filters dans son checksum
     db.add_thumbnail(idx1, thumb_bytes, size="preview")
-    expected_prev_crc_rot1 = compute_preview_checksum(rec1.ft2, rotate_step=1, flip=0)
+    expected_prev_crc_rot1 = compute_preview_checksum(
+        rec1.ft2, rotate_step=1, flip=0, filters="autolight=1;enhance=1;"
+    )
     assert db.block_indices["previews"].get_entry(idx1).checksum == expected_prev_crc_rot1
 
     # 3. Sauvegarder toute la base sur disque puis la relire depuis zéro

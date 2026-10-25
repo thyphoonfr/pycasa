@@ -547,11 +547,18 @@ class PicasaAlbumScroll(QWidget):
         try:
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-            # FR: 1. Piste de défilement (thumbui/albumscroll) adaptée au thème
-            # EN: 1. Scroll track (thumbui/albumscroll) adapted to the active theme
+            # FR: 1. Piste de défilement (thumbui/albumscroll) adaptée au thème (uni ou dégradé)
+            # EN: 1. Scroll track (thumbui/albumscroll) adapted to the active theme (solid or gradient)
             track_bg = self.style.tray_bgcolor if self.style.is_dark else self.style.topbar_grad_end
+            track_end = getattr(self.style, "tray_bgcolor_end", track_bg) if self.style.is_dark else track_bg
             border_col = self.style.splitter_color
-            painter.fillRect(self.rect(), track_bg)
+            if track_bg != track_end:
+                tr_grad = QLinearGradient(0.0, 0.0, 0.0, float(self.height()))
+                tr_grad.setColorAt(0.0, track_bg)
+                tr_grad.setColorAt(1.0, track_end)
+                painter.fillRect(self.rect(), QBrush(tr_grad))
+            else:
+                painter.fillRect(self.rect(), track_bg)
             painter.setPen(border_col)
             painter.drawLine(0, 0, 0, self.height())
 
@@ -618,23 +625,26 @@ class PicasaAlbumScroll(QWidget):
         path = QPainterPath()
         path.addRoundedRect(rect, radius, radius)
 
-        # FR: Dégradé métallique selon l'état / EN: State-dependent metallic gradient
+        # FR: Dégradé métallique ou thème selon l'état / EN: State-dependent metallic or theme gradient
         gradient = QLinearGradient(rect.topLeft(), rect.topRight())
+        btn_s = self.style.topbar_btn_bg_start
+        btn_e = self.style.topbar_btn_bg_end
+        acc = getattr(self.style, "accent_color", QColor("#6B7382"))
         if self._is_throttling:
-            gradient.setColorAt(0.0, QColor("#858D9C"))
-            gradient.setColorAt(0.5, QColor("#757D8C"))
-            gradient.setColorAt(1.0, QColor("#636B7A"))
-            border_color = QColor("#A0A8B8")
+            gradient.setColorAt(0.0, btn_s.lighter(130))
+            gradient.setColorAt(0.5, btn_s.lighter(115))
+            gradient.setColorAt(1.0, btn_e.lighter(115))
+            border_color = acc.lighter(120)
         elif self._hover_thumb:
-            gradient.setColorAt(0.0, QColor("#707886"))
-            gradient.setColorAt(0.5, QColor("#626A78"))
-            gradient.setColorAt(1.0, QColor("#545B67"))
-            border_color = QColor("#8A93A3")
+            gradient.setColorAt(0.0, btn_s.lighter(115))
+            gradient.setColorAt(0.5, btn_s)
+            gradient.setColorAt(1.0, btn_e)
+            border_color = acc
         else:
-            gradient.setColorAt(0.0, QColor("#5A616E"))
-            gradient.setColorAt(0.5, QColor("#4E5562"))
-            gradient.setColorAt(1.0, QColor("#404651"))
-            border_color = QColor("#6B7382")
+            gradient.setColorAt(0.0, btn_s)
+            gradient.setColorAt(0.5, btn_e)
+            gradient.setColorAt(1.0, btn_e.darker(110))
+            border_color = self.style.topbar_btn_border
 
         painter.fillPath(path, gradient)
         painter.setPen(QPen(border_color, 1))

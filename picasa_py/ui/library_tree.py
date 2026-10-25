@@ -175,6 +175,19 @@ class PicasaLibraryTree(QWidget):
         self.tree.verticalScrollBar().setSingleStep(self.style.alist_height)
         txt_col = getattr(self.style, "alist_textcolor", QColor("#222222")).name()
         bg_col = self.style.alist_bgcolor.name()
+        bg_end = getattr(self.style, "alist_bgcolor_end", self.style.alist_bgcolor).name()
+        sel_col = self.style.alist_selcolor_win.name()
+        sel_end = getattr(self.style, "accent_grad_end", self.style.alist_selcolor_win).name()
+        tree_bg = (
+            f"qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {bg_col}, stop:1 {bg_end})"
+            if bg_col != bg_end
+            else bg_col
+        )
+        sel_bg = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {sel_col}, stop:1 {sel_end})"
+            if sel_col != sel_end
+            else sel_col
+        )
         is_dark = getattr(self.style, "is_dark", False)
         sb_track = self.style.alist_catcolor.name() if not is_dark else self.style.window_bgcolor.name()
         sb_border = self.style.topbar_border_color.name()
@@ -186,7 +199,7 @@ class PicasaLibraryTree(QWidget):
         sb_hover = self.style.alist_selcolor_win.name()
         self.tree.setStyleSheet(f"""
             QTreeWidget {{
-                background-color: {bg_col};
+                background: {tree_bg};
                 border: none;
                 font-size: {self.style.alist_fontsize_win}px;
                 color: {txt_col};
@@ -196,7 +209,7 @@ class PicasaLibraryTree(QWidget):
                 padding-left: 4px;
             }}
             QTreeWidget::item:selected {{
-                background-color: {self.style.alist_selcolor_win.name()};
+                background: {sel_bg};
                 color: #FFFFFF;
             }}
             QTreeWidget::item:hover:!selected {{
@@ -257,6 +270,16 @@ class PicasaLibraryTree(QWidget):
             if cat is not None:
                 cat.setBackground(0, self.style.alist_catcolor)
                 cat.setForeground(0, QColor(txt_col))
+                for i in range(cat.childCount()):
+                    child = cat.child(i)
+                    if child is None:
+                        continue
+                    ud = child.data(0, Qt.ItemDataRole.UserRole)
+                    if isinstance(ud, dict) and ud.get("type") in ("starred", "unnamed_faces"):
+                        child.setBackground(0, self.style.alist_stickycolor)
+                        child.setForeground(0, QColor(txt_col))
+                    else:
+                        child.setForeground(0, QColor(txt_col))
 
     def retranslate_ui(self) -> None:
         """
@@ -495,6 +518,7 @@ class PicasaLibraryTree(QWidget):
             item_starred.setText(0, f"Photos favorites{count_str}")
             item_starred.setIcon(0, self.res_mgr.get_star_icon(18))
             item_starred.setBackground(0, self.style.alist_stickycolor)
+            item_starred.setForeground(0, self.style.alist_textcolor)
             item_starred.setData(0, Qt.ItemDataRole.UserRole, {
                 "type": "starred",
                 "key": "special_starred",
@@ -587,6 +611,7 @@ class PicasaLibraryTree(QWidget):
                 item_unnamed.setText(0, f"{unnamed_title} ({unnamed_count})")
                 item_unnamed.setIcon(0, self.res_mgr.get_icon(159))
                 item_unnamed.setBackground(0, self.style.alist_stickycolor)
+                item_unnamed.setForeground(0, self.style.alist_textcolor)
                 font_u = item_unnamed.font(0)
                 if font_u.pointSize() <= 0:
                     font_u.setPointSize(8)

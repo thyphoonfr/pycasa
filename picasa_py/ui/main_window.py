@@ -238,11 +238,29 @@ class PicasaMainWindow(QMainWindow):
         grid_bg = new_style.grid_bgcolor.name()
         txt_col = new_style.topbar_text_color.name()
         menu_bg = new_style.topbar_grad_start.name()
+        menu_bg_end = new_style.topbar_grad_end.name()
         menu_border = new_style.topbar_border_color.name()
         accent = new_style.accent_color.name()
+        accent_end = getattr(new_style, "accent_grad_end", new_style.accent_color).name()
         split_col = new_style.splitter_color.name()
         sb_bg = new_style.statusbar_bgcolor.name()
+        sb_bg_end = getattr(new_style, "statusbar_bgcolor_end", new_style.statusbar_bgcolor).name()
         sb_fg = new_style.statusbar_text_color.name()
+        accent_css = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {accent}, stop:1 {accent_end})"
+            if accent != accent_end
+            else accent
+        )
+        menubar_css = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {menu_bg}, stop:1 {menu_bg_end})"
+            if accent != accent_end
+            else menu_bg
+        )
+        sb_css = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {sb_bg}, stop:1 {sb_bg_end})"
+            if sb_bg != sb_bg_end
+            else sb_bg
+        )
 
         # Mettre à jour la QPalette de la fenêtre pour éviter tout fond sombre hérité de l'OS (Windows Dark Mode)
         pal = self.palette()
@@ -269,7 +287,7 @@ class PicasaMainWindow(QMainWindow):
                 background-color: {grid_bg};
             }}
             QMenuBar {{
-                background-color: {menu_bg};
+                background: {menubar_css};
                 color: {txt_col};
                 border-bottom: 1px solid {menu_border};
             }}
@@ -279,7 +297,7 @@ class PicasaMainWindow(QMainWindow):
                 padding: 4px 8px;
             }}
             QMenuBar::item:selected {{
-                background-color: {accent};
+                background: {accent_css};
                 color: #FFFFFF;
             }}
             QMenu {{
@@ -293,7 +311,7 @@ class PicasaMainWindow(QMainWindow):
                 color: {txt_col};
             }}
             QMenu::item:selected {{
-                background-color: {accent};
+                background: {accent_css};
                 color: #FFFFFF;
             }}
             QMenu::separator {{
@@ -323,7 +341,7 @@ class PicasaMainWindow(QMainWindow):
             f"QSplitter::handle {{ background-color: {split_col}; }}"
         )
 
-        self.status_bar.setStyleSheet(f"background-color: {sb_bg}; color: {sb_fg}; font-size: 11px;")
+        self.status_bar.setStyleSheet(f"background: {sb_css}; color: {sb_fg}; font-size: 11px;")
 
         if hasattr(self, "menu_builder") and getattr(self.menu_builder, "theme_actions", None):
             act = self.menu_builder.theme_actions.get(new_style.theme_id)
@@ -1344,7 +1362,14 @@ class PicasaMainWindow(QMainWindow):
 
         for p in paths:
             self._update_photo_ini(p, _apply_effects)
+            if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
+                try:
+                    self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
+                except Exception:
+                    pass
             self.thumb_view.invalidate_item(p)
+        if self.db is not None and hasattr(self.db, "schedule_save_thumbnails"):
+            self.db.schedule_save_thumbnails(1500)
 
         # Si l'image ouverte dans one_up_view est modifiée, rafraîchir son affichage
         if self.stack.currentWidget() == self.one_up_view and self.one_up_view.current_photo_path in paths:
@@ -1460,6 +1485,11 @@ class PicasaMainWindow(QMainWindow):
         for p in paths:
             if recycle_or_delete_file(p):
                 deleted_paths.add(p)
+                if self.db is not None and hasattr(self.db, "delete_photo"):
+                    try:
+                        self.db.delete_photo(p)
+                    except Exception:
+                        pass
 
         if deleted_paths:
             self.thumb_view.items = [it for it in self.thumb_view.items if it.path not in deleted_paths]
@@ -1639,6 +1669,7 @@ class PicasaMainWindow(QMainWindow):
                     "colorfix",
                     "redeye",
                     "retouch",
+                    "backuphash",
                 ):
                     sec.remove(k)
 
@@ -1650,6 +1681,38 @@ class PicasaMainWindow(QMainWindow):
                 if orig_backup.exists():
                     import shutil
                     shutil.copy2(str(orig_backup), str(p_obj))
+                    try:
+                        orig_backup.unlink()
+                        if not any(orig_backup.parent.iterdir()):
+                            orig_backup.parent.rmdir()
+                    except Exception:
+                        pass
+                    if self.db is not None and self.db.thumbindex is not None:
+                        try:
+                            from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
+                            from PIL import Image
+                            rec_idx = self.db.find_photo_index(p) if hasattr(self.db, "find_photo_index") else None
+                            if rec_idx is not None and 0 <= rec_idx < len(self.db.thumbindex.records):
+                                _, ft2_rest, fsize_rest = file_filetimes(p_obj)
+                                rec = self.db.thumbindex.records[rec_idx]
+                                rec.ft2 = ft2_rest
+                                rec.size = fsize_rest
+                                rec.file_size = fsize_rest
+                                self.db.thumbindex.dirty = True
+                                with Image.open(p_obj) as r_img:
+                                    rw, rh = r_img.size
+                                for col_n, col_v in (
+                                    ("imagedata_width", int(rw)),
+                                    ("imagedata_height", int(rh)),
+                                    ("imagedata_originfast", compute_originfast_hash(p_obj)),
+                                    ("imagedata_revertable", 0),
+                                ):
+                                    pmp_c = self.db.pmps.get(col_n)
+                                    if pmp_c is not None and rec_idx < len(pmp_c.records):
+                                        pmp_c.records[rec_idx] = col_v
+                                        pmp_c.dirty = True
+                        except Exception:
+                            pass
             except Exception:
                 pass
             self._update_photo_ini(p, _reset_doc)
@@ -1844,10 +1907,107 @@ class PicasaMainWindow(QMainWindow):
         else:
             self._on_tray_panel_toggled("properties")
 
+    def _bake_photo_edits_on_disk(self, target_path: str) -> bool:
+        """
+        FR: Grave les retouches non-destructives `.picasa.ini` en pleine résolution sur le disque,
+        sauvegarde l'original dans `.picasaoriginals/`, préserve EXIF/ICC et écrit `backuphash`.
+        EN: Bakes non-destructive `.picasa.ini` edits at full resolution to disk,
+        backs up the original in `.picasaoriginals/`, preserves EXIF/ICC, and writes `backuphash`.
+
+        Ref: picasa3.exe @ 0x008814AC, 0x009B9290, 0x00456A15
+        """
+        if not target_path or not os.path.exists(target_path):
+            return False
+        target_p = Path(target_path)
+        folder = target_p.parent
+        ini_p = folder / ".picasa.ini"
+        if not ini_p.exists():
+            alt_p = folder / "Picasa.ini"
+            if alt_p.exists():
+                ini_p = alt_p
+        if not ini_p.exists():
+            return False
+        try:
+            doc_check = PicasaIniParser.parse_file(ini_p)
+            sec_check = doc_check.get_section(target_p.name)
+            if not sec_check or not any(
+                sec_check.get(k)
+                for k in ("filters", "crop", "rotate", "tilt", "text", "autolight", "backlight", "colorfix", "redeye", "retouch")
+            ):
+                return False
+            full_rendered = PicasaImageProcessor.load_transformed_image(
+                target_path, max_size=0, parsed_ini=doc_check
+            )
+            if full_rendered is None:
+                return False
+
+            originals_dir = folder / ".picasaoriginals"
+            originals_dir.mkdir(parents=True, exist_ok=True)
+            if sys.platform == "win32":
+                try:
+                    import ctypes
+                    ctypes.windll.kernel32.SetFileAttributesW(str(originals_dir), 0x02)
+                except Exception:
+                    pass
+            backup_file = originals_dir / target_p.name
+            if not backup_file.exists():
+                import shutil
+                shutil.copy2(target_path, str(backup_file))
+
+            exif_bytes = None
+            icc_profile = None
+            try:
+                from PIL import Image
+                with Image.open(target_path) as meta_im:
+                    icc_profile = meta_im.info.get("icc_profile")
+                    raw_exif = meta_im.getexif()
+                    if raw_exif:
+                        if 0x0112 in raw_exif:
+                            raw_exif[0x0112] = 1
+                        exif_bytes = raw_exif.tobytes()
+            except Exception:
+                pass
+            save_kwargs: dict = {}
+            if exif_bytes:
+                save_kwargs["exif"] = exif_bytes
+            if icc_profile:
+                save_kwargs["icc_profile"] = icc_profile
+            ext = target_p.suffix.lower()
+            if ext in (".jpg", ".jpeg"):
+                full_rendered.convert("RGB").save(target_path, format="JPEG", quality=95, **save_kwargs)
+            elif ext == ".png":
+                full_rendered.save(target_path, format="PNG", **save_kwargs)
+            else:
+                full_rendered.save(target_path, **save_kwargs)
+
+            import zlib
+            try:
+                b_hash = (zlib.crc32(backup_file.read_bytes()) & 0xFFFF) or 1
+            except Exception:
+                b_hash = 1
+
+            def _clear_baked(doc: PicasaIniDocument, fname: str) -> None:
+                doc.set_crop(fname, None)
+                doc.set_rotate(fname, 0)
+                doc.set_tilt(fname, None)
+                doc.set_text(fname, None)
+                sec = doc.get_or_create_section(fname)
+                for k in ("filters", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch"):
+                    sec.remove(k)
+                sec.set("backuphash", str(b_hash))
+
+            self._update_photo_ini(target_path, _clear_baked)
+            if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
+                self.db.update_photo_thumbnails_from_disk(target_path, persist_to_disk=False)
+            self.thumb_view.invalidate_item(target_path)
+            return True
+        except Exception:
+            return False
+
     def action_save(self) -> None:
         """
-        FR: Enregistre les retouches de la photo active (ID_FILE_SAVE, Ctrl+S).
-        EN: Saves the edits of the active photo (ID_FILE_SAVE, Ctrl+S).
+        FR: Enregistre les retouches de la photo active ou des photos sélectionnées (ID_FILE_SAVE, Ctrl+S).
+        EN: Saves the edits of the active photo or selected photos (ID_FILE_SAVE, Ctrl+S).
         """
         if self.stack.currentWidget() == self.one_up_view:
             ok = self.one_up_view.save_current_photo()
@@ -1859,7 +2019,18 @@ class PicasaMainWindow(QMainWindow):
             else:
                 self.status_bar.showMessage("Impossible d'enregistrer la photo.")
         else:
-            self.status_bar.showMessage("Ouvrez une photo en mode édition pour l'enregistrer.")
+            paths = self._get_active_photo_paths()
+            saved = 0
+            for p in paths:
+                if self._bake_photo_edits_on_disk(p):
+                    saved += 1
+            if saved > 0:
+                if self.db is not None and hasattr(self.db, "schedule_save_thumbnails"):
+                    self.db.schedule_save_thumbnails(1500)
+                self.thumb_view.update()
+                self.status_bar.showMessage(f"Modifications enregistrées pour {saved} photo(s) (.picasaoriginals sauvegardé).")
+            else:
+                self.status_bar.showMessage("Aucune modification en attente à enregistrer.")
 
     def action_save_as(self) -> None:
         """
@@ -2146,8 +2317,14 @@ class PicasaMainWindow(QMainWindow):
             if album_data.get("location"):
                 sec.set("location", album_data["location"])
             if album_data.get("description"):
+                sec.set("description", album_data["description"])
                 sec.set("caption", album_data["description"])
             doc.write_file(ini_path)
+            if self.db and hasattr(self.db, "_sync_album_sections_from_ini_doc"):
+                try:
+                    self.db._sync_album_sections_from_ini_doc(doc)
+                except Exception:
+                    pass
             if self.db and hasattr(self.db, "invalidate_ini_cache"):
                 self.db.invalidate_ini_cache(ini_path)
             elif self.db and hasattr(self.db, "_ini_cache"):
@@ -2250,10 +2427,16 @@ class PicasaMainWindow(QMainWindow):
                                     if data.get("location"):
                                         sec.set("location", data["location"])
                                     if data.get("description"):
+                                        sec.set("description", data["description"])
                                         sec.set("caption", data["description"])
                                     mod = True
                             if mod:
                                 doc.write_file(ini_p)
+                                if self.db and hasattr(self.db, "_sync_album_sections_from_ini_doc"):
+                                    try:
+                                        self.db._sync_album_sections_from_ini_doc(doc)
+                                    except Exception:
+                                        pass
                                 if self.db and hasattr(self.db, "invalidate_ini_cache"):
                                     self.db.invalidate_ini_cache(ini_p)
                                 elif self.db and hasattr(self.db, "_ini_cache"):
@@ -2837,23 +3020,26 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_section_save_requested(self, folder_path: str) -> None:
         """
-        FR: Enregistre les retouches en attente du dossier (albumheader/save_edits, HEADERPANELTEXT_FR.XML).
-        EN: Saves pending edits for the folder (albumheader/save_edits, HEADERPANELTEXT_FR.XML).
+        FR: Enregistre les retouches en attente du dossier sur le disque (albumheader/save_edits, HEADERPANELTEXT_FR.XML).
+        EN: Saves pending edits for the folder to disk (albumheader/save_edits, HEADERPANELTEXT_FR.XML).
         """
         if not folder_path or not os.path.isdir(folder_path):
             return
         norm_folder = os.path.normcase(os.path.normpath(folder_path))
         saved_count = 0
-        if self.db is not None and hasattr(self.db, "sync_photo_ini_to_db"):
-            for it in self.thumb_view.items:
-                if it.path:
-                    it_dir = os.path.normcase(os.path.normpath(os.path.dirname(it.path)))
-                    if it_dir == norm_folder:
-                        try:
-                            if self.db.sync_photo_ini_to_db(it.path):
-                                saved_count += 1
-                        except Exception:
-                            pass
+        for it in self.thumb_view.items:
+            if it.path:
+                it_dir = os.path.normcase(os.path.normpath(os.path.dirname(it.path)))
+                if it_dir == norm_folder:
+                    try:
+                        if self._bake_photo_edits_on_disk(it.path):
+                            saved_count += 1
+                        elif self.db is not None and hasattr(self.db, "sync_photo_ini_to_db"):
+                            self.db.sync_photo_ini_to_db(it.path)
+                    except Exception:
+                        pass
+        if self.db is not None and hasattr(self.db, "schedule_save_thumbnails"):
+            self.db.schedule_save_thumbnails(1500)
         self.thumb_view._pixmap_cache.clear()
         self.thumb_view.update()
         folder_name = os.path.basename(folder_path.rstrip(chr(92) + "/"))
@@ -2870,8 +3056,11 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_photos_dropped_on_folder(self, dest_folder: str, photo_paths: List[str]) -> None:
         """
-        FR: Déplace les photos déposées par glisser-déposer vers le dossier cible.
-        EN: Moves photos dropped via drag-and-drop to the target folder.
+        FR: Déplace les photos déposées par glisser-déposer vers le dossier cible en migrant
+        leurs sections `.picasa.ini`, `.picasaoriginals/` et `thumbindex.db`.
+        EN: Moves photos dropped via drag-and-drop to the target folder, migrating their
+        `.picasa.ini` sections, `.picasaoriginals/`, and `thumbindex.db`.
+        Ref: picasa3.exe @ 0x0068AC80
         """
         if not dest_folder or not os.path.isdir(dest_folder) or not photo_paths:
             return
@@ -2885,7 +3074,14 @@ class PicasaMainWindow(QMainWindow):
             try:
                 dest_p = os.path.join(dest_folder, os.path.basename(p))
                 if not os.path.exists(dest_p):
-                    shutil.move(p, dest_p)
+                    if self.db is not None and hasattr(self.db, "move_photo"):
+                        self.db.move_photo(p, dest_folder)
+                    else:
+                        shutil.move(p, dest_p)
+                    for it in self.thumb_view.items:
+                        if it.path == p:
+                            it.path = dest_p
+                            it.folder_path = dest_folder
                     moved += 1
             except Exception:
                 pass
@@ -3112,9 +3308,11 @@ class PicasaMainWindow(QMainWindow):
 
     def action_move_photos_to_folder(self, photo_paths: Optional[List[str]] = None) -> None:
         """
-        FR: Déplace les photos sélectionnées vers un nouveau dossier (FolderPhoto::ID_ALBUM_NEW).
-        EN: Moves the selected photos to a new folder (FolderPhoto::ID_ALBUM_NEW).
-        Ref: picasa3.exe @ 0x00CADC5C, 0x00CADC74
+        FR: Déplace les photos sélectionnées vers un nouveau dossier (FolderPhoto::ID_ALBUM_NEW)
+        en migrant leurs sections `.picasa.ini`, `.picasaoriginals/` et `thumbindex.db`.
+        EN: Moves the selected photos to a new folder (FolderPhoto::ID_ALBUM_NEW), migrating their
+        `.picasa.ini` sections, `.picasaoriginals/`, and `thumbindex.db`.
+        Ref: picasa3.exe @ 0x00CADC5C, 0x00CADC74, 0x0068AC80
         """
         if not photo_paths:
             photo_paths = self._get_active_photo_paths()
@@ -3129,7 +3327,14 @@ class PicasaMainWindow(QMainWindow):
             for p in photo_paths:
                 try:
                     dest_p = os.path.join(dest_dir, os.path.basename(p))
-                    shutil.move(p, dest_p)
+                    if self.db is not None and hasattr(self.db, "move_photo"):
+                        self.db.move_photo(p, dest_dir)
+                    else:
+                        shutil.move(p, dest_p)
+                    for it in self.thumb_view.items:
+                        if it.path == p:
+                            it.path = dest_p
+                            it.folder_path = dest_dir
                     moved += 1
                 except Exception:
                     pass
@@ -3139,9 +3344,11 @@ class PicasaMainWindow(QMainWindow):
 
     def action_split_folder_here(self, photo_path: str) -> None:
         """
-        FR: Scinde le dossier en deux à partir de cette photo (FolderPhoto::ID_PICTURE_SPLITALBUMHERE).
-        EN: Splits the folder into two starting from this photo (FolderPhoto::ID_PICTURE_SPLITALBUMHERE).
-        Ref: picasa3.exe @ 0x00CADC90, 0x00CADCA8
+        FR: Scinde le dossier en deux à partir de cette photo (FolderPhoto::ID_PICTURE_SPLITALBUMHERE)
+        en migrant les sections `.picasa.ini`, `.picasaoriginals/` et `thumbindex.db`.
+        EN: Splits the folder into two starting from this photo (FolderPhoto::ID_PICTURE_SPLITALBUMHERE),
+        migrating `.picasa.ini` sections, `.picasaoriginals/`, and `thumbindex.db`.
+        Ref: picasa3.exe @ 0x00CADC90, 0x00CADCA8, 0x0068AC80
         """
         if not photo_path or not os.path.exists(photo_path):
             return
@@ -3165,7 +3372,15 @@ class PicasaMainWindow(QMainWindow):
             import shutil
             for p in to_move:
                 try:
-                    shutil.move(p, os.path.join(new_dir, os.path.basename(p)))
+                    dest_p = os.path.join(new_dir, os.path.basename(p))
+                    if self.db is not None and hasattr(self.db, "move_photo"):
+                        self.db.move_photo(p, new_dir)
+                    else:
+                        shutil.move(p, dest_p)
+                    for it in self.thumb_view.items:
+                        if it.path == p:
+                            it.path = dest_p
+                            it.folder_path = new_dir
                 except Exception:
                     pass
             self.notify_folders_changed()
@@ -3535,6 +3750,39 @@ class PicasaMainWindow(QMainWindow):
         if dlg.exec() == QDialog.DialogCode.Accepted:
             pairs = dlg.execute_rename()
             if pairs:
+                for old_p, new_p in pairs:
+                    if self.db is not None and hasattr(self.db, "rename_photo"):
+                        self.db.rename_photo(old_p, new_p)
+                    else:
+                        # Migrer [old_fname] -> [new_fname] dans .picasa.ini et .picasaoriginals/
+                        parent_dir = os.path.dirname(old_p)
+                        old_fn = os.path.basename(old_p)
+                        new_fn = os.path.basename(new_p)
+                        orig_old = os.path.join(parent_dir, ".picasaoriginals", old_fn)
+                        orig_new = os.path.join(parent_dir, ".picasaoriginals", new_fn)
+                        if os.path.exists(orig_old) and not os.path.exists(orig_new):
+                            try:
+                                os.rename(orig_old, orig_new)
+                            except Exception:
+                                pass
+                        ini_p = os.path.join(parent_dir, ".picasa.ini")
+                        if os.path.exists(ini_p):
+                            try:
+                                doc = PicasaIniParser.parse_file(ini_p)
+                                sec = doc.get_section(old_fn)
+                                if sec is not None:
+                                    new_sec = doc.get_or_create_section(new_fn)
+                                    for k, v in sec.items():
+                                        new_sec.set(k, v)
+                                    doc.remove_section(old_fn)
+                                    doc.write_file(ini_p)
+                            except Exception:
+                                pass
+                    for item in self.thumb_view.items:
+                        if item.path == old_p:
+                            item.path = new_p
+                            item.filename = os.path.basename(new_p)
+                self.thumb_view.update()
                 self.status_bar.showMessage(f"{len(pairs)} fichier(s) renommé(s) avec succès.")
                 # Mettre à jour One-Up si affiché
                 if self.stack.currentWidget() == self.one_up_view and self.one_up_view.current_photo_path:
@@ -3547,13 +3795,6 @@ class PicasaMainWindow(QMainWindow):
                                 direct_path=new_p
                             )
                             break
-                # Actualiser les éléments de la grille
-                if self.db:
-                    for old_p, new_p in pairs:
-                        for item in self.thumb_view.items:
-                            if item.path == old_p:
-                                item.path = new_p
-                    self.thumb_view.update()
 
     def action_print(self) -> None:
         """
@@ -4110,14 +4351,30 @@ class PicasaMainWindow(QMainWindow):
 
     def closeEvent(self, event) -> None:
         """
-        FR: Ferme proprement la fenêtre, masque la notification surgissante et interrompt les threads d'arrière-plan.
-        EN: Cleanly closes the window, hides the notification popup, and stops background threads.
+        FR: Ferme proprement la fenêtre, masque la notification surgissante, interrompt les threads d'arrière-plan
+        et sauvegarde sur disque toutes les tables modifiées de la base de données (db3/).
+        EN: Cleanly closes the window, hides the notification popup, stops background threads,
+        and flushes all dirty database tables (db3/) to disk.
         """
         self._is_closing = True
         if hasattr(self, "notifier_popup") and self.notifier_popup:
             self.notifier_popup.clear_notifications()
             self.notifier_popup.close()
+        if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "_flush_pending_thumb_db_sync"):
+            try:
+                self.one_up_view._flush_pending_thumb_db_sync()
+            except Exception:
+                pass
         self.stop_background_tasks()
+        if getattr(self, "db", None) is not None and hasattr(self.db, "save_database"):
+            try:
+                t_timer = getattr(self.db, "_thumb_save_timer", None)
+                if t_timer is not None:
+                    t_timer.cancel()
+                    self.db._thumb_save_timer = None
+                self.db.save_database()
+            except Exception:
+                pass
         super().closeEvent(event)
 
 

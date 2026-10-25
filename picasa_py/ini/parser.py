@@ -11,7 +11,15 @@ from __future__ import annotations
 import os
 import re
 from typing import List, Optional, Tuple, Dict, Union
-from picasa_py.ini.model import IniEntry, IniSection, FaceItem, CropRect, Rect64, ContactInfo
+from picasa_py.ini.model import (
+    IniEntry,
+    IniSection,
+    FaceItem,
+    CropRect,
+    Rect64,
+    ContactInfo,
+    unescape_ini_value,
+)
 
 
 # Ref: picasa3.exe @ 0x009BE730
@@ -106,9 +114,9 @@ class PicasaIniParser:
             if eq_idx != -1:
                 key = line[:eq_idx].strip()
                 val_raw = line[eq_idx + 1 :]
-                # FR: Découpage de la valeur sans \r\n / EN: Strip trailing \r\n from value
-                # (Ref: 0x009BE730 l. 127-133: arrêt à 0x0d ou 0x0a)
-                val = val_raw.rstrip("\r\n")
+                # FR: Découpage de la valeur sans \r\n et déséchappement &#010;/&#013;/&#091;/&#093; (0x0099ABC0)
+                # EN: Strip trailing \r\n from value and unescape &#010;/&#013;/&#091;/&#093; (0x0099ABC0)
+                val = unescape_ini_value(val_raw.rstrip("\r\n"))
                 entry = IniEntry(key=key, value=val, raw_line=line)
                 current_section.entries.append(entry)
             else:
@@ -195,14 +203,26 @@ class PicasaIniDocument:
         # Ref: picasa3.exe @ 0x009BE730 - Insensibilité à la casse ASCII stricte ('A'..'Z' -> +0x20)
         return "".join(chr(ord(c) + 32) if "A" <= c <= "Z" else c for c in s)
 
+    def _sanitize_sec_name(self, name: str) -> str:
+        """
+        FR: Remplace '[' par '(' et ']' par ')' dans les noms de sections de fichiers conformément à `0x0068B359` et `0x0099AFC0`.
+        EN: Replaces '[' with '(' and ']' with ')' in file section names matching `0x0068B359` and `0x0099AFC0`.
+        """
+        if "[" in name or "]" in name:
+            return name.replace("[", "(").replace("]", ")")
+        return name
+
     def get_section(self, name: str) -> Optional[IniSection]:
         """
-        FR: Recherche une section par son nom (insensible à la casse ASCII).
-        EN: Finds a section by name (ASCII case-insensitive).
+        FR: Recherche une section par son nom (insensible à la casse ASCII, avec correspondance '['->'(' et ']'->')').
+        EN: Finds a section by name (ASCII case-insensitive, matching '['->'(' and ']'->')').
+        Ref: picasa3.exe @ 0x0099AFC0..0x0099AFD5
         """
         target = self._ci_sec(name)
+        target_san = self._ci_sec(self._sanitize_sec_name(name))
         for sec in self.sections:
-            if self._ci_sec(sec.name) == target:
+            sec_ci = self._ci_sec(sec.name)
+            if sec_ci == target or sec_ci == target_san:
                 return sec
         return None
 
@@ -215,9 +235,10 @@ class PicasaIniDocument:
         if sec is None:
             self._modified = True
             self._untagged_utf8_preserved = False
-            # En-tête standard CRLF Ref: picasa3.exe @ 0x0068B37F ("[%s]\r\n")
-            sec = IniSection(name=name, raw_header=f"[{name}]\r\n")
-            ci_name = self._ci_sec(name)
+            clean_name = self._sanitize_sec_name(name)
+            # En-tête standard CRLF Ref: picasa3.exe @ 0x0068B359..0x0068B37F ("[%s]\r\n" avec '['->'(' et ']'->')')
+            sec = IniSection(name=clean_name, raw_header=f"[{clean_name}]\r\n")
+            ci_name = self._ci_sec(clean_name)
             # Ref: FUN_0068ac80 : les sections globales ([encoding], [Picasa], [Contacts2], [.album:...])
             # précèdent les sections de fichiers médias.
             if ci_name == "encoding":
@@ -241,8 +262,10 @@ class PicasaIniDocument:
         EN: Removes a section by name if it exists.
         """
         target = self._ci_sec(name)
+        target_san = self._ci_sec(self._sanitize_sec_name(name))
         for i, sec in enumerate(self.sections):
-            if self._ci_sec(sec.name) == target:
+            sec_ci = self._ci_sec(sec.name)
+            if sec_ci == target or sec_ci == target_san:
                 self.sections.pop(i)
                 self._modified = True
                 self._untagged_utf8_preserved = False
@@ -342,17 +365,20 @@ class PicasaIniDocument:
 
         sec.set("crop", f"rect64({hex_str})")
         filters_val = sec.get("filters")
-        if filters_val is not None:
-            if re.search(r"crop64=[^;]*", filters_val, re.IGNORECASE):
+        # Protection contre le bug de picasa3.exe @ 0x00459DE3 -> LAB_00459e21 :
+        # si backuphash= est présent sans filters=, picasa3.exe écrase imagedata_crop64 = 0.
+        if filters_val is not None or sec.get("backuphash") is not None:
+            f_str = filters_val or ""
+            if re.search(r"crop64=[^;]*", f_str, re.IGNORECASE):
                 updated = re.sub(
                     r"crop64=[^;]*;?",
                     f"crop64=1,{hex_str};",
-                    filters_val,
+                    f_str,
                     flags=re.IGNORECASE,
                 )
                 sec.set("filters", updated.strip(";") + ";")
             else:
-                base = filters_val.strip(";")
+                base = f_str.strip(";")
                 sec.set("filters", (f"{base};crop64=1,{hex_str};" if base else f"crop64=1,{hex_str};"))
 
     def get_crop(self, filename: str) -> Optional[str]:
@@ -392,17 +418,18 @@ class PicasaIniDocument:
             clean = clean[7:-1]
         sec.set("crop", f"rect64({clean})")
         filters_val = sec.get("filters")
-        if filters_val is not None:
-            if re.search(r"crop64=[^;]*", filters_val, re.IGNORECASE):
+        if filters_val is not None or sec.get("backuphash") is not None:
+            f_str = filters_val or ""
+            if re.search(r"crop64=[^;]*", f_str, re.IGNORECASE):
                 updated = re.sub(
                     r"crop64=[^;]*;?",
                     f"crop64=1,{clean};",
-                    filters_val,
+                    f_str,
                     flags=re.IGNORECASE,
                 )
                 sec.set("filters", updated.strip(";") + ";")
             else:
-                base = filters_val.strip(";")
+                base = f_str.strip(";")
                 sec.set("filters", (f"{base};crop64=1,{clean};" if base else f"crop64=1,{clean};"))
 
     # Ref: picasa3.exe @ 0x008814AC ("tilt", "filters=%s")
@@ -508,9 +535,11 @@ class PicasaIniDocument:
     def get_text(self, filename: str) -> Optional[str]:
         """
         FR: Retourne l'annotation textuelle (outil Texte) d'une photo, ou None.
-        Si la valeur est au format complet Picasa 3 à 12 champs (`Police;taille;...;texte`), extrait le texte.
+        Supporte le format natif `CTextItemList` de `picasa3.exe` (`<num_items>;<utf8_len>;<texte>;<police>;...`,
+        Ref: `0x00A4DB30` / `0x00A4DD50`), le format à 12 champs (`Police;taille;...;texte`) et le texte brut.
         EN: Returns the text overlay annotation (Text tool) of a photo, or None.
-        If the value is in the full 12-field Picasa 3 format (`Font;size;...;text`), extracts the text.
+        Supports the native `picasa3.exe` `CTextItemList` format (`<num_items>;<utf8_len>;<text>;<font>;...`,
+        Ref: `0x00A4DB30` / `0x00A4DD50`), the 12-field format (`Font;size;...;text`), and plain text.
         """
         sec = self.get_section(filename)
         if not sec:
@@ -518,6 +547,18 @@ class PicasaIniDocument:
         val = sec.get("text")
         if not val:
             return val
+        # Format natif CTextItemList (0x00A4DB30 / 0x00A4DD50) : <num_items>;<utf8_len>;<utf8_text>;<font>;...
+        first_semi = val.find(";")
+        if first_semi > 0 and val[:first_semi].strip().isdigit():
+            second_semi = val.find(";", first_semi + 1)
+            if second_semi > first_semi + 1 and val[first_semi + 1 : second_semi].strip().isdigit():
+                try:
+                    utf8_len = int(val[first_semi + 1 : second_semi].strip())
+                    rest_bytes = val[second_semi + 1 :].encode("utf-8")
+                    if len(rest_bytes) >= utf8_len:
+                        return rest_bytes[:utf8_len].decode("utf-8", errors="replace")
+                except Exception:
+                    pass
         parts = val.split(";", 11)
         if len(parts) == 12 and "," in parts[8] and "," in parts[9]:
             return parts[11]

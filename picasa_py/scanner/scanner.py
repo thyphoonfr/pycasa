@@ -976,7 +976,7 @@ class PicasaDirScanner:
                         try:
                             date_val = float(raw_date.strip())
                         except ValueError:
-                            for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"):
+                            for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y/%m/%d"):
                                 try:
                                     dt = datetime.strptime(raw_date.strip()[:19], fmt)
                                     date_val = datetime_to_ole(dt)
@@ -1038,14 +1038,18 @@ class PicasaDirScanner:
                 pmp.records.append(def_val)
                 pmp.dirty = True
 
-        # FR: Si les tables albumdata_* sont totalement vides, réserver la ligne 0 ("Default") comme picasa3.exe
-        # EN: If albumdata_* tables are completely empty, reserve row 0 ("Default") like picasa3.exe
+        # FR: Si les tables albumdata_* sont totalement vides, réserver la ligne 0 ("]unknownface" / "Sans nom") comme picasa3.exe (0x008AAD76)
+        # EN: If albumdata_* tables are completely empty, reserve row 0 ("]unknownface" / "Sans nom") like picasa3.exe (0x008AAD76)
         if len(ad_name.records) == 0:
             for stem, pmp in albumdata_tables.items():
                 if stem == "albumdata_name":
-                    pmp.records.append("Default")
+                    pmp.records.append("Sans nom")
+                elif stem == "albumdata_token":
+                    pmp.records.append("]unknownface")
+                elif stem == "albumdata_uid":
+                    pmp.records.append("dd27de9b1f1abf38b41e1a769380f405")
                 elif stem == "albumdata_category":
-                    pmp.records.append(0)
+                    pmp.records.append(8)
                 else:
                     pmp.records.append(pmp.default_value())
                 pmp.dirty = True
@@ -1093,6 +1097,17 @@ class PicasaDirScanner:
                     if ad_date.records[existing_row] != adate:
                         ad_date.records[existing_row] = adate
                         ad_date.dirty = True
+                for meta_key, col_stem in (
+                    ("description", "albumdata_description"),
+                    ("location", "albumdata_location"),
+                    ("music", "albumdata_music"),
+                ):
+                    meta_val = str(alb_meta.get(meta_key) or "")
+                    if meta_val and col_stem in albumdata_tables:
+                        ad_col = albumdata_tables[col_stem]
+                        if ad_col.records[existing_row] != meta_val:
+                            ad_col.records[existing_row] = meta_val
+                            ad_col.dirty = True
                 updated_or_added += 1
             else:
                 for stem, pmp in albumdata_tables.items():

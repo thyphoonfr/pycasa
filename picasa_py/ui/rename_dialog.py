@@ -364,6 +364,17 @@ class PicasaRenameDialog(QDialog):
                     src_p.rename(dst_p)
                     renamed_pairs.append((str(src_p), str(dst_p)))
 
+                    # FR: Renommer également la copie dans .picasaoriginals si elle existe (Ref: 0x00543642)
+                    # EN: Also rename the backup copy in .picasaoriginals if it exists (Ref: 0x00543642)
+                    for orig_sub in (".picasaoriginals", "Originals"):
+                        orig_src = src_p.parent / orig_sub / src_p.name
+                        orig_dst = src_p.parent / orig_sub / dst_p.name
+                        if orig_src.exists() and not orig_dst.exists():
+                            try:
+                                orig_src.rename(orig_dst)
+                            except Exception:
+                                pass
+
                     # FR: Mise à jour de la section .picasa.ini correspondante
                     # EN: Update the corresponding .picasa.ini section
                     parent_dir = str(src_p.parent)

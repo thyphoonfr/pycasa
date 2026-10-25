@@ -331,20 +331,49 @@ class ThumbIndexFile:
 
     def sanitize_records(self) -> None:
         """
-        FR: Nettoie les entrées inactives (`flags_hi == 0` ou `type == 0`) ou orphelines conformément à SaveThumbIndex (`FUN_004f54b0` @ `0x004F54B0`).
-        EN: Sanitizes inactive (`flags_hi == 0` or `type == 0`) or orphaned entries in accordance with SaveThumbIndex (`FUN_004f54b0` @ `0x004F54B0`).
+        FR: Nettoie les entrées inactives (`flags_hi == 0` ou `type == 0`), cycliques (`depth > 10`) ou orphelines
+        conformément à SaveThumbIndex (`FUN_004f54b0` @ `0x004F54B0`), tout en corrigeant l'oubli de validation
+        du type du parent pour les médias (`type in (2, 4, 7, 18, 32)`) et les visages (`type == 1001`).
+        EN: Sanitizes inactive (`flags_hi == 0` or `type == 0`), cyclic (`depth > 10`), or orphaned entries
+        in accordance with SaveThumbIndex (`FUN_004f54b0` @ `0x004F54B0`), while also validating parent types
+        for media (`type in (2, 4, 7, 18, 32)`) and face (`type == 1001`) records.
         """
         count = len(self.records)
-        for rec in self.records:
+        # Passe 1 : invalider les entrées supprimées ou comportant un cycle de parenté (> 10 sauts, Ref: 0x004F56BA)
+        for idx, rec in enumerate(self.records):
             if rec.type == 0 or rec.flags_hi == 0:
                 rec.mark_deleted()
-            elif rec.type == 4 and (
-                rec.parent_idx < 0
-                or rec.parent_idx >= count
-                or rec.parent_idx == 0xFFFFFFFF
-                or self.records[rec.parent_idx].type not in (1, 0x19)
-            ):
+                continue
+            cur = rec.parent_idx
+            depth = 0
+            has_cycle_or_oob = False
+            while cur != 0xFFFFFFFF:
+                if cur < 0 or cur >= count or cur == idx or depth >= 10:
+                    has_cycle_or_oob = True
+                    break
+                parent_rec = self.records[cur]
+                if parent_rec.type == 0 or parent_rec.flags_hi == 0:
+                    has_cycle_or_oob = True
+                    break
+                cur = parent_rec.parent_idx
+                depth += 1
+            if has_cycle_or_oob:
                 rec.mark_deleted()
+
+        # Passe 2 : vérifier le type du parent direct pour tous les types d'enfants (pas seulement type == 4)
+        for rec in self.records:
+            if rec.type == 0:
+                continue
+            p_idx = rec.parent_idx
+            if rec.type == 4:
+                if p_idx < 0 or p_idx >= count or p_idx == 0xFFFFFFFF or self.records[p_idx].type not in (1, 0x19):
+                    rec.mark_deleted()
+            elif rec.type in (2, 7, 18, 32) and p_idx != 0xFFFFFFFF:
+                if p_idx < 0 or p_idx >= count or self.records[p_idx].type not in (1, 0x19):
+                    rec.mark_deleted()
+            elif rec.type == 1001:
+                if p_idx < 0 or p_idx >= count or p_idx == 0xFFFFFFFF or self.records[p_idx].type not in (2, 7, 18, 32):
+                    rec.mark_deleted()
 
     # Ref: picasa3.exe @ 0x004F54B0
     def to_bytes(self, encoding: str = "utf-8", sanitize: bool = False) -> bytes:

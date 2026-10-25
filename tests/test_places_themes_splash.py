@@ -164,14 +164,47 @@ def test_color_themes_loading_and_switching(tmp_path: Path, monkeypatch):
 
     themes = PicasaStyle.list_available_themes()
     theme_ids = {t[0] if isinstance(t, tuple) else t["id"] for t in themes}
-    assert {"original", "dark", "ocean", "sepia_warm", "emerald_forest"}.issubset(theme_ids)
+    assert {"original", "dark", "aurora_gradient", "sunset_gradient", "ocean", "sepia_warm", "emerald_forest"}.issubset(theme_ids)
 
     db = PicasaDatabase.create_new(tmp_path / "db_themes")
     win = PicasaMainWindow(db_path=str(db.db3_dir), auto_scan=False)
     try:
         # Vérifier la présence des actions dans Affichage > Thème de couleurs
         assert win.menu_builder.menu_themes is not None
-        assert len(win.menu_builder.theme_actions) >= 5
+        assert len(win.menu_builder.theme_actions) >= 7
+
+        # Basculer sur le thème Sunset Dégradé ("sunset_gradient")
+        win.apply_theme("sunset_gradient")
+        assert win.style.theme_id == "sunset_gradient"
+        assert win.style.is_dark is True
+        assert win.menu_builder.theme_actions["sunset_gradient"].isChecked()
+        assert PicasaPreferences.get_theme_id() == "sunset_gradient"
+        assert win.style.grid_bgcolor.name().lower() == "#140c14"
+        assert win.style.grid_bgcolor_end.name().lower() == "#2d122b"
+        assert win.style.accent_color.name().lower() == "#e11d48"
+        assert win.style.accent_grad_end.name().lower() == "#f59e0b"
+
+        # Basculer sur le nouveau thème moderne dégradé ("aurora_gradient")
+        win.apply_theme("aurora_gradient")
+        assert win.style.theme_id == "aurora_gradient"
+        assert win.style.is_dark is True
+        assert win.menu_builder.theme_actions["aurora_gradient"].isChecked()
+        assert PicasaPreferences.get_theme_id() == "aurora_gradient"
+        assert win.style.grid_bgcolor.name().lower() == "#0b1120"
+        assert win.style.grid_bgcolor_end.name().lower() == "#1e1b4b"
+        assert win.style.topbar_grad_mid is not None
+        assert win.style.topbar_grad_mid.name().lower() == "#172554"
+        assert win.style.accent_color.name().lower() == "#6366f1"
+        assert win.style.accent_grad_end.name().lower() == "#06b6d4"
+        assert "qlineargradient" in win.top_bar.styleSheet()
+        assert "qlineargradient" in win.library_tree.tree.styleSheet()
+        assert "qlineargradient" in win.photo_tray.styleSheet()
+
+        # Vérifier que "Photos favorites (0)" dans l'arborescence prend bien alist_stickycolor à chaud
+        if win.library_tree.cat_albums and win.library_tree.cat_albums.childCount() > 0:
+            starred_item = win.library_tree.cat_albums.child(0)
+            assert starred_item.background(0).color().name().lower() == "#1e1b4b"
+            assert starred_item.foreground(0).color().name().lower() == "#f1f5f9"
 
         # Basculer sur le thème Sombre ("dark")
         win.apply_theme("dark")

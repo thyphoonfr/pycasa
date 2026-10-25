@@ -208,3 +208,19 @@ Points non résolus (`# TODO(unverified)`) :
    pas décoder ces fichiers et écrit 640×480.
 6. **Détection par signature** : observée sur un seul enregistrement (WEBP nommé `.jpg` → type 31) ; routine de
    détection non localisée dans le désassemblage.
+
+---
+
+## 14. Bugs et anomalies découverts dans le binaire original (`picasa3.exe` & `Red.dll`)
+
+Voir le rapport détaillé [`docs/analysis/original_bugs_and_quirks.md`](./analysis/original_bugs_and_quirks.md) qui documente :
+- **Catégorie A (4 bugs corrigés dans `PyCasa`)** :
+  1. Double calcul et double écriture disque de `backuphash` (`0x00429CA0` & `0x00429D57..0x00429D86`),
+  2. `Fallthrough` écrasant `imagedata_crop64 = 0` lorsque `backuphash=` est présent sans `filters=` (`0x00459DE3 -> LAB_00459e21`),
+  3. Clé `screensaver=` ignorant sa valeur à droite du `=` dans `SyncIniToDB` (`0x00458F9B`),
+  4. Validation incomplète du type de parent dans `SaveThumbIndex` (`0x004F56BA`).
+- **Catégorie B (3 bugs/anomalies conservés à l'identique pour garantir l'interopérabilité bit-à-bit et pixel-exact)** :
+  5. Troncature `float32` (`12` groupes au lieu de `12.5`) et pointeur `edi` non incrémenté dans `dqc_Relator::init` de `Red.dll` (`0x101007F8..0x10100856`),
+  6. Extension de signe `char` signé (`movsx ecx, cl`) sur les octets UTF-8 `>= 0x80` dans les checksums `CBlockFile` (`0x006B9A60`, `0x0042A96A`),
+  7. Paramètre `sharpness` câblé en dur à `0.0f` dans le filtre `Soft Focus` / `radblur` (`0x008F8645`).
+

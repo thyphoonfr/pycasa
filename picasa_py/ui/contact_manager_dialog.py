@@ -427,11 +427,9 @@ class PicasaContactManagerDialog(QDialog):
         )
         if res == QMessageBox.StandardButton.Yes:
             cid = self.current_person.contact_id
-            if getattr(self.db, "face_manager", None) and cid in self.db.face_manager.people:
-                del self.db.face_manager.people[cid]
-                self.db.face_manager.notify_people_changed()
-
-            if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
+            if getattr(self.db, "face_manager", None):
+                self.db.face_manager.delete_person(cid)
+            elif getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
                 self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() != cid.lower()]
                 if hasattr(self.db, "save_contacts"):
                     self.db.save_contacts()
@@ -459,41 +457,10 @@ class PicasaContactManagerDialog(QDialog):
                 return
 
             old_cid = self.current_person.contact_id
-            new_cid = target_person.contact_id
-
-            # Mettre à jour les entrées faces= dans .picasa.ini pour les photos de l'ancienne personne
-            if self.db and hasattr(self.db, "get_media_full_path") and hasattr(self.db, "update_photo_ini"):
-                for idx in list(self.current_person.photo_indices):
-                    full_path = self.db.get_media_full_path(idx)
-                    if full_path and os.path.exists(full_path):
-                        from pathlib import Path
-                        ini_p = Path(full_path).parent / ".picasa.ini"
-                        if ini_p.exists():
-                            doc = self.db.get_parsed_ini(str(ini_p))
-                            if doc:
-                                sec = doc.get_section(Path(full_path).name)
-                                if sec:
-                                    faces_val = sec.get("faces", "")
-                                    if old_cid in faces_val:
-                                        self.db.update_photo_ini(
-                                            full_path,
-                                            {"faces": faces_val.replace(old_cid, new_cid)},
-                                        )
-
-            # Fusionner les listes de photos
-            for idx in self.current_person.photo_indices:
-                if idx not in target_person.photo_indices:
-                    target_person.photo_indices.append(idx)
-
-            # Supprimer l'ancienne personne
-            if getattr(self.db, "face_manager", None) and old_cid in self.db.face_manager.people:
-                del self.db.face_manager.people[old_cid]
-                self.db.face_manager.notify_people_changed()
-
-            if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
-                self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() != old_cid.lower()]
-                if hasattr(self.db, "save_contacts"):
-                    self.db.save_contacts()
+            if getattr(self.db, "face_manager", None):
+                # FR : Déléguer à face_manager.rename_person qui gère la fusion complète (.picasa.ini, PMP, wordhash.dat, contacts.xml)
+                # EN: Delegate to face_manager.rename_person which handles full merge (.picasa.ini, PMP, wordhash.dat, contacts.xml)
+                self.db.face_manager.rename_person(old_cid, target_person.name)
 
             self._load_people()
             QMessageBox.information(

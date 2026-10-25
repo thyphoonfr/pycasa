@@ -111,63 +111,19 @@ class PicasaSplashScreen(QSplashScreen):
             grad.setColorAt(1.0, QColor("#181B20"))
             painter.fillRect(0, 0, self.SPLASH_WIDTH, self.SPLASH_HEIGHT, grad)
 
-        # FR: 2. Icône officielle Picasa 3 (diaphragme coloré ID 105)
-        # EN: 2. Official Picasa 3 icon (colored aperture ID 105)
-        try:
-            res_mgr = PicasaResourceManager.get()
-            icon = res_mgr.get_icon(105)
-            icon_pix = icon.pixmap(64, 64)
-            if not icon_pix.isNull():
-                painter.drawPixmap(36, 56, icon_pix)
-        except Exception:
-            pass
-
-        # FR: 3. Titre principal "Picasa 3" avec ombre portée douce
-        # EN: 3. Main title "Picasa 3" with soft drop shadow
-        title_font = QFont("Segoe UI", 30, QFont.Weight.Bold)
-        painter.setFont(title_font)
-
-        # FR: Ombre du titre / EN: Title shadow
-        painter.setPen(QColor(0, 0, 0, 90))
-        painter.drawText(QRect(115, 51, 480, 52), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.app_title)
-
-        # FR: Texte principal du titre / EN: Main title text
-        painter.setPen(QColor("#2B3038"))
-        painter.drawText(QRect(114, 50, 480, 52), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.app_title)
-
-        # FR: 4. Sous-titre et numéro de version
-        # EN: 4. Subtitle and version number
-        sub_font = QFont("Segoe UI", 10, QFont.Weight.DemiBold)
+        # FR: 2. Numéro de version dans le coin inférieur droit (splashbk.jpg contient déjà le logo et le titre)
+        # EN: 2. Version number in the bottom-right corner (splashbk.jpg already contains the logo and title)
+        sub_font = QFont("Segoe UI", 9, QFont.Weight.DemiBold)
         painter.setFont(sub_font)
         painter.setPen(QColor("#545B66"))
         painter.drawText(
-            QRect(116, 102, 480, 22),
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+            QRect(self.SPLASH_WIDTH - 240, self.SPLASH_HEIGHT - 28, 228, 20),
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
             self.app_version,
         )
 
-        # FR: 5. Bandeau inférieur de statut
-        # EN: 5. Bottom status banner
-        footer_rect = QRect(0, self.SPLASH_HEIGHT - 34, self.SPLASH_WIDTH, 34)
-        painter.fillRect(footer_rect, QColor(28, 31, 36, 215))
-
-        # FR: Ligne d'accentuation colorée (couleurs du logo Picasa)
-        # EN: Colored accent stripe (Picasa logo colors)
-        stripe_w = self.SPLASH_WIDTH // 5
-        picasa_colors = [
-            QColor("#E53935"),  # Rouge / Red
-            QColor("#FB8C00"),  # Orange
-            QColor("#FDD835"),  # Jaune / Yellow
-            QColor("#43A047"),  # Vert / Green
-            QColor("#1E88E5"),  # Bleu / Blue
-        ]
-        for idx, col in enumerate(picasa_colors):
-            x0 = idx * stripe_w
-            w = stripe_w if idx < 4 else (self.SPLASH_WIDTH - x0)
-            painter.fillRect(QRect(x0, self.SPLASH_HEIGHT - 36, w, 2), col)
-
         # FR: Bordure extérieure fine / EN: Thin outer border
-        painter.setPen(QPen(QColor("#3A3F47"), 1))
+        painter.setPen(QPen(QColor("#D0D7DE"), 1))
         painter.drawRect(0, 0, self.SPLASH_WIDTH - 1, self.SPLASH_HEIGHT - 1)
 
         painter.end()
@@ -175,40 +131,18 @@ class PicasaSplashScreen(QSplashScreen):
 
     def set_status(self, message: str) -> None:
         """
-        FR: Met à jour le texte d'état affiché en bas de l'écran de démarrage et rafraîchit l'affichage.
-        EN: Updates the status text displayed at the bottom of the splash screen and refreshes the display.
+        FR: Met à jour le texte d'état de l'écran de démarrage.
+        EN: Updates the status text of the splash screen.
         """
         self.status_text = message
-        self.showMessage(
-            message,
-            int(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft),
-            QColor("#E8EAED"),
-        )
+        self.repaint()
         app = QApplication.instance()
         if app is not None:
             app.processEvents()
 
     def drawContents(self, painter: Optional[QPainter]) -> None:
         """
-        FR: Dessine le message d'état et le copyright dans le bandeau inférieur.
-        EN: Draws the status message and copyright in the bottom banner.
+        FR: Laisse l'image composite (splashbk.jpg + version en coin) intacte sans surimpression.
+        EN: Leaves the composite image (splashbk.jpg + corner version) intact without overlay.
         """
-        if painter is None:
-            return
-        painter.save()
-        status_font = QFont("Segoe UI", 9, QFont.Weight.Normal)
-        painter.setFont(status_font)
-        painter.setPen(QColor("#E8EAED"))
-        painter.drawText(
-            QRect(16, self.SPLASH_HEIGHT - 32, 440, 30),
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-            self.status_text,
-        )
-
-        painter.setPen(QColor("#9AA0A6"))
-        painter.drawText(
-            QRect(460, self.SPLASH_HEIGHT - 32, 164, 30),
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
-            self.app_copyright,
-        )
-        painter.restore()
+        return

@@ -274,6 +274,11 @@ class PicasaFaceManager:
                 return os.path.join(fdir, r.path)
             return ""
 
+        ignored_rec_ids = (
+            set(self.db.wordhash.search("]ignoreface"))
+            if (self.db and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "search"))
+            else set()
+        )
         if pmp_facerect:
             for db_idx, rect_val in enumerate(pmp_facerect.records):
                 is_face_rec = bool(self.db and getattr(self.db, "is_face_record", lambda i: False)(db_idx))
@@ -291,15 +296,23 @@ class PicasaFaceManager:
                 if not is_face_rec and db_idx in self._parent_to_1001:
                     continue
 
+                # FR : Ignorer les visages explicitement marqués ]ignoreface dans wordhash.dat
+                # EN: Skip faces explicitly marked ]ignoreface in wordhash.dat
+                # Ref: picasa3.exe @ 0x00896FA8 (]ignoreface)
+                if db_idx in ignored_rec_ids:
+                    continue
+
                 alb_idx = pmp_personalbum.records[db_idx] if pmp_personalbum and db_idx < len(pmp_personalbum.records) else 0
                 sug_idx = pmp_suggestion.records[db_idx] if pmp_suggestion and db_idx < len(pmp_suggestion.records) else 0
-                parecs_idx = pmp_parecs.records[db_idx] if pmp_parecs and db_idx < len(pmp_parecs.records) else 0
 
                 photo_path = _get_photo_path(db_idx)
 
-                # FR : Priorité 1 : Visage attribué à une personne connue
-                # EN: Priority 1: Face assigned to a known person
-                assigned_alb_idx = alb_idx if alb_idx in album_idx_to_contact_id else (parecs_idx if parecs_idx in album_idx_to_contact_id else 0)
+                # FR : Priorité 1 : Visage attribué à une personne confirmée uniquement via imagedata_personalbumid
+                # (imagedata_personalbumrecs stocke le plus proche voisin sur tous les visages 1001, même sans nom ou ignorés)
+                # EN: Priority 1: Face assigned to a confirmed person strictly via imagedata_personalbumid
+                # (imagedata_personalbumrecs stores the nearest neighbor on all 1001 faces, including unnamed or ignored ones)
+                # Ref: picasa3.exe @ 0x00880B5C (personalbumid), 0x00880BBC (personalbumrecs)
+                assigned_alb_idx = alb_idx if alb_idx in album_idx_to_contact_id else 0
                 if assigned_alb_idx and assigned_alb_idx in album_idx_to_contact_id:
                     cid = album_idx_to_contact_id[assigned_alb_idx]
                     cluster = self.people.get(cid)
@@ -1828,19 +1841,50 @@ class PicasaFaceManager:
             if matched_cluster is not None:
                 df.contact_id = ""
                 df.contact_name = f"? {matched_cluster.name}"
+                sug_target_idx = child_idx if child_idx is not None else db_idx
                 sug = FaceSuggestion(
                     contact_id=matched_cluster.contact_id,
                     contact_name=matched_cluster.name,
                     photo_path=photo_path,
                     face_rect=df,
                     similarity=best_similarity,
-                    db_idx=db_idx
+                    db_idx=sug_target_idx
                 )
                 self.suggestions.setdefault(matched_cluster.contact_id, []).append(sug)
+                # FR : Persister la suggestion dans imagedata_suggestionpersonalbumid, personalbumrecs et wordhash.dat
+                # EN: Persist suggestion in imagedata_suggestionpersonalbumid, personalbumrecs, and wordhash.dat
+                # Ref: picasa3.exe @ 0x00880B94 (suggestionpersonalbumid), 0x00880BBC (personalbumrecs), 0x008AAD76 (]facealbum:%d)
+                if sug_target_idx is not None and sug_target_idx >= 0 and self.db:
+                    with self.db._lock:
+                        sug_alb_idx = self._get_or_create_person_album_id(matched_cluster.contact_id, matched_cluster.name)
+                        if sug_alb_idx is not None and sug_alb_idx > 0:
+                            pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+                            if pmp_sug is not None:
+                                while len(pmp_sug.records) <= sug_target_idx:
+                                    pmp_sug.records.append(0)
+                                pmp_sug.records[sug_target_idx] = sug_alb_idx
+                                pmp_sug.dirty = True
+                            pmp_parecs = self.db.pmps.get("imagedata_personalbumrecs")
+                            if pmp_parecs is not None:
+                                while len(pmp_parecs.records) <= sug_target_idx:
+                                    pmp_parecs.records.append(0)
+                                pmp_parecs.records[sug_target_idx] = sug_alb_idx
+                                pmp_parecs.dirty = True
+                            pmp_parecvals = self.db.pmps.get("imagedata_personalbumrecvalues")
+                            if pmp_parecvals is not None:
+                                while len(pmp_parecvals.records) <= sug_target_idx:
+                                    pmp_parecvals.records.append(0)
+                                pmp_parecvals.records[sug_target_idx] = int(round(max(0.0, min(1.0, best_similarity)) * 10000.0)) & 0xFFFF
+                                pmp_parecvals.dirty = True
+                            if getattr(self.db, "wordhash", None) is not None:
+                                if hasattr(self.db.wordhash, "remove_word"):
+                                    self.db.wordhash.remove_word("]unknownface", sug_target_idx)
+                                    self.db.wordhash.remove_word("]ignoreface", sug_target_idx)
+                                self.db.wordhash.add_word(f"]facealbum:{sug_alb_idx}", sug_target_idx)
             else:
                 df.contact_id = ""
                 df.contact_name = None  # FR : Visage sans nom / EN: Unnamed face (Ref: CThumbDB::unknownfacealbum)
-                self.unnamed_faces.append((db_idx, photo_path, df))
+                self.unnamed_faces.append((child_idx if child_idx is not None else db_idx, photo_path, df))
 
             existing.append(df)
             newly_detected_rects.append(df)
@@ -2249,25 +2293,32 @@ class PicasaFaceManager:
                 pmp_pa = self.db.pmps.get("imagedata_personalbumid")
                 pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
                 pa_target_idx = face_rec_idx if face_rec_idx is not None else parent_photo_idx
+                alb_idx = None
                 if pa_target_idx is not None and pmp_pa is not None and contact_id not in ("", "0", "ffffffffffffffff", "unknown", "unnamed"):
                     alb_idx = self._get_or_create_person_album_id(contact_id, clean_name)
                     if alb_idx is not None:
                         while len(pmp_pa.records) <= pa_target_idx:
                             pmp_pa.records.append(0)
+                        old_pa = pmp_pa.records[pa_target_idx]
                         pmp_pa.records[pa_target_idx] = alb_idx
                         pmp_pa.dirty = True
                         if getattr(self.db, "wordhash", None) is not None:
                             if hasattr(self.db.wordhash, "remove_word"):
                                 self.db.wordhash.remove_word("]unknownface", pa_target_idx)
                                 self.db.wordhash.remove_word("]ignoreface", pa_target_idx)
+                                if old_pa and old_pa != alb_idx:
+                                    self.db.wordhash.remove_word(f"]facealbum:{old_pa}", pa_target_idx)
                             self.db.wordhash.add_word(f"]facealbum:{alb_idx}", pa_target_idx)
                             if parent_photo_idx is not None and parent_photo_idx >= 0:
                                 self.db.wordhash.add_word("]face", parent_photo_idx)
                 if pmp_sug is not None:
                     for t_idx in target_indices:
                         if 0 <= t_idx < len(pmp_sug.records):
+                            old_sug = pmp_sug.records[t_idx]
                             pmp_sug.records[t_idx] = 0
                             pmp_sug.dirty = True
+                            if old_sug and old_sug != alb_idx and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                                self.db.wordhash.remove_word(f"]facealbum:{old_sug}", t_idx)
 
         # FR : Écriture bit-exacte dans le .picasa.ini
         # EN: Bit-exact write to .picasa.ini
@@ -2303,6 +2354,11 @@ class PicasaFaceManager:
                     self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
                 except TypeError:
                     self.db.invalidate_ini_cache(ini_path)
+            if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
+                try:
+                    self.db.sync_photo_ini_to_db(photo_path, doc)
+                except Exception:
+                    pass
 
         # FR : Synchroniser contacts.xml pour la base globale Picasa
         # EN: Synchronize contacts.xml for the global Picasa database
@@ -2528,7 +2584,7 @@ class PicasaFaceManager:
                     old_alb = pmp.records[face_rec_idx]
                     pmp.records[face_rec_idx] = 0
                     pmp.dirty = True
-                    if col_name == "imagedata_personalbumid" and old_alb and getattr(self.db, "wordhash", None) is not None:
+                    if old_alb and getattr(self.db, "wordhash", None) is not None:
                         if hasattr(self.db.wordhash, "remove_word"):
                             self.db.wordhash.remove_word(f"]facealbum:{old_alb}", face_rec_idx)
             if getattr(self.db, "wordhash", None) is not None:
@@ -2563,6 +2619,11 @@ class PicasaFaceManager:
                 doc.write_file(ini_path)
                 if self.db and hasattr(self.db, "invalidate_ini_cache"):
                     self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
+                    try:
+                        self.db.sync_photo_ini_to_db(photo_path, doc)
+                    except Exception:
+                        pass
         self.notify_people_changed()
 
     def create_person(self, name: str) -> PersonCluster:
@@ -2680,8 +2741,67 @@ class PicasaFaceManager:
                         doc.write_file(ini_path)
                         if self.db and hasattr(self.db, "invalidate_ini_cache"):
                             self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                        if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
+                            try:
+                                self.db.sync_photo_ini_to_db(ppath, doc)
+                            except Exception:
+                                pass
                     except Exception:
                         pass
+
+            # FR : Fusionner aussi les colonnes PMP (imagedata_personalbumid, suggestionpersonalbumid, personalbumrecs),
+            # wordhash.dat (]facealbum:<id>) et albumdata_* pour que Picasa3.exe voie la fusion
+            # EN: Also merge PMP columns (imagedata_personalbumid, suggestionpersonalbumid, personalbumrecs),
+            # wordhash.dat (]facealbum:<id>), and albumdata_* so Picasa3.exe sees the merge
+            if self.db:
+                with self.db._lock:
+                    target_alb_idx = self._get_or_create_person_album_id(target_cid, existing_target.name)
+                    ad_names = self.db.pmps.get("albumdata_name")
+                    ad_cats = self.db.pmps.get("albumdata_category")
+                    ad_cids = self.db.pmps.get("albumdata_albumcontactids")
+                    ad_toks = self.db.pmps.get("albumdata_token")
+                    ad_uids = self.db.pmps.get("albumdata_uid")
+                    old_alb_ids: Set[int] = set()
+                    cid_int_m: Optional[int] = None
+                    try:
+                        cid_int_m = int(cid, 16) & 0xFFFFFFFFFFFFFFFF
+                    except Exception:
+                        cid_int_m = None
+                    if ad_names is not None and ad_cats is not None:
+                        for i in range(1, len(ad_names.records)):
+                            if i != target_alb_idx and i < len(ad_cats.records) and ad_cats.records[i] == 8:
+                                if (ad_cids is not None and i < len(ad_cids.records) and cid_int_m is not None and ad_cids.records[i] == cid_int_m) or (
+                                    str(ad_names.records[i] or "").strip().lower() == old_name.strip().lower()
+                                ):
+                                    old_alb_ids.add(i)
+                    if old_alb_ids and target_alb_idx is not None and target_alb_idx > 0:
+                        for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid", "imagedata_personalbumrecs"):
+                            pmp_col = self.db.pmps.get(col_name)
+                            if pmp_col is not None:
+                                for r_idx, val in enumerate(pmp_col.records):
+                                    if val in old_alb_ids:
+                                        pmp_col.records[r_idx] = target_alb_idx
+                                        pmp_col.dirty = True
+                                        if col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid") and getattr(self.db, "wordhash", None) is not None:
+                                            if hasattr(self.db.wordhash, "remove_word"):
+                                                self.db.wordhash.remove_word(f"]facealbum:{val}", r_idx)
+                                            self.db.wordhash.add_word(f"]facealbum:{target_alb_idx}", r_idx)
+                        for old_id in old_alb_ids:
+                            if ad_cats is not None and old_id < len(ad_cats.records):
+                                ad_cats.records[old_id] = 0
+                                ad_cats.dirty = True
+                            if ad_names is not None and old_id < len(ad_names.records):
+                                ad_names.records[old_id] = ""
+                                ad_names.dirty = True
+                            if ad_cids is not None and old_id < len(ad_cids.records):
+                                ad_cids.records[old_id] = 0
+                                ad_cids.dirty = True
+                            if ad_toks is not None and old_id < len(ad_toks.records):
+                                ad_toks.records[old_id] = ""
+                                ad_toks.dirty = True
+                            if ad_uids is not None and old_id < len(ad_uids.records):
+                                ad_uids.records[old_id] = ""
+                                ad_uids.dirty = True
 
             del self.people[cid]
             if self.db and getattr(self.db, "contacts", None):
@@ -2827,40 +2947,78 @@ class PicasaFaceManager:
                     doc.write_file(ini_path)
                     if self.db and hasattr(self.db, "invalidate_ini_cache"):
                         self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                    if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
+                        try:
+                            self.db.sync_photo_ini_to_db(ppath, doc)
+                        except Exception:
+                            pass
                 except Exception:
                     pass
 
         if self.db:
-            ad_names = self.db.pmps.get("albumdata_name")
-            ad_cats = self.db.pmps.get("albumdata_category")
-            ad_cids = self.db.pmps.get("albumdata_albumcontactids")
-            matching_alb_ids: Set[int] = set()
-            cid_int: Optional[int] = None
-            try:
-                cid_int = int(cid, 16) & 0xFFFFFFFFFFFFFFFF
-            except Exception:
-                cid_int = None
-            if ad_names is not None and ad_cats is not None:
-                for i in range(len(ad_names.records)):
-                    if i < len(ad_cats.records) and ad_cats.records[i] == 8 and i > 0:
-                        if (ad_cids is not None and i < len(ad_cids.records) and cid_int is not None and ad_cids.records[i] == cid_int) or (
-                            cluster and str(ad_names.records[i] or "").strip().lower() == cluster.name.strip().lower()
-                        ):
-                            matching_alb_ids.add(i)
+            with self.db._lock:
+                ad_names = self.db.pmps.get("albumdata_name")
+                ad_cats = self.db.pmps.get("albumdata_category")
+                ad_cids = self.db.pmps.get("albumdata_albumcontactids")
+                ad_toks = self.db.pmps.get("albumdata_token")
+                ad_uids = self.db.pmps.get("albumdata_uid")
+                matching_alb_ids: Set[int] = set()
+                cid_int: Optional[int] = None
+                try:
+                    cid_int = int(cid, 16) & 0xFFFFFFFFFFFFFFFF
+                except Exception:
+                    cid_int = None
+                if ad_names is not None and ad_cats is not None:
+                    for i in range(len(ad_names.records)):
+                        if i < len(ad_cats.records) and ad_cats.records[i] == 8 and i > 0:
+                            if (ad_cids is not None and i < len(ad_cids.records) and cid_int is not None and ad_cids.records[i] == cid_int) or (
+                                cluster and str(ad_names.records[i] or "").strip().lower() == cluster.name.strip().lower()
+                            ):
+                                matching_alb_ids.add(i)
 
-            for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
-                pmp = self.db.pmps.get(col_name)
-                if pmp is not None:
-                    if cluster:
-                        for p_idx in cluster.photo_indices:
-                            if 0 <= p_idx < len(pmp.records):
-                                pmp.records[p_idx] = 0
-                                pmp.dirty = True
-                    if matching_alb_ids:
-                        for r_idx, val in enumerate(pmp.records):
-                            if val in matching_alb_ids:
-                                pmp.records[r_idx] = 0
-                                pmp.dirty = True
+                reset_face_indices: Set[int] = set()
+                for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
+                    pmp = self.db.pmps.get(col_name)
+                    if pmp is not None:
+                        if cluster:
+                            for p_idx in cluster.photo_indices:
+                                if 0 <= p_idx < len(pmp.records) and pmp.records[p_idx] != 0:
+                                    old_v = pmp.records[p_idx]
+                                    pmp.records[p_idx] = 0
+                                    pmp.dirty = True
+                                    reset_face_indices.add(p_idx)
+                                    if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                                        self.db.wordhash.remove_word(f"]facealbum:{old_v}", p_idx)
+                        if matching_alb_ids:
+                            for r_idx, val in enumerate(pmp.records):
+                                if val in matching_alb_ids:
+                                    pmp.records[r_idx] = 0
+                                    pmp.dirty = True
+                                    reset_face_indices.add(r_idx)
+                                    if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                                        self.db.wordhash.remove_word(f"]facealbum:{val}", r_idx)
+
+                if getattr(self.db, "wordhash", None) is not None:
+                    for r_idx in reset_face_indices:
+                        if getattr(self.db, "is_face_record", lambda i: False)(r_idx):
+                            self.db.wordhash.add_word("]unknownface", r_idx)
+
+                for old_id in matching_alb_ids:
+                    if ad_cats is not None and old_id < len(ad_cats.records):
+                        ad_cats.records[old_id] = 0
+                        ad_cats.dirty = True
+                    if ad_names is not None and old_id < len(ad_names.records):
+                        ad_names.records[old_id] = ""
+                        ad_names.dirty = True
+                    if ad_cids is not None and old_id < len(ad_cids.records):
+                        ad_cids.records[old_id] = 0
+                        ad_cids.dirty = True
+                    if ad_toks is not None and old_id < len(ad_toks.records):
+                        ad_toks.records[old_id] = ""
+                        ad_toks.dirty = True
+                    if ad_uids is not None and old_id < len(ad_uids.records):
+                        ad_uids.records[old_id] = ""
+                        ad_uids.dirty = True
 
         if self.db and getattr(self.db, "contacts", None):
             self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() != cid]
@@ -2961,12 +3119,19 @@ class PicasaFaceManager:
             self.unnamed_faces.append((eff_idx, suggestion.photo_path, suggestion.face_rect))
 
         if self.db:
-            pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
-            if pmp_sug is not None:
-                for t_idx in {idx for idx in (face_rec_idx, db_idx) if idx is not None}:
-                    if 0 <= t_idx < len(pmp_sug.records):
-                        pmp_sug.records[t_idx] = 0
-                        pmp_sug.dirty = True
+            with self.db._lock:
+                pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+                if pmp_sug is not None:
+                    for t_idx in {idx for idx in (face_rec_idx, db_idx) if idx is not None}:
+                        if 0 <= t_idx < len(pmp_sug.records):
+                            old_sug = pmp_sug.records[t_idx]
+                            pmp_sug.records[t_idx] = 0
+                            pmp_sug.dirty = True
+                            if getattr(self.db, "wordhash", None) is not None:
+                                if old_sug and hasattr(self.db.wordhash, "remove_word"):
+                                    self.db.wordhash.remove_word(f"]facealbum:{old_sug}", t_idx)
+                                if getattr(self.db, "is_face_record", lambda i: False)(t_idx):
+                                    self.db.wordhash.add_word("]unknownface", t_idx)
 
         self.notify_people_changed()
 
@@ -3113,8 +3278,11 @@ class PicasaFaceManager:
         sec_c2 = doc.get_or_create_section("Contacts2")
         items: List[FaceItem] = []
         for fr in faces_list:
-            cid = (fr.contact_id or "").strip().lower() or "ffffffffffffffff"
-            if cid not in ("", "0", "ffffffffffffffff", "unknown", "unnamed"):
+            raw_cid = (fr.contact_id or "").strip().lower()
+            if raw_cid in ("", "0", "unknown", "unnamed"):
+                continue
+            cid = raw_cid
+            if cid != "ffffffffffffffff":
                 cname = (fr.contact_name or "").lstrip("? ").strip()
                 if not cname and cid in self.people:
                     cname = self.people[cid].name

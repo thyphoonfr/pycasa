@@ -30,7 +30,7 @@ from PySide6.QtCore import Qt, QRect, QSize, Signal, QPoint, QThread, QObject, Q
 from PySide6.QtGui import (
     QPainter, QColor, QFont, QPen, QBrush, QPixmap, QImage, QImageReader,
     QMouseEvent, QWheelEvent, QPaintEvent, QResizeEvent, QPolygon, QContextMenuEvent,
-    QKeyEvent, QDrag
+    QKeyEvent, QDrag, QLinearGradient
 )
 
 from picasa_py.ui.style import PicasaStyle
@@ -2947,8 +2947,16 @@ class PicasaThumbnailView(QWidget):
         try:
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-            # Fond de la photothèque
-            painter.fillRect(self.rect(), self.style.grid_bgcolor)
+            # Fond de la photothèque (uni ou dégradé diagonal)
+            grid_start = self.style.grid_bgcolor
+            grid_end = getattr(self.style, "grid_bgcolor_end", grid_start)
+            if grid_start != grid_end:
+                bg_grad = QLinearGradient(0.0, 0.0, float(self.width()), float(self.height()))
+                bg_grad.setColorAt(0.0, grid_start)
+                bg_grad.setColorAt(1.0, grid_end)
+                painter.fillRect(self.rect(), QBrush(bg_grad))
+            else:
+                painter.fillRect(self.rect(), grid_start)
 
             viewport_h = self.height()
             sticky_idx, sticky_y = self._get_sticky_header_info()
@@ -3025,18 +3033,38 @@ class PicasaThumbnailView(QWidget):
         sep_col = self.style.splitter_color if is_dark else QColor("#BFB9A8" if is_sticky else "#C8C8C8")
 
         if is_sticky:
-            # Fond beige/crème épinglé authentique de constants.ui (alist_stickycolor=#EAE7DC)
-            painter.fillRect(QRect(0, y, header_w, 38), self.style.alist_stickycolor)
+            # Fond beige/crème épinglé authentique de constants.ui (alist_stickycolor=#EAE7DC) ou dégradé
+            st_start = self.style.alist_stickycolor
+            st_end = getattr(self.style, "alist_stickycolor_end", st_start)
+            sticky_rect = QRect(0, y, header_w, 38)
+            if st_start != st_end:
+                st_grad = QLinearGradient(0.0, float(y), float(header_w), float(y))
+                st_grad.setColorAt(0.0, st_start)
+                st_grad.setColorAt(1.0, st_end)
+                painter.fillRect(sticky_rect, QBrush(st_grad))
+            else:
+                painter.fillRect(sticky_rect, st_start)
             painter.setPen(sep_col)
             painter.drawLine(0, y + 37, header_w, y + 37)
             # Ombre portée douce sous l'en-tête flottant
             painter.fillRect(QRect(0, y + 38, header_w, 3), QColor(0, 0, 0, 45))
             painter.fillRect(QRect(0, y + 41, header_w, 2), QColor(0, 0, 0, 20))
         else:
-            # Fond d'en-tête clair authentique (alabel_fldrcol=#e2e2e2, alabel_fldrhicol=#f2f2f2)
+            # Fond d'en-tête clair authentique (alabel_fldrcol=#e2e2e2, alabel_fldrhicol=#f2f2f2) ou dégradé
             bg_col = self.style.alabel_fldrhicol if is_hdr_hovered else self.style.alabel_fldrcol
+            bg_end = (
+                getattr(self.style, "alabel_fldrhicol_end", bg_col)
+                if is_hdr_hovered
+                else getattr(self.style, "alabel_fldrcol_end", bg_col)
+            )
             header_rect = QRect(6, y + 1, header_w - 12, 36)
-            painter.fillRect(header_rect, bg_col)
+            if bg_col != bg_end:
+                hdr_grad = QLinearGradient(6.0, float(y + 1), float(header_w - 6), float(y + 1))
+                hdr_grad.setColorAt(0.0, bg_col)
+                hdr_grad.setColorAt(1.0, bg_end)
+                painter.fillRect(header_rect, QBrush(hdr_grad))
+            else:
+                painter.fillRect(header_rect, bg_col)
             painter.setPen(sep_col)
             painter.drawLine(6, y, header_w - 6, y)
             painter.drawLine(6, y + 37, header_w - 6, y + 37)
@@ -3104,17 +3132,36 @@ class PicasaThumbnailView(QWidget):
         painter.setPen(getattr(self.style, "alayout_subtitleColor", QColor("#5C534E")))
         painter.drawText(date_x, y + 24, meta_str)
 
-        btn_bg_norm = QColor("#353B45") if is_dark else QColor("#F6F6F6")
-        btn_txt_norm = QColor("#E2E8F0") if is_dark else QColor("#333333")
-        btn_brd_norm = QColor("#4A5568") if is_dark else QColor("#B5B5B5")
+        btn_s = self.style.topbar_btn_bg_start
+        btn_e = self.style.topbar_btn_bg_end
+        btn_txt_norm = self.style.topbar_text_color
+        btn_brd_norm = self.style.topbar_btn_border
         accent_col = getattr(self.style, "accent_color", QColor("#3879D9"))
+        accent_end = getattr(self.style, "accent_grad_end", accent_col)
+
+        def _make_btn_brush(r: QRect, hovered: bool = False, is_accent: bool = False) -> QBrush:
+            if is_accent:
+                if accent_col != accent_end:
+                    g = QLinearGradient(float(r.left()), float(r.top()), float(r.right()), float(r.bottom()))
+                    g.setColorAt(0.0, accent_col.lighter(112) if hovered else accent_col)
+                    g.setColorAt(1.0, accent_end.lighter(112) if hovered else accent_end)
+                    return QBrush(g)
+                return QBrush(accent_col.lighter(112) if hovered else accent_col)
+            c1 = btn_s.lighter(115) if hovered else btn_s
+            c2 = btn_e.lighter(115) if hovered else btn_e
+            if c1 != c2:
+                g = QLinearGradient(float(r.left()), float(r.top()), float(r.left()), float(r.bottom()))
+                g.setColorAt(0.0, c1)
+                g.setColorAt(1.0, c2)
+                return QBrush(g)
+            return QBrush(c1)
 
         if sec.is_unnamed:
             if sec.cluster_faces is not None:
                 # 1. Bouton "Développer les groupes" (Ref: unknownfaceheaderpanel/showall)
                 btn_ungroup = self._get_ungroup_action_btn_rect(y)
                 painter.setPen(QPen(btn_brd_norm, 1))
-                painter.setBrush(btn_bg_norm)
+                painter.setBrush(_make_btn_brush(btn_ungroup))
                 painter.drawRoundedRect(btn_ungroup, 3, 3)
                 painter.setFont(QFont("Tahoma", 8, QFont.Weight.Normal))
                 painter.setPen(btn_txt_norm)
@@ -3123,7 +3170,7 @@ class PicasaThumbnailView(QWidget):
                 # 2. Bouton "Ajouter un nom" pour ce groupe (Ref: unknownfaceheaderpanel/addname)
                 btn_cluster = self._get_cluster_action_btn_rect(y)
                 painter.setPen(QPen(accent_col.darker(120), 1))
-                painter.setBrush(accent_col)
+                painter.setBrush(_make_btn_brush(btn_cluster, is_accent=True))
                 painter.drawRoundedRect(btn_cluster, 3, 3)
                 painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
                 painter.setPen(QColor("#FFFFFF"))
@@ -3143,14 +3190,14 @@ class PicasaThumbnailView(QWidget):
                 is_working = getattr(self, "_cluster_worker", None) is not None and self._cluster_worker.isRunning()
                 if is_working:
                     painter.setPen(QPen(btn_brd_norm, 1))
-                    painter.setBrush(btn_bg_norm)
+                    painter.setBrush(_make_btn_brush(btn_cluster))
                     painter.drawRoundedRect(btn_cluster, 3, 3)
                     painter.setFont(QFont("Tahoma", 8, QFont.Weight.Normal))
                     painter.setPen(btn_txt_norm)
                     painter.drawText(btn_cluster, Qt.AlignmentFlag.AlignCenter, "⏳ Regroupement...")
                 else:
                     painter.setPen(QPen(accent_col.darker(120), 1))
-                    painter.setBrush(accent_col)
+                    painter.setBrush(_make_btn_brush(btn_cluster, is_accent=True))
                     painter.drawRoundedRect(btn_cluster, 3, 3)
                     painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
                     painter.setPen(QColor("#FFFFFF"))
@@ -3162,10 +3209,10 @@ class PicasaThumbnailView(QWidget):
             # Bouton Zoom visage
             if sec.face_zoom:
                 painter.setPen(QPen(accent_col.darker(120), 1))
-                painter.setBrush(accent_col)
+                painter.setBrush(_make_btn_brush(btn_fz, is_accent=True))
             else:
                 painter.setPen(QPen(btn_brd_norm, 1))
-                painter.setBrush(btn_bg_norm)
+                painter.setBrush(_make_btn_brush(btn_fz))
             painter.drawRoundedRect(btn_fz, 3, 3)
             painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold if sec.face_zoom else QFont.Weight.Normal))
             painter.setPen(QColor("#FFFFFF") if sec.face_zoom else btn_txt_norm)
@@ -3174,10 +3221,10 @@ class PicasaThumbnailView(QWidget):
             # Bouton Photo entière
             if not sec.face_zoom:
                 painter.setPen(QPen(accent_col.darker(120), 1))
-                painter.setBrush(accent_col)
+                painter.setBrush(_make_btn_brush(btn_pz, is_accent=True))
             else:
                 painter.setPen(QPen(btn_brd_norm, 1))
-                painter.setBrush(btn_bg_norm)
+                painter.setBrush(_make_btn_brush(btn_pz))
             painter.drawRoundedRect(btn_pz, 3, 3)
             painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold if not sec.face_zoom else QFont.Weight.Normal))
             painter.setPen(QColor("#FFFFFF") if not sec.face_zoom else btn_txt_norm)
@@ -3228,20 +3275,17 @@ class PicasaThumbnailView(QWidget):
                     painter.drawText(btn_rsel, Qt.AlignmentFlag.AlignCenter, "✖ Supprimer")
         else:
             # Boutons d'action d'en-tête d'album/dossier (Ref: HEADERPANELTEXT_FR.XML)
-            btn_bg_norm = QColor("#353B45") if getattr(self.style, "is_dark", False) else QColor("#F6F6F6")
-            btn_txt_norm = QColor("#E2E8F0") if getattr(self.style, "is_dark", False) else QColor("#333333")
-            btn_brd_norm = QColor("#4A5568") if getattr(self.style, "is_dark", False) else QColor("#B5B5B5")
             def _draw_hdr_action_btn(rect: QRect, label: str, btn_key: str) -> None:
                 """
                 FR: Dessine un bouton d'action standard (Enregistrer, Favoris, Film, Montage) dans l'en-tête.
                 EN: Draws a standard action button (Save, Starred, Movie, Collage) inside the section header.
                 """
                 hov = (self._hovered_header_btn == (btn_key, sec_idx))
-                painter.setPen(QPen(QColor("#7A99B8") if hov else btn_brd_norm, 1))
-                painter.setBrush(QColor("#E5F0FA") if hov else btn_bg_norm)
+                painter.setPen(QPen(accent_col if hov else btn_brd_norm, 1))
+                painter.setBrush(_make_btn_brush(rect, hovered=hov))
                 painter.drawRoundedRect(rect, 3, 3)
                 painter.setFont(QFont(self.style.alabel_buttfont_win, 8, QFont.Weight.Bold if hov else QFont.Weight.Normal))
-                painter.setPen(QColor("#1B4F72") if hov else btn_txt_norm)
+                painter.setPen(btn_txt_norm)
                 painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, label)
 
             _draw_hdr_action_btn(self._get_save_edits_btn_rect(y), "💾", "save")
@@ -3252,16 +3296,8 @@ class PicasaThumbnailView(QWidget):
         # Bouton Diaporama / Lecture à droite (Ref: headerpanel/play)
         btn_rect = self._get_slideshow_btn_rect(y)
         is_hovered = (self._hovered_header_btn == ("slideshow", sec_idx))
-        btn_bg_norm = QColor("#353B45") if getattr(self.style, "is_dark", False) else QColor("#F6F6F6")
-        btn_txt_norm = QColor("#E2E8F0") if getattr(self.style, "is_dark", False) else QColor("#222222")
-        btn_brd_norm = QColor("#4A5568") if getattr(self.style, "is_dark", False) else QColor("#B5B5B5")
-
-        if is_hovered:
-            painter.setPen(QPen(QColor("#7A99B8"), 1))
-            painter.setBrush(QColor("#E5F0FA"))
-        else:
-            painter.setPen(QPen(btn_brd_norm, 1))
-            painter.setBrush(btn_bg_norm)
+        painter.setPen(QPen(accent_col if is_hovered else btn_brd_norm, 1))
+        painter.setBrush(_make_btn_brush(btn_rect, hovered=is_hovered))
         painter.drawRoundedRect(btn_rect, 3, 3)
 
         # Triangle lecture vert Picasa
@@ -3275,7 +3311,7 @@ class PicasaThumbnailView(QWidget):
         painter.drawPolygon(play_poly)
 
         painter.setFont(QFont(self.style.alabel_buttfont_win, 8, QFont.Weight.Bold))
-        painter.setPen(QColor("#1B4F72") if is_hovered else btn_txt_norm)
+        painter.setPen(btn_txt_norm)
         painter.drawText(btn_rect.x() + 24, y + 23, "Diaporama")
 
     def apply_style(self, style: PicasaStyle) -> None:
@@ -3347,9 +3383,17 @@ class PicasaThumbnailView(QWidget):
         else:
             painter.fillRect(rect.adjusted(4, 4, -4, -4), QColor("#D0D0D0"))
 
-        # Bordures de sélection Picasa (Bleu externe, Blanc interne)
+        # Bordures de sélection Picasa (Bleu externe ou dégradé, Blanc interne)
         if is_selected:
-            pen_blue = QPen(self.style.thumbsel_color1, 2)
+            sel_c1 = self.style.thumbsel_color1
+            sel_end = getattr(self.style, "accent_grad_end", sel_c1)
+            if sel_c1 != sel_end and getattr(self.style, "accent_color", sel_c1) != sel_end:
+                sel_grad = QLinearGradient(float(rect.left()), float(rect.top()), float(rect.right()), float(rect.bottom()))
+                sel_grad.setColorAt(0.0, sel_c1)
+                sel_grad.setColorAt(1.0, sel_end)
+                pen_blue = QPen(QBrush(sel_grad), 2)
+            else:
+                pen_blue = QPen(sel_c1, 2)
             painter.setPen(pen_blue)
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawRect(rect.adjusted(-2, -2, 2, 2))

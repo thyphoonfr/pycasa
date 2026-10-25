@@ -144,7 +144,7 @@ class PicasaImageProcessor:
         return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def load_transformed_image(file_path: str, max_size: int = 0) -> Optional[Image.Image]:
+    def load_transformed_image(file_path: str, max_size: int = 0, parsed_ini: Any = None) -> Optional[Image.Image]:
         """
         FR : Charge une image depuis le disque en appliquant fidèlement l'orientation EXIF
              et les retouches non-destructives Picasa (.picasa.ini : crop, rotate, tilt, filters).
@@ -179,11 +179,11 @@ class PicasaImageProcessor:
                 ini_path = os.path.join(parent_dir, ".picasa.ini")
                 if not os.path.exists(ini_path):
                     ini_path = os.path.join(parent_dir, "Picasa.ini")
-                if os.path.exists(ini_path):
+                if parsed_ini is not None or os.path.exists(ini_path):
                     try:
                         from picasa_py.ini.parser import PicasaIniParser
                         from picasa_py.faces.facerect import decode_rect64_string
-                        doc = PicasaIniParser.parse_file(ini_path)
+                        doc = parsed_ini if parsed_ini is not None else PicasaIniParser.parse_file(ini_path)
                         base_name = os.path.basename(file_path)
 
                         crop_hex = doc.get_crop(base_name)
@@ -226,7 +226,7 @@ class PicasaImageProcessor:
                         if sec:
                             filters_str = sec.get("filters", "")
                             if filters_str:
-                                pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str)
+                                pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str, skip_geom=True)
 
                         # Ref: editpanel/edittextpanel (0x00658900)
                         txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
@@ -252,14 +252,18 @@ class PicasaImageProcessor:
     @staticmethod
     def parse_text_token(txt_val: str) -> Tuple[str, Tuple[float, float], int, Tuple[int, int, int], bool]:
         """
-        FR : Analyse une entrée `text=` de `.picasa.ini` (format complet Picasa 3 à 12 champs
-             `Police;taille;0;0;0;400;0;0;r,g,b;px,py;shadow;texte` ou format court à 4 champs
-             `texte;taille;r,g,b;px,py` ou texte brut).
-        EN : Parses a `.picasa.ini` `text=` entry (full 12-field Picasa 3 format
-             `Font;size;0;0;0;400;0;0;r,g,b;px,py;shadow;text`, short 4-field format
-             `text;size;r,g,b;px,py`, or plain text).
+        FR : Analyse une entrée `text=` de `.picasa.ini` :
+             1. Format natif `CTextItemList` de `picasa3.exe` (`0x00A4DB30` / `0x00A4DD50`) :
+                `<num_items>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,<weight>,<flags2>,<rel_size>,<outline_w>,<aspect>,<fill_alpha>,<outline_argb>,<fill_argb>,<style_flags>;`
+             2. Format historique à 12 champs : `Police;taille;0;0;0;400;0;0;r,g,b;px,py;shadow;texte`
+             3. Format court à 4 champs : `texte;taille;r,g,b;px,py` ou texte brut.
+        EN : Parses a `.picasa.ini` `text=` entry:
+             1. Native `picasa3.exe` `CTextItemList` format (`0x00A4DB30` / `0x00A4DD50`):
+                `<num_items>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,<weight>,<flags2>,<rel_size>,<outline_w>,<aspect>,<fill_alpha>,<outline_argb>,<fill_argb>,<style_flags>;`
+             2. Legacy 12-field format: `Font;size;0;0;0;400;0;0;r,g,b;px,py;shadow;text`
+             3. Short 4-field format: `text;size;r,g,b;px,py` or plain text.
 
-        Ref: picasa3.exe @ 0x00658900 (editpanel/edittextpanel)
+        Ref: picasa3.exe @ 0x00A4DB30, 0x00A4DD50, 0x00A4E3A0, 0x00658900
         """
         raw = txt_val.strip()
         if not raw:
@@ -267,8 +271,48 @@ class PicasaImageProcessor:
         if ";" not in raw:
             return raw, (0.15, 0.85), 28, (255, 255, 255), True
 
+        # 1. Format natif CTextItemList (0x00A4DB30 / 0x00A4DD50) : <num_items>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,...
+        first_semi = raw.find(";")
+        if first_semi > 0 and raw[:first_semi].strip().isdigit():
+            second_semi = raw.find(";", first_semi + 1)
+            if second_semi > first_semi + 1 and raw[first_semi + 1 : second_semi].strip().isdigit():
+                try:
+                    utf8_len = int(raw[first_semi + 1 : second_semi].strip())
+                    rest_bytes = raw[second_semi + 1 :].encode("utf-8")
+                    if len(rest_bytes) >= utf8_len:
+                        text_str = rest_bytes[:utf8_len].decode("utf-8", errors="replace")
+                        tail_str = rest_bytes[utf8_len:].decode("utf-8", errors="replace").lstrip(";")
+                        tail_parts = [p.strip() for p in tail_str.split(";") if p.strip()]
+                        pos_norm: Tuple[float, float] = (0.15, 0.85)
+                        size = 28
+                        color: Tuple[int, int, int] = (255, 255, 255)
+                        shadow = True
+                        if len(tail_parts) >= 2 and "," in tail_parts[1]:
+                            coords = [float(x.strip()) for x in tail_parts[1].split(",") if x.strip()]
+                            if len(coords) >= 2:
+                                pos_norm = (coords[0], coords[1])
+                            if len(coords) >= 3 and coords[2] > 0:
+                                size = max(8, int(round(coords[2] * 360.0)))
+                        if len(tail_parts) >= 3 and tail_parts[2].startswith("v1,"):
+                            v_fields = [x.strip() for x in tail_parts[2].split(",")]
+                            if len(v_fields) >= 5:
+                                shadow = float(v_fields[4]) > 0.0
+                            if len(v_fields) >= 9:
+                                raw_c = v_fields[8].strip().lower()
+                                try:
+                                    if any(ch in raw_c for ch in "abcdef") or len(raw_c) == 8:
+                                        fill_u32 = int(raw_c, 16) & 0xFFFFFFFF
+                                    else:
+                                        fill_u32 = int(float(raw_c)) & 0xFFFFFFFF
+                                except ValueError:
+                                    fill_u32 = int(raw_c, 16) & 0xFFFFFFFF
+                                color = ((fill_u32 >> 16) & 0xFF, (fill_u32 >> 8) & 0xFF, fill_u32 & 0xFF)
+                        return text_str, pos_norm, size, color, shadow
+                except Exception:
+                    pass
+
         parts = raw.split(";")
-        # Format court à 4 champs : txt;size;r,g,b;px,py
+        # 2. Format court à 4 champs : txt;size;r,g,b;px,py
         if len(parts) == 4 and "," in parts[3]:
             try:
                 coord_parts = [float(x.strip()) for x in parts[3].split(",") if x.strip()]
@@ -276,7 +320,7 @@ class PicasaImageProcessor:
                     px, py = coord_parts[0], coord_parts[1]
                     text_str = parts[0].strip()
                     size = int(round(float(parts[1].strip()))) if parts[1].strip() else 28
-                    color: Tuple[int, int, int] = (255, 255, 255)
+                    color = (255, 255, 255)
                     if "," in parts[2]:
                         c_vals = [int(round(float(c.strip()))) for c in parts[2].split(",") if c.strip()]
                         if len(c_vals) >= 3:
@@ -285,7 +329,7 @@ class PicasaImageProcessor:
             except Exception:
                 pass
 
-        # Format complet Picasa 3 : Arial;size;0;0;0;400;0;0;r,g,b;px,py;shadow;txt
+        # 3. Format historique à 12 champs : Arial;size;0;0;0;400;0;0;r,g,b;px,py;shadow;txt
         if len(parts) >= 10:
             try:
                 size = int(round(float(parts[1].strip()))) if parts[1].strip() else 28
@@ -299,7 +343,7 @@ class PicasaImageProcessor:
                         color = (c_vals[0], c_vals[1], c_vals[2])
                 except Exception:
                     pass
-            pos_norm: Tuple[float, float] = (0.15, 0.85)
+            pos_norm = (0.15, 0.85)
             if len(parts) > 9 and "," in parts[9]:
                 try:
                     p_vals = [float(x.strip()) for x in parts[9].split(",") if x.strip()]
@@ -332,12 +376,50 @@ class PicasaImageProcessor:
         return PicasaImageProcessor.add_text(img, text_str, pos_norm, font_size, color, shadow)
 
     @staticmethod
-    def apply_filter_chain(img: Image.Image, filters_str: str) -> Image.Image:
+    def _parse_filter_color(
+        parts: list[str],
+        idx: int,
+        default_rgb: Tuple[int, int, int] = (255, 255, 255),
+    ) -> Tuple[Tuple[int, int, int], int]:
+        """
+        FR : Extrait une couleur `(R, G, B)` depuis `parts[idx:]` en acceptant à la fois
+             le format hexadécimal 8 chiffres natif de `picasa3.exe` (`%08x`, `0x008FAC40` / `0x008FB7E7`)
+             et le format décimal à 3 composantes `R,G,B`. Retourne `(rgb, next_idx)`.
+        EN : Extracts an `(R, G, B)` color from `parts[idx:]`, accepting both the native
+             `picasa3.exe` 8-hex-digit format (`%08x`, `0x008FAC40` / `0x008FB7E7`)
+             and the 3-component decimal `R,G,B` format. Returns `(rgb, next_idx)`.
+
+        Ref: picasa3.exe @ 0x008FAC40, 0x008FB7E7
+        """
+        if idx >= len(parts):
+            return default_rgb, idx
+        tok = parts[idx].strip()
+        hex_candidate = tok[2:] if tok.lower().startswith("0x") else tok
+        if (
+            len(hex_candidate) in (6, 8)
+            and "." not in hex_candidate
+            and all(c in "0123456789abcdefABCDEF" for c in hex_candidate)
+            and (idx + 2 >= len(parts) or len(hex_candidate) >= 6)
+        ):
+            val = int(hex_candidate, 16)
+            return ((val >> 16) & 0xFF, (val >> 8) & 0xFF, val & 0xFF), idx + 1
+        if idx + 2 < len(parts):
+            try:
+                r = max(0, min(255, int(round(float(parts[idx])))))
+                g = max(0, min(255, int(round(float(parts[idx + 1])))))
+                b = max(0, min(255, int(round(float(parts[idx + 2])))))
+                return (r, g, b), idx + 3
+            except Exception:
+                pass
+        return default_rgb, idx + 1
+
+    @staticmethod
+    def apply_filter_chain(img: Image.Image, filters_str: str, skip_geom: bool = False) -> Image.Image:
         """
         FR : Applique séquentiellement la chaîne de filtres non-destructifs .picasa.ini (filters=...).
         EN : Sequentially applies the .picasa.ini non-destructive filter chain (filters=...).
 
-        Ref: picasa3.exe @ filterdesc.xml, 0x008814AC, 0x00760F40
+        Ref: picasa3.exe @ filterdesc.xml, 0x008FAC40, 0x008FB450, 0x008814AC, 0x00760F40
         """
         out = img
         for token in filters_str.split(";"):
@@ -348,15 +430,31 @@ class PicasaImageProcessor:
             fname_l = fname.strip().lower()
             parts = [p.strip() for p in fval.split(",") if p.strip()]
             try:
-                if fname_l in ("autolight", "autocontrast", "enhance"):
+                if fname_l in ("crop64", "crop"):
+                    if not skip_geom and len(parts) > 1:
+                        from picasa_py.faces.facerect import decode_rect64_string
+                        lf, tf, rf, bf = decode_rect64_string(parts[1])
+                        out = PicasaImageProcessor.crop(out, (lf, tf, rf, bf))
+                elif fname_l == "tilt":
+                    if not skip_geom and len(parts) > 1:
+                        t_ang = float(parts[1])
+                        if abs(t_ang) >= 0.01:
+                            out = PicasaImageProcessor.straighten(out, t_ang)
+                elif fname_l in ("autolight", "autocontrast"):
                     out = PicasaImageProcessor.auto_contrast(out)
+                elif fname_l == "enhance":
+                    out = PicasaImageProcessor.enhance_lucky(out)
                 elif fname_l in ("autocolor", "colorfix"):
                     out = PicasaImageProcessor.auto_color(out)
                 elif fname_l == "whitept":
-                    r = int(round(float(parts[1]))) if len(parts) > 1 else 128
-                    g = int(round(float(parts[2]))) if len(parts) > 2 else 128
-                    b = int(round(float(parts[3]))) if len(parts) > 3 else 128
-                    out = PicasaImageProcessor.neutral_color_picker(out, (r, g, b))
+                    if len(parts) == 2 and len(parts[1]) in (6, 8):
+                        col, _ = PicasaImageProcessor._parse_filter_color(parts, 1, (128, 128, 128))
+                        out = PicasaImageProcessor.neutral_color_picker(out, col)
+                    else:
+                        r = int(round(float(parts[1]))) if len(parts) > 1 else 128
+                        g = int(round(float(parts[2]))) if len(parts) > 2 else 128
+                        b = int(round(float(parts[3]))) if len(parts) > 3 else 128
+                        out = PicasaImageProcessor.neutral_color_picker(out, (r, g, b))
                 elif fname_l in ("bw", "blackwhite"):
                     out = PicasaImageProcessor.black_and_white(out)
                 elif fname_l == "sepia":
@@ -364,21 +462,41 @@ class PicasaImageProcessor:
                 elif fname_l in ("warm", "warmify"):
                     out = PicasaImageProcessor.warmify(out)
                 elif fname_l in ("unsharp", "unsharp2", "sharpen"):
-                    amt = float(parts[1]) if len(parts) > 1 else 0.5
+                    amt = float(parts[1]) if len(parts) > 1 else 0.6
                     out = PicasaImageProcessor.sharpen(out, amount=amt)
                 elif fname_l in ("grain", "grain2", "filmgrain", "picnikgrain"):
-                    amt = float(parts[1]) if len(parts) > 1 else 18.0
-                    fade = float(parts[2]) if len(parts) > 2 else 0.0
-                    out = PicasaImageProcessor.film_grain(out, intensity=amt, fade=fade)
+                    if fname_l == "picnikgrain" and len(parts) == 2:
+                        out = PicasaImageProcessor.film_grain(out, intensity=18.0, fade=float(parts[1]))
+                    elif len(parts) <= 1:
+                        out = PicasaImageProcessor.film_grain(out, intensity=18.0, fade=0.0)
+                    else:
+                        amt = float(parts[1]) if len(parts) > 1 else 18.0
+                        fade = float(parts[2]) if len(parts) > 2 else 0.0
+                        out = PicasaImageProcessor.film_grain(out, intensity=amt, fade=fade)
                 elif fname_l in ("fill", "backlight", "autobacklight", "filllight"):
                     amt = float(parts[1]) if len(parts) > 1 else 0.3
                     out = PicasaImageProcessor.fill_light(out, amt)
                 elif fname_l in ("finetune", "finetune2"):
+                    # Ref: picasa3.exe @ 0x008FAC40, 0x008FB120
+                    # Format exact : finetune2=1,<fill:%f>,<highlights:%f>,<shadows:%f>,<neutral_rgb:%08x>,<colortemp:%f>
                     f_val = float(parts[1]) if len(parts) > 1 else 0.0
                     hl_val = float(parts[2]) if len(parts) > 2 else 0.0
                     sh_val = float(parts[3]) if len(parts) > 3 else 0.0
-                    ct_val = float(parts[4]) if len(parts) > 4 else 0.0
-                    out = PicasaImageProcessor.finetune(out, f_val, hl_val, sh_val, ct_val)
+                    neutral_rgb = 0
+                    ct_val = 0.0
+                    if len(parts) >= 6:
+                        try:
+                            neutral_rgb = int(parts[4], 16)
+                        except ValueError:
+                            neutral_rgb = 0
+                        ct_val = float(parts[5])
+                    elif len(parts) == 5:
+                        p4 = parts[4].strip()
+                        if len(p4) == 8 and all(c in "0123456789abcdefABCDEF" for c in p4) and "." not in p4:
+                            neutral_rgb = int(p4, 16)
+                        else:
+                            ct_val = float(p4)
+                    out = PicasaImageProcessor.finetune(out, f_val, hl_val, sh_val, ct_val, neutral_rgb=neutral_rgb)
                 elif fname_l == "highlights":
                     amt = float(parts[1]) if len(parts) > 1 else 0.3
                     out = PicasaImageProcessor.adjust_highlights(out, amt)
@@ -389,44 +507,77 @@ class PicasaImageProcessor:
                     t = float(parts[1]) if len(parts) > 1 else 0.0
                     out = PicasaImageProcessor.color_temperature(out, t)
                 elif fname_l in ("sat", "saturation"):
-                    fac = float(parts[1]) if len(parts) > 1 else 1.4
+                    fac = float(parts[1]) if len(parts) > 1 else 0.1618
                     out = PicasaImageProcessor.saturation(out, fac)
                 elif fname_l in ("tint", "picniktint"):
-                    amt = float(parts[1]) if len(parts) > 1 else 0.4
-                    col = (
-                        (int(round(float(parts[2]))), int(round(float(parts[3]))), int(round(float(parts[4]))))
-                        if len(parts) >= 5
-                        else (220, 190, 150)
-                    )
+                    # Ref: picasa3.exe @ 0x008FAC40 : PicnikTint=1,<fade>,<00rrggbb> ou tint=1,<pres>,<ffrrggbb>
+                    raw_s = float(parts[1]) if len(parts) > 1 else 0.4
+                    if fname_l == "picniktint" or raw_s > 1.0:
+                        amt = max(0.0, min(1.0, 1.0 - (raw_s / 100.0 if fname_l == "picniktint" else raw_s / 256.0)))
+                    else:
+                        amt = raw_s
+                    col, _ = PicasaImageProcessor._parse_filter_color(parts, 2, (220, 190, 150))
                     out = PicasaImageProcessor.tint(out, tint_rgb=col, intensity=amt)
                 elif fname_l in ("radblur", "softfocus"):
-                    amt = float(parts[1]) if len(parts) > 1 else 0.4
-                    sz = float(parts[2]) if len(parts) > 2 else 0.35
-                    out = PicasaImageProcessor.soft_focus(out, amount=amt, radius_norm=sz)
+                    # Ref: picasa3.exe @ 0x008FAE22..0x008FAE90 : radblur=1,<cx>,<cy>,<size>,<amount>
+                    if len(parts) >= 5:
+                        cx = float(parts[1])
+                        cy = float(parts[2])
+                        sz = float(parts[3])
+                        amt = float(parts[4])
+                        out = PicasaImageProcessor.soft_focus(out, amount=amt, radius_norm=sz, center_x=cx, center_y=cy)
+                    else:
+                        amt = float(parts[1]) if len(parts) > 1 else 0.4
+                        sz = float(parts[2]) if len(parts) > 2 else 0.35
+                        out = PicasaImageProcessor.soft_focus(out, amount=amt, radius_norm=sz)
                 elif fname_l in ("glow", "glow2"):
-                    amt = float(parts[1]) if len(parts) > 1 else 0.45
-                    rad = float(parts[2]) if len(parts) > 2 else 8.0
+                    amt = float(parts[1]) if len(parts) > 1 else 0.65
+                    rad = float(parts[2]) if len(parts) > 2 else 3.0
                     out = PicasaImageProcessor.glow(out, intensity=amt, radius=rad)
                 elif fname_l in ("radsat", "focalbw"):
-                    sz = float(parts[1]) if len(parts) > 1 else 0.35
-                    sh = float(parts[2]) if len(parts) > 2 else 0.4
-                    out = PicasaImageProcessor.focal_bw(out, radius_norm=sz, sharpness=sh)
+                    # Ref: picasa3.exe @ 0x008FAE22..0x008FAE90 : radsat=1,<cx>,<cy>,<size>,<sharpness>
+                    if len(parts) >= 5:
+                        cx = float(parts[1])
+                        cy = float(parts[2])
+                        sz = float(parts[3])
+                        sh = float(parts[4])
+                        out = PicasaImageProcessor.focal_bw(out, radius_norm=sz, sharpness=sh, center_x=cx, center_y=cy)
+                    else:
+                        sz = float(parts[1]) if len(parts) > 1 else 0.35
+                        sh = float(parts[2]) if len(parts) > 2 else 0.4
+                        out = PicasaImageProcessor.focal_bw(out, radius_norm=sz, sharpness=sh)
                 elif fname_l in ("dir_tint", "gradtint", "graduatedtint", "graduated_tint"):
-                    amt = float(parts[1]) if len(parts) > 1 else 0.5
-                    feath = float(parts[2]) if len(parts) > 2 else 0.5
-                    col = (
-                        (int(round(float(parts[3]))), int(round(float(parts[4]))), int(round(float(parts[5]))))
-                        if len(parts) >= 6
-                        else (255, 140, 50)
-                    )
-                    out = PicasaImageProcessor.graduated_tint(out, tint_rgb=col, intensity=amt, feather=feath)
+                    # Ref: picasa3.exe @ 0x008FAE22..0x008FAF30 : dir_tint=1,<cx>,<cy>,<feather>,<shade>,<ffrrggbb>[,<angle>]
+                    if fname_l == "dir_tint" and len(parts) >= 6 and (len(parts[5]) in (6, 8) or len(parts) == 7):
+                        cx = float(parts[1])
+                        cy = float(parts[2])
+                        feath = float(parts[3])
+                        amt = float(parts[4])
+                        col, next_i = PicasaImageProcessor._parse_filter_color(parts, 5, (123, 180, 216))
+                        ang = float(parts[next_i]) if next_i < len(parts) else 0.0
+                        out = PicasaImageProcessor.graduated_tint(
+                            out, tint_rgb=col, intensity=amt, feather=feath, center_x=cx, center_y=cy, angle_deg=ang
+                        )
+                    else:
+                        amt = float(parts[1]) if len(parts) > 1 else 0.5
+                        feath = float(parts[2]) if len(parts) > 2 else 0.5
+                        col, _ = PicasaImageProcessor._parse_filter_color(parts, 3, (255, 140, 50))
+                        out = PicasaImageProcessor.graduated_tint(out, tint_rgb=col, intensity=amt, feather=feath)
                 elif fname_l in ("ansel", "filtered_bw", "filteredbw"):
-                    col = (
-                        (int(round(float(parts[1]))), int(round(float(parts[2]))), int(round(float(parts[3]))))
-                        if len(parts) >= 4
-                        else (255, 85, 85)
-                    )
+                    # Ref: picasa3.exe @ 0x008FAC40, 0x008FB7E7 : ansel=1,<ffrrggbb>
+                    col, _ = PicasaImageProcessor._parse_filter_color(parts, 1, (255, 85, 85))
                     out = PicasaImageProcessor.filtered_bw(out, col)
+                elif fname_l == "redeye":
+                    if len(parts) >= 5:
+                        box = (float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4]))
+                        out = PicasaImageProcessor.remove_red_eye(out, box)
+                    else:
+                        out = PicasaImageProcessor.remove_red_eye(out)
+                elif fname_l == "retouch":
+                    cx = float(parts[1]) if len(parts) > 1 else 0.5
+                    cy = float(parts[2]) if len(parts) > 2 else 0.5
+                    rad = float(parts[3]) if len(parts) > 3 else 0.03
+                    out = PicasaImageProcessor.retouch_heal(out, (cx, cy), rad)
                 elif fname_l in ("hdr", "hdrish"):
                     args = [float(p) for p in parts[1:4]]
                     out = PicasaImageProcessor.hdr_simulator(out, *args)
@@ -455,11 +606,7 @@ class PicasaImageProcessor:
                 elif fname_l in ("nightvision", "night_vision"):
                     gr = float(parts[1]) if len(parts) > 1 else 20.0
                     fade = float(parts[2]) if len(parts) > 2 else 0.0
-                    col = (
-                        (int(round(float(parts[3]))), int(round(float(parts[4]))), int(round(float(parts[5]))))
-                        if len(parts) >= 6
-                        else (87, 204, 41)
-                    )
+                    col, _ = PicasaImageProcessor._parse_filter_color(parts, 3, (87, 204, 41))
                     out = PicasaImageProcessor.night_vision(out, grain_val=gr, fade=fade, color_rgb=col)
                 elif fname_l == "heatmap":
                     sh = float(parts[1]) if len(parts) > 1 else 0.0
@@ -471,34 +618,32 @@ class PicasaImageProcessor:
                 elif fname_l == "vignette":
                     amt = float(parts[1]) if len(parts) > 1 else 0.5
                     sz = float(parts[2]) if len(parts) > 2 else 0.25
-                    col = (
-                        (int(round(float(parts[3]))), int(round(float(parts[4]))), int(round(float(parts[5]))))
-                        if len(parts) >= 6
-                        else (0, 0, 0)
-                    )
+                    # Ref: filterdesc.xml @ Vignette : Vignette=1,<blur>,<strength>,<fade>,<clrsw:%08x> ou legacy <amt>,<sz>,<color>
+                    if len(parts) == 5 and len(parts[4]) in (6, 8) and "." not in parts[4]:
+                        col, _ = PicasaImageProcessor._parse_filter_color(parts, 4, (0, 0, 0))
+                    else:
+                        col, _ = PicasaImageProcessor._parse_filter_color(parts, 3, (0, 0, 0))
                     out = PicasaImageProcessor.vignette(out, amount=amt, size=sz, color_rgb=col)
                 elif fname_l in ("twotone", "duotone", "two_tone"):
                     b_val = float(parts[1]) if len(parts) > 1 else 0.0
                     c_val = float(parts[2]) if len(parts) > 2 else 0.0
                     f_val = float(parts[3]) if len(parts) > 3 else 0.0
-                    sc = (
-                        (int(round(float(parts[4]))), int(round(float(parts[5]))), int(round(float(parts[6]))))
-                        if len(parts) >= 7
-                        else (0, 68, 136)
-                    )
-                    hc = (
-                        (int(round(float(parts[7]))), int(round(float(parts[8]))), int(round(float(parts[9]))))
-                        if len(parts) >= 10
-                        else (255, 255, 0)
-                    )
+                    sc, next_i = PicasaImageProcessor._parse_filter_color(parts, 4, (0, 68, 136))
+                    hc, _ = PicasaImageProcessor._parse_filter_color(parts, next_i, (255, 255, 0))
                     out = PicasaImageProcessor.two_tone(out, b_val, c_val, f_val, sc, hc)
                 elif fname_l == "pixelate":
                     bs = int(round(float(parts[1]))) if len(parts) > 1 else 14
-                    fade = float(parts[2]) if len(parts) > 2 else 0.0
+                    fade = float(parts[3]) if len(parts) >= 4 else (float(parts[2]) if len(parts) > 2 else 0.0)
                     out = PicasaImageProcessor.pixelate(out, block_size=bs, fade=fade)
                 elif fname_l in ("focalpixelate", "picnikfocalpixelate"):
-                    args = [float(p) for p in parts[1:6]]
-                    out = PicasaImageProcessor.focal_pixelate(out, *args)
+                    # Ref: 0x008FADDE : PicnikFocalPixelate=1,<cx>,<cy>,<block_size>,<size>,<hardness>[,<rev>]
+                    if len(parts) >= 6 and 0.0 <= float(parts[1]) <= 1.0 and 0.0 <= float(parts[2]) <= 1.0 and float(parts[3]) > 1.0:
+                        cx, cy = float(parts[1]), float(parts[2])
+                        bs, sz, hd = float(parts[3]), float(parts[4]), float(parts[5])
+                        out = PicasaImageProcessor.focal_pixelate(out, bs, sz, hd, cx, cy)
+                    else:
+                        args = [float(p) for p in parts[1:6]]
+                        out = PicasaImageProcessor.focal_pixelate(out, *args)
                 elif fname_l == "localcontrast":
                     args = [float(p) for p in parts[1:4]]
                     out = PicasaImageProcessor.local_contrast(out, *args)
@@ -506,12 +651,14 @@ class PicasaImageProcessor:
                     dist = float(parts[1]) if len(parts) > 1 else 6.0
                     ang = float(parts[2]) if len(parts) > 2 else 45.0
                     blur = float(parts[3]) if len(parts) > 3 else 8.0
-                    fade = float(parts[4]) if len(parts) > 4 else 50.0
-                    bg = (
-                        (int(round(float(parts[5]))), int(round(float(parts[6]))), int(round(float(parts[7]))))
-                        if len(parts) >= 8
-                        else (255, 255, 255)
-                    )
+                    # Ref: filterdesc.xml @ DropShadow : DropShadow=1,<dist>,<ang>,<blur>,<shadow_hex>,<bg_hex>,<fade>
+                    if len(parts) >= 7 and len(parts[4]) in (6, 8) and "." not in parts[4]:
+                        _, next_i = PicasaImageProcessor._parse_filter_color(parts, 4, (0, 0, 0))
+                        bg, next_i2 = PicasaImageProcessor._parse_filter_color(parts, next_i, (255, 255, 255))
+                        fade = float(parts[next_i2]) if next_i2 < len(parts) else 50.0
+                    else:
+                        fade = float(parts[4]) if len(parts) > 4 else 50.0
+                        bg, _ = PicasaImageProcessor._parse_filter_color(parts, 5, (255, 255, 255))
                     out = PicasaImageProcessor.drop_shadow(
                         out,
                         distance=dist,
@@ -520,19 +667,20 @@ class PicasaImageProcessor:
                         shadow_alpha=(100.0 - fade) / 100.0,
                         bg_color=bg,
                     )
-                elif fname_l in ("roundededges", "rounded_edges"):
+                elif fname_l in ("roundededges", "rounded_edges", "roundedcorners"):
                     rr = float(parts[1]) if len(parts) > 1 else 0.1
-                    oc = (
-                        (int(round(float(parts[2]))), int(round(float(parts[3]))), int(round(float(parts[4]))))
-                        if len(parts) >= 5
-                        else (255, 255, 255)
-                    )
+                    oc, _ = PicasaImageProcessor._parse_filter_color(parts, 2, (255, 255, 255))
                     out = PicasaImageProcessor.rounded_edges(out, radius_ratio=rr, outer_color=oc)
                 elif fname_l == "invert":
                     out = PicasaImageProcessor.invert(out)
                 elif fname_l == "focalzoom":
-                    args = [float(p) for p in parts[1:6]]
-                    out = PicasaImageProcessor.focal_zoom(out, *args)
+                    # Ref: 0x008FADDE : FocalZoom=1,<cx>,<cy>,<zoom>,<size>,<hardness>[,<fade>]
+                    if len(parts) >= 6 and 0.0 <= float(parts[1]) <= 1.0 and 0.0 <= float(parts[2]) <= 1.0 and float(parts[3]) > 1.0:
+                        zm, sz, hd = float(parts[3]), float(parts[4]), float(parts[5])
+                        out = PicasaImageProcessor.focal_zoom(out, zm, sz, hd)
+                    else:
+                        args = [float(p) for p in parts[1:6]]
+                        out = PicasaImageProcessor.focal_zoom(out, *args)
                 elif fname_l == "soften":
                     args = [float(p) for p in parts[1:3]]
                     out = PicasaImageProcessor.soften(out, *args)
@@ -541,11 +689,7 @@ class PicasaImageProcessor:
                     out = PicasaImageProcessor.comic(out, *args)
                 elif fname_l == "neon":
                     fade = float(parts[1]) if len(parts) > 1 else 0.0
-                    col = (
-                        (int(round(float(parts[2]))), int(round(float(parts[3]))), int(round(float(parts[4]))))
-                        if len(parts) >= 5
-                        else (0, 255, 255)
-                    )
+                    col, _ = PicasaImageProcessor._parse_filter_color(parts, 2, (0, 255, 255))
                     out = PicasaImageProcessor.neon(out, col, fade)
                 elif fname_l == "pencilsketch":
                     args = [float(p) for p in parts[1:3]]
@@ -554,28 +698,12 @@ class PicasaImageProcessor:
                     in_t = float(parts[1]) if len(parts) > 1 else 12.0
                     if len(parts) >= 5 and float(parts[2]) == 0.0 and float(parts[3]) == 0.0:
                         out_t = float(parts[4])
-                        ic = (
-                            (int(round(float(parts[5]))), int(round(float(parts[6]))), int(round(float(parts[7]))))
-                            if len(parts) >= 8
-                            else (240, 234, 228)
-                        )
-                        oc = (
-                            (int(round(float(parts[8]))), int(round(float(parts[9]))), int(round(float(parts[10]))))
-                            if len(parts) >= 11
-                            else (26, 14, 3)
-                        )
+                        ic, next_i = PicasaImageProcessor._parse_filter_color(parts, 5, (240, 234, 228))
+                        oc, _ = PicasaImageProcessor._parse_filter_color(parts, next_i, (26, 14, 3))
                     else:
                         out_t = float(parts[2]) if len(parts) > 2 else 7.0
-                        ic = (
-                            (int(round(float(parts[3]))), int(round(float(parts[4]))), int(round(float(parts[5]))))
-                            if len(parts) >= 6
-                            else (240, 234, 228)
-                        )
-                        oc = (
-                            (int(round(float(parts[6]))), int(round(float(parts[7]))), int(round(float(parts[8]))))
-                            if len(parts) >= 9
-                            else (26, 14, 3)
-                        )
+                        ic, next_i = PicasaImageProcessor._parse_filter_color(parts, 3, (240, 234, 228))
+                        oc, _ = PicasaImageProcessor._parse_filter_color(parts, next_i, (26, 14, 3))
                     out = PicasaImageProcessor.museum_matte(out, in_t, out_t, ic, oc)
                 elif fname_l == "reanimatedeyecolor":
                     args = [float(p) for p in parts[1:3]]
@@ -584,16 +712,8 @@ class PicasaImageProcessor:
                     outer_t = float(parts[1]) if len(parts) > 1 else 0.04
                     inner_t = float(parts[2]) if len(parts) > 2 else 0.005
                     rad = float(parts[3]) if len(parts) > 3 else 0.0
-                    oc = (
-                        (int(round(float(parts[4]))), int(round(float(parts[5]))), int(round(float(parts[6]))))
-                        if len(parts) >= 7
-                        else (26, 26, 26)
-                    )
-                    ic = (
-                        (int(round(float(parts[7]))), int(round(float(parts[8]))), int(round(float(parts[9]))))
-                        if len(parts) >= 10
-                        else (255, 255, 255)
-                    )
+                    oc, next_i = PicasaImageProcessor._parse_filter_color(parts, 4, (26, 26, 26))
+                    ic, _ = PicasaImageProcessor._parse_filter_color(parts, next_i, (255, 255, 255))
                     out = PicasaImageProcessor.border(out, outer_t, inner_t, rad, oc, ic)
                 elif fname_l == "polaroid":
                     ang = float(parts[1]) if len(parts) > 1 else 5.0
@@ -641,106 +761,534 @@ class PicasaImageProcessor:
             return img.rotate(90, expand=True)
         return img.copy()
 
-    @staticmethod
-    def auto_contrast(img: Image.Image) -> Image.Image:
-        """
-        FR : Contraste automatique (AutoFix / AutoLight).
-        EN : Automatic contrast adjustment (AutoFix / AutoLight).
+    # =========================================================================
+    # CONSTANTES ET MOTEURS DE NIVEAUX / COULEURS DÉSOBFUSQUÉS DE PICASA3.EXE
+    # Ref: picasa3.exe @ 0x008F7EE0, 0x0090AC20, 0x0090C1E0, 0x0090E9D0, 0x0090EDA0
+    # =========================================================================
 
-        Ref: picasa3.exe @ ID_PICTURE_AUTO_LIGHTING, filterdesc.xml @ autolight
+    # Table exacte des 115 températures de couleur (R, G, B) extraite de picasa3.exe @ 0x00C7CF98
+    # Index 55 = (255, 249, 253) correspond au point blanc neutre (colortemp = 0.0)
+    _KELVIN_TABLE_00C7CF98: Tuple[Tuple[int, int, int], ...] = (
+        (255, 56, 0), (255, 71, 0), (255, 83, 0), (255, 93, 0), (255, 101, 0),
+        (255, 109, 0), (255, 115, 0), (255, 121, 0), (255, 126, 0), (255, 131, 0),
+        (255, 137, 18), (255, 142, 33), (255, 147, 44), (255, 152, 54), (255, 157, 63),
+        (255, 161, 72), (255, 165, 79), (255, 169, 87), (255, 173, 94), (255, 177, 101),
+        (255, 180, 107), (255, 184, 114), (255, 187, 120), (255, 190, 126), (255, 193, 132),
+        (255, 196, 137), (255, 199, 143), (255, 201, 148), (255, 204, 153), (255, 206, 159),
+        (255, 209, 163), (255, 211, 168), (255, 213, 173), (255, 215, 177), (255, 217, 182),
+        (255, 219, 186), (255, 221, 190), (255, 223, 194), (255, 225, 198), (255, 227, 202),
+        (255, 228, 206), (255, 230, 210), (255, 232, 213), (255, 233, 217), (255, 235, 220),
+        (255, 236, 224), (255, 238, 227), (255, 239, 230), (255, 240, 233), (255, 242, 236),
+        (255, 243, 239), (255, 244, 242), (255, 245, 245), (255, 246, 248), (255, 248, 251),
+        (255, 249, 253), (254, 249, 255), (252, 247, 255), (249, 246, 255), (247, 245, 255),
+        (245, 243, 255), (243, 242, 255), (240, 241, 255), (239, 240, 255), (237, 239, 255),
+        (235, 238, 255), (233, 237, 255), (231, 236, 255), (230, 235, 255), (228, 234, 255),
+        (227, 233, 255), (225, 232, 255), (224, 231, 255), (222, 230, 255), (221, 230, 255),
+        (220, 229, 255), (218, 228, 255), (217, 227, 255), (216, 227, 255), (215, 226, 255),
+        (214, 225, 255), (212, 225, 255), (211, 224, 255), (210, 223, 255), (209, 223, 255),
+        (208, 222, 255), (207, 221, 255), (207, 221, 255), (206, 220, 255), (205, 220, 255),
+        (204, 219, 255), (203, 219, 255), (202, 218, 255), (201, 218, 255), (201, 217, 255),
+        (200, 217, 255), (199, 216, 255), (199, 216, 255), (198, 216, 255), (197, 215, 255),
+        (196, 215, 255), (196, 214, 255), (195, 214, 255), (195, 214, 255), (194, 213, 255),
+        (193, 213, 255), (193, 212, 255), (192, 212, 255), (192, 212, 255), (191, 211, 255),
+        (191, 211, 255), (190, 211, 255), (190, 210, 255), (189, 210, 255), (189, 210, 255),
+    )
+
+    # Matrice d'espace conique A @ 0x00CF47B0..0x00CF47D0 et son inverse Q = A^-1 (call 0x00A4A140)
+    _CONE_MATRIX_A_00CF47B0 = np.array(
+        [
+            [1.9044, 0.4508, -0.3826],
+            [-0.0532, 1.8018, 0.1995],
+            [0.0491, -0.3057, 1.8576],
+        ],
+        dtype=np.float32,
+    )
+    _CONE_MATRIX_Q_00A4A140 = np.linalg.inv(_CONE_MATRIX_A_00CF47B0).astype(np.float32)
+
+    @staticmethod
+    def _chromatic_adaptation_0090eda0(
+        img: Image.Image,
+        rgb_in: Tuple[int, int, int] | int,
+    ) -> Image.Image:
+        """
+        FR : Adaptation chromatique matricielle 3x3 en virgule fixe 16.16 reproduisant exactement
+             `FUN_0090eda0 @ 0x0090EDA0` de `picasa3.exe`.
+             Neutralise la couleur d'illuminant `(R_in, G_in, B_in)` vers le gris neutre `(Y, Y, Y)`
+             de même luminance `Y = (77*R_in + 151*G_in + 28*B_in) >> 8` dans l'espace conique `Q = A^-1`.
+        EN : Exact 16.16 fixed-point 3x3 chromatic adaptation matrix reproducing
+             `FUN_0090eda0 @ 0x0090EDA0` from `picasa3.exe`.
+             Neutralizes the illuminant color `(R_in, G_in, B_in)` to neutral gray `(Y, Y, Y)`
+             of identical luminance `Y = (77*R_in + 151*G_in + 28*B_in) >> 8` in cone space `Q = A^-1`.
+
+        Ref: picasa3.exe @ 0x0090EDA0, 0x00A4A140, 0x00CF47B0..0x00CF47D0
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        return ImageOps.autocontrast(img, cutoff=0.5)
+        if isinstance(rgb_in, int):
+            if (rgb_in & 0x00FFFFFF) == 0:
+                return img.copy()
+            r_in = (rgb_in >> 16) & 0xFF
+            g_in = (rgb_in >> 8) & 0xFF
+            b_in = rgb_in & 0xFF
+        else:
+            r_in, g_in, b_in = int(rgb_in[0]), int(rgb_in[1]), int(rgb_in[2])
+            if r_in == 0 and g_in == 0 and b_in == 0:
+                return img.copy()
+
+        # Ref: 0x0090EE6B..0x0090EE94 : chaque canal à 0 est forcé à 1
+        r = max(1, min(255, r_in))
+        g = max(1, min(255, g_in))
+        b = max(1, min(255, b_in))
+
+        # Ref: 0x0090EE94..0x0090EEAB : Y = (77 * R + 151 * G + 28 * B) >> 8
+        y_luma = (77 * r + 151 * g + 28 * b) >> 8
+        v_gray = np.array([float(y_luma), float(y_luma), float(y_luma)], dtype=np.float32)
+        v_in = np.array([float(r), float(g), float(b)], dtype=np.float32)
+
+        q_mat = PicasaImageProcessor._CONE_MATRIX_Q_00A4A140
+        a_mat = PicasaImageProcessor._CONE_MATRIX_A_00CF47B0
+        u_gray = q_mat @ v_gray
+        u_in = q_mat @ v_in
+
+        # Ref: 0x0090F002..0x0090F02B : ratios diagonaux Von Kries dans l'espace Q
+        s0 = float(u_gray[0] / u_in[0]) if abs(float(u_in[0])) > 1e-6 else 1.0
+        s1 = float(u_gray[1] / u_in[1]) if abs(float(u_in[1])) > 1e-6 else 1.0
+        s2 = float(u_gray[2] / u_in[2]) if abs(float(u_in[2])) > 1e-6 else 1.0
+
+        # Ref: 0x0090F032..0x0090F316 : M_final = A * diag(s0, s1, s2) * Q, puis virgule fixe 16.16 (* 65536.0)
+        m_final = a_mat @ (np.diag(np.array([s0, s1, s2], dtype=np.float32)) @ q_mat)
+        m_fp = np.round(m_final.astype(np.float64) * 65536.0).astype(np.int64)
+
+        # Ref: 0x0090F360..0x0090F3FE : produit matriciel entier >> 16 avec saturation [0..255]
+        arr = np.array(img, dtype=np.int64)
+        out = (arr @ m_fp.T) >> 16
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+
+    @staticmethod
+    def _levels_lut_0090c1e0(
+        img: Image.Image,
+        black_pt: float,
+        white_pt: float,
+        gamma: float = 1.0,
+    ) -> Image.Image:
+        """
+        FR : Table de correspondance (LUT) 16 bits (`0..65280`, `0xFF00`) d'étirement des niveaux
+             Ombres / Hautes lumières reproduisant exactement `FUN_0090c3b0 @ 0x0090C3B0` ->
+             `FUN_0090c1e0 @ 0x0090C1E0` -> `FUN_0090bc60 @ 0x0090BC60` de `picasa3.exe`.
+        EN : Exact 16-bit (`0..65280`, `0xFF00`) Shadows / Highlights levels lookup table (LUT)
+             reproducing `FUN_0090c3b0 @ 0x0090C3B0` -> `FUN_0090c1e0 @ 0x0090C1E0` ->
+             `FUN_0090bc60 @ 0x0090BC60` from `picasa3.exe`.
+
+        Ref: picasa3.exe @ 0x008F7F5D, 0x0090C3B0, 0x0090C1E0, 0x0090BC60
+        """
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        bp = float(black_pt)
+        wp = float(white_pt)
+        if abs(wp - bp) < 1e-6:
+            scale = 1.0
+        else:
+            scale = 1.0 / (wp - bp)
+        offset = bp * 65280.0
+        xs = np.arange(256, dtype=np.float64) * 256.0
+        if abs(float(gamma) - 1.0) < 1e-6:
+            vals = (xs - offset) * scale
+        else:
+            norm = np.maximum(0.0, (xs - offset) * scale / 65280.0)
+            vals = (norm ** float(gamma)) * 65280.0
+        lut16 = np.clip(np.round(vals), 0, 65280).astype(np.int32)
+        lut8 = np.clip(lut16 >> 8, 0, 255).astype(np.uint8)
+        arr = np.array(img, dtype=np.uint8)
+        return Image.fromarray(lut8[arr])
+
+    @staticmethod
+    def _central_crop_percentiles_00a4b960(
+        img: Image.Image,
+        low_pct: float = 0.005,
+        high_pct: float = 0.995,
+    ) -> Tuple[list[int], list[int], int, int]:
+        """
+        FR : Calcule les histogrammes R, G, B sur la zone centrale de 90 % (`x` de 5 % à 95 %,
+             `y` de 5 % à 95 %, `0x00A4B960`) et extrait les quantiles bas (`0.5 %`) et hauts (`99.5 %`)
+             par canal ainsi que leurs extrema globaux `min_low` et `max_high` (`0x00A4BFD0`).
+        EN : Computes R, G, B histograms on the central 90% crop (`x` from 5% to 95%,
+             `y` from 5% to 95%, `0x00A4B960`) and extracts per-channel low (`0.5%`) and high (`99.5%`)
+             percentiles along with their global extrema `min_low` and `max_high` (`0x00A4BFD0`).
+
+        Ref: picasa3.exe @ 0x00A4B960, 0x00A4BFD0
+        """
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        arr = np.array(img, dtype=np.uint8)
+        h, w = arr.shape[:2]
+        x0 = int(w * 0.05)
+        x1 = max(x0 + 1, int(w * 0.95))
+        y0 = int(h * 0.05)
+        y1 = max(y0 + 1, int(h * 0.95))
+        crop = arr[y0:y1, x0:x1]
+        n_pix = max(1, crop.shape[0] * crop.shape[1])
+        low_thresh = float(low_pct) * n_pix
+        high_thresh = float(high_pct) * n_pix
+
+        lows: list[int] = []
+        highs: list[int] = []
+        for c in range(3):
+            hist = np.bincount(crop[:, :, c].ravel(), minlength=256)
+            csum = np.cumsum(hist)
+            low_idx = int(np.searchsorted(csum, low_thresh, side="left"))
+            high_idx = int(np.searchsorted(csum, high_thresh, side="left"))
+            lows.append(max(0, min(255, low_idx)))
+            highs.append(max(0, min(255, high_idx)))
+
+        return lows, highs, min(lows), max(highs)
+
+    @staticmethod
+    def _estimate_scene_illuminant_0090f8f0(img: Image.Image) -> Tuple[int, int, int]:
+        """
+        FR : Estime l'illuminant de la scène `(R_est, 128, B_est)` via l'histogramme 2D `64x64`
+             des rapports `(R/G, B/G)` pondéré au centre cubique, reproduisant exactement
+             `FUN_0090f8f0 @ 0x0090F8F0` de `picasa3.exe`.
+        EN : Estimates the scene illuminant `(R_est, 128, B_est)` via the `64x64` 2D histogram
+             of `(R/G, B/G)` ratios with cubic center weighting, reproducing
+             `FUN_0090f8f0 @ 0x0090F8F0` from `picasa3.exe`.
+
+        Ref: picasa3.exe @ 0x0090F8F0, 0x008F82A0
+        """
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        arr = np.array(img, dtype=np.int32)
+        r = arr[:, :, 0]
+        g = arr[:, :, 1]
+        b = arr[:, :, 2]
+
+        # Ref: 0x0090F958..0x0090F9A9 : filtre 32 <= G <= 224 et rx, ry dans [0..63]
+        valid_g = (g >= 32) & (g <= 224)
+        if not np.any(valid_g):
+            return (128, 128, 128)
+        r_v = r[valid_g]
+        g_v = g[valid_g]
+        b_v = b[valid_g]
+        rx = (r_v * 32) // g_v - 16
+        ry = (b_v * 32) // g_v - 16
+        in_bounds = (rx >= 0) & (rx < 64) & (ry >= 0) & (ry < 64)
+        if not np.any(in_bounds):
+            return (128, 128, 128)
+
+        rx = rx[in_bounds]
+        ry = ry[in_bounds]
+        flat_idx = ry * 64 + rx
+        hist2d = np.bincount(flat_idx, minlength=4096).reshape((64, 64)).astype(np.float64)
+
+        # Ref: 0x0090F9BA..0x0090FA44 : poids w(x, y) = ((32 - max(|x - 32|, |y - 32|))^3) // 32
+        yy, xx = np.mgrid[0:64, 0:64]
+        max_d = np.maximum(np.abs(xx - 32), np.abs(yy - 32))
+        weights = (((32 - max_d) ** 3) // 32).astype(np.float64)
+        w_hist = hist2d * weights
+        total_w = float(np.sum(w_hist))
+        if total_w <= 0.0:
+            return (128, 128, 128)
+
+        cx = float(np.sum(w_hist * xx)) / total_w
+        cy = float(np.sum(w_hist * yy)) / total_w
+        r_est = max(1, min(255, int(round((cx + 16.0) * 4.0))))
+        b_est = max(1, min(255, int(round((cy + 16.0) * 4.0))))
+        return (r_est, 128, b_est)
+
+    @staticmethod
+    def auto_contrast(img: Image.Image) -> Image.Image:
+        """
+        FR : Contraste automatique (`autolight`) reproduisant exactement `FUN_008f80c0 @ 0x008F80C0` :
+             calcule les quantiles 0.5 % / 99.5 % sur les 90 % centraux de l'image, prend le point noir
+             global `min_low / 255.0` et le point blanc global `max_high / 255.0` (préservant la teinte)
+             et applique la LUT 16 bits `_levels_lut_0090c1e0`.
+        EN : Automatic contrast (`autolight`) reproducing `FUN_008f80c0 @ 0x008F80C0`:
+             computes 0.5% / 99.5% percentiles on the central 90% crop, takes the global black point
+             `min_low / 255.0` and global white point `max_high / 255.0` (preserving hue),
+             and applies the 16-bit LUT `_levels_lut_0090c1e0`.
+
+        Ref: picasa3.exe @ 0x008F80C0, 0x00A4B960, 0x00A4BFD0, 0x0090C3B0
+        """
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        _lows, _highs, min_low, max_high = PicasaImageProcessor._central_crop_percentiles_00a4b960(
+            img, 0.005, 0.995
+        )
+        if max_high <= min_low:
+            return img.copy()
+        return PicasaImageProcessor._levels_lut_0090c1e0(
+            img,
+            black_pt=float(min_low) / 255.0,
+            white_pt=float(max_high) / 255.0,
+            gamma=1.0,
+        )
 
     @staticmethod
     def auto_color(img: Image.Image) -> Image.Image:
         """
-        FR : Couleur automatique / équilibrage d'histogramme par canal.
-        EN : Automatic color / per-channel histogram equalization.
+        FR : Couleur automatique (`autocolor`) reproduisant exactement `FUN_008f82a0 @ 0x008F82A0` :
+             estime l'illuminant de la scène `(R_est, 128, B_est)` via l'histogramme 2D `(R/G, B/G)`
+             (`0x0090F8F0`) et applique la matrice d'adaptation chromatique 3x3 (`0x0090EDA0`).
+        EN : Automatic color (`autocolor`) reproducing `FUN_008f82a0 @ 0x008F82A0`:
+             estimates the scene illuminant `(R_est, 128, B_est)` via the 2D `(R/G, B/G)` histogram
+             (`0x0090F8F0`) and applies the 3x3 chromatic adaptation matrix (`0x0090EDA0`).
 
-        Ref: picasa3.exe @ ID_PICTURE_AUTO_COLOR, filterdesc.xml @ colorfix
+        Ref: picasa3.exe @ 0x008F82A0, 0x0090F8F0, 0x0090EDA0
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        return ImageOps.equalize(img)
+        illum_rgb = PicasaImageProcessor._estimate_scene_illuminant_0090f8f0(img)
+        return PicasaImageProcessor._chromatic_adaptation_0090eda0(img, illum_rgb)
+
+    @staticmethod
+    def enhance_lucky(img: Image.Image) -> Image.Image:
+        """
+        FR : « J'ai de la chance » (`enhance=1`) reproduisant exactement `FUN_008f8840 @ 0x008F8840`
+             -> `FUN_009db610 @ 0x009DB610` (`is_enhance=1, factor=0.3`) :
+             étirement par canal amorti à 50 % vers les extrema globaux `(min_low, max_high)`
+             avec facteur de point noir `0.3` et plafond de sortie à `252` (`0xFC`).
+        EN : "I'm Feeling Lucky" (`enhance=1`) reproducing `FUN_008f8840 @ 0x008F8840`
+             -> `FUN_009db610 @ 0x009DB610` (`is_enhance=1, factor=0.3`):
+             per-channel stretch damped 50% toward global `(min_low, max_high)`
+             with black-point factor `0.3` and output ceiling `252` (`0xFC`).
+
+        Ref: picasa3.exe @ 0x008F8840, 0x009DB610, 0x00A4B960, 0x00A4BFD0
+        """
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        lows, highs, min_low, max_high = PicasaImageProcessor._central_crop_percentiles_00a4b960(
+            img, 0.005, 0.995
+        )
+        arr = np.array(img, dtype=np.uint8)
+        out = np.empty_like(arr)
+        xs = np.arange(256, dtype=np.int32)
+        for c in range(3):
+            low_scaled = int(round(float(lows[c]) * 0.3))
+            eff_low = int(round((float(min_low) - float(low_scaled)) * 0.5 + float(low_scaled)))
+            eff_high = int(round((float(max_high) - float(highs[c])) * 0.5 + float(highs[c])))
+            denom = eff_high - eff_low
+            if denom <= 0:
+                out[:, :, c] = arr[:, :, c]
+            else:
+                lut = np.zeros(256, dtype=np.uint8)
+                mid_mask = (xs > eff_low) & (xs < eff_high)
+                lut[mid_mask] = np.clip(((xs[mid_mask] - eff_low) * 252) // denom, 0, 252).astype(np.uint8)
+                lut[xs >= eff_high] = 252
+                out[:, :, c] = lut[arr[:, :, c]]
+        return Image.fromarray(out)
+
+    # Table statique 256 entrées BGRA de `warm` extraite de picasa3.exe @ 0x00D33B70 (FUN_0090c040 @ 0x0090C040)
+    _WARM_LUT_R_00D33B72: Tuple[int, ...] = (
+        0, 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18,
+        20, 21, 22, 23, 25, 26, 27, 29, 30, 31, 33, 34, 35, 36, 38, 39,
+        40, 42, 43, 44, 46, 47, 48, 50, 51, 52, 54, 55, 56, 58, 59, 60,
+        61, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78,
+        79, 80, 81, 82, 83, 84, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+        96, 97, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
+        111, 112, 113, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 122, 123, 124,
+        125, 126, 127, 128, 129, 129, 130, 131, 132, 133, 134, 135, 135, 136, 137, 138,
+        139, 140, 140, 141, 142, 143, 143, 144, 145, 146, 147, 147, 148, 149, 150, 150,
+        151, 152, 153, 153, 154, 155, 156, 156, 157, 158, 159, 159, 160, 161, 162, 162,
+        163, 164, 165, 166, 166, 167, 168, 169, 169, 170, 171, 172, 172, 173, 174, 175,
+        175, 176, 177, 178, 178, 179, 180, 181, 181, 182, 183, 184, 185, 185, 186, 187,
+        187, 188, 189, 190, 191, 192, 192, 193, 194, 195, 196, 197, 198, 198, 199, 200,
+        201, 202, 203, 203, 204, 205, 206, 207, 208, 208, 209, 210, 211, 212, 213, 213,
+        214, 215, 216, 217, 218, 218, 219, 220, 221, 222, 223, 224, 225, 226, 226, 227,
+        228, 229, 230, 231, 232, 233, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242,
+    )
+    _WARM_LUT_G_00D33B71: Tuple[int, ...] = (
+        0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
+        45, 46, 47, 48, 49, 50, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+        60, 60, 61, 62, 63, 64, 65, 65, 66, 67, 68, 69, 70, 70, 71, 72,
+        73, 74, 74, 75, 76, 77, 78, 79, 79, 80, 81, 82, 83, 84, 84, 85,
+        86, 87, 88, 88, 89, 90, 91, 92, 93, 93, 94, 95, 96, 97, 98, 98,
+        99, 100, 101, 102, 103, 104, 104, 105, 106, 107, 108, 109, 109, 110, 111, 112,
+        113, 114, 114, 115, 116, 117, 118, 119, 119, 120, 121, 122, 123, 124, 125, 125,
+        126, 127, 128, 129, 130, 131, 131, 132, 133, 134, 135, 136, 137, 137, 138, 139,
+        140, 141, 142, 143, 143, 144, 145, 146, 147, 148, 149, 149, 150, 151, 152, 153,
+        154, 155, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
+        168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183,
+        184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
+        200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 212, 213, 214, 215, 216,
+        217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232,
+    )
+    _WARM_LUT_B_00D33B70: Tuple[int, ...] = (
+        0, 0, 1, 2, 2, 3, 4, 4, 5, 6, 7, 7, 8, 9, 9, 10,
+        11, 12, 12, 13, 14, 14, 15, 16, 16, 17, 18, 19, 19, 20, 21, 21,
+        22, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 31, 31, 32, 33,
+        33, 34, 35, 35, 36, 37, 37, 38, 39, 40, 40, 41, 42, 42, 43, 44,
+        44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 53, 54, 55, 56, 57,
+        58, 58, 59, 60, 61, 62, 62, 63, 64, 65, 66, 66, 67, 68, 69, 70,
+        71, 71, 72, 73, 74, 75, 75, 76, 77, 78, 79, 80, 80, 81, 82, 83,
+        84, 84, 85, 86, 87, 88, 89, 89, 90, 91, 92, 93, 94, 95, 96, 96,
+        97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112,
+        113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128,
+        129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144,
+        145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 161, 162,
+        163, 164, 165, 166, 167, 168, 169, 171, 172, 173, 174, 175, 176, 177, 178, 180,
+        181, 182, 183, 184, 185, 186, 187, 189, 190, 191, 192, 193, 194, 195, 196, 198,
+        199, 200, 201, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 214, 215, 216,
+        217, 218, 219, 220, 222, 223, 224, 225, 226, 227, 228, 230, 231, 232, 233, 234,
+    )
 
     @staticmethod
     def black_and_white(img: Image.Image) -> Image.Image:
         """
-        FR : Filtre Noir et Blanc standard Picasa.
-        EN : Standard Picasa Black and White filter.
+        FR : Filtre Noir et Blanc (`bw=1`) reproduisant exactement `FUN_008f84c0 @ 0x008F84C0`
+             -> `FUN_009a9550 @ 0x009A9550` (`factor = 0x100`) de `picasa3.exe` :
+             $$Y = (77 \\cdot R + 151 \\cdot G + 28 \\cdot B) \\gg 8$$
+        EN : Black and White filter (`bw=1`) reproducing `FUN_008f84c0 @ 0x008F84C0`
+             -> `FUN_009a9550 @ 0x009A9550` (`factor = 0x100`) from `picasa3.exe`:
+             $$Y = (77 \\cdot R + 151 \\cdot G + 28 \\cdot B) \\gg 8$$
 
-        Ref: picasa3.exe @ ID_VIEW_BW, filterdesc.xml @ bw
+        Ref: picasa3.exe @ 0x008F84C0, 0x009A9550..0x009A95F2, filterdesc.xml @ bw
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        gray = img.convert("L")
-        return gray.convert("RGB")
+        arr = np.array(img, dtype=np.int32)
+        y = ((77 * arr[:, :, 0] + 151 * arr[:, :, 1] + 28 * arr[:, :, 2]) >> 8).astype(np.uint8)
+        return Image.fromarray(np.stack([y, y, y], axis=2))
 
     @staticmethod
     def sepia(img: Image.Image) -> Image.Image:
         """
-        FR : Filtre Sépia classique Picasa.
-        EN : Classic Picasa Sepia filter.
+        FR : Filtre Sépia (`sepia=1`) reproduisant exactement `FUN_008f8950 @ 0x008F8950`
+             -> `FUN_0090a120 @ 0x0090A120` de `picasa3.exe` :
+             1. Luminance entière : $Y = (77 R + 151 G + 28 B) \\gg 8$
+             2. Relèvement du point noir (`0xDA = 218`) : $U = 255 - (((255 - Y) \\cdot 218) \\gg 8)$
+             3. Virage linéaire par morceaux autour de $U = 128$ et de la teinte médiane
+                `0xFF9B7D63` ($R_{\\text{mid}} = 155, G_{\\text{mid}} = 125, B_{\\text{mid}} = 99$) :
+                - Si $U < 128$ : $(R, G, B) = ((2 U \\cdot 155) \\gg 8, (2 U \\cdot 125) \\gg 8, (2 U \\cdot 99) \\gg 8)$
+                - Si $U \\ge 128$ : $(R, G, B) = 255 - ((2 (255 - U) \\cdot (100, 130, 156)) \\gg 8)$
+        EN : Sepia filter (`sepia=1`) reproducing `FUN_008f8950 @ 0x008F8950`
+             -> `FUN_0090a120 @ 0x0090A120` from `picasa3.exe`:
+             1. Integer luminance: $Y = (77 R + 151 G + 28 B) \\gg 8$
+             2. Black-point lift (`0xDA = 218`): $U = 255 - (((255 - Y) \\cdot 218) \\gg 8)$
+             3. Two-segment piecewise linear toning around $U = 128$ and midpoint color
+                `0xFF9B7D63` ($R_{\\text{mid}} = 155, G_{\\text{mid}} = 125, B_{\\text{mid}} = 99$).
 
-        Ref: picasa3.exe @ ID_VIEW_SEPIA, filterdesc.xml @ sepia
+        Ref: picasa3.exe @ 0x008F8950, 0x0090A120..0x0090A2CE, filterdesc.xml @ sepia
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32)
-        # FR : Matrice sépia standard de transformation colorimétrique
-        # EN : Standard sepia colorimetric transformation matrix
-        r = arr[:, :, 0]
-        g = arr[:, :, 1]
-        b = arr[:, :, 2]
-        tr = 0.393 * r + 0.769 * g + 0.189 * b
-        tg = 0.349 * r + 0.686 * g + 0.168 * b
-        tb = 0.272 * r + 0.534 * g + 0.131 * b
-        out = np.stack([np.clip(tr, 0, 255), np.clip(tg, 0, 255), np.clip(tb, 0, 255)], axis=2)
-        return Image.fromarray(out.astype(np.uint8))
+        ys = np.arange(256, dtype=np.int32)
+        us = 255 - (((255 - ys) * 218) >> 8)
+        lut = np.empty((256, 3), dtype=np.uint8)
+        low = us < 128
+        high = ~low
+        lut[low, 0] = ((2 * us[low] * 155) >> 8).astype(np.uint8)
+        lut[low, 1] = ((2 * us[low] * 125) >> 8).astype(np.uint8)
+        lut[low, 2] = ((2 * us[low] * 99) >> 8).astype(np.uint8)
+        inv_u = 255 - us[high]
+        lut[high, 0] = (255 - ((2 * inv_u * 100) >> 8)).astype(np.uint8)
+        lut[high, 1] = (255 - ((2 * inv_u * 130) >> 8)).astype(np.uint8)
+        lut[high, 2] = (255 - ((2 * inv_u * 156) >> 8)).astype(np.uint8)
+
+        arr = np.array(img, dtype=np.int32)
+        y_img = np.clip((77 * arr[:, :, 0] + 151 * arr[:, :, 1] + 28 * arr[:, :, 2]) >> 8, 0, 255)
+        return Image.fromarray(lut[y_img])
 
     @staticmethod
     def warmify(img: Image.Image, intensity: float = 0.2) -> Image.Image:
         """
-        FR : Réchauffer les tons (augmentation du rouge, diminution du bleu).
-        EN : Warmify tones (boost red channel, reduce blue channel).
+        FR : Filtre Réchauffer (`warm=1`) reproduisant exactement `FUN_008f8930 @ 0x008F8930`
+             -> `FUN_0090c040 @ 0x0090C040` via la table statique de 256 entrées BGRA à `0x00D33B70`.
+        EN : Warmify filter (`warm=1`) reproducing `FUN_008f8930 @ 0x008F8930`
+             -> `FUN_0090c040 @ 0x0090C040` using the static 256-entry BGRA LUT at `0x00D33B70`.
 
-        Ref: picasa3.exe @ ID_PICTURE_WARMIFY, filterdesc.xml @ warm
+        Ref: picasa3.exe @ 0x008F8930, 0x0090C040, 0x00D33B70, filterdesc.xml @ warm
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32)
-        arr[:, :, 0] = np.clip(arr[:, :, 0] * (1.0 + intensity), 0, 255)  # FR: Boost rouge / EN: Boost red
-        arr[:, :, 2] = np.clip(arr[:, :, 2] * (1.0 - intensity * 0.5), 0, 255)  # FR: Diminue bleu / EN: Reduce blue
-        return Image.fromarray(arr.astype(np.uint8))
+        lut_table = (
+            list(PicasaImageProcessor._WARM_LUT_R_00D33B72)
+            + list(PicasaImageProcessor._WARM_LUT_G_00D33B71)
+            + list(PicasaImageProcessor._WARM_LUT_B_00D33B70)
+        )
+        warmed = img.point(lut_table)
+        # Si une intensité personnalisée différente du défaut one-click (0.2) est demandée, interpoler
+        if abs(float(intensity) - 0.2) > 1e-4 and 0.0 <= float(intensity) <= 1.0:
+            blend_w = min(1.0, max(0.0, float(intensity) / 0.2))
+            if abs(blend_w - 1.0) > 1e-4:
+                return Image.blend(img, warmed, blend_w)
+        return warmed
 
     @staticmethod
-    def fill_light(img: Image.Image, amount: float = 0.3) -> Image.Image:
+    def fill_light(img: Image.Image, amount: float = 0.3, chroma_preserve: float = 1.0) -> Image.Image:
         """
-        FR : Lumière d'appoint : rehausse les ombres sans brûler les hautes lumières.
-        EN : Fill light: lifts shadows without clipping highlights.
+        FR : Lumière d'appoint (`fill`, `backlight`, et Étape 1 de `finetune2`) reproduisant exactement
+             `FUN_0090ac20 @ 0x0090AC20` de `picasa3.exe` :
+             - `t = 1.0 - amount`, `w = 1.0 / (0.7 * t + 0.3)`, `gamma = t / (0.7 * w + 0.3)`
+             - `LUT[i] = round(255.0 * clamp(((i * w) / 255.0) ** gamma, 0.0, 256.0))`
+             - Luminance entière rapide `L = (R + 2*G + B) >> 2`
+             - Mélange pondéré par `(255 - L)` : `C_out = clamp(C + (((LUT[C] - C) * factor * (255 - L)) >> 16), 0, 255)`
+        EN : Fill Light (`fill`, `backlight`, and Step 1 of `finetune2`) reproducing
+             `FUN_0090ac20 @ 0x0090AC20` from `picasa3.exe`:
+             - `t = 1.0 - amount`, `w = 1.0 / (0.7 * t + 0.3)`, `gamma = t / (0.7 * w + 0.3)`
+             - `LUT[i] = round(255.0 * clamp(((i * w) / 255.0) ** gamma, 0.0, 256.0))`
+             - Fast integer luma `L = (R + 2*G + B) >> 2`
+             - Inverse-luma blend: `C_out = clamp(C + (((LUT[C] - C) * factor * (255 - L)) >> 16), 0, 255)`
 
-        Ref: filterdesc.xml @ triple, fill
+        Ref: picasa3.exe @ 0x0090AC20, 0x008F7CF0, 0x008F7F28
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32) / 255.0
-        # FR : Courbe de rehaussement d'ombres / EN : Shadow lifting curve
-        boost = (1.0 - arr) * amount
-        out = np.clip((arr + boost) * 255.0, 0, 255)
-        return Image.fromarray(out.astype(np.uint8))
+        amt = max(0.0, min(1.0, float(amount)))
+        if amt <= 1e-6:
+            return img.copy()
+
+        # Ref: 0x0090AC59..0x0090ACA6
+        t = 1.0 - amt
+        w = 1.0 / (0.7 * t + 0.3)
+        gamma = t / (0.7 * w + 0.3)
+
+        # Ref: 0x0090ACF0..0x0090AD55 : table LUT[0..255] int32
+        xs = (np.arange(256, dtype=np.float64) * w) / 255.0
+        curved = np.clip(np.power(np.maximum(0.0, xs), gamma), 0.0, 256.0)
+        lut = np.round(255.0 * curved).astype(np.int32)
+
+        # Ref: 0x0090AD8D..0x0090AE59 : boucle pixels en arithmétique entière >> 16
+        arr = np.array(img, dtype=np.int32)
+        r = arr[:, :, 0]
+        g = arr[:, :, 1]
+        b = arr[:, :, 2]
+        luma = (r + (g << 1) + b) >> 2
+        factor = int(round(float(chroma_preserve) * 256.0))
+        inv_luma_w = ((255 - luma) * factor)[:, :, np.newaxis]
+
+        lut_vals = lut[arr]
+        out = arr + (((lut_vals - arr) * inv_luma_w) >> 16)
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def sharpen(img: Image.Image, amount: float = 0.5) -> Image.Image:
+    def sharpen(img: Image.Image, amount: float = 0.6) -> Image.Image:
         """
-        FR : Amélioration de netteté par masque flou (UnsharpMask).
-        EN : Sharpness enhancement via UnsharpMask.
+        FR : Amélioration de netteté par masque flou (`unsharp2` / `unsharp`) reproduisant exactement
+             `FUN_008f8f30 @ 0x008F8F30` -> `FUN_0090c4a0 @ 0x0090C4A0` de `picasa3.exe` :
+             - Flou séparable de rayon `1.0` (`0x00A42C20(radius=1.0f, type=2)`)
+             - Facteur d'amplification entier `scale_int = round(amount * 512.0)` (`[0x00CF4C48] = 512.0`)
+             - Sans seuil (`threshold = 0`) :
+               $$C_{\\text{out}} = \\text{clamp}\\left(C_{\\text{src}} + \\left(\\frac{(C_{\\text{src}} - C_{\\text{blur}}) \\cdot \\text{scale\\_int}}{256}\\right), 0, 255\\right)$$
+        EN : Sharpness enhancement (`unsharp2` / `unsharp`) reproducing `FUN_008f8f30 @ 0x008F8F30`
+             -> `FUN_0090c4a0 @ 0x0090C4A0` from `picasa3.exe`:
+             - Separable blur of radius `1.0` (`0x00A42C20(radius=1.0f, type=2)`)
+             - Integer scale `scale_int = round(amount * 512.0)` (`[0x00CF4C48] = 512.0`)
+             - Zero threshold (`threshold = 0`).
 
-        Ref: picasa3.exe @ ID_PICTURE_SHARPEN, filterdesc.xml @ unsharp, unsharp2
+        Ref: picasa3.exe @ 0x008F8F30, 0x0090C4A0..0x0090C6AC, filterdesc.xml @ unsharp, unsharp2
         """
-        pct = max(10, int(round(float(amount) * 300.0)))
-        return img.filter(ImageFilter.UnsharpMask(radius=2, percent=pct, threshold=3))
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        amt = float(amount)
+        if abs(amt) < 1e-6:
+            return img.copy()
+        blurred = img.filter(ImageFilter.GaussianBlur(radius=1.0))
+        scale_int = int(round(amt * 512.0))
+        arr_src = np.array(img, dtype=np.int32)
+        arr_blur = np.array(blurred, dtype=np.int32)
+        out = arr_src + (((arr_src - arr_blur) * scale_int) >> 8)
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
     def film_grain(img: Image.Image, intensity: float = 18.0, fade: float = 0.0) -> Image.Image:
@@ -915,108 +1463,163 @@ class PicasaImageProcessor:
     @staticmethod
     def adjust_highlights(img: Image.Image, amount: float = 0.3) -> Image.Image:
         """
-        FR : Ajuste les hautes lumières (compresse ou adoucit les zones très lumineuses).
-        EN : Adjusts highlights (compresses or softens bright regions).
+        FR : Ajuste les hautes lumières (`highlights`, plage `0.0 .. 0.48` dans `filterdesc.xml`)
+             en abaissant le point blanc `white_pt = max(0.001, 1.0 - highlights)` via la LUT 16 bits
+             exacte de `picasa3.exe` (`0x008F7F5D..0x008F7FFC` -> `0x0090C3B0` / `0x0090C1E0`).
+        EN : Adjusts highlights (`highlights`, range `0.0 .. 0.48` in `filterdesc.xml`)
+             by lowering the white point `white_pt = max(0.001, 1.0 - highlights)` via the exact
+             16-bit LUT from `picasa3.exe` (`0x008F7F5D..0x008F7FFC` -> `0x0090C3B0` / `0x0090C1E0`).
 
-        Ref: filterdesc.xml @ whitept, finetune
+        Ref: picasa3.exe @ 0x008F7F5D, 0x0090C3B0, 0x0090C1E0, filterdesc.xml @ finetune2 (slider id="1")
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32) / 255.0
-        lum = 0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]
-        hl_mask = np.clip((lum - 0.45) / 0.55, 0.0, 1.0)[:, :, np.newaxis]
-        arr = np.clip(arr - hl_mask * amount * 0.35, 0.0, 1.0)
-        return Image.fromarray((arr * 255.0).astype(np.uint8))
+        hl = max(0.0, min(0.999, float(amount)))
+        if hl <= 1e-6:
+            return img.copy()
+        white_pt = max(0.001, 1.0 - hl)
+        return PicasaImageProcessor._levels_lut_0090c1e0(img, black_pt=0.0, white_pt=white_pt, gamma=1.0)
 
     @staticmethod
     def adjust_shadows(img: Image.Image, amount: float = 0.3) -> Image.Image:
         """
-        FR : Ajuste et débouche les ombres.
-        EN : Adjusts and lifts shadows.
+        FR : Ajuste les ombres (`shadows`, plage `0.0 .. 0.48` dans `filterdesc.xml`)
+             en relevant le point noir `black_pt = shadows` (ce qui approfondit/assombrit les ombres)
+             via la LUT 16 bits exacte de `picasa3.exe` (`0x008F7F5D..0x008F7FFC` -> `0x0090C3B0` / `0x0090C1E0`).
+        EN : Adjusts shadows (`shadows`, range `0.0 .. 0.48` in `filterdesc.xml`)
+             by raising the black point `black_pt = shadows` (deepening/darkening shadows)
+             via the exact 16-bit LUT from `picasa3.exe` (`0x008F7F5D..0x008F7FFC` -> `0x0090C3B0` / `0x0090C1E0`).
 
-        Ref: filterdesc.xml @ shadow, finetune
+        Ref: picasa3.exe @ 0x008F7F5D, 0x0090C3B0, 0x0090C1E0, filterdesc.xml @ finetune2 (slider id="2")
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32) / 255.0
-        lum = 0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]
-        sh_mask = np.clip((0.55 - lum) / 0.55, 0.0, 1.0)[:, :, np.newaxis]
-        arr = np.clip(arr + sh_mask * amount * 0.4, 0.0, 1.0)
-        return Image.fromarray((arr * 255.0).astype(np.uint8))
+        sh = max(0.0, min(0.998, float(amount)))
+        if sh <= 1e-6:
+            return img.copy()
+        return PicasaImageProcessor._levels_lut_0090c1e0(img, black_pt=sh, white_pt=1.0, gamma=1.0)
 
     @staticmethod
     def color_temperature(img: Image.Image, temp: float = 0.0) -> Image.Image:
         """
-        FR : Ajuste la température de couleur (temp > 0 : plus chaud, temp < 0 : plus froid).
-        EN : Adjusts color temperature (temp > 0: warmer orange/red, temp < 0: cooler blue).
+        FR : Ajuste la température de couleur (`colortemp` dans `[-1.0, +1.0]`, ou `[-50..+50]` normalisé)
+             en reproduisant exactement `FUN_0090e9d0 @ 0x0090E9D0` :
+             `idx = clamp(round(colortemp * 37.0 + 55.0), 0, 114)` dans `_KELVIN_TABLE_00C7CF98`,
+             suivi de l'adaptation chromatique matricielle `_chromatic_adaptation_0090eda0`.
+        EN : Adjusts color temperature (`colortemp` in `[-1.0, +1.0]`, or normalized `[-50..+50]`)
+             reproducing `FUN_0090e9d0 @ 0x0090E9D0`:
+             `idx = clamp(round(colortemp * 37.0 + 55.0), 0, 114)` into `_KELVIN_TABLE_00C7CF98`,
+             followed by the `_chromatic_adaptation_0090eda0` matrix transform.
 
-        Ref: filterdesc.xml @ colortemp, finetune
+        Ref: picasa3.exe @ 0x0090E9D0, 0x0090EDA0, 0x00C7CF98, filterdesc.xml @ finetune2 (slider id="3")
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        shift = float(temp) / 100.0  # -0.5 .. +0.5
-        arr = np.array(img, dtype=np.float32)
-        if shift > 0:
-            arr[:, :, 0] = np.clip(arr[:, :, 0] * (1.0 + shift * 0.55), 0, 255)
-            arr[:, :, 1] = np.clip(arr[:, :, 1] * (1.0 + shift * 0.15), 0, 255)
-            arr[:, :, 2] = np.clip(arr[:, :, 2] * (1.0 - shift * 0.40), 0, 255)
-        elif shift < 0:
-            s = abs(shift)
-            arr[:, :, 0] = np.clip(arr[:, :, 0] * (1.0 - s * 0.35), 0, 255)
-            arr[:, :, 2] = np.clip(arr[:, :, 2] * (1.0 + s * 0.55), 0, 255)
-        return Image.fromarray(arr.astype(np.uint8))
+        t_val = float(temp)
+        if abs(t_val) < 1e-6:
+            return img.copy()
+        if abs(t_val) > 1.0:
+            t_val = max(-1.0, min(1.0, t_val / 50.0))
+        else:
+            t_val = max(-1.0, min(1.0, t_val))
+        idx = max(0, min(114, int(round(t_val * 37.0 + 55.0))))
+        if idx == 55:
+            return img.copy()
+        rgb_kelvin = PicasaImageProcessor._KELVIN_TABLE_00C7CF98[idx]
+        return PicasaImageProcessor._chromatic_adaptation_0090eda0(img, rgb_kelvin)
 
     @staticmethod
-    def neutral_color_balance(img: Image.Image, sampled_rgb: Tuple[int, int, int]) -> Image.Image:
+    def neutral_color_balance(img: Image.Image, sampled_rgb: Tuple[int, int, int] | int) -> Image.Image:
         """
-        FR : Corrige la balance des blancs à partir d'un point supposé neutre (gris/blanc).
-        EN : Corrects white balance from a sampled neutral (gray/white) reference point.
+        FR : Corrige la balance des blancs à partir d'un point échantillonné à la pipette (`neutral_rgb`)
+             en appliquant exactement la matrice d'adaptation chromatique 3x3 `FUN_0090eda0 @ 0x0090EDA0`
+             de `picasa3.exe` (Étape 3 de `finetune2 @ 0x008F8002`).
+        EN : Corrects white balance from a pipette-sampled neutral point (`neutral_rgb`)
+             by applying the exact 3x3 chromatic adaptation matrix `FUN_0090eda0 @ 0x0090EDA0`
+             from `picasa3.exe` (Step 3 of `finetune2 @ 0x008F8002`).
 
-        Ref: picasa3.exe @ filter_whitept (filterdesc.xml), CDesaturateFilter::pickcolor (0x0088C3EC)
+        Ref: picasa3.exe @ 0x008F8002, 0x0090EDA0, filterdesc.xml @ finetune2 (<colorpicker id="0"/>)
         """
-        if img.mode != "RGB":
-            img = img.convert("RGB")
-        r0, g0, b0 = sampled_rgb
-        if r0 <= 0 or g0 <= 0 or b0 <= 0:
-            return img
-
-        # FR : Luminance perçue du point échantillonné / EN : Perceived luminance of sampled pixel
-        luma = 0.299 * r0 + 0.587 * g0 + 0.114 * b0
-        if luma < 5 or luma > 250:
-            return img
-
-        # FR : Facteurs de correction pour neutraliser la teinte / EN : Gain factors to neutralize cast
-        gain_r = float(luma) / float(r0)
-        gain_g = float(luma) / float(g0)
-        gain_b = float(luma) / float(b0)
-
-        # FR : Atténuation douce (mixage 85% correction, 15% original) pour un rendu naturel
-        # EN : Gentle damping (85% correction, 15% original) for natural rendering
-        gain_r = 1.0 + (gain_r - 1.0) * 0.85
-        gain_g = 1.0 + (gain_g - 1.0) * 0.85
-        gain_b = 1.0 + (gain_b - 1.0) * 0.85
-
-        arr = np.array(img, dtype=np.float32)
-        arr[:, :, 0] = np.clip(arr[:, :, 0] * gain_r, 0, 255)
-        arr[:, :, 1] = np.clip(arr[:, :, 1] * gain_g, 0, 255)
-        arr[:, :, 2] = np.clip(arr[:, :, 2] * gain_b, 0, 255)
-        return Image.fromarray(arr.astype(np.uint8))
+        return PicasaImageProcessor._chromatic_adaptation_0090eda0(img, sampled_rgb)
 
     # =========================================================================
     # TAB 3: EFFETS 1 (Picasa Standard: Ref: filterdesc.xml @ sat, tint, glow...)
     # =========================================================================
 
     @staticmethod
-    def saturation(img: Image.Image, factor: float = 1.4) -> Image.Image:
+    def saturation(img: Image.Image, factor: float = 0.1618) -> Image.Image:
         """
-        FR : Augmente ou diminue la saturation.
-        EN : Increases or decreases color saturation.
+        FR : Ajuste la saturation (`sat=1,<amount>`) en reproduisant exactement `FUN_008f8ff0 @ 0x008F8FF0` :
+             - Si `amount < 0.0` (`0x0090E200`) : désaturation linéaire entière vers
+               `Y = (2*R + 5*G + B + 4) >> 3` avec `ebx = round((amount + 1.0) * 256.0)`.
+             - Si `amount >= 0.0` (`0x0090B930`) : amplification non-linéaire via 3 tables de puissance
+               de 2048 entrées (`x = i / 256.0`) avec exposants `1 + 0.3*(3*amount)` (R),
+               `1 + 0.7*(3*amount)` (G), `1 + 0.9*(3*amount)` (B) autour de `Y = (2*R + 5*G + B) >> 3`,
+               et réduction proportionnelle `(255 << 8) // max(R', G', B')` si `max > 255` pour préserver la teinte.
+        EN : Adjusts color saturation (`sat=1,<amount>`) reproducing `FUN_008f8ff0 @ 0x008F8FF0`:
+             - If `amount < 0.0` (`0x0090E200`): integer linear desaturation toward
+               `Y = (2*R + 5*G + B + 4) >> 3` with `ebx = round((amount + 1.0) * 256.0)`.
+             - If `amount >= 0.0` (`0x0090B930`): non-linear saturation boost via 2048-entry power LUTs
+               with channel exponents `1 + 0.3*(3*amount)` (R), `1 + 0.7*(3*amount)` (G), `1 + 0.9*(3*amount)` (B)
+               relative to `Y = (2*R + 5*G + B) >> 3`, plus hue-preserving scaling when `max(R', G', B') > 255`.
 
-        Ref: filterdesc.xml @ sat
+        Ref: picasa3.exe @ 0x008F8FF0, 0x0090E200, 0x0090B930, filterdesc.xml @ sat
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        return ImageEnhance.Color(img).enhance(factor)
+        amt = float(factor)
+        # Compatibilité descendante si un facteur > 1.0 (ex. 1.4) est passé au lieu de [-1.0, +1.0]
+        if amt > 1.0001:
+            amt = max(-1.0, min(1.0, amt - 1.0))
+        else:
+            amt = max(-1.0, min(1.0, amt))
+
+        if abs(amt) < 1e-6:
+            return img.copy()
+
+        arr = np.array(img, dtype=np.int32)
+        r = arr[:, :, 0]
+        g = arr[:, :, 1]
+        b = arr[:, :, 2]
+
+        if amt < 0.0:
+            # Ref: 0x0090E200..0x0090E305 : désaturation entière
+            ebx = max(0, min(256, int(round((amt + 1.0) * 256.0))))
+            y = ((r << 1) + 5 * g + b + 4) >> 3
+            y3 = y[:, :, np.newaxis]
+            out = y3 + (((arr - y3) * ebx) >> 8)
+            return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+
+        # Ref: 0x0090B930..0x0090BBE8 : amplification de saturation non-linéaire à préservation de teinte
+        s = 3.0 * amt
+        xs = np.arange(2048, dtype=np.float64) / 256.0
+        lut_r = (np.power(xs, 1.0 + 0.3 * s) * 256.0).astype(np.int32)
+        lut_g = (np.power(xs, 1.0 + 0.7 * s) * 256.0).astype(np.int32)
+        lut_b = (np.power(xs, 1.0 + 0.9 * s) * 256.0).astype(np.int32)
+
+        y = ((r << 1) + 5 * g + b) >> 3
+        inv_y = np.zeros_like(y)
+        pos_y = y > 0
+        inv_y[pos_y] = 65535 // y[pos_y]
+
+        idx_r = np.clip((r * inv_y) >> 8, 0, 2047)
+        idx_g = np.clip((g * inv_y) >> 8, 0, 2047)
+        idx_b = np.clip((b * inv_y) >> 8, 0, 2047)
+
+        r_p = (lut_r[idx_r] * y) >> 8
+        g_p = (lut_g[idx_g] * y) >> 8
+        b_p = (lut_b[idx_b] * y) >> 8
+
+        max_c = np.maximum(np.maximum(r_p, g_p), b_p)
+        over = max_c > 255
+        if np.any(over):
+            scale_over = (255 << 8) // max_c[over]
+            r_p[over] = (r_p[over] * scale_over) >> 8
+            g_p[over] = (g_p[over] * scale_over) >> 8
+            b_p[over] = (b_p[over] * scale_over) >> 8
+
+        out = np.stack([np.clip(r_p, 0, 255), np.clip(g_p, 0, 255), np.clip(b_p, 0, 255)], axis=2).astype(np.uint8)
+        return Image.fromarray(out)
 
     @staticmethod
     def tint(img: Image.Image, tint_rgb: tuple[int, int, int] = (220, 190, 150), intensity: float = 0.4) -> Image.Image:
@@ -1034,94 +1637,175 @@ class PicasaImageProcessor:
         return Image.fromarray(np.clip(blended, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def soft_focus(img: Image.Image, amount: float = 0.4, radius_norm: float = 0.35) -> Image.Image:
+    def soft_focus(
+        img: Image.Image,
+        amount: float = 0.4,
+        radius_norm: float = 0.35,
+        center_x: float = 0.5,
+        center_y: float = 0.5,
+    ) -> Image.Image:
         """
-        FR : Flou artistique / Soft focus autour d'un centre net.
-        EN : Soft focus artistic blur around a sharp center.
+        FR : Flou artistique / Soft focus (`radblur`) autour du centre `(center_x, center_y)`
+             reproduisant `FUN_008f8520 @ 0x008F8520` -> `FUN_0090b050 @ 0x0090B050` (`0x0090AEB0` Hermite smoothstep).
+        EN : Soft focus artistic blur (`radblur`) around `(center_x, center_y)`
+             reproducing `FUN_008f8520 @ 0x008F8520` -> `FUN_0090b050 @ 0x0090B050` (`0x0090AEB0` Hermite smoothstep).
 
-        Ref: filterdesc.xml @ radblur
+        Ref: picasa3.exe @ 0x008F8520, 0x0090B050, 0x0090AEB0, filterdesc.xml @ radblur
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        r_px = max(1.0, float(amount) * 12.0)
+        w_img, h_img = img.size
+        amt = max(0.0, float(amount))
+        # Ref: picasa3.exe @ 0x008F85BE..0x008F8617 & 0x0090B0CE..0x0090B129 ([0x00CF40B8] = 0.01) :
+        # s = 0.01 * w; r_blur = s * amount + 0.001 + s = 0.01 * w * (1 + amount) + 0.001
+        r_px = max(0.5, float(w_img) * 0.01 * (1.0 + amt) + 0.001 if amt <= 1.0 else amt * 12.0)
         blurred = img.filter(ImageFilter.GaussianBlur(radius=r_px))
-        if radius_norm <= 0.01:
-            return Image.blend(img, blurred, min(1.0, max(0.0, float(amount))))
+        if abs(float(radius_norm)) <= 0.01:
+            return blurred
         arr_orig = np.array(img, dtype=np.float32)
         arr_blur = np.array(blurred, dtype=np.float32)
         h, w = arr_orig.shape[:2]
         y, x = np.ogrid[:h, :w]
-        cy, cx = h / 2.0, w / 2.0
-        max_r = min(w, h) * float(radius_norm)
+        cy, cx = h * float(center_y), w * float(center_x)
+        sz_f = float(radius_norm)
+        eff_r = (sz_f + 1.0) * 0.5 if sz_f < 0.0 else sz_f
+        # Ref: picasa3.exe @ 0x0090AEB0 : R = max(0.5*w, 0.5*h) * (size + 1.0) = max(w, h) * eff_r, sharpness = 0.0
+        max_r = max(1.0, float(max(w, h)) * max(0.02, eff_r))
         dist = np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
-        mask = np.clip((dist - max_r * 0.5) / max(1.0, max_r), 0.0, 1.0)[:, :, np.newaxis] * min(1.0, max(0.1, float(amount)))
-        out = arr_orig * (1.0 - mask) + arr_blur * mask
+        t = np.clip(dist / max_r, 0.0, 1.0)
+        # Ref: 0x0090AFBD..0x0090AFE0 : u = 1 - t; w_orig = u^2 * (3 - 2*u)
+        u = 1.0 - t
+        w_orig = (u * u * (3.0 - 2.0 * u))[:, :, np.newaxis]
+        out = arr_orig * w_orig + arr_blur * (1.0 - w_orig)
         return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def glow(img: Image.Image, intensity: float = 0.45, radius: float = 8.0) -> Image.Image:
+    def glow(img: Image.Image, intensity: float = 0.65, radius: float = 3.0) -> Image.Image:
         """
-        FR : Halo / Éclat lumineux diffus (fusion Screen).
-        EN : Diffuse luminous glow (Screen blend).
+        FR : Halo / Éclat lumineux diffus (`glow2` / `glow`) reproduisant exactement
+             `FUN_008f8f70 @ 0x008F8F70` -> `FUN_0090d4b0 @ 0x0090D4B0` & `FUN_009ac3f0 @ 0x009AC3F0` :
+             1. Pré-assombrissement quadratique des tons moyens/ombres avant le flou
+                (`0x00AA40A0(dst, 0.5f, 0)` : $\\gamma = 2.0$, $C' = (C \\cdot C) // 255$) afin que seules
+                les hautes lumières diffusent dans le halo.
+             2. Flou gaussien de rayon `radius` (`0x009DD0D0`).
+             3. Fusion **Screen (Superposition)** entière (`0x009AC3F0`) pondérée par `w = round(|intensity| * 256)` :
+                $$\\text{screen} = 255 - (((255 - C_{\\text{blur}}) \\cdot (255 - C_{\\text{src}})) \\gg 8)$$
+                $$C_{\\text{out}} = \\text{screen} + (((C_{\\text{src}} - \\text{screen}) \\cdot (256 - w)) \\gg 8)$$
+        EN : Diffuse luminous glow (`glow2` / `glow`) reproducing `FUN_008f8f70 @ 0x008F8F70`
+             -> `FUN_0090d4b0 @ 0x0090D4B0` & `FUN_009ac3f0 @ 0x009AC3F0`:
+             1. Pre-blur quadratic gamma darkening (`0x00AA40A0(dst, 0.5f, 0)`: $\\gamma = 2.0$) so only highlights bloom.
+             2. Gaussian blur of radius `radius` (`0x009DD0D0`).
+             3. Integer **Screen** blend (`0x009AC3F0`) weighted by `w = round(|intensity| * 256)`.
 
-        Ref: filterdesc.xml @ glow, glow2
+        Ref: picasa3.exe @ 0x008F8F70, 0x0090D4B0, 0x00AA40A0, 0x009AC3F0, filterdesc.xml @ glow, glow2
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        blurred = img.filter(ImageFilter.GaussianBlur(radius=max(1.0, float(radius))))
-        a = np.array(img, dtype=np.float32) / 255.0
-        b = np.array(blurred, dtype=np.float32) / 255.0
-        # FR : Fusion Screen / EN : Screen blend
-        screen = 1.0 - (1.0 - a) * (1.0 - b)
-        amt = max(0.0, min(1.0, float(intensity)))
-        out = a * (1.0 - amt) + screen * amt
-        return Image.fromarray((np.clip(out, 0, 1.0) * 255.0).astype(np.uint8))
+        # Étape 1 : gamma quadratique (1 / 0.5 = 2.0) avant flou (Ref: 0x0090D516 -> 0x00AA40A0)
+        xs = np.arange(256, dtype=np.float64)
+        gamma2_lut = np.clip(np.round(255.0 * ((xs / 255.0) ** 2.0)), 0, 255).astype(np.uint8)
+        arr_src = np.array(img, dtype=np.int32)
+        pre_dark = Image.fromarray(gamma2_lut[arr_src.astype(np.uint8)])
+
+        # Étape 2 : flou (Ref: 0x0090D538 -> 0x009DD0D0)
+        blurred = pre_dark.filter(ImageFilter.GaussianBlur(radius=max(0.5, float(radius))))
+        arr_blur = np.array(blurred, dtype=np.int32)
+
+        # Étape 3 : fusion Screen entière (Ref: 0x0090D55E -> 0x009AC3F0)
+        w = max(0, min(256, int(round(abs(float(intensity)) * 256.0))))
+        inv_w = 256 - w
+        screen = 255 - (((255 - arr_blur) * (255 - arr_src)) >> 8)
+        out = screen + (((arr_src - screen) * inv_w) >> 8)
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def focal_bw(img: Image.Image, radius_norm: float = 0.35, sharpness: float = 0.4) -> Image.Image:
+    def focal_bw(
+        img: Image.Image,
+        radius_norm: float = 0.35,
+        sharpness: float = 0.4,
+        center_x: float = 0.5,
+        center_y: float = 0.5,
+    ) -> Image.Image:
         """
-        FR : Noir & Blanc focalisé avec centre conservant la couleur.
-        EN : Focal Black & White preserving color at the center.
+        FR : Noir & Blanc focalisé (`radsat`) avec centre `(center_x, center_y)` conservant la couleur,
+             reproduisant `FUN_008f8680 @ 0x008F8680` -> `FUN_0090b660 @ 0x0090B660` & `FUN_0090aeb0 @ 0x0090AEB0`
+             (transition radiale Hermite smoothstep et luminance entière `(77*R + 151*G + 28*B) >> 8`).
+        EN : Focal Black & White (`radsat`) preserving color at `(center_x, center_y)`,
+             reproducing `FUN_008f8680 @ 0x008F8680` -> `FUN_0090b660 @ 0x0090B660` & `FUN_0090aeb0 @ 0x0090AEB0`
+             (Hermite smoothstep radial transition and integer luminance `(77*R + 151*G + 28*B) >> 8`).
 
-        Ref: filterdesc.xml @ radsat
+        Ref: picasa3.exe @ 0x008F8680, 0x0090B660, 0x0090AEB0, filterdesc.xml @ radsat
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
         arr_rgb = np.array(img, dtype=np.float32)
-        arr_gray = np.array(img.convert("L"), dtype=np.float32)
+        arr_i = arr_rgb.astype(np.int32)
+        # Ref: 0x0090B81D..0x0090B834 : Y = (77*R + 151*G + 28*B) >> 8
+        arr_gray = ((77 * arr_i[:, :, 0] + 151 * arr_i[:, :, 1] + 28 * arr_i[:, :, 2]) >> 8).astype(np.float32)
         arr_gray3 = np.stack([arr_gray] * 3, axis=2)
         h, w = arr_rgb.shape[:2]
         y, x = np.ogrid[:h, :w]
-        cy, cx = h / 2.0, w / 2.0
-        max_r = min(w, h) * max(0.02, float(radius_norm))
+        cy, cx = h * float(center_y), w * float(center_x)
+        sz_f = float(radius_norm)
+        eff_r = (sz_f + 1.0) * 0.5 if sz_f < 0.0 else sz_f
+        # Ref: picasa3.exe @ 0x0090B674..0x0090B693 & 0x0090AEB0 :
+        # R = max(w, h) * eff_r, sh_sqrt = sqrt(sharpness), inv_feather = 1 / (1 - 0.99 * sh_sqrt)
+        max_r = max(1.0, float(max(w, h)) * max(0.02, eff_r))
         dist = np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
-        feather = max(1.0, max_r * max(0.05, 1.0 - float(sharpness)))
-        mask = np.clip((dist - max_r) / feather, 0.0, 1.0)[:, :, np.newaxis]
-        out = arr_rgb * (1.0 - mask) + arr_gray3 * mask
-        return Image.fromarray(out.astype(np.uint8))
+        sh_sqrt = math.sqrt(max(0.0, min(1.0, float(sharpness))))
+        inv_feather = 1.0 / max(0.01, 1.0 - 0.99 * sh_sqrt)
+        t = np.clip((dist / max_r - 0.5) * inv_feather + 0.5, 0.0, 1.0)
+        # Ref: 0x0090AFBD : u = 1 - t; w_col = u^2 * (3 - 2*u)
+        u = 1.0 - t
+        w_col = (u * u * (3.0 - 2.0 * u))[:, :, np.newaxis]
+        out = arr_rgb * w_col + arr_gray3 * (1.0 - w_col)
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
     def graduated_tint(
         img: Image.Image,
-        tint_rgb: tuple[int, int, int] = (255, 140, 50),
+        tint_rgb: tuple[int, int, int] = (123, 180, 216),
         intensity: float = 0.5,
         feather: float = 0.5,
+        center_x: float = 0.5,
+        center_y: float = 0.5,
+        angle_deg: float = 0.0,
     ) -> Image.Image:
         """
-        FR : Teinte dégradée linéaire du haut vers le bas.
-        EN : Top-to-bottom linear graduated tint.
+        FR : Teinte dégradée directionnelle (`dir_tint`) reproduisant `FUN_008f9880 @ 0x008F9880`
+             -> `FUN_0090f470 @ 0x0090F470` & `FUN_0090ec40 @ 0x0090EC40` :
+             courbe rationnelle d'assombrissement `g = 0.95 * (1 - shade) + 0.025`, `k = 1/g - 1`,
+             `y = x / (x + (1 - x) * k)` multipliée par `tint_rgb` et mélangée le long de la normale.
+        EN : Directional graduated tint (`dir_tint`) reproducing `FUN_008f9880 @ 0x008F9880`
+             -> `FUN_0090f470 @ 0x0090F470` & `FUN_0090ec40 @ 0x0090EC40`.
 
-        Ref: filterdesc.xml @ dir_tint
+        Ref: picasa3.exe @ 0x008F9880, 0x0090F470, 0x0090ECD0, 0x0090EC40, filterdesc.xml @ dir_tint
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
         arr = np.array(img, dtype=np.float32)
         h, w = arr.shape[:2]
-        ys = np.linspace(0.0, 1.0, h, dtype=np.float32)
+        y, x = np.ogrid[:h, :w]
+        cx = float(center_x) * w
+        cy = float(center_y) * h
+        rad = math.radians(float(angle_deg) + 90.0)
+        cos_a = math.cos(rad)
+        sin_a = math.sin(rad)
+        # Ref: 0x0090F52C ([0x00CF43C0] = 0.38) : échelle de transition sur la diagonale
+        diag = max(1.0, math.hypot(w, h) * 0.38)
+        proj = ((x - cx) * cos_a + (y - cy) * sin_a) / diag
         span = max(0.05, float(feather))
-        grad = np.clip(1.0 - (ys - 0.15) / span, 0.0, 1.0)[:, np.newaxis, np.newaxis]
+        t = np.clip(0.5 - proj / span, 0.0, 1.0)
+        grad = (t * t * (3.0 - 2.0 * t))[:, :, np.newaxis]
+        # Ref: 0x008F9968 & 0x0090EC40 : courbe rationnelle g = 0.95 * (1 - shade) + 0.025
+        shade_clamped = max(0.0, min(1.0, float(intensity)))
+        g_val = 0.95 * (1.0 - shade_clamped) + 0.025
+        k_val = (1.0 / g_val) - 1.0
+        x_norm = arr / 255.0
+        y_curve = x_norm / np.maximum(1e-6, x_norm + (1.0 - x_norm) * k_val)
         tint_arr = np.array(tint_rgb, dtype=np.float32)
-        blended = arr * (1.0 - grad * float(intensity)) + (arr / 255.0) * tint_arr * (grad * float(intensity))
+        tinted = y_curve * tint_arr
+        blended = arr * (1.0 - grad) + tinted * grad
         return Image.fromarray(np.clip(blended, 0, 255).astype(np.uint8))
 
     # =========================================================================
@@ -1288,10 +1972,17 @@ class PicasaImageProcessor:
         out[:, :, 0] = lut_r[arr[:, :, 0]]
         out[:, :, 1] = lut_g[arr[:, :, 1]]
         out[:, :, 2] = lut_b[arr[:, :, 2]]
-        # Multiply tint 0xfcff00 with BlendAlpha=0.2
+        # Pass 2: SimpleColorMatrixImageOperation(Contrast=10, Brightness=10) per filterdesc.xml @ CrossProcess
+        step2 = PicasaImageProcessor._simple_color_matrix(
+            Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)),
+            brightness=10.0,
+            contrast=10.0,
+        )
+        out2 = np.array(step2, dtype=np.float32)
+        # Pass 3: Multiply tint 0xfcff00 with BlendAlpha=0.2
         tint_mult = np.array([252.0 / 255.0, 255.0 / 255.0, 0.0], dtype=np.float32)
-        out = out * (0.8 + 0.2 * tint_mult)
-        res = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+        out2 = out2 * (0.8 + 0.2 * tint_mult)
+        res = Image.fromarray(np.clip(out2, 0, 255).astype(np.uint8))
         alpha = max(0.0, min(1.0, 1.0 - float(fade) / 100.0))
         return Image.blend(img, res, alpha) if alpha < 1.0 else res
 
@@ -2029,8 +2720,10 @@ class PicasaImageProcessor:
         Ref: picasa3.exe @ filterdesc.xml, 0x00760F40
         """
         p = params or {}
-        if effect_name in ("autocontrast", "lucky"):
+        if effect_name == "autocontrast":
             return PicasaImageProcessor.auto_contrast(img)
+        if effect_name in ("lucky", "enhance"):
+            return PicasaImageProcessor.enhance_lucky(img)
         if effect_name == "autocolor":
             return PicasaImageProcessor.auto_color(img)
         if effect_name == "bw":
@@ -2040,7 +2733,7 @@ class PicasaImageProcessor:
         if effect_name == "warmify":
             return PicasaImageProcessor.warmify(img, float(p.get("intensity", 0.2)))
         if effect_name == "sharpen":
-            return PicasaImageProcessor.sharpen(img, amount=float(p.get("amount", 0.5)))
+            return PicasaImageProcessor.sharpen(img, amount=float(p.get("amount", 0.6)))
         if effect_name == "grain":
             return PicasaImageProcessor.film_grain(
                 img,
@@ -2062,6 +2755,7 @@ class PicasaImageProcessor:
                 highlights=float(p.get("highlights", 0.0)),
                 shadows=float(p.get("shadows", 0.0)),
                 colortemp=float(p.get("colortemp", 0.0)),
+                neutral_rgb=p.get("neutral_rgb", 0),
             )
         if effect_name == "tint":
             return PicasaImageProcessor.tint(
@@ -2070,31 +2764,38 @@ class PicasaImageProcessor:
                 intensity=float(p.get("intensity", 0.4)),
             )
         if effect_name == "saturation":
-            return PicasaImageProcessor.saturation(img, float(p.get("factor", 1.4)))
+            return PicasaImageProcessor.saturation(img, float(p.get("factor", p.get("amount", 0.1618))))
         if effect_name == "soft_focus":
             return PicasaImageProcessor.soft_focus(
                 img,
                 amount=float(p.get("amount", 0.4)),
                 radius_norm=float(p.get("size", 0.35)),
+                center_x=float(p.get("cx", 0.5)),
+                center_y=float(p.get("cy", 0.5)),
             )
         if effect_name == "glow":
             return PicasaImageProcessor.glow(
                 img,
-                intensity=float(p.get("intensity", 0.45)),
-                radius=float(p.get("radius", 8.0)),
+                intensity=float(p.get("intensity", 0.65)),
+                radius=float(p.get("radius", 3.0)),
             )
         if effect_name == "focal_bw":
             return PicasaImageProcessor.focal_bw(
                 img,
                 radius_norm=float(p.get("size", 0.35)),
                 sharpness=float(p.get("sharpness", 0.4)),
+                center_x=float(p.get("cx", 0.5)),
+                center_y=float(p.get("cy", 0.5)),
             )
         if effect_name == "graduated_tint":
             return PicasaImageProcessor.graduated_tint(
                 img,
-                tint_rgb=tuple(p.get("color", (255, 140, 50))),
+                tint_rgb=tuple(p.get("color", (123, 180, 216))),
                 intensity=float(p.get("shade", 0.5)),
                 feather=float(p.get("feather", 0.5)),
+                center_x=float(p.get("cx", 0.5)),
+                center_y=float(p.get("cy", 0.5)),
+                angle_deg=float(p.get("angle", 0.0)),
             )
         if effect_name == "filtered_bw":
             return PicasaImageProcessor.filtered_bw(
@@ -2387,19 +3088,50 @@ class PicasaImageProcessor:
     @staticmethod
     def filtered_bw(img: Image.Image, filter_rgb: tuple[int, int, int] = (255, 85, 85)) -> Image.Image:
         """
-        FR : Noir & Blanc avec filtre optique coloré (BWImageOperation / ansel).
-        EN : Black & White with colored optical filter (BWImageOperation / ansel).
+        FR : Noir & Blanc avec filtre optique coloré exact (`ansel` @ 0x008F8410 -> 0x0090E680) :
+             1. Poids entiers normalisés à 256 : w_C = int(C_f * 256 / (R_f + G_f + B_f)).
+             2. Luminance filtrée 16 bits : L16 = min(65535, R*w_R + G*w_G + B*w_B), L8 = L16 >> 8.
+             3. Luminance naturelle : Y_nat = (2*R + 5*G + B + 4) >> 3.
+             4. Compensation parabolique de luminosité moyenne :
+                k = clamp((mean(Y_nat) - mean(L8)) / 32.0, -1.0, 1.0), k_fp = int(k * 256.0)
+                L16' = clamp(L16 + (((((65535 - L16) * L16) >> 14) * k_fp) >> 8), 0, 65535)
+                C_out = L16' >> 8
+        EN : Exact Black & White with colored optical filter (`ansel` @ 0x008F8410 -> 0x0090E680):
+             1. Integer weights normalized to 256: w_C = int(C_f * 256 / (R_f + G_f + B_f)).
+             2. 16-bit filtered luminance: L16 = min(65535, R*w_R + G*w_G + B*w_B), L8 = L16 >> 8.
+             3. Natural luminance: Y_nat = (2*R + 5*G + B + 4) >> 3.
+             4. Parabolic average-brightness compensation:
+                k = clamp((mean(Y_nat) - mean(L8)) / 32.0, -1.0, 1.0), k_fp = int(k * 256.0)
+                L16' = clamp(L16 + (((((65535 - L16) * L16) >> 14) * k_fp) >> 8), 0, 65535)
+                C_out = L16' >> 8
 
+        Ref: picasa3.exe @ 0x008F8410 (ansel vtable apply)
+        Ref: picasa3.exe @ 0x0090E680 (filtered B&W parabolic brightness compensation)
         Ref: runtime/filterdesc.xml @ ansel
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32)
-        fr, fg, fb = [max(1.0, float(c)) for c in filter_rgb]
-        total = fr + fg + fb
-        lum = (arr[:, :, 0] * fr + arr[:, :, 1] * fg + arr[:, :, 2] * fb) / total
-        gray = np.clip(lum, 0, 255).astype(np.uint8)
-        return Image.fromarray(np.stack([gray] * 3, axis=2))
+        arr = np.array(img, dtype=np.int64)
+        rf, gf, bf = int(filter_rgb[0]), int(filter_rgb[1]), int(filter_rgb[2])
+        s = rf + gf + bf
+        if s <= 0:
+            wr, wg, wb = 85, 85, 85
+        else:
+            wr = (rf * 256) // s
+            wg = (gf * 256) // s
+            wb = (bf * 256) // s
+        r, g, b = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
+        l16 = np.minimum(65535, r * wr + g * wg + b * wb)
+        l8 = l16 >> 8
+        y_nat = ((g * 2 + r) * 2 + b + g + 4) >> 3
+        mean_diff = float(np.mean(y_nat) - np.mean(l8))
+        k = max(-1.0, min(1.0, mean_diff * 0.03125))
+        k_fp = int(k * 256.0)
+        if k_fp != 0:
+            delta = ((((65535 - l16) * l16) >> 14) * k_fp) >> 8
+            l16 = np.clip(l16 + delta, 0, 65535)
+        gray = (l16 >> 8).astype(np.uint8)
+        return Image.fromarray(np.stack([gray, gray, gray], axis=2))
 
     @staticmethod
     def radial_tint(img: Image.Image, tint_rgb: tuple[int, int, int] = (123, 180, 216), feather: float = 0.25) -> Image.Image:
@@ -2558,24 +3290,89 @@ class PicasaImageProcessor:
         fill: float = 0.0,
         highlights: float = 0.0,
         shadows: float = 0.0,
-        colortemp: float = 0.0
+        colortemp: float = 0.0,
+        neutral_rgb: int | Tuple[int, int, int] = 0,
     ) -> Image.Image:
         """
-        FR : Réglage fin combiné (Lumière d'appoint, Hautes lumières, Ombres, Température de couleur).
-        EN : Combined fine-tuning (Fill light, Highlights, Shadows, Color temperature).
+        FR : Pipeline de réglage fin combiné en 4 étapes (`finetune2`) reproduisant exactement
+             `FUN_008f7ee0 @ 0x008F7EE0` de `picasa3.exe` :
+             1. Lumière d'appoint (`0x008F7F28` -> `0x0090AC20`) si `fill != 0.0`
+             2. LUT 16 bits Hautes lumières & Ombres (`0x008F7F5D` -> `0x0090C3B0`) avec
+                `white_pt = max(0.001, 1.0 - highlights)` et `black_pt = shadows`
+             3. Adaptation chromatique point neutre (`0x008F8002` -> `0x0090EDA0`) si `neutral_rgb != 0`
+             4. Température de couleur Kelvin (`0x008F8037` -> `0x0090E9D0`) si `colortemp != 0.0`
+        EN : Exact 4-step combined fine-tuning pipeline (`finetune2`) reproducing
+             `FUN_008f7ee0 @ 0x008F7EE0` from `picasa3.exe`:
+             1. Fill Light (`0x008F7F28` -> `0x0090AC20`) if `fill != 0.0`
+             2. 16-bit Highlights & Shadows LUT (`0x008F7F5D` -> `0x0090C3B0`) with
+                `white_pt = max(0.001, 1.0 - highlights)` and `black_pt = shadows`
+             3. Neutral point chromatic adaptation (`0x008F8002` -> `0x0090EDA0`) if `neutral_rgb != 0`
+             4. Kelvin Color Temperature (`0x008F8037` -> `0x0090E9D0`) if `colortemp != 0.0`
 
-        Ref: runtime/filterdesc.xml @ finetune, finetune2
+        Ref: picasa3.exe @ 0x008F7EE0, 0x0090AC20, 0x0090C3B0, 0x0090EDA0, 0x0090E9D0
         """
-        out = img
-        if abs(fill) > 0.001:
-            out = PicasaImageProcessor.fill_light(out, fill)
-        if abs(highlights) > 0.001:
-            out = PicasaImageProcessor.adjust_highlights(out, highlights)
-        if abs(shadows) > 0.001:
-            out = PicasaImageProcessor.adjust_shadows(out, shadows)
-        if abs(colortemp) > 0.001:
-            out = PicasaImageProcessor.color_temperature(out, colortemp)
+        if img.mode != "RGB":
+            out = img.convert("RGB")
+        else:
+            out = img.copy()
+
+        # Étape 1 : Lumière d'appoint (Ref: 0x008F7F28 -> 0x0090AC20)
+        if abs(float(fill)) > 1e-6:
+            out = PicasaImageProcessor.fill_light(out, float(fill), 1.0)
+
+        # Étape 2 : LUT 16 bits combinée Hautes lumières + Ombres (Ref: 0x008F7F5D..0x008F7FFC -> 0x0090C3B0)
+        hl = float(highlights)
+        sh = float(shadows)
+        if abs(hl) > 1e-6 or abs(sh) > 1e-6:
+            white_pt = max(0.001, 1.0 - hl)
+            black_pt = sh
+            out = PicasaImageProcessor._levels_lut_0090c1e0(out, black_pt=black_pt, white_pt=white_pt, gamma=1.0)
+
+        # Étape 3 : Point neutre pipette (Ref: 0x008F8002 -> 0x0090EDA0)
+        has_neutral = (
+            (neutral_rgb & 0x00FFFFFF) != 0
+            if isinstance(neutral_rgb, int)
+            else (isinstance(neutral_rgb, (tuple, list)) and len(neutral_rgb) >= 3 and any(int(c) > 0 for c in neutral_rgb[:3]))
+        )
+        if has_neutral:
+            out = PicasaImageProcessor._chromatic_adaptation_0090eda0(out, neutral_rgb)
+
+        # Étape 4 : Température de couleur (Ref: 0x008F8037 -> 0x0090E9D0)
+        if abs(float(colortemp)) > 1e-6:
+            out = PicasaImageProcessor.color_temperature(out, float(colortemp))
+
         return out
+
+    @staticmethod
+    def compute_autotune_lighting(img: Image.Image, current_fill: float = 0.0) -> Tuple[float, float]:
+        """
+        FR : Calcule les valeurs automatiques des curseurs `highlights` (`0.0 .. 0.48`) et `shadows` (`0.0 .. 0.48`)
+             lors du clic sur la baguette magique d'éclairage de l'onglet 2 (`button id="0"`, `0x008FC690`).
+        EN : Computes automatic slider values for `highlights` (`0.0 .. 0.48`) and `shadows` (`0.0 .. 0.48`)
+             when clicking the Tab 2 lighting magic wand (`button id="0"`, `0x008FC690`).
+
+        Ref: picasa3.exe @ 0x008FC690, 0x00A4B960, 0x00A4BFD0
+        """
+        src = PicasaImageProcessor.fill_light(img, current_fill) if abs(current_fill) > 1e-6 else img
+        _lows, _highs, min_low, max_high = PicasaImageProcessor._central_crop_percentiles_00a4b960(
+            src, 0.005, 0.995
+        )
+        sh_val = max(0.0, min(0.48, float(min_low) / 255.0))
+        hl_val = max(0.0, min(0.48, 1.0 - float(max_high) / 255.0))
+        return hl_val, sh_val
+
+    @staticmethod
+    def compute_autotune_color(img: Image.Image) -> int:
+        """
+        FR : Calcule la valeur automatique `neutral_rgb` (`0x00RRGGBB`) lors du clic sur la baguette
+             magique de couleur de l'onglet 2 (`button id="1"`, `0x008FC690` -> `0x0090F8F0`).
+        EN : Computes the automatic `neutral_rgb` (`0x00RRGGBB`) value when clicking the Tab 2
+             color magic wand (`button id="1"`, `0x008FC690` -> `0x0090F8F0`).
+
+        Ref: picasa3.exe @ 0x008FC690, 0x0090F8F0
+        """
+        r_est, g_est, b_est = PicasaImageProcessor._estimate_scene_illuminant_0090f8f0(img)
+        return ((r_est & 0xFF) << 16) | ((g_est & 0xFF) << 8) | (b_est & 0xFF)
 
     # FR : Alias de méthodes pour correspondance stricte 1:1 avec filterdesc.xml et tools/audit_picasa_code.py
     # EN : Method aliases for strict 1:1 correspondence with filterdesc.xml and tools/audit_picasa_code.py
@@ -2590,7 +3387,7 @@ class PicasaImageProcessor:
     autobacklight = backlight_fix
     autolight = auto_contrast
     bw = black_and_white
-    enhance = auto_contrast
+    enhance = enhance_lucky
     warm = warmify
     grain = film_grain
     grain2 = film_grain

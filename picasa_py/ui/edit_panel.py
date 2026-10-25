@@ -656,7 +656,7 @@ FILTER_SPECS: dict[str, dict] = {
         "title_id": "FilterName_unsharp2",
         "desc": "Ajustez le curseur pour renforcer le piqué et la netteté des contours, puis cliquez sur Appliquer.",
         "sliders": [
-            {"key": "amount", "label": "Quantité", "min": 5, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
+            {"key": "amount", "label": "Quantité", "min": 0, "max": 300, "default": 60, "scale": 100.0, "unit": "%"},
         ],
     },
     "grain": {
@@ -684,7 +684,7 @@ FILTER_SPECS: dict[str, dict] = {
         "title_id": "FilterName_sat",
         "desc": "Déplacez le curseur pour désaturer (gauche) ou intensifier les couleurs (droite).",
         "sliders": [
-            {"key": "factor", "label": "Quantité", "min": 0, "max": 250, "default": 140, "scale": 100.0, "unit": "%"},
+            {"key": "factor", "label": "Quantité", "min": -100, "max": 100, "default": 16, "scale": 100.0, "unit": "%"},
         ],
     },
     "soft_focus": {
@@ -701,8 +701,8 @@ FILTER_SPECS: dict[str, dict] = {
         "title_id": "FilterName_glow2",
         "desc": "Ajustez l'intensité lumineuse et le rayon de diffusion du halo.",
         "sliders": [
-            {"key": "intensity", "label": "Intensité", "min": 5, "max": 100, "default": 45, "scale": 100.0, "unit": "%"},
-            {"key": "radius", "label": "Rayon", "min": 2, "max": 25, "default": 8, "scale": 1.0, "unit": " px"},
+            {"key": "intensity", "label": "Intensité", "min": 0, "max": 100, "default": 65, "scale": 100.0, "unit": "%"},
+            {"key": "radius", "label": "Rayon", "min": 0, "max": 10, "default": 3, "scale": 1.0, "unit": " px"},
         ],
     },
     "focal_bw": {
@@ -719,11 +719,11 @@ FILTER_SPECS: dict[str, dict] = {
         "title_id": "FilterName_dir_tint",
         "desc": "Choisissez la couleur du filtre dégradé, son estompage et son intensité.",
         "colors": [
-            {"key": "color", "label": "Couleur du filtre", "default": (255, 140, 50)},
+            {"key": "color", "label": "Couleur du filtre", "default": (123, 180, 216)},
         ],
         "sliders": [
-            {"key": "feather", "label": "Estomper", "min": 10, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
-            {"key": "shade", "label": "Ombre / Intensité", "min": 5, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
+            {"key": "feather", "label": "Estomper", "min": 0, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
+            {"key": "shade", "label": "Ombre / Intensité", "min": 0, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
         ],
     },
     "filtered_bw": {
@@ -1835,21 +1835,76 @@ class PicasaEditPanel(QWidget):
 
     def get_tuning_params(self) -> dict:
         """
-        FR: Retourne l'état courant des 4 curseurs de réglage d'éclairage (Tab 1 / Tab 2).
-        EN: Returns the current state of the 4 lighting/tuning sliders (Tab 1 / Tab 2).
+        FR: Retourne l'état courant des 4 curseurs de réglage d'éclairage et de la pipette (`finetune2`)
+            selon les plages exactes de `filterdesc.xml` (`0x008FBDF0`) :
+            - `fill` : `0.0 .. 1.0` (`slider id="0"`)
+            - `highlights` : `0.0 .. 0.48` (`slider id="1"`, `<range>0.48</range>`)
+            - `shadows` : `0.0 .. 0.48` (`slider id="2"`, `<range>0.48</range>`)
+            - `colortemp` : `-1.0 .. +1.0` (`slider id="3"`, `<range>2.0</range><offset>-1.0</offset>`)
+            - `neutral_rgb` : `0x00RRGGBB` (`colorpicker id="0"`)
+        EN: Returns the current state of the 4 lighting/tuning sliders and neutral pipette (`finetune2`)
+            using the exact ranges from `filterdesc.xml` (`0x008FBDF0`):
+            - `fill`: `0.0 .. 1.0` (`slider id="0"`)
+            - `highlights`: `0.0 .. 0.48` (`slider id="1"`, `<range>0.48</range>`)
+            - `shadows`: `0.0 .. 0.48` (`slider id="2"`, `<range>0.48</range>`)
+            - `colortemp`: `-1.0 .. +1.0` (`slider id="3"`, `<range>2.0</range><offset>-1.0</offset>`)
+            - `neutral_rgb`: `0x00RRGGBB` (`colorpicker id="0"`)
+
+        Ref: picasa3.exe @ 0x008FBDF0, 0x008F7EE0, filterdesc.xml @ finetune2
         """
         return {
             "fill": self.sldr_fill.value() / 100.0,
-            "highlights": self.sldr_highlights.value() / 100.0,
-            "shadows": self.sldr_shadows.value() / 100.0,
-            "colortemp": float(self.sldr_temp.value()),
+            "highlights": (self.sldr_highlights.value() / 100.0) * 0.48,
+            "shadows": (self.sldr_shadows.value() / 100.0) * 0.48,
+            "colortemp": float(self.sldr_temp.value()) / 50.0,
+            "neutral_rgb": int(getattr(self, "_tuning_neutral_rgb", 0)),
         }
+
+    def set_tuning_neutral_rgb(self, neutral_rgb: int) -> None:
+        """
+        FR: Définit la couleur de point neutre (`0x00RRGGBB`) de `finetune2` (`[edi + 0x40]` @ `0x008F8002`).
+        EN: Sets the `finetune2` neutral point color (`0x00RRGGBB`, `[edi + 0x40]` @ `0x008F8002`).
+        """
+        self._tuning_neutral_rgb = int(neutral_rgb) & 0x00FFFFFF
+
+    def set_tuning_sliders_from_params(self, highlights: float, shadows: float, fill: Optional[float] = None) -> None:
+        """
+        FR: Positionne les curseurs de l'onglet 2 à partir des valeurs physiques (`0.0..0.48` pour
+            `highlights`/`shadows`, `0.0..1.0` pour `fill`) calculées par la baguette magique (`0x008FC690`).
+        EN: Positions the Tab 2 sliders from the physical values (`0.0..0.48` for
+            `highlights`/`shadows`, `0.0..1.0` for `fill`) computed by the magic wand (`0x008FC690`).
+        """
+        self._syncing_tuning_sliders = True
+        try:
+            hl_pct = max(0, min(100, int(round((float(highlights) / 0.48) * 100.0))))
+            sh_pct = max(0, min(100, int(round((float(shadows) / 0.48) * 100.0))))
+            self.sldr_highlights.blockSignals(True)
+            self.sldr_highlights.setValue(hl_pct)
+            self.sldr_highlights.blockSignals(False)
+            self.lbl_highlights_val.setText(f"{hl_pct}%")
+
+            self.sldr_shadows.blockSignals(True)
+            self.sldr_shadows.setValue(sh_pct)
+            self.sldr_shadows.blockSignals(False)
+            self.lbl_shadows_val.setText(f"{sh_pct}%")
+
+            if fill is not None:
+                f_pct = max(0, min(100, int(round(float(fill) * 100.0))))
+                for s in (self.sldr_basic_fill, self.sldr_fill):
+                    s.blockSignals(True)
+                    s.setValue(f_pct)
+                    s.blockSignals(False)
+                self.lbl_basic_fill_val.setText(f"{f_pct}%")
+                self.lbl_fill_val.setText(f"{f_pct}%")
+        finally:
+            self._syncing_tuning_sliders = False
 
     def reset_tuning_controls_silently(self) -> None:
         """
-        FR: Remet les curseurs de Lumière d'appoint et Réglages à zéro sans émettre d'événement d'édition.
-        EN: Resets the Fill Light and Tuning sliders to zero without emitting edit signals.
+        FR: Remet les curseurs de Lumière d'appoint et Réglages ainsi que `neutral_rgb` à zéro sans émettre d'événement d'édition.
+        EN: Resets the Fill Light and Tuning sliders as well as `neutral_rgb` to zero without emitting edit signals.
         """
+        self._tuning_neutral_rgb = 0
         self._syncing_tuning_sliders = True
         try:
             for s in (self.sldr_basic_fill, self.sldr_fill, self.sldr_highlights, self.sldr_shadows, self.sldr_temp):
@@ -2098,18 +2153,25 @@ class PicasaEditPanel(QWidget):
         )
         layout.addWidget(self.sldr_fill)
 
-        # 2. FR: Hautes lumières / EN: Highlights
+        # 2. FR: Hautes lumières (plage 0.0..0.48 dans filterdesc.xml) + Baguette magique éclairage (button id="0" @ 0x008FC690)
+        # EN: Highlights (range 0.0..0.48 in filterdesc.xml) + Lighting Magic Wand (button id="0" @ 0x008FC690)
         h_hl = QHBoxLayout()
         h_hl.addWidget(QLabel("☀️ Hautes lumières :"))
         h_hl.addStretch(1)
         self.lbl_highlights_val = QLabel("0%")
         self.lbl_highlights_val.setObjectName("SubpanelValue")
+        self.btn_wand_lighting = QPushButton("🪄")
+        self.btn_wand_lighting.setObjectName("HistModeBtn")
+        self.btn_wand_lighting.setFixedSize(22, 18)
+        self.btn_wand_lighting.setToolTip("Réglage automatique de l'éclairage (Hautes lumières et Ombres, Ref: 0x008FC690)")
+        self.btn_wand_lighting.clicked.connect(lambda: self.apply_effect.emit("autotune_lighting", {}))
         btn_rst_hl = QPushButton("↺")
         btn_rst_hl.setObjectName("HistModeBtn")
         btn_rst_hl.setFixedSize(20, 18)
         btn_rst_hl.setToolTip("Réinitialiser les hautes lumières (0%)")
         btn_rst_hl.clicked.connect(lambda: self._reset_single_tuning_slider("highlights"))
         h_hl.addWidget(self.lbl_highlights_val)
+        h_hl.addWidget(self.btn_wand_lighting)
         h_hl.addWidget(btn_rst_hl)
         layout.addLayout(h_hl)
 
@@ -2120,11 +2182,11 @@ class PicasaEditPanel(QWidget):
             lambda v: self._on_tuning_slider_value_changed("highlights", v)
         )
         self.sldr_highlights.sliderReleased.connect(
-            lambda: self.apply_effect.emit("highlights", {"amount": self.sldr_highlights.value() / 100.0})
+            lambda: self.apply_effect.emit("highlights", {"amount": (self.sldr_highlights.value() / 100.0) * 0.48})
         )
         layout.addWidget(self.sldr_highlights)
 
-        # 3. FR: Ombres / EN: Shadows
+        # 3. FR: Ombres (plage 0.0..0.48 dans filterdesc.xml) / EN: Shadows (range 0.0..0.48 in filterdesc.xml)
         h_sh = QHBoxLayout()
         h_sh.addWidget(QLabel("🌑 Ombres :"))
         h_sh.addStretch(1)
@@ -2146,17 +2208,25 @@ class PicasaEditPanel(QWidget):
             lambda v: self._on_tuning_slider_value_changed("shadows", v)
         )
         self.sldr_shadows.sliderReleased.connect(
-            lambda: self.apply_effect.emit("shadows", {"amount": self.sldr_shadows.value() / 100.0})
+            lambda: self.apply_effect.emit("shadows", {"amount": (self.sldr_shadows.value() / 100.0) * 0.48})
         )
         layout.addWidget(self.sldr_shadows)
 
-        # 4. FR: Température de couleur avec Pipette de couleur neutre / EN: Color Temp with Neutral Color Picker (Ref: filter_whitept, CDesaturateFilter::pickcolor)
+        # 4. FR: Température de couleur (-1.0..+1.0) avec Baguette magique couleur (button id="1" @ 0x008FC690) et Pipette
+        # EN: Color Temp (-1.0..+1.0) with Color Magic Wand (button id="1" @ 0x008FC690) and Neutral Color Picker
         h_temp_lbl = QHBoxLayout()
         h_temp_lbl.addWidget(QLabel("🌡️ Température :"))
         h_temp_lbl.addStretch(1)
         self.lbl_temp_val = QLabel("0")
         self.lbl_temp_val.setObjectName("SubpanelValue")
         h_temp_lbl.addWidget(self.lbl_temp_val)
+
+        self.btn_wand_color = QPushButton("🪄")
+        self.btn_wand_color.setObjectName("HistModeBtn")
+        self.btn_wand_color.setFixedSize(22, 18)
+        self.btn_wand_color.setToolTip("Réglage automatique de la température des couleurs (Ref: 0x008FC690)")
+        self.btn_wand_color.clicked.connect(lambda: self.apply_effect.emit("autotune_color", {}))
+        h_temp_lbl.addWidget(self.btn_wand_color)
 
         btn_rst_temp = QPushButton("↺")
         btn_rst_temp.setObjectName("HistModeBtn")
@@ -2180,7 +2250,7 @@ class PicasaEditPanel(QWidget):
             lambda v: self._on_tuning_slider_value_changed("temp", v)
         )
         self.sldr_temp.sliderReleased.connect(
-            lambda: self.apply_effect.emit("color_temp", {"temp": float(self.sldr_temp.value())})
+            lambda: self.apply_effect.emit("color_temp", {"temp": float(self.sldr_temp.value()) / 50.0})
         )
         layout.addWidget(self.sldr_temp)
 
@@ -2218,12 +2288,20 @@ class PicasaEditPanel(QWidget):
         """
         if which == "fill":
             self.sldr_fill.setValue(0)
+            self.apply_effect.emit("fill_light", {"amount": 0.0})
         elif which == "highlights":
             self.sldr_highlights.setValue(0)
+            self.apply_effect.emit("highlights", {"amount": 0.0})
         elif which == "shadows":
             self.sldr_shadows.setValue(0)
+            self.apply_effect.emit("shadows", {"amount": 0.0})
         elif which == "temp":
-            self.sldr_temp.setValue(0)
+            self._tuning_neutral_rgb = 0
+            if self.sldr_temp.value() != 0:
+                self.sldr_temp.setValue(0)
+            else:
+                self.tuning_preview_changed.emit(self.get_tuning_params())
+            self.apply_effect.emit("color_temp", {"temp": 0.0})
 
     def _reset_tuning_sliders(self) -> None:
         """

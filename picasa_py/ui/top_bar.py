@@ -291,6 +291,7 @@ class PicasaTopBar(QWidget):
             style = PicasaStyle.instance()
         self.style = style
         g_start = style.topbar_grad_start.name()
+        g_mid = style.topbar_grad_mid.name() if getattr(style, "topbar_grad_mid", None) else None
         g_end = style.topbar_grad_end.name()
         b_col = style.topbar_border_color.name()
         txt_col = style.topbar_text_color.name()
@@ -298,13 +299,25 @@ class PicasaTopBar(QWidget):
         btn_e = style.topbar_btn_bg_end.name()
         btn_b = style.topbar_btn_border.name()
         accent = style.accent_color.name()
+        accent_end = getattr(style, "accent_grad_end", style.accent_color).name()
         search_bg = "#252932" if style.is_dark else "#FFFFFF"
         search_txt = "#E2E8F0" if style.is_dark else "#222222"
+        if g_mid:
+            topbar_bg_grad = (
+                f"qlineargradient(x1:0, y1:0, x2:1, y2:1, "
+                f"stop:0 {g_start}, stop:0.5 {g_mid}, stop:1 {g_end})"
+            )
+        else:
+            topbar_bg_grad = f"qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {g_start}, stop:1 {g_end})"
+        accent_bg_grad = (
+            f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {accent}, stop:1 {accent_end})"
+            if accent != accent_end
+            else accent
+        )
 
         self.setStyleSheet(f"""
             QWidget#TopBarRoot {{
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 {g_start}, stop:1 {g_end});
+                background: {topbar_bg_grad};
                 border-bottom: 1px solid {b_col};
             }}
             QPushButton#ListHeaderBtn {{
@@ -321,7 +334,7 @@ class PicasaTopBar(QWidget):
                 border-color: {accent};
             }}
             QPushButton#ListHeaderBtn:pressed, QPushButton#ListHeaderBtn:checked {{
-                background-color: {accent};
+                background: {accent_bg_grad};
                 color: #FFFFFF;
                 border-color: {accent};
             }}
@@ -351,7 +364,7 @@ class PicasaTopBar(QWidget):
                 color: {txt_col};
             }}
             QPushButton#ViewToggleLeft:checked, QPushButton#ViewToggleRight:checked {{
-                background-color: {accent};
+                background: {accent_bg_grad};
                 color: #FFFFFF;
                 border-color: {accent};
                 font-weight: bold;
@@ -369,7 +382,7 @@ class PicasaTopBar(QWidget):
                 border-color: {accent};
             }}
             QPushButton#FilterBtn:checked {{
-                background-color: {accent};
+                background: {accent_bg_grad};
                 color: #FFFFFF;
                 border-color: {accent};
                 font-weight: bold;
