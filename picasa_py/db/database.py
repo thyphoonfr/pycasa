@@ -478,6 +478,35 @@ class PicasaDatabase:
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
             self.contacts = ContactsFile.from_xml((self.contacts_dir / "contacts.xml").read_text(encoding="utf-8"))
 
+        # 7. Synchroniser en mémoire les dossiers ayant P2category=Hidden Folders dans .picasa.ini (Ref: 0x004420D3)
+        self._hidden_folders: Set[str] = set()
+        ad_cats = self.pmps.get("albumdata_category")
+        ad_files = self.pmps.get("albumdata_filename")
+        if ad_cats is not None and ad_files is not None:
+            for i_row, fp_val in enumerate(ad_files.records):
+                if not fp_val or i_row >= len(ad_cats.records):
+                    continue
+                cat_v = ad_cats.records[i_row]
+                if cat_v == 7:
+                    self._hidden_folders.add(str(fp_val).replace("\\", "/").rstrip("/").lower())
+                elif cat_v == 2:
+                    host_fp = _to_host_path(str(fp_val).rstrip("\\/"))
+                    if host_fp:
+                        ini_cand = os.path.join(host_fp, ".picasa.ini")
+                        if os.path.exists(ini_cand):
+                            try:
+                                with open(ini_cand, "rb") as fh_ini:
+                                    head_bytes = fh_ini.read(512)
+                                if b"Hidden Folders" in head_bytes:
+                                    doc_ini = self.get_parsed_ini(ini_cand)
+                                    sec_p = doc_ini.get_section("Picasa") if doc_ini is not None else None
+                                    p2c = (sec_p.get("P2category") or sec_p.get("category") or "").strip() if sec_p else ""
+                                    if p2c.lower() in ("hidden folders", "dossiers masqués"):
+                                        ad_cats.records[i_row] = 7
+                                        self._hidden_folders.add(str(fp_val).replace("\\", "/").rstrip("/").lower())
+                            except Exception:
+                                pass
+
         self._deleted_or_reset_indices.clear()
         self._modified_media_indices.clear()
         self._invalidate_path_index_cache()
@@ -3011,6 +3040,7 @@ class PicasaDatabase:
         ini_ft2 = 0
         ini_name_override: Optional[str] = None
         ini_date_override: Optional[float] = None
+        target_cat: int = 2  # Ref: picasa3.exe @ 0x004420D3 - 0x00442172 (2 = Folders on Disk, 7 = Hidden Folders)
         if host_folder:
             for ini_cand in (".picasa.ini", "Picasa.ini"):
                 ini_p = os.path.join(host_folder, ini_cand)
@@ -3026,6 +3056,9 @@ class PicasaDatabase:
                                 n_val = sec_p.get("name")
                                 if n_val and n_val.strip():
                                     ini_name_override = n_val.strip()
+                                p2cat_val = (sec_p.get("P2category") or sec_p.get("category") or "").strip()
+                                if p2cat_val.lower() in ("hidden folders", "dossiers masqués"):
+                                    target_cat = 7
                                 d_val = sec_p.get("date")
                                 if d_val and d_val.strip():
                                     try:
@@ -3043,10 +3076,21 @@ class PicasaDatabase:
                         pass
                     break
 
+        if not hasattr(self, "_hidden_folders") or not isinstance(self._hidden_folders, set):
+            self._hidden_folders = set()
+        norm_slash_low = norm.replace("\\", "/").rstrip("/").lower()
+        if target_cat == 7:
+            self._hidden_folders.add(norm_slash_low)
+        elif norm_slash_low in self._hidden_folders:
+            target_cat = 7
+
         if ad_fnames is not None:
             for row_i, fn_val in enumerate(ad_fnames.records):
-                if row_i < len(ad_cats.records) and ad_cats.records[row_i] == 2:
+                if row_i < len(ad_cats.records) and ad_cats.records[row_i] in (2, 7):
                     if str(fn_val or "").replace("/", "\\").rstrip("\\").lower() + "\\" == norm_low:
+                        if ad_cats.records[row_i] != target_cat:
+                            ad_cats.records[row_i] = target_cat
+                            ad_cats.dirty = True
                         if ad_inisync is not None and row_i < len(ad_inisync.records) and ini_ft2:
                             if ad_inisync.records[row_i] != ini_ft2:
                                 ad_inisync.records[row_i] = ini_ft2
@@ -3111,7 +3155,7 @@ class PicasaDatabase:
             elif stem == "albumdata_uid":
                 pmp.records.append(uid_hex)
             elif stem == "albumdata_category":
-                pmp.records.append(2)
+                pmp.records.append(target_cat)
             elif stem == "albumdata_date":
                 pmp.records.append(ole_dt)
             elif stem == "albumdata_inisync":

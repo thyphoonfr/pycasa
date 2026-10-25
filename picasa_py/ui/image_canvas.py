@@ -273,6 +273,9 @@ class PicasaImageCanvas(QWidget):
             self.pan_offset = QPointF(0, 0)
             self.fit_to_window = True
         self._update_display_pixmap()
+        if self.fit_to_window:
+            self.zoom_level = self._get_fit_scale()
+        self.zoom_changed.emit(self.get_current_scale())
         self.update()
 
     def set_display_image(self, pil_img: Image.Image) -> None:
@@ -331,7 +334,16 @@ class PicasaImageCanvas(QWidget):
         Ref: picasa3.exe @ TwoUp, TwoUpAB (0x0088E588), TwoUpAA (0x0088E59C)
         """
         if mode in ("A", "A_B", "A_A"):
+            prev_fit_scale = self._get_fit_scale()
             self.view_mode = mode
+            new_fit_scale = self._get_fit_scale()
+            if self.fit_to_window:
+                self.zoom_level = new_fit_scale
+                self.pan_offset = QPointF(0, 0)
+            elif prev_fit_scale > 0 and new_fit_scale > 0:
+                self.zoom_level = max(0.1, min(6.0, self.zoom_level * (new_fit_scale / prev_fit_scale)))
+                self._clamp_pan_offset()
+            self.zoom_changed.emit(self.get_current_scale())
             self.update()
 
     def set_split_orientation(self, orientation: str) -> None:
@@ -341,7 +353,16 @@ class PicasaImageCanvas(QWidget):
         Ref: picasa3.exe @ 0x00569720 (FUN_00569720, editpanel/swap_2up_layout)
         """
         if orientation in ("horizontal", "vertical"):
+            prev_fit_scale = self._get_fit_scale()
             self.split_orientation = orientation
+            new_fit_scale = self._get_fit_scale()
+            if self.fit_to_window:
+                self.zoom_level = new_fit_scale
+                self.pan_offset = QPointF(0, 0)
+            elif prev_fit_scale > 0 and new_fit_scale > 0:
+                self.zoom_level = max(0.1, min(6.0, self.zoom_level * (new_fit_scale / prev_fit_scale)))
+                self._clamp_pan_offset()
+            self.zoom_changed.emit(self.get_current_scale())
             self.update()
 
     def toggle_split_orientation(self) -> str:
@@ -372,6 +393,9 @@ class PicasaImageCanvas(QWidget):
         """
         self._original_pixmap = pixmap
         if self.view_mode == "A_A":
+            if self.fit_to_window:
+                self.zoom_level = self._get_fit_scale()
+            self.zoom_changed.emit(self.get_current_scale())
             self.update()
 
     def set_secondary_pixmap(self, pixmap: Optional[QPixmap], title: str = "Photo B") -> None:
@@ -382,6 +406,9 @@ class PicasaImageCanvas(QWidget):
         self._secondary_pixmap = pixmap
         self.secondary_title = title
         if self.view_mode == "A_B":
+            if self.fit_to_window:
+                self.zoom_level = self._get_fit_scale()
+            self.zoom_changed.emit(self.get_current_scale())
             self.update()
 
     def _update_display_pixmap(self) -> None:
@@ -418,6 +445,41 @@ class PicasaImageCanvas(QWidget):
         else:
             self._nav_thumbnail = None
 
+    def _get_active_pane_rect(self, for_pos: Optional[QPointF] = None) -> QRectF:
+        """
+        FR: Retourne le rectangle du volet actif (plein canevas en mode "A", demi-volet en mode "A_B" / "A_A").
+        EN: Returns the active pane rectangle (full canvas in "A" mode, half-pane in "A_B" / "A_A" mode).
+        Ref: picasa3.exe @ 0x005D157D ([ebp + 0x327c] / [ebp + 0x3280])
+        """
+        w, h = float(max(1, self.width())), float(max(1, self.height()))
+        if self.view_mode not in ("A_B", "A_A"):
+            return QRectF(0.0, 0.0, w, h)
+        if self.split_orientation == "vertical":
+            half_h = max(10.0, (h - 2.0) / 2.0)
+            first_rect = QRectF(0.0, 0.0, w, half_h)
+            second_rect = QRectF(0.0, half_h + 2.0, w, half_h)
+        else:
+            half_w = max(10.0, (w - 2.0) / 2.0)
+            first_rect = QRectF(0.0, 0.0, half_w, h)
+            second_rect = QRectF(half_w + 2.0, 0.0, half_w, h)
+        if for_pos is not None:
+            return second_rect if second_rect.contains(for_pos) else first_rect
+        return first_rect if self.active_pane == "A" else second_rect
+
+    def _get_active_pane_pixmap(self) -> Optional[QPixmap]:
+        """
+        FR: Retourne le `QPixmap` affiché dans le volet actif (A ou B selon `view_mode` et `active_pane`).
+        EN: Returns the `QPixmap` displayed in the active pane (A or B depending on `view_mode` and `active_pane`).
+        Ref: picasa3.exe @ 0x005D157D
+        """
+        if self.view_mode == "A_B" and self.active_pane == "B":
+            if self._secondary_pixmap is not None and not self._secondary_pixmap.isNull():
+                return self._secondary_pixmap
+        elif self.view_mode == "A_A" and self.active_pane == "A":
+            if self._original_pixmap is not None and not self._original_pixmap.isNull():
+                return self._original_pixmap
+        return self._display_pixmap
+
     def get_current_scale(self) -> float:
         """
         FR: Retourne le facteur d'échelle actuel de l'image.
@@ -429,26 +491,57 @@ class PicasaImageCanvas(QWidget):
 
     def is_zoomed_in(self) -> bool:
         """
-        FR: Vérifie si l'image dépasse les dimensions de la fenêtre d'affichage.
-        EN: Checks whether the scaled image exceeds the viewport dimensions.
+        FR: Vérifie si l'image est zoomée au-delà de l'ajustement au volet d'affichage (1-Up ou 2-Up A|B / A|A).
+        EN: Checks whether the image is zoomed beyond the viewport pane fit (1-Up or 2-Up A|B / A|A).
+        Ref: picasa3.exe @ 0x005D1520..0x005D16B6 (editpanel/nav)
         """
-        if self._display_pixmap is None or self._display_pixmap.isNull():
+        pix = self._get_active_pane_pixmap()
+        if pix is None or pix.isNull():
             return False
+        if self.fit_to_window:
+            return False
+        pane_rect = self._get_active_pane_rect()
         scale = self.get_current_scale()
-        draw_w = self._display_pixmap.width() * scale
-        draw_h = self._display_pixmap.height() * scale
-        return (draw_w > self.width() + 10) or (draw_h > self.height() + 10)
+        fit_scale = self._get_fit_scale()
+        draw_w = pix.width() * scale
+        draw_h = pix.height() * scale
+        if (draw_w > pane_rect.width() + 10) or (draw_h > pane_rect.height() + 10):
+            return True
+        return scale > fit_scale * 1.01
 
     def set_zoom(self, zoom: float) -> None:
         """
-        FR: Définit le niveau de zoom (entre 0.1 et 6.0) et contraint le décalage panoramique.
-        EN: Sets the zoom level (clamped between 0.1 and 6.0) and constrains the pan offset.
+        FR: Définit le niveau de zoom (entre 0.1 et 6.0) centré sur la vue courante et contraint le décalage panoramique.
+        EN: Sets the zoom level (clamped between 0.1 and 6.0) centered on the current view and constrains the pan offset.
+        Ref: picasa3.exe @ 0x005D1520 (CEditPanel::SetZoom)
         """
-        self.zoom_level = max(0.1, min(6.0, zoom))
+        old_scale = self.get_current_scale()
+        new_zoom = max(0.1, min(6.0, float(zoom)))
+        if old_scale > 0 and not self.fit_to_window:
+            self.pan_offset = QPointF(
+                self.pan_offset.x() * (new_zoom / old_scale),
+                self.pan_offset.y() * (new_zoom / old_scale),
+            )
+        self.zoom_level = new_zoom
         self.fit_to_window = False
         self._clamp_pan_offset()
         self.zoom_changed.emit(self.zoom_level)
         self.update()
+
+    def set_zoom_from_slider(self, slider_pct: int) -> None:
+        """
+        FR: Applique le niveau de zoom issu du curseur `zoomslider/scaleslider` (`slider_pct` en %).
+        Lorsque le curseur est ramené tout à gauche (au niveau Ajuster `fit_scale`), réactive le mode Ajuster.
+        EN: Applies the zoom level from the `zoomslider/scaleslider` slider (`slider_pct` in %).
+        When dragged back to the leftmost Fit position (`fit_scale`), re-enables Fit-to-window mode.
+        Ref: picasa3.exe @ 0x0057C322, 0x005D1520, 0x00597D10
+        """
+        target_zoom = float(slider_pct) / 100.0
+        fit_scale = self._get_fit_scale()
+        if target_zoom <= fit_scale * 1.01:
+            self.reset_zoom_to_fit()
+            return
+        self.set_zoom(target_zoom)
 
     def reset_zoom_to_fit(self) -> None:
         """
@@ -470,46 +563,52 @@ class PicasaImageCanvas(QWidget):
 
     def _get_fit_scale(self) -> float:
         """
-        FR: Calcule le facteur d'échelle permettant de faire tenir l'image dans la fenêtre.
-        EN: Computes the scale factor required to fit the image inside the viewport.
+        FR: Calcule le facteur d'échelle permettant de faire tenir l'image dans le volet actif (1-Up ou 2-Up).
+        EN: Computes the scale factor required to fit the image inside the active viewport pane (1-Up or 2-Up).
         """
-        if self._display_pixmap is None or self._display_pixmap.isNull():
+        pix = self._get_active_pane_pixmap()
+        if pix is None or pix.isNull():
             return 1.0
-        img_w = self._display_pixmap.width()
-        img_h = self._display_pixmap.height()
-        view_w = max(10, self.width() - 20)
-        view_h = max(10, self.height() - 20)
+        pane_rect = self._get_active_pane_rect()
+        img_w = max(1, pix.width())
+        img_h = max(1, pix.height())
+        view_w = max(10.0, pane_rect.width() - 20.0)
+        view_h = max(10.0, pane_rect.height() - 20.0)
         scale_x = view_w / img_w
         scale_y = view_h / img_h
         return min(scale_x, scale_y)
 
     def _clamp_pan_offset(self) -> None:
         """
-        FR: Contraint le panoramique pour maintenir l'image visible et centrée.
-        EN: Constrains the pan offset to keep the image visible and centered.
+        FR: Contraint le panoramique pour maintenir l'image visible et centrée dans le volet actif.
+        EN: Constrains the pan offset to keep the image visible and centered inside the active pane.
         Ref: picasa3.exe @ PanHandler 0x0093F3A8
         """
-        if self._display_pixmap is None or self._display_pixmap.isNull():
+        pix = self._get_active_pane_pixmap()
+        if pix is None or pix.isNull():
             self.pan_offset = QPointF(0, 0)
             return
 
+        pane_rect = self._get_active_pane_rect()
+        pane_w = pane_rect.width()
+        pane_h = pane_rect.height()
         scale = self.get_current_scale()
-        draw_w = self._display_pixmap.width() * scale
-        draw_h = self._display_pixmap.height() * scale
+        draw_w = pix.width() * scale
+        draw_h = pix.height() * scale
 
         # FR: Axe horizontal / EN: Horizontal axis
-        if draw_w <= self.width():
+        if draw_w <= pane_w:
             new_x = 0.0
         else:
-            max_delta_x = (draw_w - self.width()) / 2.0
+            max_delta_x = (draw_w - pane_w) / 2.0
             bound_x = max_delta_x + 40.0
             new_x = max(-bound_x, min(bound_x, self.pan_offset.x()))
 
         # FR: Axe vertical / EN: Vertical axis
-        if draw_h <= self.height():
+        if draw_h <= pane_h:
             new_y = 0.0
         else:
-            max_delta_y = (draw_h - self.height()) / 2.0
+            max_delta_y = (draw_h - pane_h) / 2.0
             bound_y = max_delta_y + 40.0
             new_y = max(-bound_y, min(bound_y, self.pan_offset.y()))
 
@@ -517,13 +616,15 @@ class PicasaImageCanvas(QWidget):
 
     def set_zoom_anchored(self, new_zoom: float, anchor: QPointF) -> None:
         """
-        FR: Zoom ancré au niveau du curseur : le point de la photo sous la souris reste stable.
-        EN: Cursor-anchored zoom: the point on the photo under the mouse remains stationary.
-        Ref: picasa3.exe @ CLoupeMaker / OneUpUI 0x0094355C
+        FR: Zoom ancré au niveau du curseur : le point de la photo sous la souris reste stable (1-Up et 2-Up).
+        EN: Cursor-anchored zoom: the point on the photo under the mouse remains stationary (1-Up and 2-Up).
+        Ref: picasa3.exe @ CLoupeMaker / OneUpUI 0x0094355C, 0x005D1520
         """
-        if self._display_pixmap is None or self._display_pixmap.isNull():
+        pix = self._get_active_pane_pixmap()
+        if pix is None or pix.isNull():
             return
 
+        pane_rect = self._get_active_pane_rect(for_pos=anchor)
         old_scale = self.get_current_scale()
         clamped_zoom = max(0.1, min(6.0, new_zoom))
         fit_scale = self._get_fit_scale()
@@ -532,25 +633,25 @@ class PicasaImageCanvas(QWidget):
             self.reset_zoom_to_fit()
             return
 
-        draw_w_old = self._display_pixmap.width() * old_scale
-        draw_h_old = self._display_pixmap.height() * old_scale
-        cx_old = (self.width() - draw_w_old) / 2.0 + self.pan_offset.x()
-        cy_old = (self.height() - draw_h_old) / 2.0 + self.pan_offset.y()
+        draw_w_old = pix.width() * old_scale
+        draw_h_old = pix.height() * old_scale
+        cx_old = pane_rect.x() + (pane_rect.width() - draw_w_old) / 2.0 + self.pan_offset.x()
+        cy_old = pane_rect.y() + (pane_rect.height() - draw_h_old) / 2.0 + self.pan_offset.y()
 
         u = (anchor.x() - cx_old) / draw_w_old if draw_w_old > 0 else 0.5
         v = (anchor.y() - cy_old) / draw_h_old if draw_h_old > 0 else 0.5
         u = max(0.0, min(1.0, u))
         v = max(0.0, min(1.0, v))
 
-        draw_w_new = self._display_pixmap.width() * clamped_zoom
-        draw_h_new = self._display_pixmap.height() * clamped_zoom
+        draw_w_new = pix.width() * clamped_zoom
+        draw_h_new = pix.height() * clamped_zoom
 
         cx_new = anchor.x() - u * draw_w_new
         cy_new = anchor.y() - v * draw_h_new
 
         self.pan_offset = QPointF(
-            cx_new - (self.width() - draw_w_new) / 2.0,
-            cy_new - (self.height() - draw_h_new) / 2.0
+            cx_new - (pane_rect.x() + (pane_rect.width() - draw_w_new) / 2.0),
+            cy_new - (pane_rect.y() + (pane_rect.height() - draw_h_new) / 2.0)
         )
         self.zoom_level = clamped_zoom
         self.fit_to_window = False
@@ -561,13 +662,14 @@ class PicasaImageCanvas(QWidget):
     def _update_loupe_geometry(self) -> None:
         """
         FR: Calcule la géométrie du navigateur Loupe (`editpanel/nav`), de son bouton de fermeture `[×]`
-        et du cadre de visée orange (`nav/nav`).
+        et du cadre de visée orange (`nav/nav`) en mode 1-Up (`A`) comme en mode 2-Up (`A|B`, `A|A`).
         EN: Computes the geometry of the Loupe overview navigator (`editpanel/nav`), its close `[×]` button,
-        and the orange viewfinder frame (`nav/nav`).
+        and the orange viewfinder frame (`nav/nav`) in both 1-Up (`A`) and 2-Up (`A|B`, `A|A`) modes.
         Ref: picasa3.exe @ editpanel/nav (0x005D165D), nav/overview (0x0056953D), nav/zoom (0x005736F4),
              nav/nav (0x0056B338), PanHandler (0x005C46B0 / 0x005C47F0 -> 0x00597D10)
         """
-        if not self.is_zoomed_in() or self._display_pixmap is None:
+        pix = self._get_active_pane_pixmap()
+        if not self.is_zoomed_in() or pix is None or pix.isNull():
             self._nav_card_rect = QRectF()
             self._nav_img_rect = QRectF()
             self._vbox_rect = QRectF()
@@ -575,8 +677,8 @@ class PicasaImageCanvas(QWidget):
             self._is_hovering_nav_close = False
             return
 
-        img_w = self._display_pixmap.width()
-        img_h = self._display_pixmap.height()
+        img_w = pix.width()
+        img_h = pix.height()
         if img_w <= 0 or img_h <= 0:
             return
 
@@ -609,17 +711,20 @@ class PicasaImageCanvas(QWidget):
         close_y = card_y + (header_h - close_sz) / 2.0 + 1.0
         self._nav_close_rect = QRectF(close_x, close_y, close_sz, close_sz)
 
+        pane_rect = self._get_active_pane_rect()
+        pane_w = pane_rect.width()
+        pane_h = pane_rect.height()
         scale = self.get_current_scale()
         draw_w = img_w * scale
         draw_h = img_h * scale
 
-        cx = (self.width() - draw_w) / 2.0 + self.pan_offset.x()
-        cy = (self.height() - draw_h) / 2.0 + self.pan_offset.y()
+        cx = (pane_w - draw_w) / 2.0 + self.pan_offset.x()
+        cy = (pane_h - draw_h) / 2.0 + self.pan_offset.y()
 
-        u1 = max(0.0, min(1.0, -cx / draw_w))
-        u2 = max(0.0, min(1.0, (self.width() - cx) / draw_w))
-        v1 = max(0.0, min(1.0, -cy / draw_h))
-        v2 = max(0.0, min(1.0, (self.height() - cy) / draw_h))
+        u1 = max(0.0, min(1.0, -cx / draw_w)) if draw_w > 0 else 0.0
+        u2 = max(0.0, min(1.0, (pane_w - cx) / draw_w)) if draw_w > 0 else 1.0
+        v1 = max(0.0, min(1.0, -cy / draw_h)) if draw_h > 0 else 0.0
+        v2 = max(0.0, min(1.0, (pane_h - cy) / draw_h)) if draw_h > 0 else 1.0
 
         if u2 < u1:
             u2 = u1
@@ -772,6 +877,13 @@ class PicasaImageCanvas(QWidget):
         self._draw_pane_content(painter, first_rect, img_first, badge_first, act_first, False)
         self._draw_pane_content(painter, second_rect, img_second, badge_second, act_second, (self.view_mode == "A_A"))
 
+        # FR: Dessin du navigateur Loupe d'ensemble avec cadre de visée orange en mode A|B et A|A
+        # EN: Draw overview Loupe navigator with orange viewfinder frame in A|B and A|A modes
+        # Ref: picasa3.exe @ 0x005D1520..0x005D16B6 (editpanel/nav, [ebp + 0x327c] / [ebp + 0x3280])
+        if not self.is_any_tool_active():
+            self._update_loupe_geometry()
+            self._draw_overview_navigator(painter)
+
     def _draw_pane_content(
         self, painter: QPainter, pane_rect: QRectF,
         pix: Optional[QPixmap], badge_text: str, is_active: bool, is_modified_style: bool
@@ -789,7 +901,11 @@ class PicasaImageCanvas(QWidget):
             scale_x = max(10.0, pane_rect.width() - 20.0) / max(1, pix.width())
             scale_y = max(10.0, pane_rect.height() - 20.0) / max(1, pix.height())
             fit_scale = min(scale_x, scale_y)
-            scale = fit_scale if self.fit_to_window else (self.zoom_level * fit_scale)
+            if self.fit_to_window:
+                scale = fit_scale
+            else:
+                active_fit = max(0.001, self._get_fit_scale())
+                scale = self.zoom_level * (fit_scale / active_fit)
 
             dw = pix.width() * scale
             dh = pix.height() * scale
@@ -900,17 +1016,21 @@ class PicasaImageCanvas(QWidget):
             painter.drawLine(QPointF(cx1, cy1), QPointF(cx2, cy2))
             painter.drawLine(QPointF(cx2, cy1), QPointF(cx1, cy2))
 
-        # 3. FR: Miniature de l'image / EN: Image thumbnail
-        if (self._nav_thumbnail is None or self._nav_thumbnail.isNull()) and self._display_pixmap and not self._display_pixmap.isNull():
-            self._nav_thumbnail = self._display_pixmap.scaled(
-                180, 180,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-        if self._nav_thumbnail and not self._nav_thumbnail.isNull():
-            painter.drawPixmap(self._nav_img_rect, self._nav_thumbnail, QRectF(self._nav_thumbnail.rect()))
-        elif self._display_pixmap:
-            painter.drawPixmap(self._nav_img_rect, self._display_pixmap, QRectF(self._display_pixmap.rect()))
+        # 3. FR: Miniature de l'image du volet actif / EN: Active pane image thumbnail
+        active_pix = self._get_active_pane_pixmap()
+        if active_pix is self._display_pixmap:
+            if (self._nav_thumbnail is None or self._nav_thumbnail.isNull()) and active_pix and not active_pix.isNull():
+                self._nav_thumbnail = active_pix.scaled(
+                    180, 180,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+            if self._nav_thumbnail and not self._nav_thumbnail.isNull():
+                painter.drawPixmap(self._nav_img_rect, self._nav_thumbnail, QRectF(self._nav_thumbnail.rect()))
+            elif active_pix:
+                painter.drawPixmap(self._nav_img_rect, active_pix, QRectF(active_pix.rect()))
+        elif active_pix and not active_pix.isNull():
+            painter.drawPixmap(self._nav_img_rect, active_pix, QRectF(active_pix.rect()))
 
         # 4. FR: Voile sombre atténuant les zones hors du cadrage actuel / EN: Dark veil dimming areas outside the current framing
         painter.setPen(Qt.PenStyle.NoPen)
@@ -1796,7 +1916,8 @@ class PicasaImageCanvas(QWidget):
         FR: Recentre la vue principale sur le point cliqué dans la miniature de la Loupe.
         EN: Recenters the main view on the point clicked inside the Loupe thumbnail.
         """
-        if self._nav_img_rect.isEmpty() or self._display_pixmap is None:
+        pix = self._get_active_pane_pixmap()
+        if self._nav_img_rect.isEmpty() or pix is None or pix.isNull():
             return
         u = (click_pos.x() - self._nav_img_rect.x()) / self._nav_img_rect.width()
         v = (click_pos.y() - self._nav_img_rect.y()) / self._nav_img_rect.height()
@@ -1804,8 +1925,8 @@ class PicasaImageCanvas(QWidget):
         v = max(0.0, min(1.0, v))
 
         scale = self.get_current_scale()
-        draw_w = self._display_pixmap.width() * scale
-        draw_h = self._display_pixmap.height() * scale
+        draw_w = pix.width() * scale
+        draw_h = pix.height() * scale
 
         self.pan_offset = QPointF(draw_w * (0.5 - u), draw_h * (0.5 - v))
         self._clamp_pan_offset()
@@ -1904,10 +2025,11 @@ class PicasaImageCanvas(QWidget):
             delta = pos - self._last_nav_drag_pos
             self._last_nav_drag_pos = pos
 
-            if not self._nav_img_rect.isEmpty() and self._display_pixmap:
+            pix = self._get_active_pane_pixmap()
+            if not self._nav_img_rect.isEmpty() and pix is not None and not pix.isNull():
                 scale = self.get_current_scale()
-                draw_w = self._display_pixmap.width() * scale
-                draw_h = self._display_pixmap.height() * scale
+                draw_w = pix.width() * scale
+                draw_h = pix.height() * scale
 
                 ratio_x = draw_w / self._nav_img_rect.width()
                 ratio_y = draw_h / self._nav_img_rect.height()
@@ -2084,6 +2206,9 @@ class PicasaImageCanvas(QWidget):
         EN: Recomputes and clamps the pan offset when the canvas widget is resized.
         """
         super().resizeEvent(event)
+        if self.fit_to_window:
+            self.zoom_level = self._get_fit_scale()
+            self.zoom_changed.emit(self.zoom_level)
         self._clamp_pan_offset()
 
     def keyPressEvent(self, event) -> None:

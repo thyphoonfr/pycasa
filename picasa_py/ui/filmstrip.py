@@ -14,8 +14,8 @@ import io
 from typing import List, Dict, Optional
 from PIL import Image
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt, Signal, QRect, QPoint
+from PySide6.QtWidgets import QWidget, QSizePolicy
+from PySide6.QtCore import Qt, Signal, QRect, QPoint, QSize
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPixmap, QImage, QWheelEvent, QMouseEvent
 
 from picasa_py.db.database import PicasaDatabase
@@ -48,16 +48,37 @@ class PicasaFilmstrip(QWidget):
         self.thumb_size = thumb_size
         self.spacing = spacing
         self.setFixedHeight(thumb_size + 10)
+        # FR: Largeur minimale fidèle à editpanel/filmclip rect=(431, 6, 645, 34) -> 214 px dans respack.yt
+        # EN: Minimum width faithful to editpanel/filmclip rect=(431, 6, 645, 34) -> 214 px in respack.yt
+        self.setMinimumWidth(214)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setMouseTracking(True)
 
         self.db: Optional[PicasaDatabase] = None
         self.indices: List[int] = []
         self.current_index: int = -1
+        self.secondary_index: int = -1
         self.hovered_index: int = -1
 
         self.scroll_x: int = 0
         self._thumb_cache: Dict[int, QPixmap] = {}
         self._pixmap_cache: Dict[int, QPixmap] = self._thumb_cache
+
+    def sizeHint(self) -> QSize:
+        """
+        FR: Renvoie la taille recommandée de la pellicule (`editpanel/filmclip` : 214..240 px de large).
+        EN: Returns the recommended size of the filmstrip (`editpanel/filmclip`: 214..240 px wide).
+        Ref: respack.yt @ editpanel/filmclip rect=(431, 6, 645, 34)
+        """
+        return QSize(230, self.thumb_size + 10)
+
+    def minimumSizeHint(self) -> QSize:
+        """
+        FR: Empêche le rétrécissement de la pellicule à 0 px dans les modes de comparaison A|B et A|A.
+        EN: Prevents the filmstrip from collapsing to 0 px in A|B and A|A comparison modes.
+        Ref: respack.yt @ editpanel/filmclip rect=(431, 6, 645, 34)
+        """
+        return QSize(214, self.thumb_size + 10)
 
     def apply_style(self, style: PicasaStyle) -> None:
         """
@@ -91,6 +112,14 @@ class PicasaFilmstrip(QWidget):
         """
         self.current_index = current_index
         self._ensure_centered(current_index)
+        self.update()
+
+    def set_secondary_index(self, secondary_index: int) -> None:
+        """
+        FR: Définit l'indice de la seconde photo affichée en mode de comparaison A|B.
+        EN: Sets the index of the secondary photo displayed in A|B comparison mode.
+        """
+        self.secondary_index = secondary_index
         self.update()
 
     def invalidate_thumbnail(self, db_idx: int) -> None:
@@ -231,6 +260,24 @@ class PicasaFilmstrip(QWidget):
             except Exception:
                 pass
 
+        if pix is None or pix.isNull():
+            win = self.window()
+            tv = getattr(win, "thumb_view", None) if win is not None else None
+            if tv is not None:
+                cached = getattr(tv, "_db_pixmap_cache", {}).get(resolved_idx)
+                if cached is not None and not cached.isNull():
+                    fw, fh = cached.width(), cached.height()
+                    side = min(fw, fh)
+                    if side > 0:
+                        left = (fw - side) // 2
+                        top = (fh - side) // 2
+                        pix = cached.copy(left, top, side, side).scaled(
+                            self.thumb_size,
+                            self.thumb_size,
+                            Qt.AspectRatioMode.IgnoreAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation,
+                        )
+
         if pix:
             self._thumb_cache[db_idx] = pix
         return pix
@@ -334,6 +381,7 @@ class PicasaFilmstrip(QWidget):
 
             r = QRect(x, y, self.thumb_size, self.thumb_size)
             is_active = (idx == self.current_index)
+            is_secondary = (self.secondary_index >= 0 and idx == self.secondary_index and not is_active)
             is_hover = (idx == self.hovered_index)
 
             # FR: Charger la miniature / EN: Load the thumbnail pixmap
@@ -347,6 +395,11 @@ class PicasaFilmstrip(QWidget):
             if is_active:
                 # FR: Bordure lumineuse bleue / cyan Picasa / EN: Bright Picasa blue / cyan border
                 painter.setPen(QPen(QColor(51, 153, 255), 2))
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.drawRoundedRect(r.adjusted(1, 1, -1, -1), 3, 3)
+            elif is_secondary:
+                # FR: Bordure de la seconde photo en mode A|B / EN: Secondary photo border in A|B mode
+                painter.setPen(QPen(QColor(255, 175, 55), 2))
                 painter.setBrush(Qt.BrushStyle.NoBrush)
                 painter.drawRoundedRect(r.adjusted(1, 1, -1, -1), 3, 3)
             elif is_hover:

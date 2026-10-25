@@ -485,3 +485,116 @@ def test_move_face_to_person_live_refresh(qapp):
         win.close()
     finally:
         shutil.rmtree(td, ignore_errors=True)
+
+
+def test_menu_album_folder_title_and_hidden_pictures(qapp):
+    """
+    FR: Vérifie que :
+    - Le 5e menu s'appelle « &Photo » en FR (Ref: STRINGRES_FR.XML eMenuPicture) et non « &Image ».
+    - Le 4e menu bascule dynamiquement entre « &Album » (vue globale / album / personne) et « &Dossier »
+      (lorsqu'un dossier physique est sélectionné) (Ref: picasa3.exe @ 0x00537FB0).
+    - Photo > Masquer (`ID_PICTURE_HIDE`), Photo > Afficher (`ID_PICTURE_UNHIDE`) et Affichage > Photos masquées
+      (`ID_VIEW_SHOWHIDDEN`) fonctionnent et écrivent `hidden=yes` dans `.picasa.ini`.
+    EN: Verifies dynamic Album/Folder 4th menu title, &Photo 5th menu title in FR, and Hide/Unhide/ShowHidden.
+    """
+    import tempfile
+    import shutil
+    from PIL import Image
+    from picasa_py.ui.main_window import PicasaMainWindow
+    from picasa_py.ui.resources import PicasaResourceManager
+    from picasa_py.ini.parser import PicasaIniParser
+
+    td = tempfile.mkdtemp(prefix="picasa_hidden_test_")
+    rm = PicasaResourceManager.get()
+    prev_lang = rm.get_current_language()
+    try:
+        rm.set_language("fr")
+        photo1 = os.path.join(td, "photo1.jpg")
+        Image.new("RGB", (120, 90), color=(80, 120, 160)).save(photo1)
+
+        db_dir = os.path.join(td, "db3")
+        os.makedirs(db_dir, exist_ok=True)
+        win = PicasaMainWindow(db_path=db_dir)
+        db = win.db
+        db.add_media_record(td + "\\", "photo1.jpg", 100, 10000, 2)
+        win.thumb_view.set_database(db)
+
+        # Par défaut (aucun dossier sélectionné), le 4e menu est &Album et le 5e est &Photo
+        top_titles = [act.text() for act in win.menuBar().actions()]
+        assert top_titles[3] == "&Album"
+        assert top_titles[4] == "&Photo"
+
+        # Lorsqu'on sélectionne un dossier physique, le 4e menu passe à &Dossier
+        win._on_folder_selected(td, "folder", "TestFolder")
+        assert win.menu_builder.menu_folder.title() == "&Dossier"
+
+        # Lorsqu'on sélectionne un album virtuel, le 4e menu repasse à &Album
+        win._on_folder_selected("special_starred", "starred", "Photos favorites")
+        assert win.menu_builder.menu_folder.title() == "&Album"
+        win._on_folder_selected(td, "folder", "TestFolder")
+
+        # Masquer photo1 via action_hide_pictures
+        assert len(win.thumb_view.filtered_indices) == 1
+        win.action_hide_pictures([photo1])
+        ini_doc = PicasaIniParser.parse_file(os.path.join(td, ".picasa.ini"))
+        assert ini_doc.get_section("photo1.jpg").get("hidden") == "yes"
+        # ShowHidden est False par défaut -> la photo masquée n'est plus affichée
+        assert len(win.thumb_view.filtered_indices) == 0
+
+        # Basculer Affichage > Photos masquées (ID_VIEW_SHOWHIDDEN) -> la photo masquée réapparaît
+        win.action_toggle_show_hidden(True)
+        assert win.show_hidden_pictures is True
+        assert win.menu_builder.act_show_hidden.isChecked() is True
+        assert len(win.thumb_view.filtered_indices) == 1
+
+        # Réafficher photo1 via action_unhide_pictures
+        win.action_unhide_pictures([photo1])
+        ini_doc2 = PicasaIniParser.parse_file(os.path.join(td, ".picasa.ini"))
+        sec2 = ini_doc2.get_section("photo1.jpg")
+        assert sec2 is None or sec2.get("hidden") is None
+        win.action_toggle_show_hidden(False)
+        assert len(win.thumb_view.filtered_indices) == 1
+
+        # Vérifier l'enregistrement et la lecture du mot de passe de collection dans catdata_info.pmp
+        win._set_collection_password_hash("Hidden Folders", "e10adc3949ba59abbe56e057f20f883e")
+        assert win._get_collection_password_hash("Hidden Folders") == "e10adc3949ba59abbe56e057f20f883e"
+        assert "catdata_info" in win.db.pmps
+        assert os.path.exists(os.path.join(db_dir, "catdata_info.pmp"))
+
+        # Vérifier le masquage et le réaffichage d'un dossier entier (Ref: 0x005EE2A0, 0x00446012)
+        win.action_hide_folder(td)
+        assert td.replace("\\", "/").rstrip("/").lower() in win.db._hidden_folders
+        ini_folder_doc = PicasaIniParser.parse_file(os.path.join(td, ".picasa.ini"))
+        assert ini_folder_doc.get_section("Picasa").get("P2category") == "Hidden Folders"
+        assert len(win.thumb_view.filtered_indices) == 0
+
+        # Basculer Affichage > Photos masquées (0x005C9300) NE demande PAS de mot de passe :
+        # "Dossiers masqués" apparaît replié (verrouillé) tant que l'utilisateur ne le déplie pas (0x004AB9A0 -> 0x004AB650)
+        win.action_toggle_show_hidden(True)
+        assert win.library_tree.cat_hidden_folders.isHidden() is False
+        assert win.library_tree.cat_hidden_folders.isExpanded() is False
+        assert len(win.thumb_view.filtered_indices) == 0
+
+        # Déverrouiller et déplier "Dossiers masqués" -> les photos du dossier masqué apparaissent
+        win._unlocked_collections.add("Hidden Folders")
+        win.library_tree.cat_hidden_folders.setExpanded(True)
+        win.thumb_view._apply_current_filters(reset_scroll=False)
+        assert len(win.thumb_view.filtered_indices) == 1
+
+        # Replier "Dossiers masqués" reverrouille la collection (0x00453AF0)
+        win.library_tree.cat_hidden_folders.setExpanded(False)
+        assert "Hidden Folders" not in win._unlocked_collections
+        assert len(win.thumb_view.filtered_indices) == 0
+
+        win.action_unhide_folder(td)
+        assert td.replace("\\", "/").rstrip("/").lower() not in win.db._hidden_folders
+        ini_folder_doc2 = PicasaIniParser.parse_file(os.path.join(td, ".picasa.ini"))
+        assert ini_folder_doc2.get_section("Picasa").get("P2category") == "Folders on Disk"
+        assert len(win.thumb_view.filtered_indices) == 1
+
+        win.stop_background_tasks()
+        win.close()
+    finally:
+        rm.set_language(prev_lang)
+        shutil.rmtree(td, ignore_errors=True)
+

@@ -76,6 +76,7 @@ class ThumbnailItem:
     folder: str          # Nom du dossier (ex. Vacances)
     folder_path: str     # Chemin complet du dossier (ex. C:\\Photos\\Vacances\\)
     starred: bool = False
+    hidden: bool = False
     has_edits: bool = False
     has_backup: bool = False
     is_video: bool = False
@@ -483,6 +484,7 @@ class PicasaThumbnailView(QWidget):
         # En-tête globale / filtre actif
         self.current_folder_filter: Optional[str] = None
         self._unfiltered_special_sections: List[AlbumSection] = []
+        self.show_hidden: bool = False  # Ref: picasa3.exe @ 0x00564ED4, 0x00660C84 ([eax + 0x3188] ShowHidden)
         self.quick_filter_starred: bool = False
         self.quick_filter_faces: bool = False
         self.quick_filter_videos: bool = False
@@ -665,6 +667,25 @@ class PicasaThumbnailView(QWidget):
         text_recs = db.pmps["imagedata_textactive"].records if "imagedata_textactive" in db.pmps else None
         backup_recs = db.pmps["imagedata_backuphash"].records if "imagedata_backuphash" in db.pmps else None
         star_recs = db.pmps["imagedata_star"].records if "imagedata_star" in db.pmps else None
+        hidden_recs = db.pmps["imagedata_hidden"].records if "imagedata_hidden" in db.pmps else None
+        # Ref: picasa3.exe @ 0x00458EC0, 0x004A6C14, 0x005E7DEE (Le jeton système "]hidden" est indexé dans wordhash.dat)
+        hidden_wordhash_set: Set[int] = set()
+        wh = getattr(db, "wordhash", None)
+        if wh is not None and hasattr(wh, "_word_map"):
+            hid_ent = wh._word_map.get("]hidden")
+            if hid_ent is not None and getattr(hid_ent, "image_ids", None):
+                hidden_wordhash_set = set(hid_ent.image_ids)
+
+        # Peupler db._hidden_folders depuis albumdata_category == 7 (Ref: picasa3.exe @ 0x00445B80, 0x005EE2A0)
+        ad_cats = db.pmps.get("albumdata_category")
+        ad_files = db.pmps.get("albumdata_filename")
+        if ad_cats is not None and ad_files is not None:
+            if not hasattr(db, "_hidden_folders") or not isinstance(db._hidden_folders, set):
+                db._hidden_folders = set()
+            for idx_a, fp_a in enumerate(ad_files.records):
+                if fp_a and idx_a < len(ad_cats.records) and ad_cats.records[idx_a] == 7:
+                    db._hidden_folders.add(str(fp_a).replace("\\", "/").rstrip("/").lower())
+
         has_pmp_meta = any(
             r is not None
             for r in (edited_recs, filters_recs, crop64_recs, rotate_recs, tilt_recs, text_recs, backup_recs)
@@ -689,6 +710,7 @@ class PicasaThumbnailView(QWidget):
             is_st = bool(star_recs and i < len(star_recs) and star_recs[i])
             if not is_st and starred_norm_set and full_path:
                 is_st = os.path.normcase(os.path.normpath(full_path)) in starred_norm_set
+            is_hid = (i in hidden_wordhash_set) or bool(hidden_recs and i < len(hidden_recs) and hidden_recs[i])
 
             has_ed = bool(
                 (edited_recs and i < len(edited_recs) and edited_recs[i])
@@ -714,6 +736,7 @@ class PicasaThumbnailView(QWidget):
                 folder=folder_name,
                 folder_path=folder_path,
                 starred=is_st,
+                hidden=is_hid,
                 has_edits=has_ed,
                 has_backup=has_bk,
                 is_video=is_vid,
@@ -810,6 +833,13 @@ class PicasaThumbnailView(QWidget):
         text_recs = db.pmps["imagedata_textactive"].records if "imagedata_textactive" in db.pmps else None
         backup_recs = db.pmps["imagedata_backuphash"].records if "imagedata_backuphash" in db.pmps else None
         star_recs = db.pmps["imagedata_star"].records if "imagedata_star" in db.pmps else None
+        hidden_recs = db.pmps["imagedata_hidden"].records if "imagedata_hidden" in db.pmps else None
+        hidden_wordhash_set: Set[int] = set()
+        wh = getattr(db, "wordhash", None)
+        if wh is not None and hasattr(wh, "_word_map"):
+            hid_ent = wh._word_map.get("]hidden")
+            if hid_ent is not None and getattr(hid_ent, "image_ids", None):
+                hidden_wordhash_set = set(hid_ent.image_ids)
         starred_cache_raw = getattr(db, "_starred_cache", None)
         starred_norm_set: Set[str] = (
             {os.path.normcase(os.path.normpath(p)) for p in starred_cache_raw}
@@ -842,6 +872,7 @@ class PicasaThumbnailView(QWidget):
             is_st = bool(star_recs and i < len(star_recs) and star_recs[i])
             if not is_st and starred_norm_set and full_path:
                 is_st = os.path.normcase(os.path.normpath(full_path)) in starred_norm_set
+            is_hid = (i in hidden_wordhash_set) or bool(hidden_recs and i < len(hidden_recs) and hidden_recs[i])
 
             has_ed = bool(
                 (edited_recs and i < len(edited_recs) and edited_recs[i])
@@ -860,6 +891,7 @@ class PicasaThumbnailView(QWidget):
                 folder=folder_name,
                 folder_path=folder_path,
                 starred=is_st,
+                hidden=is_hid,
                 has_edits=has_ed,
                 has_backup=has_bk,
                 is_video=is_vid,
@@ -990,10 +1022,25 @@ class PicasaThumbnailView(QWidget):
             )
         return cloned
 
+    def _is_hidden_folders_unlocked(self) -> bool:
+        """
+        FR: Vérifie si la collection « Dossiers masqués » (`cat=7`) est déverrouillée (pas de mot de passe ou mot de passe déjà saisi).
+        EN: Checks whether the "Hidden Folders" collection (`cat=7`) is unlocked (no password or password already entered).
+        Ref: picasa3.exe @ 0x004AB650, 0x004B2060
+        """
+        main_win = self.window()
+        if main_win is not None and hasattr(main_win, "_get_collection_password_hash"):
+            pwd_hash = main_win._get_collection_password_hash("Hidden Folders")
+            if pwd_hash:
+                unlocked = getattr(main_win, "_unlocked_collections", set())
+                return "Hidden Folders" in unlocked
+        return True
+
     def _apply_current_filters(self, reset_scroll: bool = True) -> None:
         """
-        FR: Applique le filtre de dossier et les filtres rapides actifs (étoiles, visages, vidéos, géolocalisation).
-        EN: Applies the active folder filter and quick filters (starred, faces, videos, geotagging).
+        FR: Applique le filtre de dossier et les filtres rapides actifs (étoiles, visages, vidéos, géolocalisation, photos/dossiers masqués).
+        EN: Applies the active folder filter and quick filters (starred, faces, videos, geotagging, hidden pictures/folders).
+        Ref: picasa3.exe @ 0x00660C80 - 0x00660E2E, 0x004A8B10, 0x004B2060
         """
         if self.current_folder_filter and self.current_folder_filter.startswith("person:"):
             src_secs = (
@@ -1043,13 +1090,28 @@ class PicasaThumbnailView(QWidget):
             or self.quick_filter_videos
             or self.quick_filter_geo
         )
+        hidden_folders_set: Set[str] = set()
+        if self.db is not None:
+            raw_hf = getattr(self.db, "_hidden_folders", None)
+            if raw_hf:
+                hidden_folders_set = {str(p).replace("\\", "/").rstrip("/").lower() for p in raw_hf}
+        allow_hidden_folders = self.show_hidden and self._is_hidden_folders_unlocked()
+
         new_visible_sections = []
         self.filtered_indices = []
 
         for sec in base_sections:
+            if hidden_folders_set and not (sec.is_person or sec.is_album or sec.is_search or sec.is_unnamed):
+                sec_norm_fp = sec.folder_path.replace("\\", "/").rstrip("/").lower()
+                if sec_norm_fp in hidden_folders_set and not allow_hidden_folders:
+                    continue
+
             filtered_sec_indices = []
             for idx in sec.item_indices:
                 item = self.items[idx]
+                # Ref: picasa3.exe @ 0x00660C80 - 0x00660E2E (Exclut ]hidden lorsque ShowHidden == 0)
+                if not self.show_hidden and getattr(item, "hidden", False):
+                    continue
                 if self.quick_filter_starred and not item.starred:
                     continue
                 if self.quick_filter_videos and not item.is_video:
@@ -1066,7 +1128,8 @@ class PicasaThumbnailView(QWidget):
                 else:
                     filtered_sec_indices.append(idx)
 
-            if filtered_sec_indices or not has_quick:
+            # Ne pas afficher un en-tête de dossier dont toutes les photos sont masquées lorsque ShowHidden == 0
+            if filtered_sec_indices or (not has_quick and not sec.item_indices):
                 display_sec = AlbumSection(
                     name=sec.name,
                     folder_path=sec.folder_path,
@@ -1115,14 +1178,12 @@ class PicasaThumbnailView(QWidget):
         if not folder_path:
             return
 
-        # Rétablir l'ensemble des sections pour le flux continu si nécessaire
-        if len(self.visible_sections) != len(self.sections) or self.current_folder_filter is not None:
+        # Rétablir l'ensemble des sections visibles pour le flux continu en respectant ShowHidden et les filtres rapides
+        if self.current_folder_filter is not None:
             self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)]
             self.current_folder_filter = None
             self._unfiltered_special_sections.clear()
-            self.visible_sections = list(self.sections)
-            self.filtered_indices = list(range(len(self.items)))
-            self._recompute_layout()
+            self._apply_current_filters(reset_scroll=False)
 
         norm_target = folder_path.replace("\\", "/").rstrip("/").lower()
         target_y = None
@@ -3372,6 +3433,10 @@ class PicasaThumbnailView(QWidget):
             pix = self._get_thumbnail_pixmap(item_idx)
 
         if pix and not pix.isNull():
+            # Ref: picasa3.exe @ 0x005423D4 (Photos masquées affichées en semi-transparence lorsque ShowHidden=1)
+            prev_opacity = painter.opacity()
+            if getattr(item, "hidden", False):
+                painter.setOpacity(prev_opacity * 0.5)
             target_rect = rect.adjusted(4, 4, -4, -4)
             tw, th = target_rect.width(), target_rect.height()
             if self._is_zooming_thumbs:
@@ -3398,6 +3463,8 @@ class PicasaThumbnailView(QWidget):
                 draw_x = target_rect.x() + (tw - scaled.width()) // 2
                 draw_y = target_rect.y() + (th - scaled.height()) // 2
                 painter.drawPixmap(draw_x, draw_y, scaled)
+            if getattr(item, "hidden", False):
+                painter.setOpacity(prev_opacity)
         else:
             painter.fillRect(rect.adjusted(4, 4, -4, -4), QColor("#D0D0D0"))
 

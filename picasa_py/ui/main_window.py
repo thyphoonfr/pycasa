@@ -209,6 +209,8 @@ class PicasaMainWindow(QMainWindow):
         self.status_bar.showMessage("Prêt")
 
         # 5. Construction des menus / Menu bar construction
+        self.show_hidden_pictures: bool = False  # Ref: picasa3.exe @ 0x00564ED4 ([ebp + 0x3188] Preferences/ShowHidden)
+        self._unlocked_collections: Set[str] = set()  # Ref: picasa3.exe @ 0x004AB650, 0x005EC440
         self.menu_builder = PicasaMenuBuilder(self)
         self.menu_builder.build_menu_bar()
 
@@ -393,9 +395,11 @@ class PicasaMainWindow(QMainWindow):
         self.photo_tray.toggle_left_drawer_requested.connect(self.one_up_view._toggle_left_edit_drawer)
         self.photo_tray.oneup_fit_requested.connect(self.one_up_view.canvas.reset_zoom_to_fit)
         self.photo_tray.oneup_zoom_1to1_requested.connect(lambda: self.one_up_view.canvas.set_zoom(1.0))
-        self.photo_tray.oneup_zoom_changed.connect(self.one_up_view.canvas.set_zoom)
+        self.photo_tray.oneup_zoom_changed.connect(self.one_up_view.canvas.set_zoom_from_slider)
         self.photo_tray.oneup_faces_toggled.connect(self.one_up_view._on_toggle_face_tags)
-        self.one_up_view.canvas.zoom_changed.connect(self.photo_tray.set_oneup_zoom_from_canvas)
+        self.one_up_view.canvas.zoom_changed.connect(
+            lambda scale: self.photo_tray.set_oneup_zoom_from_canvas(scale, self.one_up_view.canvas._get_fit_scale())
+        )
 
         # Recherche, mode d'affichage des dossiers et filtres rapides
         self.top_bar.folder_view_mode_changed.connect(self._on_top_bar_folder_view_mode_changed)
@@ -661,7 +665,10 @@ class PicasaMainWindow(QMainWindow):
                 "◀" if not self.one_up_view.edit_panel.isHidden() else "▶"
             )
         if hasattr(self.one_up_view, "canvas") and hasattr(self.photo_tray, "set_oneup_zoom_from_canvas"):
-            self.photo_tray.set_oneup_zoom_from_canvas(getattr(self.one_up_view.canvas, "zoom_factor", 1.0))
+            self.photo_tray.set_oneup_zoom_from_canvas(
+                self.one_up_view.canvas.get_current_scale(),
+                self.one_up_view.canvas._get_fit_scale(),
+            )
 
         photo_path = self.one_up_view.current_photo_path or ""
         avail = list(getattr(self.one_up_view, "available_indices", []) or [])
@@ -917,6 +924,9 @@ class PicasaMainWindow(QMainWindow):
         EN: Handles selection of a folder, album, or person in the library tree.
         """
         BackgroundScanWorker.notify_gui_activity()
+        # Ref: picasa3.exe @ 0x00537FB0 - 0x005380EA (ThumbUIOutput::FolderMenu vs AlbumMenu)
+        if hasattr(self, "menu_builder") and self.menu_builder is not None:
+            self.menu_builder.update_folder_album_menu_title(target_type == "folder")
         if target_type == "folder":
             self.thumb_view.scroll_to_folder(key)
             # FR: Indices du dossier via sa section (O(sections)) au lieu de parcourir tous les items
@@ -3365,35 +3375,393 @@ class PicasaMainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Erreur KML", f"Impossible d'écrire le fichier KML : {e}")
 
+    def _get_collection_password_hash(self, collection_name: str = "Hidden Folders") -> str:
+        """
+        FR: Récupère le hachage MD5 du mot de passe d'une collection depuis `catdata_info.pmp`
+        (ou `.picasa.ini` `[Picasa] password=` si `collection_name` est un chemin de dossier).
+        EN: Retrieves the MD5 password hash of a collection from `catdata_info.pmp`
+        (or `.picasa.ini` `[Picasa] password=` if `collection_name` is a folder path).
+        Ref: picasa3.exe @ 0x004AB69D, 0x005EB989, 0x005EC44A (catdata_info 'info')
+        """
+        if collection_name and os.path.isdir(collection_name):
+            ini_p = os.path.join(collection_name, ".picasa.ini")
+            if os.path.exists(ini_p):
+                try:
+                    doc = PicasaIniParser.parse_file(ini_p)
+                    sec = doc.get_section("Picasa")
+                    if sec and sec.get("password"):
+                        return sec.get("password", "").strip()
+                except Exception:
+                    pass
+        if self.db is not None and hasattr(self.db, "pmps"):
+            cat_names = self.db.pmps.get("catdata_name")
+            cat_infos = self.db.pmps.get("catdata_info")
+            if cat_names and cat_infos:
+                target_low = (collection_name or "Hidden Folders").strip().lower()
+                if target_low in ("dossiers masqués", "hidden folders"):
+                    target_low = "hidden folders"
+                for idx, cname in enumerate(cat_names.records):
+                    if str(cname or "").strip().lower() == target_low and idx < len(cat_infos.records):
+                        return str(cat_infos.records[idx] or "").strip()
+            pwd_map = getattr(self.db, "_collection_passwords", None)
+            if isinstance(pwd_map, dict):
+                return str(pwd_map.get(collection_name, "") or pwd_map.get("Hidden Folders", "")).strip()
+        return ""
+
+    def _set_collection_password_hash(self, collection_name: str, pwd_hash: str) -> None:
+        """
+        FR: Enregistre ou efface le hachage MD5 du mot de passe d'une collection dans `catdata_info.pmp`
+        et `.picasa.ini` si un dossier est ciblé.
+        EN: Stores or clears a collection's MD5 password hash in `catdata_info.pmp`
+        and `.picasa.ini` if a folder path is targeted.
+        Ref: picasa3.exe @ 0x005EBA5E, 0x005EBC52 (SetCatData 'info')
+        """
+        if collection_name and os.path.isdir(collection_name):
+            ini_p = os.path.join(collection_name, ".picasa.ini")
+            doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+            sec = doc.get_or_create_section("Picasa")
+            if pwd_hash:
+                sec.set("password", pwd_hash)
+            else:
+                sec.remove("password")
+            doc.write_file(ini_p)
+        if self.db is not None:
+            if not hasattr(self.db, "_collection_passwords") or not isinstance(self.db._collection_passwords, dict):
+                self.db._collection_passwords = {}
+            norm_col = "Hidden Folders" if (collection_name or "").strip().lower() in ("", "dossiers masqués", "hidden folders") else collection_name
+            if pwd_hash:
+                self.db._collection_passwords[norm_col] = pwd_hash
+            else:
+                self.db._collection_passwords.pop(norm_col, None)
+            if hasattr(self.db, "pmps"):
+                from picasa_py.db.pmp import PmpFile, PmpType
+                from picasa_py.db.database import DEFAULT_CATDATA_RECORDS
+                cat_names = self.db.pmps.get("catdata_name")
+                if cat_names is None:
+                    cat_names = PmpFile(
+                        pmp_type=PmpType.STRING,
+                        records=list(DEFAULT_CATDATA_RECORDS["catdata_name"]),
+                        dirty=True,
+                    )
+                    self.db.pmps["catdata_name"] = cat_names
+                if "catdata_info" not in self.db.pmps:
+                    self.db.pmps["catdata_info"] = PmpFile(
+                        pmp_type=PmpType.STRING,
+                        records=["" for _ in range(len(cat_names.records))],
+                        dirty=True,
+                    )
+                cat_infos = self.db.pmps["catdata_info"]
+                while len(cat_infos.records) < len(cat_names.records):
+                    cat_infos.records.append("")
+                for idx, cname in enumerate(cat_names.records):
+                    if str(cname or "").strip().lower() == norm_col.lower():
+                        cat_infos.records[idx] = pwd_hash
+                        cat_infos.dirty = True
+                        break
+                db3_dir = getattr(self.db, "db3_dir", None)
+                if db3_dir and os.path.isdir(str(db3_dir)):
+                    for stem_c in ("catdata_name", "catdata_info", "catdata_state"):
+                        pmp_c = self.db.pmps.get(stem_c)
+                        if pmp_c is not None and getattr(pmp_c, "dirty", False):
+                            try:
+                                (Path(db3_dir) / f"{stem_c}.pmp").write_bytes(pmp_c.to_bytes())
+                                pmp_c.dirty = False
+                            except Exception:
+                                pass
+
+    def _verify_collection_password_prompt(self, collection_name: str = "Hidden Folders") -> bool:
+        """
+        FR: Vérifie le mot de passe d'une collection protégée avant de l'ouvrir (`CAlbumState::passprompt` / `CThumbUI::PassEntryPrompt`).
+        EN: Verifies a protected collection's password before opening it (`CAlbumState::passprompt` / `CThumbUI::PassEntryPrompt`).
+        Ref: picasa3.exe @ 0x004AB650 - 0x004AB8F1, 0x005EC440 - 0x005EC80E
+        """
+        norm_col = (
+            "Hidden Folders"
+            if (collection_name or "").strip().lower() in ("", "dossiers masqués", "hidden folders")
+            else collection_name
+        )
+        expected_hash = self._get_collection_password_hash(norm_col)
+        if not expected_hash or norm_col in self._unlocked_collections:
+            return True
+        from PySide6.QtWidgets import QLineEdit
+        prompt_txt = self.res_mgr.get_stringres(
+            "CThumbUI::PassEntryPrompt",
+            "Entrez un mot de passe pour ouvrir cette collection.",
+        )
+        title_txt = self.res_mgr.get_stringres("CThumbUI::PassEntryTitle", "Saisie du mot de passe")
+        pwd, ok = QInputDialog.getText(self, title_txt, prompt_txt, QLineEdit.EchoMode.Password)
+        if not ok:
+            return False
+        import hashlib
+        entered_hash = hashlib.md5(pwd.strip().encode("utf-8")).hexdigest()
+        if entered_hash.lower() == expected_hash.lower():
+            self._unlocked_collections.add(norm_col)
+            return True
+        QMessageBox.warning(self, title_txt, "Mot de passe incorrect.")
+        return False
+
     def action_password_protect_collection(self, folder_path: Optional[str] = None) -> None:
         """
-        FR: Définit ou retire la protection par mot de passe d'une collection (ID_SAFE_ADD / safedialog.fen).
-        EN: Sets or removes password protection for a collection (ID_SAFE_ADD / safedialog.fen).
-        Ref: picasa3.exe @ 0x0088C3EC (ID_SAFE_ADD, Password Protect Collection)
+        FR: Définit, modifie ou retire la protection par mot de passe d'une collection (`Collection::ID_COL_PASSWORD` 0x9D56 -> `FUN_005EB910`).
+        Demande le mot de passe (`CThumbUI::PassEntryOpenPrompt`) puis sa confirmation (`CThumbUI::PassVerifyPrompt`),
+        ou supprime le mot de passe s'il est laissé vide (`CThumbUI::PassEntryNoPass`).
+        EN: Sets, changes, or removes password protection for a collection (`Collection::ID_COL_PASSWORD` 0x9D56 -> `FUN_005EB910`).
+        Prompts for the password (`CThumbUI::PassEntryOpenPrompt`) and confirmation (`CThumbUI::PassVerifyPrompt`),
+        or removes the password if left blank (`CThumbUI::PassEntryNoPass`).
+        Ref: picasa3.exe @ 0x005EB910 - 0x005EBC99, 0x00732715 (Collection::ID_COL_PASSWORD)
         """
-        target = folder_path or self.thumb_view.current_folder_filter
-        if not target or not os.path.isdir(target):
-            QMessageBox.information(self, "Protection par mot de passe", "Sélectionnez un dossier à protéger.")
-            return
-        pwd, ok = QInputDialog.getText(
-            self,
-            "Protéger la collection par mot de passe",
-            f"Mot de passe pour « {os.path.basename(target.rstrip(chr(92) + '/'))} » (laisser vide pour retirer) :"
+        raw_target = folder_path if isinstance(folder_path, str) and folder_path else (self.thumb_view.current_folder_filter or "Hidden Folders")
+        target = (
+            "Hidden Folders"
+            if (raw_target or "").strip().lower() in ("", "dossiers masqués", "hidden folders")
+            else raw_target
         )
+        if not self._verify_collection_password_prompt(target):
+            return
+        from PySide6.QtWidgets import QLineEdit
+        open_prompt = self.res_mgr.get_stringres(
+            "CThumbUI::PassEntryOpenPrompt",
+            "Entrez le mot de passe à utiliser pour cette collection.",
+        )
+        title_txt = self.res_mgr.get_stringres("CThumbUI::PassEntryTitle", "Saisie du mot de passe")
+        pwd, ok = QInputDialog.getText(self, title_txt, open_prompt, QLineEdit.EchoMode.Password)
         if not ok:
             return
-        ini_p = os.path.join(target, ".picasa.ini")
-        doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
-        sec = doc.get_or_create_section("Picasa")
-        if pwd.strip():
-            import hashlib
-            digest = hashlib.md5(pwd.strip().encode("utf-8")).hexdigest()
-            sec.set("password", digest)
-            self.status_bar.showMessage("Collection protégée par mot de passe.")
-        else:
-            sec.remove("password")
-            self.status_bar.showMessage("Protection par mot de passe retirée.")
-        doc.write_file(ini_p)
+        if not pwd.strip():
+            # Ref: picasa3.exe @ 0x005EBA54 - 0x005EBAAE (CThumbUI::PassEntryNoPass)
+            self._set_collection_password_hash(target, "")
+            self.library_tree._update_hidden_folders_category()
+            self.thumb_view._apply_current_filters(reset_scroll=False)
+            no_pass_msg = self.res_mgr.get_stringres("CThumbUI::PassEntryNoPass", "Aucun mot de passe n'est défini.")
+            self.status_bar.showMessage(no_pass_msg)
+            return
+
+        # Ref: picasa3.exe @ 0x005EBABF - 0x005EBC05 (CThumbUI::PassVerifyPrompt & PassVerifyWrong)
+        verify_prompt = self.res_mgr.get_stringres("CThumbUI::PassVerifyPrompt", "Veuillez confirmer votre mot de passe.")
+        verify_title = self.res_mgr.get_stringres("CThumbUI::PassVerifyTitle", "Vérification du mot de passe")
+        pwd2, ok2 = QInputDialog.getText(self, verify_title, verify_prompt, QLineEdit.EchoMode.Password)
+        if not ok2:
+            return
+        if pwd.strip() != pwd2.strip():
+            wrong_msg = self.res_mgr.get_stringres("CThumbUI::PassVerifyWrong", "Les mots de passe ne correspondent pas.")
+            QMessageBox.warning(self, verify_title, wrong_msg)
+            return
+
+        import hashlib
+        digest = hashlib.md5(pwd.strip().encode("utf-8")).hexdigest()
+        self._set_collection_password_hash(target, digest)
+        self._unlocked_collections.add(target)
+        self.library_tree._update_hidden_folders_category()
+        self.thumb_view._apply_current_filters(reset_scroll=False)
+        self.status_bar.showMessage("Collection protégée par mot de passe.")
+
+    def action_toggle_show_hidden(self, checked: Optional[bool] = None) -> None:
+        """
+        FR: Bascule l'affichage des photos masquées et de la collection « Dossiers masqués »
+        (`eMenuView::ID_VIEW_SHOWHIDDEN`, cmd `0x9C9E` -> `FUN_005C9300` & `FUN_005C90F0`).
+        Dans `picasa3.exe @ 0x005C9300`, le clic sur `Affichage > Photos masquées` ne demande
+        jamais de mot de passe : il affiche immédiatement les photos `]hidden` et rend visible
+        l'en-tête « Dossiers masqués » (replié s'il est protégé par mot de passe). Le mot de passe
+        n'est demandé que lorsque l'utilisateur déplie ou clique sur « Dossiers masqués » (`0x004AB9A0 -> 0x004AB650`).
+        EN: Toggles display of hidden pictures and the "Hidden Folders" collection
+        (`eMenuView::ID_VIEW_SHOWHIDDEN`, cmd `0x9C9E` -> `FUN_005C9300` & `FUN_005C90F0`).
+        Ref: picasa3.exe @ 0x005C9300 - 0x005C93C1, 0x005C90F0 - 0x005C9155, 0x00660C80, 0x004AB9A0
+        """
+        new_state = (not self.show_hidden_pictures) if checked is None else bool(checked)
+        self.show_hidden_pictures = new_state
+        if not self.show_hidden_pictures:
+            self._unlocked_collections.discard("Hidden Folders")
+        if hasattr(self, "menu_builder") and self.menu_builder.act_show_hidden is not None:
+            self.menu_builder.act_show_hidden.blockSignals(True)
+            self.menu_builder.act_show_hidden.setChecked(self.show_hidden_pictures)
+            self.menu_builder.act_show_hidden.blockSignals(False)
+        self.thumb_view.show_hidden = self.show_hidden_pictures
+        self.library_tree.set_show_hidden(self.show_hidden_pictures)
+        self.thumb_view._apply_current_filters(reset_scroll=False)
+        self.status_bar.showMessage(
+            "Photos masquées affichées." if self.show_hidden_pictures else "Photos masquées masquées."
+        )
+
+    def _set_pictures_hidden_state(self, hide: bool, photo_paths: Optional[List[str]] = None) -> None:
+        """
+        FR: Masque (`hide=True`, cmd `0x9CA4`) ou réaffiche (`hide=False`, cmd `0x9CA5`) les photos sélectionnées
+        en écrivant `hidden=yes` dans `.picasa.ini`, en mettant à jour `imagedata_hidden.pmp` et le jeton `]hidden`
+        dans `wordhash.dat` (`FUN_005E7D90`).
+        EN: Hides (`hide=True`, cmd `0x9CA4`) or unhides (`hide=False`, cmd `0x9CA5`) selected photos
+        by writing `hidden=yes` in `.picasa.ini`, updating `imagedata_hidden.pmp`, and indexing `]hidden`
+        in `wordhash.dat` (`FUN_005E7D90`).
+        Ref: picasa3.exe @ 0x005E7D90 - 0x005E8060, 0x00458D50, 0x0078CCFE
+        """
+        paths = photo_paths if isinstance(photo_paths, list) and photo_paths else self._get_active_photo_paths()
+        if not paths:
+            return
+        norm_targets = {p.replace("\\", "/").lower() for p in paths if p}
+        docs_by_ini: Dict[str, PicasaIniDocument] = {}
+        updated_count = 0
+
+        for p in paths:
+            if not p:
+                continue
+            folder_dir = os.path.dirname(p)
+            fname = os.path.basename(p)
+            if folder_dir and os.path.isdir(folder_dir):
+                ini_p = os.path.join(folder_dir, ".picasa.ini")
+                if ini_p not in docs_by_ini:
+                    docs_by_ini[ini_p] = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+                doc = docs_by_ini[ini_p]
+                if hide:
+                    sec = doc.get_or_create_section(fname)
+                    sec.set("hidden", "yes")
+                else:
+                    sec = doc.get_section(fname)
+                    if sec is not None:
+                        sec.remove("hidden")
+            updated_count += 1
+
+        for ini_p, doc in docs_by_ini.items():
+            try:
+                doc.write_file(ini_p)
+            except Exception:
+                pass
+
+        for it in self.thumb_view.items:
+            if it.path and it.path.replace("\\", "/").lower() in norm_targets:
+                it.hidden = hide
+                if self.db is not None and it.index >= 0:
+                    if "imagedata_hidden" in self.db.pmps and it.index < len(self.db.pmps["imagedata_hidden"].records):
+                        self.db.pmps["imagedata_hidden"].records[it.index] = 1 if hide else 0
+                        self.db.pmps["imagedata_hidden"].dirty = True
+                    if getattr(self.db, "wordhash", None) is not None:
+                        if hide:
+                            self.db.wordhash.add_word("]hidden", it.index)
+                        elif hasattr(self.db.wordhash, "remove_word"):
+                            self.db.wordhash.remove_word("]hidden", it.index)
+
+        self.thumb_view._apply_current_filters(reset_scroll=False)
+        self.status_bar.showMessage(
+            f"{updated_count} photo(s) masquée(s)." if hide else f"{updated_count} photo(s) affichée(s)."
+        )
+
+    def action_hide_pictures(self, photo_paths: Optional[List[str]] = None) -> None:
+        """
+        FR: Masque les photos sélectionnées (`eMenuPicture::ID_PICTURE_HIDE`, cmd `0x9CA4` -> `FUN_005E7D90(1)`).
+        EN: Hides the selected pictures (`eMenuPicture::ID_PICTURE_HIDE`, cmd `0x9CA4` -> `FUN_005E7D90(1)`).
+        Ref: picasa3.exe @ 0x005CBD52, 0x005E7D90
+        """
+        self._set_pictures_hidden_state(True, photo_paths)
+
+    def action_unhide_pictures(self, photo_paths: Optional[List[str]] = None) -> None:
+        """
+        FR: Réaffiche les photos masquées sélectionnées (`eMenuPicture::ID_PICTURE_UNHIDE`, cmd `0x9CA5` -> `FUN_005E7D90(0)`).
+        EN: Unhides the selected hidden pictures (`eMenuPicture::ID_PICTURE_UNHIDE`, cmd `0x9CA5` -> `FUN_005E7D90(0)`).
+        Ref: picasa3.exe @ 0x005CBD5F, 0x005E7D90
+        """
+        self._set_pictures_hidden_state(False, photo_paths)
+
+    def _set_folder_hidden_state(self, hide: bool, folder_path: Optional[str] = None) -> None:
+        """
+        FR: Déplace un dossier vers la collection « Dossiers masqués » (`hide=True`, cmd `0x9C72`, `cat=7`)
+        ou vers « Dossiers sur le disque » (`hide=False`, cmd `0x9CD0`, `cat=2`) conformément à `FUN_005EE2A0` & `FUN_00445B80`.
+        Écrit également `P2category=Hidden Folders` (ou `P2category=Folders on Disk`) dans `[Picasa]` du `.picasa.ini` (`0x00446012`).
+        Si `hide=True` et que « Dossiers masqués » n'a pas encore de mot de passe, propose d'en ajouter un
+        (`IDS_PROMPT_HIDDEN_PWD_MESSAGE` @ `0x005EE444`).
+        EN: Moves a folder into the "Hidden Folders" collection (`hide=True`, cmd `0x9C72`, `cat=7`)
+        or back to "Folders on Disk" (`hide=False`, cmd `0x9CD0`, `cat=2`) per `FUN_005EE2A0` & `FUN_00445B80`.
+        Ref: picasa3.exe @ 0x005EE2A0 - 0x005EE57F, 0x00445B80 - 0x00446050
+        """
+        target = folder_path if isinstance(folder_path, str) and folder_path else self.thumb_view.current_folder_filter
+        if not target or not os.path.isdir(target):
+            return
+        norm_target = target.replace("\\", "/").rstrip("/").lower()
+
+        # Ref: picasa3.exe @ 0x00446012 (Écrit P2category dans [Picasa] de .picasa.ini)
+        try:
+            ini_p = os.path.join(target, ".picasa.ini")
+            doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+            sec = doc.get_or_create_section("Picasa")
+            sec.set("P2category", "Hidden Folders" if hide else "Folders on Disk")
+            doc.write_file(ini_p)
+        except Exception:
+            pass
+
+        if self.db is not None:
+            if not hasattr(self.db, "_hidden_folders") or not isinstance(self.db._hidden_folders, set):
+                self.db._hidden_folders = set()
+            if hide:
+                self.db._hidden_folders.add(norm_target)
+            else:
+                self.db._hidden_folders.discard(norm_target)
+
+            if hasattr(self.db, "invalidate_ini_cache"):
+                self.db.invalidate_ini_cache(os.path.join(target, ".picasa.ini"))
+            if hasattr(self.db, "ensure_folder_album_row"):
+                self.db.ensure_folder_album_row(target)
+            ad_cats = self.db.pmps.get("albumdata_category")
+            ad_files = self.db.pmps.get("albumdata_filename")
+            if ad_cats and ad_files:
+                for i, fp in enumerate(ad_files.records):
+                    if str(fp or "").replace("\\", "/").rstrip("/").lower() == norm_target and i < len(ad_cats.records):
+                        ad_cats.records[i] = 7 if hide else 2
+                        ad_cats.dirty = True
+            db3_dir = getattr(self.db, "db3_dir", None)
+            if db3_dir and os.path.isdir(str(db3_dir)):
+                for stem_a, pmp_a in self.db.pmps.items():
+                    if stem_a.startswith("albumdata_") and getattr(pmp_a, "dirty", False):
+                        try:
+                            (Path(db3_dir) / f"{stem_a}.pmp").write_bytes(pmp_a.to_bytes())
+                            pmp_a.dirty = False
+                        except Exception:
+                            pass
+
+        # Ref: picasa3.exe @ 0x005EE373 - 0x005EE4E6 (IDS_PROMPT_HIDDEN_PWD_MESSAGE -> call 0x005EB910)
+        if hide and not self._get_collection_password_hash("Hidden Folders") and not getattr(self, "_do_not_confirm_hidden_pwd", False):
+            msg = self.res_mgr.get_stringres(
+                "IDS_WARN_NO_HIDDEN_PWD",
+                'Actuellement, la collection "Dossiers masqués" n\'est pas protégée par un mot de passe. Voulez-vous ajouter un mot de passe maintenant ?',
+            )
+            title = self.res_mgr.get_stringres("IDS_HIDDEN", "Dossiers masqués")
+            ans = QMessageBox.question(
+                self,
+                title,
+                msg,
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if ans == QMessageBox.StandardButton.Yes:
+                self.action_password_protect_collection("Hidden Folders")
+
+        # Ref: picasa3.exe @ 0x005EE522 (Si un mot de passe existe sur Hidden Folders, replie la catégorie state=0)
+        if hide and self._get_collection_password_hash("Hidden Folders"):
+            self._unlocked_collections.discard("Hidden Folders")
+            if self.db is not None and hasattr(self.db, "pmps") and "catdata_state" in self.db.pmps:
+                cat_states = self.db.pmps["catdata_state"]
+                if len(cat_states.records) > 7:
+                    cat_states.records[7] = 0
+                    cat_states.dirty = True
+
+        self.library_tree.refresh_folders()
+        self.thumb_view._apply_current_filters(reset_scroll=False)
+        self.status_bar.showMessage(
+            f"Dossier déplacé vers « Dossiers masqués » : {os.path.basename(target.rstrip(chr(92) + '/'))}"
+            if hide
+            else f"Dossier rétabli dans « Dossiers sur le disque » : {os.path.basename(target.rstrip(chr(92) + '/'))}"
+        )
+
+    def action_hide_folder(self, folder_path: Optional[str] = None) -> None:
+        """
+        FR: Masque le dossier entier en le déplaçant dans « Dossiers masqués » (`Folder::ID_HIDEENTIREALBUM`, cmd `0x9C72`).
+        EN: Hides the entire folder by moving it to "Hidden Folders" (`Folder::ID_HIDEENTIREALBUM`, cmd `0x9C72`).
+        Ref: picasa3.exe @ 0x005CC054, 0x005EE2A0
+        """
+        self._set_folder_hidden_state(True, folder_path)
+
+    def action_unhide_folder(self, folder_path: Optional[str] = None) -> None:
+        """
+        FR: Réaffiche le dossier masqué dans « Dossiers sur le disque » (`Folder::ID_UNHIDEENTIREALBUM`, cmd `0x9CD0`).
+        EN: Unhides the hidden folder back to "Folders on Disk" (`Folder::ID_UNHIDEENTIREALBUM`, cmd `0x9CD0`).
+        Ref: picasa3.exe @ 0x005CC069, 0x005EE2A0
+        """
+        self._set_folder_hidden_state(False, folder_path)
 
     def action_backup(self) -> None:
         """

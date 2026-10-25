@@ -319,19 +319,23 @@ class PicasaOneUpView(QWidget):
         self.btn_top_slideshow.clicked.connect(self.slideshow_requested.emit)
         layout.addWidget(self.btn_top_slideshow)
 
-        layout.addSpacing(6)
+        layout.addStretch(1)
 
         # FR: 2. editpanel/filmcontainer : rect=(394, 3, 682, 36) -> prev (399..428) + filmstrip (431..645) + next (651..680)
+        #     Centré horizontalement (`m_centerX`) dans `editpanel/oneup_controls` et toujours visible en modes A, A|B et A|A.
         # EN: 2. editpanel/filmcontainer: rect=(394, 3, 682, 36) -> prev (399..428) + filmstrip (431..645) + next (651..680)
+        #     Horizontally centered (`m_centerX`) in `editpanel/oneup_controls` and always visible in A, A|B, and A|A modes.
         self.btn_top_prev = QPushButton("◀")
         self.btn_top_prev.setFixedSize(29, 32)
         self.btn_top_prev.setToolTip("Photo précédente (Flèche Gauche)")
         self.btn_top_prev.clicked.connect(self.navigate_previous)
         layout.addWidget(self.btn_top_prev)
 
-        self.filmstrip = PicasaFilmstrip(thumb_size=36, spacing=5, parent=bar)
+        self.filmstrip = PicasaFilmstrip(thumb_size=34, spacing=5, parent=bar)
+        self.filmstrip.setMinimumWidth(214)
+        self.filmstrip.setMaximumWidth(360)
         self.filmstrip.photo_clicked.connect(self._on_filmstrip_photo_clicked)
-        layout.addWidget(self.filmstrip, 1)
+        layout.addWidget(self.filmstrip, 2)
 
         self.btn_top_next = QPushButton("▶")
         self.btn_top_next.setFixedSize(29, 32)
@@ -339,60 +343,72 @@ class PicasaOneUpView(QWidget):
         self.btn_top_next.clicked.connect(self.navigate_next)
         layout.addWidget(self.btn_top_next)
 
-        layout.addSpacing(6)
-
-        # FR: 3. Libellé d'informations de la photo en cours (Ref: il_BigView::2)
-        # EN: 3. Current photo information label (Ref: il_BigView::2)
-        self.lbl_top_info = QLabel("")
-        self.lbl_top_info.setStyleSheet("color: #E2E2E2; font-weight: bold; padding-left: 4px;")
-        layout.addWidget(self.lbl_top_info)
-
         layout.addStretch(1)
 
-        # FR: 4. editpanel/layout_2up_group : rect=(693, 8, 809, 32) -> only_1up_toggle, ab_2up_toggle, aa_2up_toggle,
-        #     swap_2up_layout (0x00C8ED18, FUN_00569720), swap_2up_focus (0x00C8ECFC, FUN_0056A160)
-        # EN: 4. editpanel/layout_2up_group: rect=(693, 8, 809, 32) -> only_1up_toggle, ab_2up_toggle, aa_2up_toggle,
-        #     swap_2up_layout (0x00C8ED18, FUN_00569720), swap_2up_focus (0x00C8ECFC, FUN_0056A160)
+        # FR: Note : Dans picasa3.exe, les informations de la photo sont affichées dans `thumbui/infotext`
+        #     (au-dessus de la barre inférieure) et non dans `editpanel/oneup_controls`. On garde `lbl_top_info`
+        #     masqué pour la compatibilité des tests sans écraser la pellicule ni les boutons 2-Up.
+        # EN: Note: In picasa3.exe, photo info is displayed in `thumbui/infotext` (above the bottom bar)
+        #     and not in `editpanel/oneup_controls`. Keep `lbl_top_info` hidden for test compatibility
+        #     without crushing the filmstrip or clipping the 2-Up buttons.
+        self.lbl_top_info = QLabel("", bar)
+        self.lbl_top_info.hide()
+
+        # FR: 4. editpanel/layout_2up_group : rect=(596, 8, 795, 32) -> only_1up_toggle (596..635), ab_2up_toggle (635..674),
+        #     aa_2up_toggle (673..712), swap_2up_focus (720..756, 0x00C8ECFC, FUN_0056A160),
+        #     swap_2up_layout (759..795, 0x00C8ED18, FUN_00569720)
+        # EN: 4. editpanel/layout_2up_group: rect=(596, 8, 795, 32) -> only_1up_toggle (596..635), ab_2up_toggle (635..674),
+        #     aa_2up_toggle (673..712), swap_2up_focus (720..756, 0x00C8ECFC, FUN_0056A160),
+        #     swap_2up_layout (759..795, 0x00C8ED18, FUN_0056A160)
         from PySide6.QtCore import QSize
         rm = PicasaResourceManager.get()
 
-        self.btn_mode_a = QPushButton("🖼️")
-        self.btn_mode_a.setFixedSize(36, 26)
+        self.btn_mode_a = QPushButton("")
+        self.btn_mode_a.setObjectName("editpanel/only_1up_toggle")
+        self.btn_mode_a.setFixedSize(39, 26)
+        self.btn_mode_a.setIcon(rm.get_2up_button_icon("only_1up", 20))
+        self.btn_mode_a.setIconSize(QSize(20, 15))
         self.btn_mode_a.setCheckable(True)
         self.btn_mode_a.setChecked(True)
         self.btn_mode_a.setToolTip(rm.get_xml_string("editpanel/only_1up_toggle.tooltip", "Afficher une seule image"))
 
-        self.btn_mode_ab = QPushButton("A | B")
-        self.btn_mode_ab.setFixedSize(42, 26)
+        self.btn_mode_ab = QPushButton("")
+        self.btn_mode_ab.setObjectName("editpanel/ab_2up_toggle")
+        self.btn_mode_ab.setFixedSize(39, 26)
+        self.btn_mode_ab.setIcon(rm.get_2up_button_icon("ab_2up", 27))
+        self.btn_mode_ab.setIconSize(QSize(27, 15))
         self.btn_mode_ab.setCheckable(True)
         self.btn_mode_ab.setToolTip(rm.get_xml_string("editpanel/ab_2up_toggle.tooltip", "Afficher deux images côte à côte"))
 
-        self.btn_mode_aa = QPushButton("A | A")
-        self.btn_mode_aa.setFixedSize(42, 26)
+        self.btn_mode_aa = QPushButton("")
+        self.btn_mode_aa.setObjectName("editpanel/aa_2up_toggle")
+        self.btn_mode_aa.setFixedSize(39, 26)
+        self.btn_mode_aa.setIcon(rm.get_2up_button_icon("aa_2up", 27))
+        self.btn_mode_aa.setIconSize(QSize(27, 15))
         self.btn_mode_aa.setCheckable(True)
         self.btn_mode_aa.setToolTip(rm.get_xml_string("editpanel/aa_2up_toggle.tooltip", "Afficher deux copies de la même image côte à côte"))
 
-        self.btn_swap_2up_layout = QPushButton("")
-        self.btn_swap_2up_layout.setObjectName("editpanel/swap_2up_layout")
-        self.btn_swap_2up_layout.setFixedSize(34, 26)
-        self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_vert", 18))
-        self.btn_swap_2up_layout.setIconSize(QSize(18, 18))
-        self.btn_swap_2up_layout.setToolTip(
-            rm.get_xml_string("editpanel/swap_2up_layout.tooltip", "Basculer entre l'affichage horizontal et l'affichage vertical")
-        )
-        self.btn_swap_2up_layout.hide()
-        self.btn_swap_2up_layout.clicked.connect(self._on_swap_2up_layout_clicked)
-
         self.btn_swap_2up_focus = QPushButton("")
         self.btn_swap_2up_focus.setObjectName("editpanel/swap_2up_focus")
-        self.btn_swap_2up_focus.setFixedSize(34, 26)
-        self.btn_swap_2up_focus.setIcon(rm.get_2up_button_icon("swap_focus", 18))
-        self.btn_swap_2up_focus.setIconSize(QSize(18, 18))
+        self.btn_swap_2up_focus.setFixedSize(36, 26)
+        self.btn_swap_2up_focus.setIcon(rm.get_2up_button_icon("swap_focus", 21))
+        self.btn_swap_2up_focus.setIconSize(QSize(21, 15))
         self.btn_swap_2up_focus.setToolTip(
             rm.get_xml_string("editpanel/swap_2up_focus.tooltip", "Modifier l'image sur laquelle porte la mise au point")
         )
         self.btn_swap_2up_focus.hide()
         self.btn_swap_2up_focus.clicked.connect(self._on_swap_2up_focus_clicked)
+
+        self.btn_swap_2up_layout = QPushButton("")
+        self.btn_swap_2up_layout.setObjectName("editpanel/swap_2up_layout")
+        self.btn_swap_2up_layout.setFixedSize(36, 26)
+        self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_vert", 22))
+        self.btn_swap_2up_layout.setIconSize(QSize(22, 17))
+        self.btn_swap_2up_layout.setToolTip(
+            rm.get_xml_string("editpanel/swap_2up_layout.tooltip", "Basculer entre l'affichage horizontal et l'affichage vertical")
+        )
+        self.btn_swap_2up_layout.hide()
+        self.btn_swap_2up_layout.clicked.connect(self._on_swap_2up_layout_clicked)
 
         self.mode_btn_group = QButtonGroup(bar)
         self.mode_btn_group.addButton(self.btn_mode_a, 0)
@@ -403,8 +419,8 @@ class PicasaOneUpView(QWidget):
         layout.addWidget(self.btn_mode_a)
         layout.addWidget(self.btn_mode_ab)
         layout.addWidget(self.btn_mode_aa)
-        layout.addWidget(self.btn_swap_2up_layout)
         layout.addWidget(self.btn_swap_2up_focus)
+        layout.addWidget(self.btn_swap_2up_layout)
 
         return bar
 
@@ -612,10 +628,10 @@ class PicasaOneUpView(QWidget):
 
         layout.addWidget(QLabel("🔍"))
         self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
-        self.zoom_slider.setRange(10, 300)
+        self.zoom_slider.setRange(10, 400)
         self.zoom_slider.setValue(100)
         self.zoom_slider.setFixedWidth(125)
-        self.zoom_slider.valueChanged.connect(lambda v: self.canvas.set_zoom(v / 100.0))
+        self.zoom_slider.valueChanged.connect(self.canvas.set_zoom_from_slider)
         self.canvas.zoom_changed.connect(self._on_canvas_zoom_changed)
         layout.addWidget(self.zoom_slider)
 
@@ -1025,7 +1041,13 @@ class PicasaOneUpView(QWidget):
         EN: Synchronizes the zoom slider position when the canvas zoom factor changes.
         """
         self.zoom_slider.blockSignals(True)
-        self.zoom_slider.setValue(int(zoom * 100))
+        fit_scale = self.canvas._get_fit_scale()
+        if fit_scale > 0:
+            min_pct = max(5, min(100, int(round(fit_scale * 100))))
+            self.zoom_slider.setRange(min_pct, max(400, min_pct * 4))
+        if not self.zoom_slider.isSliderDown():
+            val = max(self.zoom_slider.minimum(), min(self.zoom_slider.maximum(), int(round(zoom * 100))))
+            self.zoom_slider.setValue(val)
         self.zoom_slider.blockSignals(False)
 
     def _on_toggle_face_tags(self, checked: bool) -> None:
@@ -1050,24 +1072,43 @@ class PicasaOneUpView(QWidget):
         Ref: picasa3.exe @ TwoUpAB, TwoUpAA, FUN_0056A680 @ 0x0056A8DB..0x0056A8EA, FUN_0056A260 @ 0x0056A5DD..0x0056A5EC
         """
         if mode_id == 0:
+            if hasattr(self, "btn_mode_a"):
+                self.btn_mode_a.setChecked(True)
             self.canvas.set_view_mode("A")
             if hasattr(self, "btn_swap_2up_layout"):
                 self.btn_swap_2up_layout.hide()
             if hasattr(self, "btn_swap_2up_focus"):
                 self.btn_swap_2up_focus.hide()
+            if hasattr(self, "filmstrip") and self.filmstrip is not None:
+                if hasattr(self.filmstrip, "set_secondary_index"):
+                    self.filmstrip.set_secondary_index(-1)
+                self.filmstrip.set_current_index(self.current_index)
         elif mode_id == 1:
+            if hasattr(self, "btn_mode_ab"):
+                self.btn_mode_ab.setChecked(True)
             self.canvas.set_view_mode("A_B")
             if hasattr(self, "btn_swap_2up_layout"):
                 self.btn_swap_2up_layout.show()
             if hasattr(self, "btn_swap_2up_focus"):
                 self.btn_swap_2up_focus.show()
             self._load_secondary_photo()
+            if hasattr(self, "filmstrip") and self.filmstrip is not None:
+                if hasattr(self.filmstrip, "set_secondary_index"):
+                    self.filmstrip.set_secondary_index(self.secondary_index)
+                active_idx = self.secondary_index if (self.canvas.active_pane == "B" and self.secondary_index >= 0) else self.current_index
+                self.filmstrip.set_current_index(active_idx)
         elif mode_id == 2:
+            if hasattr(self, "btn_mode_aa"):
+                self.btn_mode_aa.setChecked(True)
             self.canvas.set_view_mode("A_A")
             if hasattr(self, "btn_swap_2up_layout"):
                 self.btn_swap_2up_layout.show()
             if hasattr(self, "btn_swap_2up_focus"):
                 self.btn_swap_2up_focus.show()
+            if hasattr(self, "filmstrip") and self.filmstrip is not None:
+                if hasattr(self.filmstrip, "set_secondary_index"):
+                    self.filmstrip.set_secondary_index(-1)
+                self.filmstrip.set_current_index(self.current_index)
             if getattr(self, "_orig_backup_path", None) and not getattr(self, "_orig_backup_loaded", False):
                 try:
                     from PIL import ImageOps
@@ -1111,9 +1152,9 @@ class PicasaOneUpView(QWidget):
         new_orient = self.canvas.toggle_split_orientation()
         rm = PicasaResourceManager.get()
         if new_orient == "vertical":
-            self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_horiz", 18))
+            self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_horiz", 22))
         else:
-            self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_vert", 18))
+            self.btn_swap_2up_layout.setIcon(rm.get_2up_button_icon("swap_layout_vert", 22))
 
     def _on_swap_2up_focus_clicked(self) -> None:
         """
@@ -1125,10 +1166,20 @@ class PicasaOneUpView(QWidget):
 
     def _on_active_pane_changed(self, pane: str) -> None:
         """
-        FR: Met à jour les informations de la barre supérieure lorsque le volet actif (A ou B) change.
-        EN: Updates the top bar information when the active pane (A or B) changes.
+        FR: Met à jour la pellicule supérieure (`0x005704D0`) et l'en-tête d'informations (`0x005D7B60`)
+        lorsque le volet actif (A ou B) change en mode 2-Up.
+        EN: Updates the top filmstrip (`0x005704D0`) and the info header (`0x005D7B60`)
+        when the active pane (A or B) changes in 2-Up mode.
+        Ref: picasa3.exe @ 0x0056A1FB..0x0056A235
         """
         self._update_top_bar_info()
+        if self.canvas.view_mode == "A_B":
+            target_idx = self.secondary_index if (pane == "B" and self.secondary_index >= 0) else self.current_index
+            if hasattr(self, "filmstrip") and self.filmstrip is not None and target_idx >= 0:
+                self.filmstrip.set_current_index(target_idx)
+            if self.db is not None and 0 <= target_idx < len(self.db.index):
+                p_path = self.db.get_media_full_path(target_idx) or ""
+                self.current_photo_changed.emit(target_idx, p_path)
 
     def _on_neutral_color_picked(self, rgb: Tuple[int, int, int]) -> None:
         """
@@ -1714,6 +1765,12 @@ class PicasaOneUpView(QWidget):
         if self.canvas.view_mode == "A_B":
             self._load_secondary_photo()
 
+        if self.canvas.view_mode in ("A_B", "A_A"):
+            if hasattr(self, "btn_swap_2up_layout"):
+                self.btn_swap_2up_layout.show()
+            if hasattr(self, "btn_swap_2up_focus"):
+                self.btn_swap_2up_focus.show()
+
         # FR: Mettre à jour le volet latéral droit (Personnes, Lieux, Tags, Propriétés)
         # EN: Update the right side drawer (People, Places, Tags, Properties)
         self._current_photo_path = full_path
@@ -1721,6 +1778,8 @@ class PicasaOneUpView(QWidget):
         self.right_drawer.set_current_photo(db, index, full_path or "", source_img=pil_img)
         if db is not None and 0 <= index < len(db.index):
             self.filmstrip.set_items(db, available_indices, index)
+            if self.canvas.view_mode == "A_B" and hasattr(self.filmstrip, "set_secondary_index"):
+                self.filmstrip.set_secondary_index(self.secondary_index)
 
         # FR: Lire le statut favori (star=yes) et la légende (caption=) depuis .picasa.ini / DB
         # EN: Read favorite status (star=yes) and caption (caption=) from .picasa.ini / DB
@@ -1802,6 +1861,9 @@ class PicasaOneUpView(QWidget):
         if self.canvas.view_mode == "A_B" and self.canvas.active_pane == "B":
             self.secondary_index = photo_idx
             self._load_secondary_photo()
+            if self.db is not None and 0 <= photo_idx < len(self.db.index):
+                sec_path = self.db.get_media_full_path(photo_idx) or ""
+                self.current_photo_changed.emit(photo_idx, sec_path)
         else:
             self.open_photo(self.db, photo_idx, self.available_indices)
 
@@ -1834,6 +1896,12 @@ class PicasaOneUpView(QWidget):
             self.canvas.set_secondary_pixmap(sec_pix, sec_filename)
         else:
             self.canvas.set_secondary_pixmap(None, "Aucune")
+
+        if hasattr(self, "filmstrip") and self.filmstrip is not None:
+            if hasattr(self.filmstrip, "set_secondary_index"):
+                self.filmstrip.set_secondary_index(self.secondary_index)
+            if self.canvas.view_mode == "A_B" and self.canvas.active_pane == "B" and self.secondary_index >= 0:
+                self.filmstrip.set_current_index(self.secondary_index)
 
         self._update_top_bar_info()
 

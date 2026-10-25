@@ -148,12 +148,18 @@ class PicasaLibraryTree(QWidget):
         layout.addWidget(self.tree)
         self.tree.setIconSize(QSize(22, 22))
         self.tree.itemClicked.connect(self._on_item_clicked)
+        self.tree.itemExpanded.connect(self._on_item_expanded)
+        self.tree.itemCollapsed.connect(self._on_item_collapsed)
 
         self.db: Optional[PicasaDatabase] = None
         self.folder_view_mode: str = "flat"  # FR: "flat" (ID_VIEW_FOLDERS) ou "tree" (ID_VIEW_ALL) / EN: "flat" or "tree"
+        self.show_hidden: bool = False  # Ref: picasa3.exe @ 0x00748185, 0x00748610 (ShowHidden reveals Hidden Folders)
+        self._cached_hidden_folder_items: List[Tuple[str, int, str, str]] = []
+        self._updating_hidden_cat: bool = False
         self.cat_albums: Optional[QTreeWidgetItem] = None
         self.cat_people: Optional[QTreeWidgetItem] = None
         self.cat_folders: Optional[QTreeWidgetItem] = None
+        self.cat_hidden_folders: Optional[QTreeWidgetItem] = None
         self.cat_projects: Optional[QTreeWidgetItem] = None
         self._pending_tree_avatars: List[Tuple[QTreeWidgetItem, str]] = []
         self._avatar_timer = QTimer(self)
@@ -266,7 +272,7 @@ class PicasaLibraryTree(QWidget):
                 background: transparent;
             }}
         """)
-        for cat in (self.cat_albums, self.cat_people, self.cat_folders, self.cat_projects):
+        for cat in (self.cat_albums, self.cat_people, self.cat_folders, self.cat_hidden_folders, self.cat_projects):
             if cat is not None:
                 cat.setBackground(0, self.style.alist_catcolor)
                 cat.setForeground(0, QColor(txt_col))
@@ -351,6 +357,12 @@ class PicasaLibraryTree(QWidget):
 
         self.cat_albums = _create_cat(self.res_mgr.get_stringres("CAlbumList::liststicky5", self.res_mgr.get_string(200, "Albums")), 152)
         self.cat_people = _create_cat(self.res_mgr.get_stringres("Category::people", "Personnes"), 159)
+        # Ref: picasa3.exe @ 0x004A2314, 0x004A2DF2 ("Hidden Folders" / IDS_HIDDEN = "Dossiers masqués", cat=7)
+        # Placé juste au-dessus de "Dossiers" dans le QTreeWidget afin qu'il soit immédiatement visible sans défiler 700+ dossiers
+        hidden_title = self.res_mgr.get_stringres("IDS_HIDDEN", self.res_mgr.get_string(240, "Dossiers masqués"))
+        self.cat_hidden_folders = _create_cat(hidden_title, 150)
+        self.cat_hidden_folders.setData(0, Qt.ItemDataRole.UserRole, {"type": "category", "key": "Hidden Folders"})
+        self.cat_hidden_folders.setHidden(True)
         self.cat_folders = _create_cat(self.res_mgr.get_stringres("CAlbumList::liststicky2", self.res_mgr.get_string(196, "Folders")), 150)
         self.cat_projects = _create_cat(self.res_mgr.get_stringres("CAlbumList::liststicky8", self.res_mgr.get_string(299, "Projects")), 161)
 
@@ -376,6 +388,74 @@ class PicasaLibraryTree(QWidget):
         self.db = db
         self.refresh()
 
+    def set_show_hidden(self, show: bool) -> None:
+        """
+        FR: Met à jour uniquement l'état de visibilité de la collection « Dossiers masqués » (`cat=7`)
+        sans reconstruire les 700+ dossiers normaux (`cat=2`), conformément à `FUN_005C9300` & `FUN_004A8B10`.
+        EN: Updates only the visibility state of the "Hidden Folders" collection (`cat=7`)
+        without rebuilding all normal folders (`cat=2`), matching `FUN_005C9300` & `FUN_004A8B10`.
+        Ref: picasa3.exe @ 0x005C9300, 0x004A8B10, 0x004B2060
+        """
+        self.show_hidden = bool(show)
+        self._update_hidden_folders_category()
+
+    def _is_hidden_folders_password_locked(self) -> bool:
+        """
+        FR: Indique si la collection « Dossiers masqués » est actuellement protégée par mot de passe et non déverrouillée.
+        EN: Returns whether the "Hidden Folders" collection is currently password-protected and locked.
+        Ref: picasa3.exe @ 0x004AB650, 0x005EE522 (catdata_state[7] == 0 tant que le mot de passe n'a pas été saisi)
+        """
+        main_win = self.window()
+        if main_win is not None and hasattr(main_win, "_get_collection_password_hash"):
+            pwd_hash = main_win._get_collection_password_hash("Hidden Folders")
+            if pwd_hash:
+                unlocked = getattr(main_win, "_unlocked_collections", set())
+                return "Hidden Folders" not in unlocked
+        return False
+
+    def _update_hidden_folders_category(self) -> None:
+        """
+        FR: Met à jour le nœud `cat_hidden_folders` (« Dossiers masqués », `cat=7`) en O(H) :
+        - Masqué si `not self.show_hidden` ou s'il n'y a aucun dossier masqué (`0x004A8B10`, `0x004B2060`).
+        - Replié (`setExpanded(False)`) sans sous-dossiers affichés tant que la collection est verrouillée par mot de passe (`0x005EE522`, `0x004AB650`).
+        - Déplié avec ses dossiers masqués si pas de mot de passe ou déjà déverrouillé.
+        EN: Updates the `cat_hidden_folders` node ("Hidden Folders", `cat=7`) in O(H).
+        Ref: picasa3.exe @ 0x004A8B10, 0x004B2060, 0x004AB650, 0x005EE522
+        """
+        if self.cat_hidden_folders is None:
+            return
+        self._updating_hidden_cat = True
+        self.tree.setUpdatesEnabled(False)
+        try:
+            self.cat_hidden_folders.setExpanded(False)
+            self.cat_hidden_folders.takeChildren()
+            if not self.show_hidden or not self._cached_hidden_folder_items:
+                self.cat_hidden_folders.setHidden(True)
+                return
+
+            self.cat_hidden_folders.setHidden(False)
+            is_locked = self._is_hidden_folders_password_locked()
+            children_to_add: List[QTreeWidgetItem] = []
+            folder_icon = self.res_mgr.get_icon(150)
+            for name, count, fpath, norm_k in sorted(self._cached_hidden_folder_items, key=lambda x: x[0].lower()):
+                h_item = QTreeWidgetItem()
+                h_item.setText(0, f"{name} ({count})")
+                h_item.setIcon(0, folder_icon)
+                h_item.setData(0, Qt.ItemDataRole.UserRole, {
+                    "type": "folder",
+                    "key": fpath,
+                    "name": name,
+                    "is_hidden_folder": True,
+                })
+                children_to_add.append(h_item)
+            if children_to_add:
+                self.cat_hidden_folders.addChildren(children_to_add)
+            # Ref: picasa3.exe @ 0x005EE522, 0x004AB650 : replié (state=0) si protégé par mot de passe non saisi
+            self.cat_hidden_folders.setExpanded(not is_locked)
+        finally:
+            self.tree.setUpdatesEnabled(True)
+            self._updating_hidden_cat = False
+
     def refresh_folders(self) -> None:
         """
         FR: Met à jour dynamiquement la section Dossiers (Folders) dans l'arborescence.
@@ -395,50 +475,92 @@ class PicasaLibraryTree(QWidget):
                 ud = curr.data(0, Qt.ItemDataRole.UserRole)
                 if ud and ud.get("type") == "folder":
                     selected_key = ud.get("key")
+                    self.tree.setCurrentItem(None)
 
-            while self.cat_folders.childCount() > 0:
-                self.cat_folders.removeChild(self.cat_folders.child(0))
+            # Détacher tous les enfants d'un seul bloc O(1) (évite les 797 signaux QTreeModel::removeChild de 2,3 s)
+            self.cat_folders.setExpanded(False)
+            self.cat_folders.takeChildren()
 
-            ti_folders = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
+            # Compter par parent_idx entier d'abord O(N), puis normaliser uniquement par dossier unique O(F)
+            ti_folders: Dict[int, str] = {}
+            idx_media_count: Dict[int, int] = {}
+            for i, r in enumerate(self.db.index):
+                rt = r.type
+                if rt == 1:
+                    ti_folders[i] = r.path
+                elif rt in (2, 6, 7, 13, 18, 31, 32):
+                    p_idx = r.parent_idx
+                    idx_media_count[p_idx] = idx_media_count.get(p_idx, 0) + 1
 
             folder_media_count: Dict[str, int] = {}
-            for r in self.db.index:
-                if r.type in (2, 6, 7, 13, 18, 31, 32):
-                    fpath = ti_folders.get(r.parent_idx, "")
-                    if fpath:
-                        k = _norm(fpath)
-                        folder_media_count[k] = folder_media_count.get(k, 0) + 1
+            norm_by_idx: Dict[int, str] = {}
+            for idx, fpath in ti_folders.items():
+                if fpath:
+                    k = _norm(fpath)
+                    norm_by_idx[idx] = k
+                    c = idx_media_count.get(idx, 0)
+                    if c > 0:
+                        folder_media_count[k] = folder_media_count.get(k, 0) + c
 
             ad_names = self.db.pmps.get("albumdata_name")
             ad_cats = self.db.pmps.get("albumdata_category")
             ad_files = self.db.pmps.get("albumdata_filename")
 
-            folder_items = []
+            folder_items: List[Tuple[str, int, str, str]] = []
+            hidden_folder_items: List[Tuple[str, int, str, str]] = []
             added_norm_paths: Set[str] = set()
+            hidden_norm_paths: Set[str] = set()
+            db_hidden_folders = getattr(self.db, "_hidden_folders", None)
+            if db_hidden_folders:
+                for hp in db_hidden_folders:
+                    hidden_norm_paths.add(_norm(hp))
 
             if ad_names and ad_cats and ad_files:
                 names = ad_names.records
                 cats = ad_cats.records
                 files = ad_files.records
                 for i in range(len(names)):
-                    if cats[i] == 2:  # FR: Dossier réel visible dans Picasa / EN: Real folder visible in Picasa
-                        fpath = files[i] if i < len(files) else ""
-                        norm_k = _norm(fpath)
+                    fpath = files[i] if i < len(files) else ""
+                    if not fpath:
+                        continue
+                    norm_k = _norm(fpath)
+                    cat_val = cats[i] if i < len(cats) else 2
+                    if cat_val == 7 or norm_k in hidden_norm_paths:
+                        hidden_norm_paths.add(norm_k)
                         count = folder_media_count.get(norm_k, 0)
-                        if count > 0:
-                            folder_items.append((names[i], count, fpath, norm_k))
+                        if count > 0 and norm_k not in added_norm_paths:
+                            hidden_folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
+                            added_norm_paths.add(norm_k)
+                    elif cat_val == 2:  # FR: Dossier réel visible dans Picasa / EN: Real folder visible in Picasa
+                        count = folder_media_count.get(norm_k, 0)
+                        if count > 0 and norm_k not in added_norm_paths:
+                            folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
                             added_norm_paths.add(norm_k)
 
             # FR: Dossiers trouvés dans thumbindex / EN: Folders found in thumbindex
             for idx, fpath in ti_folders.items():
-                norm_k = _norm(fpath)
+                norm_k = norm_by_idx.get(idx) or _norm(fpath)
                 if norm_k not in added_norm_paths:
                     count = folder_media_count.get(norm_k, 0)
                     if count > 0:
                         dname = os.path.basename(fpath.rstrip("\\/")) or fpath
-                        folder_items.append((dname, count, fpath, norm_k))
+                        if norm_k in hidden_norm_paths:
+                            hidden_folder_items.append((dname, count, fpath, norm_k))
+                        else:
+                            folder_items.append((dname, count, fpath, norm_k))
                         added_norm_paths.add(norm_k)
 
+            # Synchroniser self.db._hidden_folders avec l'ensemble des dossiers cat==7 détectés
+            if hidden_norm_paths:
+                if not hasattr(self.db, "_hidden_folders") or not isinstance(self.db._hidden_folders, set):
+                    self.db._hidden_folders = set()
+                self.db._hidden_folders.update(hidden_norm_paths)
+
+            self._cached_hidden_folder_items = hidden_folder_items
+            self._update_hidden_folders_category()
+
+            folder_icon = self.res_mgr.get_icon(150)
+            norm_selected_key = _norm(selected_key) if selected_key else None
             item_to_reselect = None
             if self.folder_view_mode == "tree":
                 # FR: Mode arborescent (ID_VIEW_ALL) : hiérarchie parent -> sous-dossier
@@ -458,7 +580,7 @@ class PicasaLibraryTree(QWidget):
                         parent_dir = next_p
                     item = QTreeWidgetItem(parent_node)
                     item.setText(0, f"{name} ({count})")
-                    item.setIcon(0, self.res_mgr.get_icon(150))
+                    item.setIcon(0, folder_icon)
                     item.setData(0, Qt.ItemDataRole.UserRole, {
                         "type": "folder",
                         "key": fpath,
@@ -466,21 +588,25 @@ class PicasaLibraryTree(QWidget):
                     })
                     item.setExpanded(True)
                     nodes_by_norm[norm_k] = item
-                    if selected_key and norm_k == _norm(selected_key):
+                    if norm_selected_key and norm_k == norm_selected_key:
                         item_to_reselect = item
             else:
-                # FR: Mode à plat (ID_VIEW_FOLDERS) / EN: Flat list mode (ID_VIEW_FOLDERS)
+                # FR: Mode à plat (ID_VIEW_FOLDERS) — insertion groupée addChildren / EN: Flat list mode
+                flat_items: List[QTreeWidgetItem] = []
                 for name, count, fpath, norm_k in sorted(folder_items, key=lambda x: x[0].lower()):
-                    item = QTreeWidgetItem(self.cat_folders)
+                    item = QTreeWidgetItem()
                     item.setText(0, f"{name} ({count})")
-                    item.setIcon(0, self.res_mgr.get_icon(150))
+                    item.setIcon(0, folder_icon)
                     item.setData(0, Qt.ItemDataRole.UserRole, {
                         "type": "folder",
                         "key": fpath,
                         "name": name,
                     })
-                    if selected_key and norm_k == _norm(selected_key):
+                    flat_items.append(item)
+                    if norm_selected_key and norm_k == norm_selected_key:
                         item_to_reselect = item
+                if flat_items:
+                    self.cat_folders.addChildren(flat_items)
 
             self.cat_folders.setExpanded(True)
             if item_to_reselect:
@@ -503,18 +629,19 @@ class PicasaLibraryTree(QWidget):
             curr = self.tree.currentItem()
             if curr:
                 ud = curr.data(0, Qt.ItemDataRole.UserRole)
-                if ud and ud.get("type") == "album":
+                if ud and ud.get("type") in ("album", "starred"):
                     selected_key = ud.get("key")
+                    self.tree.setCurrentItem(None)
 
-            while self.cat_albums.childCount() > 0:
-                self.cat_albums.removeChild(self.cat_albums.child(0))
+            self.cat_albums.setExpanded(False)
+            self.cat_albums.takeChildren()
 
             # FR: Album virtuel épinglé "Photos favorites" / EN: Sticky virtual album "Starred Photos"
             # (Ref: picasa3.exe @ CThumbDB::starredphotos, 0x0088F6FC, alist_stickycolor)
             starred_paths = self.db.get_starred_photo_paths() if hasattr(self.db, "get_starred_photo_paths") else []
             starred_count = len(starred_paths)
             count_str = f" ({starred_count})" if starred_count > 0 else " (0)"
-            item_starred = QTreeWidgetItem(self.cat_albums)
+            item_starred = QTreeWidgetItem()
             item_starred.setText(0, f"Photos favorites{count_str}")
             item_starred.setIcon(0, self.res_mgr.get_star_icon(18))
             item_starred.setBackground(0, self.style.alist_stickycolor)
@@ -526,18 +653,20 @@ class PicasaLibraryTree(QWidget):
                 "token": "starred",
                 "photo_paths": starred_paths,
             })
+            album_children: List[QTreeWidgetItem] = [item_starred]
             item_to_reselect = None
             if selected_key == "special_starred":
                 item_to_reselect = item_starred
 
             albums = self.db.get_all_albums()
+            album_icon = self.res_mgr.get_icon(152)
 
             for alb in sorted(albums, key=lambda a: a["name"].lower()):
                 count = len(alb.get("photo_paths", []))
                 count_str = f" ({count})" if count > 0 else ""
-                item = QTreeWidgetItem(self.cat_albums)
+                item = QTreeWidgetItem()
                 item.setText(0, f"{alb['name']}{count_str}")
-                item.setIcon(0, self.res_mgr.get_icon(152))
+                item.setIcon(0, album_icon)
                 item.setData(0, Qt.ItemDataRole.UserRole, {
                     "type": "album",
                     "key": alb["token"],
@@ -545,9 +674,11 @@ class PicasaLibraryTree(QWidget):
                     "token": alb["token"],
                     "photo_paths": alb.get("photo_paths", []),
                 })
+                album_children.append(item)
                 if selected_key and (alb["token"] == selected_key or alb["name"] == selected_key):
                     item_to_reselect = item
 
+            self.cat_albums.addChildren(album_children)
             self.cat_albums.setExpanded(True)
             if item_to_reselect:
                 self.tree.setCurrentItem(item_to_reselect)
@@ -571,12 +702,13 @@ class PicasaLibraryTree(QWidget):
             curr = self.tree.currentItem()
             if curr:
                 ud = curr.data(0, Qt.ItemDataRole.UserRole)
-                if ud and ud.get("type") == "person":
+                if ud and ud.get("type") in ("person", "unnamed_faces"):
                     selected_key = ud.get("key")
+                    self.tree.setCurrentItem(None)
 
-            # FR: Supprimer les éléments existants dans cat_people / EN: Remove existing items in cat_people
-            while self.cat_people.childCount() > 0:
-                self.cat_people.removeChild(self.cat_people.child(0))
+            # FR: Détacher tous les enfants en O(1) / EN: Detach all children in O(1)
+            self.cat_people.setExpanded(False)
+            self.cat_people.takeChildren()
 
             people = list(self.db.face_manager.get_people())
             known_ids = {p.contact_id.lower() for p in people}
@@ -600,13 +732,14 @@ class PicasaLibraryTree(QWidget):
             people_sorted = sorted(people, key=lambda p: (-p.photo_count, p.name.lower()))
 
             item_to_reselect = None
+            people_children: List[QTreeWidgetItem] = []
 
             # FR: Section spéciale épinglée "Sans nom" / EN: Sticky special section "Unnamed"
             # (Ref: CThumbDB::unknownfacealbum, 0x008AAD76, alist_stickycolor)
             unnamed_list = self.db.face_manager.unnamed_faces if hasattr(self.db.face_manager, "unnamed_faces") else []
             unnamed_count = len(unnamed_list)
             if unnamed_count > 0:
-                item_unnamed = QTreeWidgetItem(self.cat_people)
+                item_unnamed = QTreeWidgetItem()
                 unnamed_title = self.res_mgr.get_stringres("CThumbDB::unknownfacealbum", "Sans nom")
                 item_unnamed.setText(0, f"{unnamed_title} ({unnamed_count})")
                 item_unnamed.setIcon(0, self.res_mgr.get_icon(159))
@@ -622,6 +755,7 @@ class PicasaLibraryTree(QWidget):
                     "key": "unnamed",
                     "name": unnamed_title,
                 })
+                people_children.append(item_unnamed)
                 if selected_key == "unnamed":
                     item_to_reselect = item_unnamed
 
@@ -631,7 +765,7 @@ class PicasaLibraryTree(QWidget):
             sync_avatar_decodes = 0
 
             for person in people_sorted:
-                item = QTreeWidgetItem(self.cat_people)
+                item = QTreeWidgetItem()
                 item.setText(0, f"{person.name} ({person.photo_count})")
                 cid_low = person.contact_id.lower()
                 cached_av = avatar_cache.get((cid_low, 48, True)) or getattr(person, "_avatar_pixmap", None)
@@ -656,9 +790,12 @@ class PicasaLibraryTree(QWidget):
                     "key": person.contact_id,
                     "name": person.name,
                 })
+                people_children.append(item)
                 if selected_key and cid_low == selected_key.lower():
                     item_to_reselect = item
 
+            if people_children:
+                self.cat_people.addChildren(people_children)
             self.cat_people.setExpanded(True)
             if item_to_reselect:
                 self.tree.setCurrentItem(item_to_reselect)
@@ -692,15 +829,71 @@ class PicasaLibraryTree(QWidget):
         if not self._pending_tree_avatars:
             self._avatar_timer.stop()
 
+    def _on_item_expanded(self, item: QTreeWidgetItem) -> None:
+        """
+        FR: Gère le dépliage d'une catégorie dans l'arborescence (`CAlbumState::passprompt` @ `0x004AB650`).
+        Si la catégorie « Dossiers masqués » (`cat=7`) est protégée par mot de passe et non déverrouillée,
+        demande le mot de passe avant d'autoriser son ouverture ; en cas de refus ou d'erreur, la replie.
+        EN: Handles category expansion in the library tree (`CAlbumState::passprompt` @ `0x004AB650`).
+        Ref: picasa3.exe @ 0x004AB9A0 - 0x004ABB69, 0x004AB650 - 0x004AB8F1
+        """
+        if self._updating_hidden_cat or item is not self.cat_hidden_folders:
+            return
+        if self._is_hidden_folders_password_locked():
+            main_win = self.window()
+            if main_win is not None and hasattr(main_win, "_verify_collection_password_prompt"):
+                if not main_win._verify_collection_password_prompt("Hidden Folders"):
+                    self._updating_hidden_cat = True
+                    try:
+                        item.setExpanded(False)
+                    finally:
+                        self._updating_hidden_cat = False
+                    return
+                if hasattr(main_win, "thumb_view"):
+                    main_win.thumb_view._apply_current_filters(reset_scroll=False)
+
+    def _on_item_collapsed(self, item: QTreeWidgetItem) -> None:
+        """
+        FR: Gère le repliage d'une catégorie dans l'arborescence (`0x00453AF0`).
+        Replier « Dossiers masqués » reverrouille la collection si elle est protégée par mot de passe (`catdata_state[7] = 0`).
+        EN: Handles category collapse in the library tree (`0x00453AF0`).
+        Collapsing "Hidden Folders" re-locks the collection if password-protected (`catdata_state[7] = 0`).
+        Ref: picasa3.exe @ 0x00453AF0, 0x004AB9A0
+        """
+        if self._updating_hidden_cat or item is not self.cat_hidden_folders:
+            return
+        main_win = self.window()
+        if main_win is not None and hasattr(main_win, "_get_collection_password_hash"):
+            if main_win._get_collection_password_hash("Hidden Folders"):
+                unlocked = getattr(main_win, "_unlocked_collections", None)
+                if isinstance(unlocked, set):
+                    unlocked.discard("Hidden Folders")
+                if hasattr(main_win, "thumb_view"):
+                    main_win.thumb_view._apply_current_filters(reset_scroll=False)
+
     def _on_item_clicked(self, item: QTreeWidgetItem, column: int) -> None:
         """
         FR: Émet le signal folder_selected correspondant à l'élément ou la catégorie cliquée.
+        Pour la catégorie « Dossiers masqués » (`cat=7`), bascule son état déplié/replié avec vérification
+        du mot de passe conformément à `0x004AB9A0 -> 0x004AB650`.
         EN: Emits the folder_selected signal matching the clicked item or category.
+        Ref: picasa3.exe @ 0x004AB9A0 - 0x004ABB69, 0x004AB650
         """
         data = item.data(0, Qt.ItemDataRole.UserRole)
         if data and data.get("type") in ("folder", "album", "person", "unnamed_faces", "starred"):
             self.folder_selected.emit(data["key"], data["type"], data["name"])
         elif data and data.get("type") == "category":
+            if item is self.cat_hidden_folders:
+                if not item.isExpanded():
+                    item.setExpanded(True)
+                    if item.isExpanded() and item.childCount() > 0:
+                        first_child = item.child(0)
+                        c_data = first_child.data(0, Qt.ItemDataRole.UserRole)
+                        if c_data and c_data.get("key"):
+                            self.folder_selected.emit(c_data["key"], "folder", c_data.get("name", ""))
+                else:
+                    item.setExpanded(False)
+                return
             # FR: Cliquer sur la catégorie "Folders" ou "Albums" réinitialise la vue à toutes les photos
             # EN: Clicking on the "Folders" or "Albums" category resets the view to all photos
             self.folder_selected.emit("", "all", "Toutes les photos")
@@ -708,7 +901,10 @@ class PicasaLibraryTree(QWidget):
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         """
         FR: Gestion du clic droit dans l'arborescence (Ref: 0x005D41F4, "lb_rightclick").
+        Si l'utilisateur fait un clic droit sur une catégorie repliée et protégée par mot de passe,
+        demande d'abord le mot de passe (`0x005D4407 -> 0x005D4494 -> 0x005EC440`).
         EN: Right-click context menu handler in the library tree (Ref: 0x005D41F4, "lb_rightclick").
+        Ref: picasa3.exe @ 0x005D41F4, 0x005D4407 - 0x005D44AF, 0x005EC440
         """
         item = self.tree.itemAt(event.pos())
         if not item:
@@ -737,6 +933,16 @@ class PicasaLibraryTree(QWidget):
             pname = data.get("name", "")
             PicasaContextMenuBuilder.show_person_context_menu(
                 self, event.globalPos(), cid, pname, db=self.db, main_win=main_win
+            )
+        elif t == "category":
+            ckey = data.get("key", "")
+            if item is self.cat_hidden_folders and not item.isExpanded() and self._is_hidden_folders_password_locked():
+                if main_win is not None and hasattr(main_win, "_verify_collection_password_prompt"):
+                    if not main_win._verify_collection_password_prompt("Hidden Folders"):
+                        return
+                    item.setExpanded(True)
+            PicasaContextMenuBuilder.show_collection_context_menu(
+                self, event.globalPos(), ckey, db=self.db, main_win=main_win
             )
 
 

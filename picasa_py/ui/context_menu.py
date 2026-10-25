@@ -249,6 +249,14 @@ class PicasaContextMenuBuilder:
         if main_win and hasattr(main_win, "action_undo_all_edits"):
             act_revert.triggered.connect(lambda: main_win.action_undo_all_edits(photo_paths))
 
+        # 5 bis. &Hide / &Unhide (FolderPhoto::ID_PICTURE_HIDE / ID_PICTURE_UNHIDE, Ref: 0x00CADC2C, 0x00CADC48)
+        act_hide = menu.addAction(_tr("&Hide", "&Masquer", "eMenuPicture::ID_PICTURE_HIDE"))
+        if main_win and hasattr(main_win, "action_hide_pictures"):
+            act_hide.triggered.connect(lambda: main_win.action_hide_pictures(photo_paths))
+        act_unhide = menu.addAction(_tr("&Unhide", "A&fficher", "eMenuPicture::ID_PICTURE_UNHIDE"))
+        if main_win and hasattr(main_win, "action_unhide_pictures"):
+            act_unhide.triggered.connect(lambda: main_win.action_unhide_pictures(photo_paths))
+
         menu.addSeparator()
 
         # 6. &Open File (ID_FILE_OPENINANEDITOR)
@@ -454,6 +462,14 @@ class PicasaContextMenuBuilder:
         act_mov = menu.addAction(_tr("&Move Folder...", "&Déplacer le dossier...", "Folder::ID_MOVEFOLDER"))
         if main_win and hasattr(main_win, "action_move_folder"):
             act_mov.triggered.connect(lambda: main_win.action_move_folder(folder_path))
+
+        # Folder::ID_HIDEENTIREALBUM / ID_UNHIDEENTIREALBUM (Ref: picasa3.exe @ 0x00731D14 - 0x00731D9E, cmds 0x9C72 / 0x9CD0)
+        act_hide_f = menu.addAction(_tr("&Hide Folder", "Masq&uer le dossier", "Folder::ID_HIDEENTIREALBUM"))
+        if main_win and hasattr(main_win, "action_hide_folder"):
+            act_hide_f.triggered.connect(lambda: main_win.action_hide_folder(folder_path))
+        act_unhide_f = menu.addAction(_tr("&Unhide Folder", "A&fficher le dossier", "Folder::ID_UNHIDEENTIREALBUM"))
+        if main_win and hasattr(main_win, "action_unhide_folder"):
+            act_unhide_f.triggered.connect(lambda: main_win.action_unhide_folder(folder_path))
 
         menu.addSeparator()
 
@@ -702,6 +718,43 @@ class PicasaContextMenuBuilder:
         """
         menu = PicasaContextMenuBuilder.build_person_context_menu(
             parent, contact_id, person_name, db=db, main_win=main_win
+        )
+        return menu.exec(global_pos) if menu else None
+
+    @staticmethod
+    def build_collection_context_menu(
+        parent: QWidget,
+        collection_name: str,
+        db: Optional[PicasaDatabase] = None,
+        main_win: Optional[Any] = None,
+    ) -> QMenu:
+        """
+        FR: Construit le menu contextuel d'une collection racine (Menu 0x88, Collection::*).
+        EN: Builds the context menu for a root collection (Menu 0x88, Collection::*).
+        Ref: picasa3.exe @ 0x00732680 - 0x0073279F (Collection::ID_COL_PASSWORD 0x9D56 -> FUN_005EB910)
+        """
+        menu = QMenu(parent)
+        act_pwd = menu.addAction(
+            _tr("&Add/Change a password...", "&Ajouter/modifier un mot de passe...", "Collection::ID_COL_PASSWORD")
+        )
+        if main_win and hasattr(main_win, "action_password_protect_collection"):
+            act_pwd.triggered.connect(lambda: main_win.action_password_protect_collection(collection_name))
+        return menu
+
+    @staticmethod
+    def show_collection_context_menu(
+        parent: QWidget,
+        global_pos: QPoint,
+        collection_name: str,
+        db: Optional[PicasaDatabase] = None,
+        main_win: Optional[Any] = None,
+    ) -> Optional[QAction]:
+        """
+        FR: Construit et affiche de manière modale le menu contextuel d'une collection.
+        EN: Builds and modally executes the context menu for a collection at global_pos.
+        """
+        menu = PicasaContextMenuBuilder.build_collection_context_menu(
+            parent, collection_name, db=db, main_win=main_win
         )
         return menu.exec(global_pos) if menu else None
 

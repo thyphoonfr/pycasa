@@ -26,10 +26,17 @@ MENU_I18N = {
         "menu_edit": "&Édition",
         "menu_view": "&Affichage",
         "menu_folder": "&Dossier",
-        "menu_picture": "&Image",
+        "menu_album": "&Album",
+        "menu_picture": "&Photo",
         "menu_create": "&Création",
         "menu_tools": "&Outils",
         "menu_help": "&Aide",
+        "ID_VIEW_SHOWHIDDEN": "&Photos masquées",
+        "ID_PICTURE_HIDE": "&Masquer",
+        "ID_PICTURE_UNHIDE": "A&fficher",
+        "ID_HIDEENTIREALBUM": "Masq&uer le dossier",
+        "ID_UNHIDEENTIREALBUM": "A&fficher le dossier",
+        "ID_COL_PASSWORD": "&Ajouter/modifier un mot de passe...",
         "ID_FILE_OPEN": "Ajouter un &fichier à Picasa...",
         "ID_TOOLS_INCLUDEEXCLUDEFOLDERS": "Ajouter un &dossier à Picasa...",
         "ID_FILE_IMPORTPICTURE": "&Importer depuis...",
@@ -162,7 +169,27 @@ class PicasaMenuBuilder:
         self.shortcuts: Dict[str, str] = {}
         self.theme_actions: Dict[str, QAction] = {}
         self.menu_themes: Optional[QMenu] = None
+        self.menu_folder: Optional[QMenu] = None
+        self.act_show_hidden: Optional[QAction] = None
+        self._is_folder_menu_mode: bool = False
         self._load_shortcuts()
+
+    def update_folder_album_menu_title(self, is_folder: bool) -> None:
+        """
+        FR : Bascule dynamiquement le titre du 4e menu entre « &Dossier » (`ThumbUIOutput::FolderMenu`)
+        lorsqu'un dossier physique est actif et « &Album » (`ThumbUIOutput::AlbumMenu`) lorsqu'un album
+        virtuel, une personne ou la vue globale est actif.
+        EN : Dynamically switches the 4th menu title between "F&older" (`ThumbUIOutput::FolderMenu`)
+        when a physical disk folder is active and "&Album" (`ThumbUIOutput::AlbumMenu`) when a virtual
+        album, person, or global view is active.
+        Ref: picasa3.exe @ 0x00537FB0 - 0x005380EA (SetMenuItemInfoW position 3 + DrawMenuBar)
+        """
+        self._is_folder_menu_mode = bool(is_folder)
+        if self.menu_folder is not None:
+            if self._is_folder_menu_mode:
+                self.menu_folder.setTitle(self._tr("menu_folder", "&Folder"))
+            else:
+                self.menu_folder.setTitle(self._tr("menu_album", "&Album"))
 
     def retranslate_ui(self) -> None:
         """
@@ -276,6 +303,16 @@ class PicasaMenuBuilder:
         self._add_action(menu_view, self._tr("ID_VIEW_TAGS", "&Tags"), "ID_VIEW_TAGS", lambda: self.win.action_toggle_drawer_panel("tags") if hasattr(self.win, "action_toggle_drawer_panel") else None)
         self._add_action(menu_view, self._tr("ID_VIEW_DRAWER_PROPERTIES", "Properties"), "ID_VIEW_PROPERTIES", lambda: self.win.action_toggle_drawer_panel("properties") if hasattr(self.win, "action_toggle_drawer_panel") else None)
         menu_view.addSeparator()
+        # Ref: picasa3.exe @ 0x0055AAB0 (eMenuView::ID_VIEW_SHOWHIDDEN, cmd 0x9C9E -> FUN_005C9300)
+        self.act_show_hidden = self._add_action(
+            menu_view,
+            self._tr("ID_VIEW_SHOWHIDDEN", "&Hidden Pictures"),
+            "ID_VIEW_SHOWHIDDEN",
+            self.win.action_toggle_show_hidden if hasattr(self.win, "action_toggle_show_hidden") else None,
+        )
+        self.act_show_hidden.setCheckable(True)
+        self.act_show_hidden.setChecked(bool(getattr(self.win, "show_hidden_pictures", False)))
+        menu_view.addSeparator()
 
         # Sous-menu Thème de couleurs (ui/resources/themes/*.ini)
         from picasa_py.ui.style import PicasaStyle
@@ -302,18 +339,28 @@ class PicasaMenuBuilder:
             self.menu_themes.addAction(act)
             self.theme_actions[tid] = act
 
-        # 4. &Folder
-        menu_folder = mb.addMenu(self._tr("menu_folder", "&Folder"))
+        # 4. &Folder / &Album (Ref: picasa3.exe @ 0x00537FB0, ThumbUIOutput::FolderMenu vs AlbumMenu)
+        folder_title = (
+            self._tr("menu_folder", "&Folder")
+            if self._is_folder_menu_mode
+            else self._tr("menu_album", "&Album")
+        )
+        menu_folder = mb.addMenu(folder_title)
+        self.menu_folder = menu_folder
         self._add_action(menu_folder, self._tr("ID_FILE_LOCATEONDISK", "&Locate on Disk"), "ID_FILE_LOCATEONDISK", self.win.action_locate_on_disk if hasattr(self.win, "action_locate_on_disk") else None)
         self._add_action(menu_folder, self._tr("ID_REFRESH_THUMB", "&Refresh Thumbnail"), "ID_REFRESH_THUMB", self.win.action_refresh_thumbnails if hasattr(self.win, "action_refresh_thumbnails") else None)
         self._add_action(menu_folder, self._tr("ID_FILE_EXPORTASWEBPAGE", "Export as &Web Page..."), "ID_FILE_EXPORTASWEBPAGE", self.win.action_export_as_web_page if hasattr(self.win, "action_export_as_web_page") else None)
         menu_folder.addSeparator()
+        # Ref: picasa3.exe @ 0x0055AF45 (eMenuLabelFolder -> ID_HIDEENTIREALBUM 0x9C72 / ID_UNHIDEENTIREALBUM 0x9CD0)
+        self._add_action(menu_folder, self._tr("ID_HIDEENTIREALBUM", "&Hide Folder"), "ID_HIDEENTIREALBUM", (lambda: self.win.action_hide_folder(self.win.thumb_view.current_folder_filter or "")) if hasattr(self.win, "action_hide_folder") else None)
+        self._add_action(menu_folder, self._tr("ID_UNHIDEENTIREALBUM", "&Unhide Folder"), "ID_UNHIDEENTIREALBUM", (lambda: self.win.action_unhide_folder(self.win.thumb_view.current_folder_filter or "")) if hasattr(self.win, "action_unhide_folder") else None)
+        menu_folder.addSeparator()
         self._add_action(menu_folder, self._tr("ID_ALBUM_EDITCAPTIONS", "&Edit Folder Description..."), "ID_ALBUM_EDITCAPTIONS", lambda: self.win.action_edit_folder_description(self.win.thumb_view.current_folder_filter or "") if hasattr(self.win, "action_edit_folder_description") else None)
-        self._add_action(menu_folder, self._tr("ID_SAFE_ADD", "&Password Protect Collection..."), "ID_SAFE_ADD", self.win.action_password_protect_collection if hasattr(self.win, "action_password_protect_collection") else None)
+        self._add_action(menu_folder, self._tr("ID_COL_PASSWORD", "&Add/Change a password..."), "ID_COL_PASSWORD", self.win.action_password_protect_collection if hasattr(self.win, "action_password_protect_collection") else None)
         self._add_action(menu_folder, self._tr("ID_MOVEFOLDER", "&Move Folder..."), "ID_MOVEFOLDER", lambda: self.win.action_move_folder(self.win.thumb_view.current_folder_filter or "") if hasattr(self.win, "action_move_folder") else None)
         self._add_action(menu_folder, self._tr("ID_ALBUM_DELETE", "&Delete Folder..."), "ID_ALBUM_DELETE", lambda: self.win.action_delete_folder(self.win.thumb_view.current_folder_filter or "") if hasattr(self.win, "action_delete_folder") else None)
 
-        # 5. &Picture
+        # 5. &Picture (&Photo in FR, Ref: picasa3.exe @ 0x0055BA1E, STRINGRES_FR.XML eMenuPicture)
         menu_picture = mb.addMenu(self._tr("menu_picture", "&Picture"))
         self._add_action(menu_picture, self._tr("ID_PICTURE_ROTATECLOCKWISE", "Rotate &Clockwise"), "ID_PICTURE_ROTATECLOCKWISE", self.win.action_rotate_clockwise if hasattr(self.win, "action_rotate_clockwise") else None)
         self._add_action(menu_picture, self._tr("ID_PICTURE_ROTATECOUNTERCLOCKWISE", "Rotate &Counterclockwise"), "ID_PICTURE_ROTATECOUNTERCLOCKWISE", self.win.action_rotate_counterclockwise if hasattr(self.win, "action_rotate_counterclockwise") else None)
@@ -324,6 +371,10 @@ class PicasaMenuBuilder:
         self._add_action(menu_picture, self._tr("ID_PICTURE_AUTO_REDEYE", "Auto &Red-Eye"), "ID_PICTURE_AUTO_REDEYE", self.win.action_auto_redeye if hasattr(self.win, "action_auto_redeye") else None)
         self._add_action(menu_picture, self._tr("ID_PICTURE_RESET_FACES", "Reset &Faces"), "ID_PICTURE_RESET_FACES", lambda: self.win.action_reset_faces(self.win._get_active_photo_paths()) if hasattr(self.win, "action_reset_faces") else None)
         self._add_action(menu_picture, self._tr("ID_PICTURE_REVERT", "&Undo All Edits"), "ID_PICTURE_REVERT", self.win.action_undo_all_edits if hasattr(self.win, "action_undo_all_edits") else None)
+        menu_picture.addSeparator()
+        # Ref: picasa3.exe @ 0x0055B856 (eMenuPicture::ID_PICTURE_HIDE 0x9CA4, ID_PICTURE_UNHIDE 0x9CA5)
+        self._add_action(menu_picture, self._tr("ID_PICTURE_HIDE", "&Hide"), "ID_PICTURE_HIDE", self.win.action_hide_pictures if hasattr(self.win, "action_hide_pictures") else None)
+        self._add_action(menu_picture, self._tr("ID_PICTURE_UNHIDE", "&Unhide"), "ID_PICTURE_UNHIDE", self.win.action_unhide_pictures if hasattr(self.win, "action_unhide_pictures") else None)
         menu_picture.addSeparator()
         self._add_action(menu_picture, self._tr("ID_PICTURE_PROPERTIES", "Propert&ies"), "ID_PICTURE_PROPERTIES", self.win.action_properties if hasattr(self.win, "action_properties") else None)
 

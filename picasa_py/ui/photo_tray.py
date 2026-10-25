@@ -1077,20 +1077,36 @@ class PicasaPhotoTray(QWidget):
         self.header_bar.setFixedHeight(18)
         header_h = QHBoxLayout(self.header_bar)
         header_h.setContentsMargins(0, 0, 0, 0)
-        header_h.setSpacing(6)
+        header_h.setSpacing(0)
 
-        self.btn_toggle_left_drawer = QPushButton("◀", self.header_bar)
+        # FR: Marge gauche de 20px (XConstraint 0, 0, 20 dans thumbui.tre) hébergeant editpanel/toggle_left_drawer (X=1..16)
+        # EN: 20px left margin (XConstraint 0, 0, 20 in thumbui.tre) hosting editpanel/toggle_left_drawer (X=1..16)
+        self.header_left_slot = QWidget(self.header_bar)
+        self.header_left_slot.setFixedSize(20, 18)
+        left_slot_layout = QHBoxLayout(self.header_left_slot)
+        left_slot_layout.setContentsMargins(0, 1, 0, 1)
+        left_slot_layout.setSpacing(0)
+
+        self.btn_toggle_left_drawer = QPushButton("◀", self.header_left_slot)
         self.btn_toggle_left_drawer.setObjectName("TrayToggleLeftDrawerBtn")
         self.btn_toggle_left_drawer.setFixedSize(20, 16)
         self.btn_toggle_left_drawer.setToolTip("Afficher/masquer le panneau de retouches gauche (editpanel/toggle_left_drawer)")
         self.btn_toggle_left_drawer.clicked.connect(self.toggle_left_drawer_requested.emit)
         self.btn_toggle_left_drawer.hide()
-        header_h.addWidget(self.btn_toggle_left_drawer)
+        left_slot_layout.addWidget(self.btn_toggle_left_drawer)
+        header_h.addWidget(self.header_left_slot)
 
+        # FR: thumbui/infotext : Property textalign center, XConstraint 0, 0, 20 .. XConstraint 1, 1, -20 (thumbui.tre)
+        # EN: thumbui/infotext: Property textalign center, XConstraint 0, 0, 20 .. XConstraint 1, 1, -20 (thumbui.tre)
         self.lbl_selection = QLabel("Aucune sélection", self.header_bar)
         self.lbl_selection.setObjectName("TraySelectionLabel")
+        self.lbl_selection.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_infotext = self.lbl_selection
         header_h.addWidget(self.lbl_selection, 1)
+
+        # FR: Marge droite symétrique de 20px (XConstraint 1, 1, -20 dans thumbui.tre)
+        # EN: Symmetrical 20px right margin (XConstraint 1, 1, -20 in thumbui.tre)
+        header_h.addSpacing(20)
 
         root_v.addWidget(self.header_bar)
 
@@ -1243,7 +1259,7 @@ class PicasaPhotoTray(QWidget):
         upper_strip.addWidget(self.oneup_zoom_icon)
 
         self.oneup_zoom_slider = QSlider(Qt.Orientation.Horizontal)
-        self.oneup_zoom_slider.setRange(10, 300)
+        self.oneup_zoom_slider.setRange(10, 400)
         self.oneup_zoom_slider.setValue(100)
         self.oneup_zoom_slider.setFixedWidth(120)
         self.oneup_zoom_slider.setToolTip("Zoom sur la photo (zoomslider/scaleslider)")
@@ -1414,16 +1430,24 @@ class PicasaPhotoTray(QWidget):
         self.btn_toggle_faces.setText("Visages (On)" if checked else "Visages (Off)")
         self.oneup_faces_toggled.emit(checked)
 
-    def set_oneup_zoom_from_canvas(self, scale: float) -> None:
+    def set_oneup_zoom_from_canvas(self, scale: float, fit_scale: Optional[float] = None) -> None:
         """
         FR: Synchronise le curseur `zoomslider/scaleslider` sans boucle de rétroaction lorsque le canevas 1-Up zoome.
+        La borne minimale du curseur est calée sur l'échelle Ajuster (`fit_scale`) afin que la butée gauche
+        corresponde toujours à « Ajuster à la fenêtre » et que le glissement vers la droite zoome jusqu'à 400%.
         EN: Synchronizes the `zoomslider/scaleslider` slider without feedback loop when the 1-Up canvas zooms.
-        Ref: picasa3.exe @ 0x0057C322 (zoomslider/scaleslider)
+        The slider minimum is aligned with `fit_scale` so the left stop always matches "Fit to window".
+        Ref: picasa3.exe @ 0x0057C322 (zoomslider/scaleslider), 0x005D1520, 0x00597D10
         """
         self.oneup_zoom_slider.blockSignals(True)
-        val = int(round(scale * 100))
-        val = max(self.oneup_zoom_slider.minimum(), min(self.oneup_zoom_slider.maximum(), val))
-        self.oneup_zoom_slider.setValue(val)
+        if fit_scale is not None and fit_scale > 0:
+            min_pct = max(5, min(100, int(round(fit_scale * 100))))
+            max_pct = max(400, min_pct * 4)
+            self.oneup_zoom_slider.setRange(min_pct, max_pct)
+        if not self.oneup_zoom_slider.isSliderDown():
+            val = int(round(scale * 100))
+            val = max(self.oneup_zoom_slider.minimum(), min(self.oneup_zoom_slider.maximum(), val))
+            self.oneup_zoom_slider.setValue(val)
         self.oneup_zoom_slider.blockSignals(False)
 
     def set_edit_mode(self, is_edit_mode: bool, is_video: bool = False) -> None:

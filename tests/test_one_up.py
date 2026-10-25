@@ -708,4 +708,112 @@ def test_single_bottom_bar_mode_buttons_and_infotext_header(qapp, tmp_path, samp
     win.close()
 
 
+def test_oneup_zoom_slider_and_two_up_loupe_navigator(qapp: QApplication, sample_image, tmp_path: Path):
+    """Vérifie le curseur de zoom 1-Up (`oneup_zoom_slider`) et la miniature Loupe en modes A, A|B et A|A."""
+    from picasa_py.ui.main_window import PicasaMainWindow
+    from picasa_py.ui.thumbnail_view import ThumbnailItem
+    from PySide6.QtGui import QPixmap
+
+    folder_dir = tmp_path / "PhotosZoom"
+    folder_dir.mkdir(parents=True, exist_ok=True)
+    p1 = folder_dir / "photo_a.jpg"
+    p2 = folder_dir / "photo_b.jpg"
+    sample_image.save(str(p1), "JPEG")
+    sample_image.save(str(p2), "JPEG")
+
+    db_dir = tmp_path / "db3_zoom"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    win = PicasaMainWindow(db_path=str(db_dir), auto_scan=False)
+    win.resize(1200, 800)
+
+    it1 = ThumbnailItem(
+        index=1,
+        path=str(p1),
+        filename="photo_a.jpg",
+        folder="PhotosZoom",
+        folder_path=str(folder_dir),
+    )
+    it2 = ThumbnailItem(
+        index=2,
+        path=str(p2),
+        filename="photo_b.jpg",
+        folder="PhotosZoom",
+        folder_path=str(folder_dir),
+    )
+    win.thumb_view.items = [it1, it2]
+    win.thumb_view.filtered_indices = [0, 1]
+
+    win._open_one_up_view(0)
+    canvas = win.one_up_view.canvas
+    canvas.resize(800, 600)
+    # Injecter un QPixmap haute résolution (800x600) directement pour un test déterministe
+    pm = QPixmap(800, 600)
+    pm.fill()
+    canvas.set_pixmap_direct(pm)
+    canvas.set_secondary_pixmap(pm, "Photo B")
+
+    # 1. Par défaut : ajusté à la fenêtre (fit_to_window = True, pas de Loupe affichée)
+    assert canvas.fit_to_window is True
+    assert canvas.is_zoomed_in() is False
+
+    # 2. Déplacement du curseur `oneup_zoom_slider` dans la barre du bas (ex: 200% = 2.0x)
+    win.photo_tray.oneup_zoom_slider.setValue(200)
+    assert canvas.fit_to_window is False
+    assert canvas.zoom_level == pytest.approx(2.0, rel=1e-2)
+    assert canvas.is_zoomed_in() is True
+    canvas._update_loupe_geometry()
+    assert not canvas._nav_card_rect.isEmpty()
+    assert not canvas._nav_img_rect.isEmpty()
+    assert not canvas._vbox_rect.isEmpty()
+
+    # 3. Retour du curseur `oneup_zoom_slider` tout à gauche (minimum = Fit) -> réinitialise `fit_to_window`
+    win.photo_tray.oneup_zoom_slider.setValue(win.photo_tray.oneup_zoom_slider.minimum())
+    assert canvas.fit_to_window is True
+    assert canvas.is_zoomed_in() is False
+
+    # 4. En mode comparaison A|B (`view_mode == "A_B"`) : zoom via le curseur -> miniature Loupe + cadre orange actifs
+    win.one_up_view.mode_btn_group.button(1).click()
+    assert canvas.view_mode == "A_B"
+    canvas.set_secondary_pixmap(pm, "Photo B")
+    win.photo_tray.oneup_zoom_slider.setValue(250)
+    assert canvas.fit_to_window is False
+    assert canvas.zoom_level == pytest.approx(2.5, rel=1e-2)
+    assert canvas.is_zoomed_in() is True
+    canvas._update_loupe_geometry()
+    assert not canvas._nav_card_rect.isEmpty()
+    assert not canvas._nav_img_rect.isEmpty()
+    assert not canvas._vbox_rect.isEmpty()
+    # Vérifie que le rendu A|B avec Loupe s'exécute sans erreur
+    grabbed_ab = canvas.grab()
+    assert not grabbed_ab.isNull()
+
+    # 5. En mode comparaison A|A (`view_mode == "A_A"`) : miniature Loupe + cadre orange également actifs
+    win.one_up_view.mode_btn_group.button(2).click()
+    assert canvas.view_mode == "A_A"
+    canvas.set_original_pixmap(pm)
+    assert canvas.is_zoomed_in() is True
+    canvas._update_loupe_geometry()
+    assert not canvas._nav_card_rect.isEmpty()
+    assert not canvas._nav_img_rect.isEmpty()
+    assert not canvas._vbox_rect.isEmpty()
+    grabbed_aa = canvas.grab()
+    assert not grabbed_aa.isNull()
+
+    # 6. En modes A|B et A|A :
+    #    - la pellicule (`filmstrip`) entre `btn_top_prev` et `btn_top_next` conserve sa largeur (>= 214 px)
+    #    - les boutons `btn_swap_2up_layout` (horizontal/vertical) et `btn_swap_2up_focus` sont visibles et non rognés
+    #    - l'en-tête `thumbui/infotext` (`lbl_selection`) est centré (`Qt.AlignmentFlag.AlignCenter`)
+    from PySide6.QtCore import Qt
+    assert bool(win.photo_tray.lbl_selection.alignment() & Qt.AlignmentFlag.AlignHCenter)
+    assert win.one_up_view.filmstrip.isVisibleTo(win.one_up_view.viewer_top_bar)
+    assert win.one_up_view.filmstrip.width() >= 214
+    assert win.one_up_view.btn_swap_2up_layout.isVisibleTo(win.one_up_view.viewer_top_bar)
+    assert win.one_up_view.btn_swap_2up_focus.isVisibleTo(win.one_up_view.viewer_top_bar)
+    assert win.one_up_view.btn_swap_2up_layout.geometry().right() <= win.one_up_view.viewer_top_bar.width()
+
+    win.stop_background_tasks()
+    win.close()
+
+
+
 
