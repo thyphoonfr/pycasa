@@ -1010,6 +1010,11 @@ class PicasaPhotoTray(QWidget):
     Ref: picasa3.exe @ 0x0088C3EC, 0x0088E914
     """
     zoom_changed = Signal(int)
+    oneup_zoom_changed = Signal(int)
+    oneup_fit_requested = Signal()
+    oneup_zoom_1to1_requested = Signal()
+    oneup_faces_toggled = Signal(bool)
+    toggle_left_drawer_requested = Signal()
     action_export = Signal()
     action_print = Signal()
     action_email = Signal()
@@ -1029,8 +1034,11 @@ class PicasaPhotoTray(QWidget):
 
     def __init__(self, style: Optional[PicasaStyle] = None, parent: Optional[QWidget] = None):
         """
-        FR: Initialise le plateau inférieur PicasaPhotoTray et ses deux étages de contrôles.
-        EN: Initializes the PicasaPhotoTray bottom tray and its two control tiers.
+        FR: Initialise le plateau inférieur PicasaPhotoTray (`thumbui/basecontrolset`) avec sa barre d'en-tête
+        (`thumbui/infotext` + `editpanel/toggle_left_drawer`) et ses deux étages de contrôles.
+        EN: Initializes the PicasaPhotoTray bottom tray (`thumbui/basecontrolset`) with its header bar
+        (`thumbui/infotext` + `editpanel/toggle_left_drawer`) and its two control tiers.
+        Ref: picasa3.exe @ 0x0056727B, 0x0057079D, 0x0057BB80..0x0057C3A3
         """
         super().__init__(parent)
         self.style = style or PicasaStyle.load()
@@ -1040,6 +1048,9 @@ class PicasaPhotoTray(QWidget):
         self.held_items: List[Any] = []
         self.active_items: List[Any] = []
         self._db: Optional[Any] = None
+        self._is_edit_mode: bool = False
+        self._is_video: bool = False
+        self._one_up_context: Optional[dict] = None
 
         # FR: Hauteur authentique de basecontrolset : rect=(0, 429, 800, 534) -> 98-105 px
         # EN: Authentic height of basecontrolset: rect=(0, 429, 800, 534) -> 98-105 px
@@ -1047,9 +1058,45 @@ class PicasaPhotoTray(QWidget):
         self.setObjectName("TrayRoot")
         self.apply_style(self.style)
 
-        root_h = QHBoxLayout(self)
-        root_h.setContentsMargins(8, 4, 8, 5)
-        root_h.setSpacing(10)
+        root_v = QVBoxLayout(self)
+        root_v.setContentsMargins(6, 2, 8, 4)
+        root_v.setSpacing(2)
+
+        # =====================================================================
+        # FR: EN-TÊTE SUPÉRIEUR DE LA BARRE DU BAS (Y = 429..446 dans basecontrolset) :
+        #     - Gauche (X=1..16) : editpanel/toggle_left_drawer (visible uniquement en mode Édition 1-Up)
+        #     - Centre (X=183..664) : thumbui/infotext (nom de l'image, date, résolution, taille, tags...)
+        # EN: TOP HEADER STRIP OF THE BOTTOM BAR (Y = 429..446 in basecontrolset):
+        #     - Left (X=1..16): editpanel/toggle_left_drawer (visible only in One-Up Edit mode)
+        #     - Center (X=183..664): thumbui/infotext (image filename, date, resolution, file size, tags...)
+        # Ref: respack.yt @ editpanel/toggle_left_drawer rect=(1, 430, 16, 446)
+        # Ref: respack.yt @ thumbui/infotext rect=(183, 429, 664, 443), picasa3.exe @ 0x0056727B, 0x0057079D
+        # =====================================================================
+        self.header_bar = QWidget(self)
+        self.header_bar.setObjectName("TrayHeaderBar")
+        self.header_bar.setFixedHeight(18)
+        header_h = QHBoxLayout(self.header_bar)
+        header_h.setContentsMargins(0, 0, 0, 0)
+        header_h.setSpacing(6)
+
+        self.btn_toggle_left_drawer = QPushButton("◀", self.header_bar)
+        self.btn_toggle_left_drawer.setObjectName("TrayToggleLeftDrawerBtn")
+        self.btn_toggle_left_drawer.setFixedSize(20, 16)
+        self.btn_toggle_left_drawer.setToolTip("Afficher/masquer le panneau de retouches gauche (editpanel/toggle_left_drawer)")
+        self.btn_toggle_left_drawer.clicked.connect(self.toggle_left_drawer_requested.emit)
+        self.btn_toggle_left_drawer.hide()
+        header_h.addWidget(self.btn_toggle_left_drawer)
+
+        self.lbl_selection = QLabel("Aucune sélection", self.header_bar)
+        self.lbl_selection.setObjectName("TraySelectionLabel")
+        self.lbl_infotext = self.lbl_selection
+        header_h.addWidget(self.lbl_selection, 1)
+
+        root_v.addWidget(self.header_bar)
+
+        body_h = QHBoxLayout()
+        body_h.setContentsMargins(2, 0, 0, 0)
+        body_h.setSpacing(10)
 
         # =====================================================================
         # FR: ZONE GAUCHE : thumbui/scratchback (Picture Tray + 3 boutons empilés)
@@ -1063,18 +1110,12 @@ class PicasaPhotoTray(QWidget):
         left_vbox.setContentsMargins(0, 0, 0, 0)
         left_vbox.setSpacing(2)
 
-        # FR: Texte d'état de sélection au sommet (thumbui/infotext rect=(183, 429, 664, 443))
-        # EN: Selection status text at the top (thumbui/infotext rect=(183, 429, 664, 443))
-        self.lbl_selection = QLabel("Aucune photo sélectionnée")
-        self.lbl_selection.setObjectName("TraySelectionLabel")
-        left_vbox.addWidget(self.lbl_selection)
-
         # FR: Cadre enfoncé du bac à photos (thumbui/scratchpadbase)
         # EN: Sunken frame of the photo tray (thumbui/scratchpadbase)
         self.scratchpad_frame = QFrame(left_zone)
         self.scratchpad_frame.setObjectName("ScratchPadBase")
         scratch_h = QHBoxLayout(self.scratchpad_frame)
-        scratch_h.setContentsMargins(4, 4, 4, 4)
+        scratch_h.setContentsMargins(4, 3, 4, 3)
         scratch_h.setSpacing(4)
 
         # FR: Bande de miniatures (thumbui/scratch rect=(8, 455, 223, 515))
@@ -1121,7 +1162,7 @@ class PicasaPhotoTray(QWidget):
 
         scratch_h.addLayout(tray_btns_col)
         left_vbox.addWidget(self.scratchpad_frame, 1)
-        root_h.addWidget(left_zone, 36)
+        body_h.addWidget(left_zone, 36)
 
         # =====================================================================
         # FR: ZONE DROITE : 2 étages séparés par thumbui/separator (Y=476..478)
@@ -1129,13 +1170,14 @@ class PicasaPhotoTray(QWidget):
         # =====================================================================
         right_zone = QWidget(self)
         right_vbox = QVBoxLayout(right_zone)
-        right_vbox.setContentsMargins(0, 2, 0, 0)
-        right_vbox.setSpacing(4)
+        right_vbox.setContentsMargins(0, 0, 0, 0)
+        right_vbox.setSpacing(3)
 
         # ---------------------------------------------------------------------
         # FR: ÉTAGE SUPÉRIEUR (Y = 448..475) :
-        # EN: UPPER TIER (Y = 448..475):
-        # [☆] [↶] [↷]   |   [🔍 ----o---- 🖼️]   |   [👤 Personnes][📍 Lieux][🏷️ Tags][ℹ️ Propriétés]
+        #     - Mode Bibliothèque : [☆] [↶] [↷] | [🔍 ----o---- 🖼️] | [👤][📍][🏷️][ℹ️]
+        #     - Mode Édition 1-Up : [☆] [↶] [↷] | [Ajuster][1:1][🔍 ----o----][Visages] | [👤][📍][🏷️][ℹ️]
+        # Ref: picasa3.exe @ 0x0057C260..0x0057C3A3, 0x005678E0..0x005679F8
         # ---------------------------------------------------------------------
         upper_strip = QHBoxLayout()
         upper_strip.setContentsMargins(0, 0, 0, 0)
@@ -1165,7 +1207,7 @@ class PicasaPhotoTray(QWidget):
 
         upper_strip.addSpacing(8)
 
-        # 4. thumbui/scale_group : loupe (368..391) + scalecontainer (398..525, 127x27)
+        # 4a. Mode Bibliothèque — thumbui/scale_group : loupe (368..391) + scalecontainer (398..525, 127x27)
         self.icon_small = PicasaZoomIcon(is_large=False)
         upper_strip.addWidget(self.icon_small)
 
@@ -1173,12 +1215,49 @@ class PicasaPhotoTray(QWidget):
         self.zoom_slider.setRange(64, 256)
         self.zoom_slider.setValue(140)
         self.zoom_slider.setFixedWidth(120)
-        self.zoom_slider.setToolTip("Ajuster la taille des vignettes")
+        self.zoom_slider.setToolTip("Ajuster la taille des vignettes (thumbui/scalecontainer)")
         self.zoom_slider.valueChanged.connect(self.zoom_changed.emit)
         upper_strip.addWidget(self.zoom_slider)
 
         self.icon_large = PicasaZoomIcon(is_large=True)
         upper_strip.addWidget(self.icon_large)
+
+        # 4b. Mode Édition 1-Up — editpanel/zoombuttcontainer (fit, 1to1) + editpanel/zoomup_icon + editpanel/zoomslider_container
+        #     (Ref: picasa3.exe @ 0x0057C277..0x0057C38F, 0x005679D5)
+        self.btn_fit = QPushButton("Ajuster")
+        self.btn_fit.setFixedHeight(24)
+        self.btn_fit.setToolTip("Ajuster la photo à la fenêtre (editpanel/fit)")
+        self.btn_fit.clicked.connect(self.oneup_fit_requested.emit)
+        self.btn_fit.hide()
+        upper_strip.addWidget(self.btn_fit)
+
+        self.btn_zoom_1to1 = QPushButton("1:1")
+        self.btn_zoom_1to1.setFixedHeight(24)
+        self.btn_zoom_1to1.setToolTip("Zoom 1:1 taille réelle 100% (editpanel/1to1)")
+        self.btn_zoom_1to1.clicked.connect(self.oneup_zoom_1to1_requested.emit)
+        self.btn_zoom_1to1.hide()
+        upper_strip.addWidget(self.btn_zoom_1to1)
+
+        self.oneup_zoom_icon = QLabel("🔍")
+        self.oneup_zoom_icon.hide()
+        upper_strip.addWidget(self.oneup_zoom_icon)
+
+        self.oneup_zoom_slider = QSlider(Qt.Orientation.Horizontal)
+        self.oneup_zoom_slider.setRange(10, 300)
+        self.oneup_zoom_slider.setValue(100)
+        self.oneup_zoom_slider.setFixedWidth(120)
+        self.oneup_zoom_slider.setToolTip("Zoom sur la photo (zoomslider/scaleslider)")
+        self.oneup_zoom_slider.valueChanged.connect(self.oneup_zoom_changed.emit)
+        self.oneup_zoom_slider.hide()
+        upper_strip.addWidget(self.oneup_zoom_slider)
+
+        self.btn_toggle_faces = QPushButton("Visages (On)")
+        self.btn_toggle_faces.setFixedHeight(24)
+        self.btn_toggle_faces.setCheckable(True)
+        self.btn_toggle_faces.setChecked(True)
+        self.btn_toggle_faces.toggled.connect(self._on_faces_btn_toggled)
+        self.btn_toggle_faces.hide()
+        upper_strip.addWidget(self.btn_toggle_faces)
 
         upper_strip.addStretch(1)
 
@@ -1260,42 +1339,42 @@ class PicasaPhotoTray(QWidget):
 
         self.btn_upload = QPushButton("⬆ Partager")
         self.btn_upload.setObjectName("GreenUploadBtn")
-        self.btn_upload.setFixedHeight(34)
+        self.btn_upload.setFixedHeight(32)
         self.btn_upload.setToolTip("Partager / Importer vers Google Photos / Web")
         self.btn_upload.clicked.connect(self.upload_requested.emit)
         self.action_buttons_layout.addWidget(self.btn_upload)
 
         self.btn_email = QPushButton("✉ E-mail")
         self.btn_email.setObjectName("OutputBtn")
-        self.btn_email.setFixedHeight(34)
+        self.btn_email.setFixedHeight(32)
         self.btn_email.setToolTip("Envoyer les photos sélectionnées par e-mail (Ctrl+E)")
         self.btn_email.clicked.connect(self.action_email.emit)
         self.action_buttons_layout.addWidget(self.btn_email)
 
         self.btn_print = QPushButton("🖨 Imprimer")
         self.btn_print.setObjectName("OutputBtn")
-        self.btn_print.setFixedHeight(34)
+        self.btn_print.setFixedHeight(32)
         self.btn_print.setToolTip("Imprimer les photos sélectionnées (Ctrl+P)")
         self.btn_print.clicked.connect(self.action_print.emit)
         self.action_buttons_layout.addWidget(self.btn_print)
 
         self.btn_export = QPushButton("📁 Exporter")
         self.btn_export.setObjectName("OutputBtn")
-        self.btn_export.setFixedHeight(34)
+        self.btn_export.setFixedHeight(32)
         self.btn_export.setToolTip("Exporter les photos sélectionnées vers un dossier (Ctrl+Maj+S)")
         self.btn_export.clicked.connect(self.action_export.emit)
         self.action_buttons_layout.addWidget(self.btn_export)
 
         self.btn_collage = QPushButton("⊞ Montage")
         self.btn_collage.setObjectName("OutputBtn")
-        self.btn_collage.setFixedHeight(34)
+        self.btn_collage.setFixedHeight(32)
         self.btn_collage.setToolTip("Créer un montage photo avec la sélection")
         self.btn_collage.clicked.connect(self.action_collage.emit)
         self.action_buttons_layout.addWidget(self.btn_collage)
 
         self.btn_movie = QPushButton("🎬 Film")
         self.btn_movie.setObjectName("OutputBtn")
-        self.btn_movie.setFixedHeight(34)
+        self.btn_movie.setFixedHeight(32)
         self.btn_movie.setToolTip("Créer un film vidéo ou diaporama avec la sélection")
         self.btn_movie.clicked.connect(self.action_movie.emit)
         self.action_buttons_layout.addWidget(self.btn_movie)
@@ -1314,17 +1393,81 @@ class PicasaPhotoTray(QWidget):
         lower_strip.addStretch(1)
 
         self.btn_configure_buttons = QPushButton("⚙")
-        self.btn_configure_buttons.setFixedSize(28, 34)
+        self.btn_configure_buttons.setFixedSize(28, 32)
         self.btn_configure_buttons.setToolTip("Configurer les boutons (outputlayout/morebutton)...")
         self.btn_configure_buttons.clicked.connect(self.open_button_manager)
         lower_strip.addWidget(self.btn_configure_buttons)
 
         right_vbox.addLayout(lower_strip)
-        root_h.addWidget(right_zone, 64)
+        body_h.addWidget(right_zone, 64)
+        root_v.addLayout(body_h, 1)
 
         self._is_starred: bool = False
         self.set_selected_count(0)
         self.apply_style(self.style)
+
+    def _on_faces_btn_toggled(self, checked: bool) -> None:
+        """
+        FR: Met à jour le libellé du bouton Visages et émet le signal vers le canevas 1-Up.
+        EN: Updates the Faces button label and emits the signal to the 1-Up canvas.
+        """
+        self.btn_toggle_faces.setText("Visages (On)" if checked else "Visages (Off)")
+        self.oneup_faces_toggled.emit(checked)
+
+    def set_oneup_zoom_from_canvas(self, scale: float) -> None:
+        """
+        FR: Synchronise le curseur `zoomslider/scaleslider` sans boucle de rétroaction lorsque le canevas 1-Up zoome.
+        EN: Synchronizes the `zoomslider/scaleslider` slider without feedback loop when the 1-Up canvas zooms.
+        Ref: picasa3.exe @ 0x0057C322 (zoomslider/scaleslider)
+        """
+        self.oneup_zoom_slider.blockSignals(True)
+        val = int(round(scale * 100))
+        val = max(self.oneup_zoom_slider.minimum(), min(self.oneup_zoom_slider.maximum(), val))
+        self.oneup_zoom_slider.setValue(val)
+        self.oneup_zoom_slider.blockSignals(False)
+
+    def set_edit_mode(self, is_edit_mode: bool, is_video: bool = False) -> None:
+        """
+        FR: Bascule la visibilité des boutons de `thumbui/basecontrolset` selon le mode actif :
+        - Mode Bibliothèque (`is_edit_mode=False`) :
+          * Masque `editpanel/toggle_left_drawer`, `editpanel/zoombuttcontainer` (`Ajuster`, `1:1`),
+            `editpanel/zoomup_icon`, `editpanel/zoomslider_container` et `btn_toggle_faces`.
+          * Affiche `thumbui/scale_group` (`icon_small`, `zoom_slider`, `icon_large`).
+        - Mode Édition 1-Up (`is_edit_mode=True`) :
+          * Affiche `editpanel/toggle_left_drawer` dans l'en-tête supérieur.
+          * Masque `thumbui/scale_group` (`icon_small`, `zoom_slider`, `icon_large`).
+          * Affiche `editpanel/zoombuttcontainer` (`Ajuster`, `1:1`), `editpanel/zoomup_icon`,
+            `editpanel/zoomslider_container` et `btn_toggle_faces` si `not is_video`
+            (les masque si `is_video=True`, conformément à `0x0057C2E6..0x0057C38F` et `0x005679BF`).
+        EN: Switches button visibility in `thumbui/basecontrolset` according to the active mode.
+        Ref: picasa3.exe @ 0x0057BB80..0x0057C3A3, 0x005678E0..0x005679F8, 0x00572D18..0x00572E18
+        """
+        self._is_edit_mode = bool(is_edit_mode)
+        self._is_video = bool(is_video)
+
+        self.btn_toggle_left_drawer.setVisible(self._is_edit_mode)
+
+        # Mode Bibliothèque : thumbui/scale_group
+        show_lib_scale = not self._is_edit_mode
+        self.icon_small.setVisible(show_lib_scale)
+        self.zoom_slider.setVisible(show_lib_scale)
+        self.icon_large.setVisible(show_lib_scale)
+
+        # Mode Édition 1-Up : editpanel/zoombuttcontainer + editpanel/zoomslider_container + editpanel/zoomup_icon
+        show_oneup_zoom = self._is_edit_mode and (not self._is_video)
+        self.btn_fit.setVisible(show_oneup_zoom)
+        self.btn_zoom_1to1.setVisible(show_oneup_zoom)
+        self.oneup_zoom_icon.setVisible(show_oneup_zoom)
+        self.oneup_zoom_slider.setVisible(show_oneup_zoom)
+        self.btn_toggle_faces.setVisible(show_oneup_zoom)
+
+        if self._is_edit_mode:
+            # Ref: 0x005678E0..0x00567943 (thumbui/rotateright, thumbui/rotateleft désactivés sur vidéo)
+            self.btn_rotate_left.setEnabled(not self._is_video)
+            self.btn_rotate_right.setEnabled(not self._is_video)
+        else:
+            self._one_up_context = None
+            self.update_info_text()
 
     def apply_button_configuration(self, keys: List[str]) -> None:
         """
@@ -1615,6 +1758,297 @@ class PicasaPhotoTray(QWidget):
         self._db = db
         _ACTIVE_TRAY_DB = db
 
+    @staticmethod
+    def format_file_size(size_bytes: int) -> str:
+        """
+        FR: Formate une taille en octets selon `FormatFileSize` (`0x0098F9F0`) et `STRINGRES_FR.XML` :
+        `%.0f octets`, `%.0f ko`, `%.1f Mo`, `%.1f Go`, `%.1f To`.
+        EN: Formats a byte size according to `FormatFileSize` (`0x0098F9F0`) and `STRINGRES_FR.XML`:
+        `%.0f octets`, `%.0f ko`, `%.1f Mo`, `%.1f Go`, `%.1f To`.
+        Ref: picasa3.exe @ 0x0098F9F0..0x0098FB80 (il_FormatBigB/KB/MB/GB/TB)
+        """
+        b = max(0, int(size_bytes or 0))
+        if b < 1024:
+            return f"{b} octets"
+        kb = b / 1024.0
+        if kb < 1024.0:
+            return f"{kb:.0f} ko"
+        mb = kb / 1024.0
+        if mb < 1024.0:
+            return f"{mb:.1f} Mo".replace(".", ",")
+        gb = mb / 1024.0
+        if gb < 1024.0:
+            return f"{gb:.1f} Go".replace(".", ",")
+        tb = gb / 1024.0
+        return f"{tb:.1f} To".replace(".", ",")
+
+    def _get_item_metadata(self, item_or_path: Any) -> Tuple[str, str, Optional[Any], int, int, int, List[str]]:
+        """
+        FR: Récupère `(filename, folder_name, datetime_obj, width, height, size_bytes, tags)` pour un élément
+        depuis la base de données Picasa (`thumbindex.db`, `imagedata_*.pmp`, `.picasa.ini`) ou le système de fichiers.
+        EN: Retrieves `(filename, folder_name, datetime_obj, width, height, size_bytes, tags)` for an item
+        from the Picasa database (`thumbindex.db`, `imagedata_*.pmp`, `.picasa.ini`) or the filesystem.
+        Ref: picasa3.exe @ 0x0056FCE8 (GetRecordInfo), 0x0056FD24 (GetImageDimensions), 0x0056F920 (GetTagInfo)
+        """
+        from datetime import datetime
+        from PySide6.QtGui import QImageReader
+
+        if isinstance(item_or_path, str):
+            path = item_or_path
+            fname = os.path.basename(path)
+            folder_path = os.path.dirname(path)
+            folder_name = os.path.basename(folder_path.rstrip("\\/")) if folder_path else ""
+            db_idx = -1
+            if self._db is not None and hasattr(self._db, "find_media_index_by_path"):
+                try:
+                    found_idx = self._db.find_media_index_by_path(path)
+                    if found_idx is not None:
+                        db_idx = int(found_idx)
+                except Exception:
+                    db_idx = -1
+        else:
+            path = getattr(item_or_path, "path", "") or ""
+            fname = getattr(item_or_path, "filename", "") or (os.path.basename(path) if path else "")
+            folder_path = getattr(item_or_path, "folder_path", "") or (os.path.dirname(path) if path else "")
+            folder_name = getattr(item_or_path, "folder", "") or (
+                os.path.basename(folder_path.rstrip("\\/")) if folder_path else ""
+            )
+            db_idx = int(getattr(item_or_path, "index", -1) if getattr(item_or_path, "index", None) is not None else -1)
+
+        dt_obj: Optional[datetime] = None
+        width = 0
+        height = 0
+        size_bytes = 0
+        tags: List[str] = []
+
+        db = self._db or _ACTIVE_TRAY_DB
+        if db is not None and db_idx >= 0:
+            try:
+                ti = getattr(db, "thumbindex", None)
+                if ti is not None and 0 <= db_idx < len(ti.records):
+                    rec = ti.records[db_idx]
+                    if not fname and rec.path:
+                        fname = rec.path
+                    if rec.size and rec.size > 0:
+                        size_bytes = int(rec.size)
+                    ts = rec.to_unix_timestamp()
+                    if ts > 0:
+                        dt_obj = datetime.fromtimestamp(ts)
+            except Exception:
+                pass
+            try:
+                if hasattr(db, "get_property"):
+                    ew = int(db.get_property("imagedata_edit_width", db_idx) or 0)
+                    eh = int(db.get_property("imagedata_edit_height", db_idx) or 0)
+                    w = int(db.get_property("imagedata_width", db_idx) or 0)
+                    h = int(db.get_property("imagedata_height", db_idx) or 0)
+                    if ew > 0 and eh > 0:
+                        width, height = ew, eh
+                    elif w > 0 and h > 0:
+                        width, height = w, h
+                    raw_tags = db.get_property("imagedata_tags", db_idx)
+                    if raw_tags and isinstance(raw_tags, str):
+                        for t in raw_tags.split(","):
+                            ts = t.strip()
+                            if ts and ts not in tags:
+                                tags.append(ts)
+            except Exception:
+                pass
+
+        if path and os.path.exists(path):
+            try:
+                st = os.stat(path)
+                if size_bytes <= 0:
+                    size_bytes = int(st.st_size)
+                if dt_obj is None and st.st_mtime > 0:
+                    dt_obj = datetime.fromtimestamp(st.st_mtime)
+            except Exception:
+                pass
+            if width <= 0 or height <= 0:
+                try:
+                    reader = QImageReader(path)
+                    sz = reader.size()
+                    if sz.isValid() and sz.width() > 0 and sz.height() > 0:
+                        width, height = sz.width(), sz.height()
+                except Exception:
+                    pass
+
+        if folder_path and fname:
+            try:
+                ini_p = os.path.join(folder_path, ".picasa.ini")
+                doc = None
+                if db is not None and hasattr(db, "get_parsed_ini"):
+                    doc = db.get_parsed_ini(ini_p)
+                    if doc is None:
+                        doc = db.get_parsed_ini(os.path.join(folder_path, "Picasa.ini"))
+                elif os.path.exists(ini_p):
+                    from picasa_py.ini.parser import PicasaIniParser
+                    doc = PicasaIniParser.parse_file(ini_p)
+                if doc is not None:
+                    for kw in doc.get_keywords(fname):
+                        kw_s = kw.strip()
+                        if kw_s and kw_s not in tags:
+                            tags.append(kw_s)
+            except Exception:
+                pass
+
+        if (width <= 0 or height <= 0) and not isinstance(item_or_path, str):
+            pm = getattr(item_or_path, "pixmap", None)
+            if isinstance(pm, QPixmap) and not pm.isNull():
+                width, height = pm.width(), pm.height()
+
+        return fname, folder_name, dt_obj, width, height, size_bytes, tags
+
+    def _format_tags_suffix(self, items_meta: List[Tuple[str, str, Optional[Any], int, int, int, List[str]]]) -> str:
+        """
+        FR: Construit le suffixe des tags (`CThumbUI::GetTagInfo` @ `0x0056F920`) :
+        `     Tags : tag1, tag2 (3)`.
+        EN: Builds the tags suffix (`CThumbUI::GetTagInfo` @ `0x0056F920`):
+        `     Tags : tag1, tag2 (3)`.
+        Ref: picasa3.exe @ 0x0056F920..0x0056FBB6 (CThumbUI::GetTagInfo::format, "%s (%d)")
+        """
+        tag_counts: dict[str, int] = {}
+        for meta in items_meta:
+            seen_in_item: set[str] = set()
+            for t in meta[6]:
+                if t not in seen_in_item:
+                    seen_in_item.add(t)
+                    tag_counts[t] = tag_counts.get(t, 0) + 1
+        if not tag_counts:
+            return ""
+        parts = [f"{t} ({cnt})" if cnt > 1 else t for t, cnt in tag_counts.items()]
+        return "     Tags : " + ", ".join(parts)
+
+    def update_one_up_info(
+        self,
+        file_path: str = "",
+        folder_name: str = "",
+        width: int = 0,
+        height: int = 0,
+        pos_1based: int = 0,
+        total_in_view: int = 0,
+        *,
+        photo_path: str = "",
+        total_in_folder: int = 0,
+    ) -> None:
+        """
+        FR: Met à jour l'en-tête `thumbui/infotext` en mode Édition 1-Up (`BuildEditModeInfoText` @ `0x00566E5A..0x00567285`) :
+        `Dossier > Image.jpg     Date Heure     LxH pixels     Taille    (i sur N)     Tags : ...`
+        EN: Updates the `thumbui/infotext` header in One-Up Edit mode (`BuildEditModeInfoText` @ `0x00566E5A..0x00567285`).
+        Ref: picasa3.exe @ 0x00566E5A..0x00567285 (il_BigView::1, il_BigView::2, CThumbUI::GetTagInfo)
+        """
+        self._one_up_context = {
+            "file_path": file_path or photo_path,
+            "folder_name": folder_name,
+            "width": width,
+            "height": height,
+            "pos_1based": pos_1based,
+            "total_in_view": total_in_view or total_in_folder,
+        }
+        self.update_info_text()
+
+    def update_info_text(self, fallback_count: Optional[int] = None) -> None:
+        """
+        FR: Reproduit fidèlement le texte d'en-tête `thumbui/infotext` de `picasa3.exe` :
+        - En mode Édition 1-Up (`0x00566E5A..0x00567285`) :
+          `Dossier > Nom.jpg     JJ/MM/AAAA HH:MM     LxH pixels     Taille    (i sur N)     Tags : ...`
+        - En mode Bibliothèque (`0x0056FBC0..0x005704CA`) :
+          * 0 élément (`il_GetSelectionInfo::1`) : `Aucune sélection`
+          * 1 élément (`il_GetSelectionInfo::2`) : `Nom.jpg     JJ/MM/AAAA HH:MM     LxH pixels     Taille     Tags : ...`
+          * >1 éléments même date (`il_GetSelectionInfo::3` + `::5`) : `N photos     JJ/MM/AAAA      Taille sur le disque     Tags : ...`
+          * >1 éléments dates différentes (`il_GetSelectionInfo::3` + `::4`) : `N photos     DateMin à DateMax     Taille sur le disque     Tags : ...`
+        EN: Faithfully reproduces the `thumbui/infotext` header text of `picasa3.exe`.
+        Ref: picasa3.exe @ 0x0056FBC0, 0x00566E5A, 0x0056F920, 0x0098F9F0
+        """
+        if self._is_edit_mode and self._one_up_context and self._one_up_context.get("file_path"):
+            ctx = self._one_up_context
+            fpath = str(ctx.get("file_path", ""))
+            fname, meta_folder, dt_obj, meta_w, meta_h, size_bytes, tags = self._get_item_metadata(fpath)
+            folder = str(ctx.get("folder_name") or meta_folder or "").strip()
+            w = int(ctx.get("width") or meta_w or 0)
+            h = int(ctx.get("height") or meta_h or 0)
+            pos_1 = int(ctx.get("pos_1based") or 0)
+            tot = int(ctx.get("total_in_view") or 0)
+
+            # Ref: 0x00566EB3 (" > ")
+            prefix = f"{folder} > {fname}" if folder else fname
+            dt_str = dt_obj.strftime("%d/%m/%Y %H:%M") if dt_obj is not None else ""
+            size_str = self.format_file_size(size_bytes)
+
+            # Ref: 0x005670F7 (il_BigView::1 : "%1$s     %2$s     %3$dx%4$d pixels     %5$s")
+            parts = [prefix]
+            if dt_str:
+                parts.append(dt_str)
+            if w > 0 and h > 0:
+                parts.append(f"{w}x{h} pixels")
+            parts.append(size_str)
+            text = "     ".join(parts)
+
+            # Ref: 0x00566FAF (il_BigView::2 : "    (%1$d sur %2$d)")
+            if tot > 0 and pos_1 > 0:
+                text += f"    ({pos_1} sur {tot})"
+
+            # Ref: 0x00567234 (CThumbUI::GetTagInfo)
+            text += self._format_tags_suffix([(fname, folder, dt_obj, w, h, size_bytes, tags)])
+            self.lbl_selection.setText(text)
+            return
+
+        effective = self.get_effective_items()
+        count = len(effective) if effective else (fallback_count if fallback_count is not None else 0)
+
+        if count <= 0:
+            # Ref: 0x0056FCA0 (il_GetSelectionInfo::1 -> "Aucune sélection")
+            self.lbl_selection.setText("Aucune sélection")
+            return
+
+        if count == 1 and effective:
+            meta = self._get_item_metadata(effective[0])
+            fname, folder, dt_obj, w, h, size_bytes, tags = meta
+            # Ref: 0x0056FD5E..0x0056FD71 (replace ':' with '/', truncate to 30 chars)
+            clean_name = (fname or "").replace(":", "/")
+            if len(clean_name) > 30:
+                clean_name = clean_name[:27] + "..."
+            dt_str = dt_obj.strftime("%d/%m/%Y %H:%M") if dt_obj is not None else ""
+            size_str = self.format_file_size(size_bytes)
+            # Ref: 0x0056FD76 (il_GetSelectionInfo::2 : "%1$s     %2$s     %3$dx%4$d pixels     %5$s")
+            parts = [clean_name]
+            if dt_str:
+                parts.append(dt_str)
+            parts.append(f"{w}x{h} pixels")
+            parts.append(size_str)
+            text = "     ".join(parts)
+            text += self._format_tags_suffix([meta])
+            self.lbl_selection.setText(text)
+            return
+
+        if count == 1:
+            self.lbl_selection.setText("1 photo")
+            return
+
+        # Ref: 0x0056FF16..0x0057040E (count > 1 : il_GetSelectionInfo::3 + ::4 / ::5)
+        metas = [self._get_item_metadata(it) for it in effective]
+        total_bytes = sum(m[5] for m in metas)
+        dts = [m[2] for m in metas if m[2] is not None]
+        count_str = f"{count:,}".replace(",", " ") if count >= 1000 else str(count)
+        size_str = self.format_file_size(total_bytes)
+
+        if dts:
+            min_dt = min(dts)
+            max_dt = max(dts)
+            min_date_str = min_dt.strftime("%d/%m/%Y")
+            max_date_str = max_dt.strftime("%d/%m/%Y")
+            if min_date_str == max_date_str:
+                # Ref: 0x005701BD (il_GetSelectionInfo::5 : "     %1$s      %2$s sur le disque")
+                text = f"{count_str} photos     {min_date_str}      {size_str} sur le disque"
+            else:
+                # Ref: 0x00570271 (il_GetSelectionInfo::4 : "     %1$s à %2$s     %3$s sur le disque")
+                text = f"{count_str} photos     {min_date_str} à {max_date_str}     {size_str} sur le disque"
+        else:
+            text = f"{count_str} photos      {size_str} sur le disque"
+
+        text += self._format_tags_suffix(metas)
+        self.lbl_selection.setText(text)
+
     def set_selected_items(self, items: List[Any]) -> None:
         """
         FR: Met à jour les éléments sélectionnés depuis la grille et affiche leurs miniatures dans le bac.
@@ -1677,16 +2111,12 @@ class PicasaPhotoTray(QWidget):
 
     def set_selected_count(self, count: int) -> None:
         """
-        FR: Met à jour le compteur de sélection affiché et l'activation des boutons d'action.
-        EN: Updates the displayed selection count and the enabled state of action buttons.
+        FR: Met à jour l'en-tête `thumbui/infotext` et l'activation des boutons d'action.
+        EN: Updates the `thumbui/infotext` header and the enabled state of action buttons.
+        Ref: picasa3.exe @ 0x005706B0, 0x0056FBC0
         """
-        enabled = count > 0
-        if count == 0:
-            self.lbl_selection.setText("Aucune photo sélectionnée")
-        elif count == 1:
-            self.lbl_selection.setText("1 photo sélectionnée")
-        else:
-            self.lbl_selection.setText(f"{count} photos sélectionnées")
+        enabled = count > 0 or self._is_edit_mode
+        self.update_info_text(fallback_count=count)
 
         self.btn_export.setEnabled(enabled)
         self.btn_print.setEnabled(enabled)
@@ -1695,8 +2125,9 @@ class PicasaPhotoTray(QWidget):
         self.btn_collage.setEnabled(enabled)
         self.btn_movie.setEnabled(enabled)
         self.btn_star.setEnabled(enabled)
-        self.btn_rotate_left.setEnabled(enabled)
-        self.btn_rotate_right.setEnabled(enabled)
+        rot_enabled = enabled and not (self._is_edit_mode and self._is_video)
+        self.btn_rotate_left.setEnabled(rot_enabled)
+        self.btn_rotate_right.setEnabled(rot_enabled)
 
     def apply_style(self, style: Optional[PicasaStyle] = None) -> None:
         """

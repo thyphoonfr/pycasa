@@ -192,6 +192,7 @@ class PicasaMainWindow(QMainWindow):
 
         # Page 1: Vue d'édition One-Up (Ref: picasa3.exe @ OneUp) / One-Up Editor view
         self.one_up_view = PicasaOneUpView(self.style, self)
+        self.one_up_view.set_use_external_bottom_bar(True)
         self.stack.addWidget(self.one_up_view)
 
         main_layout.addWidget(self.stack, 1)
@@ -387,8 +388,14 @@ class PicasaMainWindow(QMainWindow):
         self.one_up_view.photo_edited.connect(self._on_photo_edited)
         self.one_up_view.current_photo_changed.connect(self._on_one_up_photo_changed)
 
-        # Curseur de zoom du plateau
+        # Curseur de zoom du plateau (Bibliothèque : thumbui/scale_group ; 1-Up : editpanel/zoombuttcontainer & zoomslider)
         self.photo_tray.zoom_changed.connect(self.thumb_view.set_thumb_size)
+        self.photo_tray.toggle_left_drawer_requested.connect(self.one_up_view._toggle_left_edit_drawer)
+        self.photo_tray.oneup_fit_requested.connect(self.one_up_view.canvas.reset_zoom_to_fit)
+        self.photo_tray.oneup_zoom_1to1_requested.connect(lambda: self.one_up_view.canvas.set_zoom(1.0))
+        self.photo_tray.oneup_zoom_changed.connect(self.one_up_view.canvas.set_zoom)
+        self.photo_tray.oneup_faces_toggled.connect(self.one_up_view._on_toggle_face_tags)
+        self.one_up_view.canvas.zoom_changed.connect(self.photo_tray.set_oneup_zoom_from_canvas)
 
         # Recherche, mode d'affichage des dossiers et filtres rapides
         self.top_bar.folder_view_mode_changed.connect(self._on_top_bar_folder_view_mode_changed)
@@ -623,9 +630,53 @@ class PicasaMainWindow(QMainWindow):
         self.top_bar.hide()
         self.photo_tray.show()
         self.photo_tray.set_focused_path(item.path, select_only_focused=True)
+        self._sync_one_up_info_bar()
         self.stack.setCurrentIndex(1)
         self.one_up_view.setFocus()
         self.status_bar.showMessage(f"Éditeur Picasa : {item.filename}")
+
+    def _sync_one_up_info_bar(self) -> None:
+        """
+        FR: Synchronise la visibilité des boutons de la barre inférieure (`thumbui/basecontrolset`)
+        et le texte d'en-tête (`thumbui/infotext` @ `0x00566E5A..0x00567285`) avec le média
+        actuellement ouvert dans `self.one_up_view`.
+        EN: Synchronizes the bottom bar button visibility (`thumbui/basecontrolset`) and
+        header info text (`thumbui/infotext` @ `0x00566E5A..0x00567285`) with the media item
+        currently open in `self.one_up_view`.
+
+        Ref: picasa3.exe @ 0x0057BB80..0x0057C3A3, 0x00566E5A..0x00567285, 0x005678E0..0x005679F8
+        """
+        if not hasattr(self, "photo_tray") or self.photo_tray is None:
+            return
+        if self.db is not None:
+            self.photo_tray.set_database(self.db)
+        is_video = bool(
+            hasattr(self.one_up_view, "center_stack")
+            and hasattr(self.one_up_view, "video_player")
+            and self.one_up_view.center_stack.currentWidget() == self.one_up_view.video_player
+        )
+        self.photo_tray.set_edit_mode(True, is_video=is_video)
+        if hasattr(self.one_up_view, "edit_panel") and hasattr(self.photo_tray, "btn_toggle_left_drawer"):
+            self.photo_tray.btn_toggle_left_drawer.setText(
+                "◀" if not self.one_up_view.edit_panel.isHidden() else "▶"
+            )
+        if hasattr(self.one_up_view, "canvas") and hasattr(self.photo_tray, "set_oneup_zoom_from_canvas"):
+            self.photo_tray.set_oneup_zoom_from_canvas(getattr(self.one_up_view.canvas, "zoom_factor", 1.0))
+
+        photo_path = self.one_up_view.current_photo_path or ""
+        avail = list(getattr(self.one_up_view, "available_indices", []) or [])
+        curr_idx = getattr(self.one_up_view, "current_index", -1)
+        pos_1based = 0
+        total_count = len(avail)
+        if curr_idx >= 0 and curr_idx in avail:
+            pos_1based = avail.index(curr_idx) + 1
+        elif total_count > 0:
+            pos_1based = 1
+        self.photo_tray.update_one_up_info(
+            photo_path=photo_path,
+            pos_1based=pos_1based,
+            total_in_folder=total_count,
+        )
 
     def _back_to_library(self) -> None:
         """
@@ -651,6 +702,7 @@ class PicasaMainWindow(QMainWindow):
         self.top_bar.show()
         self.photo_tray.show()
         self.photo_tray.setEnabled(True)
+        self.photo_tray.set_edit_mode(False)
         if hasattr(self.one_up_view, "video_player"):
             self.one_up_view.video_player.stop()
         if self.one_up_view.current_photo_path:
@@ -854,6 +906,10 @@ class PicasaMainWindow(QMainWindow):
                         self.one_up_view.filmstrip.invalidate_thumbnail(db_idx)
             self.thumb_view.invalidate_item(photo_path)
             self.thumb_view.update()
+            if self.stack.currentWidget() == self.one_up_view:
+                self._sync_one_up_info_bar()
+            else:
+                self.photo_tray.update_info_text()
 
     def _on_folder_selected(self, key: str, target_type: str, display_name: str) -> None:
         """
@@ -982,6 +1038,8 @@ class PicasaMainWindow(QMainWindow):
         if self.db is not None and hasattr(self.photo_tray, "set_database"):
             self.photo_tray.set_database(self.db)
         self.photo_tray.set_selected_items(selected_items)
+        if not selected_items and count > 0:
+            self.photo_tray.set_selected_count(count)
 
         if self.db is None:
             return
@@ -1150,6 +1208,8 @@ class PicasaMainWindow(QMainWindow):
             self.photo_tray.set_focused_path(file_path, select_only_focused=True)
             if hasattr(self.one_up_view, "_is_starred"):
                 self.photo_tray.update_star_state(bool(getattr(self.one_up_view, "_is_starred", False)))
+            if self.stack.currentWidget() == self.one_up_view:
+                self._sync_one_up_info_bar()
 
     def _on_tray_context_action_requested(self, action_id: str, paths: List[str]) -> None:
         """

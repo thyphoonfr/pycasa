@@ -566,3 +566,146 @@ def test_modal_tool_and_effect_ui_locking(qapp, tmp_path, sample_image):
     view.close()
 
 
+def test_single_bottom_bar_mode_buttons_and_infotext_header(qapp, tmp_path, sample_image):
+    """
+    FR: Vérifie que `PicasaMainWindow` n'affiche qu'UNE SEULE barre inférieure (`self.photo_tray` /
+    `thumbui/basecontrolset`, avec `self.one_up_view.transport_bar` masquée), bascule la visibilité
+    des boutons selon le mode (Bibliothèque vs Édition 1-Up photo/vidéo, `0x0057BB80..0x0057C3A3`),
+    et formate l'en-tête `thumbui/infotext` exactement comme `picasa3.exe` (`0x0056FBC0`, `0x00566E5A`,
+    `0x0056F920`).
+    EN: Verifies that `PicasaMainWindow` displays ONLY ONE bottom bar (`self.photo_tray` /
+    `thumbui/basecontrolset`, with `self.one_up_view.transport_bar` hidden), toggles button visibility
+    by mode (Library vs One-Up Edit photo/video, `0x0057BB80..0x0057C3A3`), and formats the
+    `thumbui/infotext` header exactly like `picasa3.exe` (`0x0056FBC0`, `0x00566E5A`, `0x0056F920`).
+    """
+    import time
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.db.thumbindex import ThumbIndexFile, ThumbIndexRecord
+    from picasa_py.ui.main_window import PicasaMainWindow
+    from picasa_py.ui.thumbnail_view import ThumbnailItem
+
+    folder_dir = tmp_path / "Vacances2026"
+    folder_dir.mkdir(parents=True, exist_ok=True)
+    p1 = folder_dir / "plage_matin.jpg"
+    p2 = folder_dir / "plage_soir.jpg"
+    sample_image.save(str(p1), "JPEG")
+    sample_image.save(str(p2), "JPEG")
+
+    # Définir deux dates différentes et un fichier .picasa.ini avec keywords=mer,soleil
+    t1 = 1711968600.0  # 2024-04-01 12:50 local
+    t2 = 1712141400.0  # 2024-04-03 12:50 local
+    os.utime(str(p1), (t1, t1))
+    os.utime(str(p2), (t2, t2))
+    ini_file = folder_dir / ".picasa.ini"
+    ini_file.write_text("[plage_matin.jpg]\r\nkeywords=mer,soleil\r\n", encoding="utf-8")
+
+    db_dir = tmp_path / "db3"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    win = PicasaMainWindow(db_path=str(db_dir), auto_scan=False)
+    win.resize(1280, 800)
+
+    db = PicasaDatabase()
+    ti = ThumbIndexFile()
+    ti.records.append(ThumbIndexRecord(path=str(folder_dir), ft1=0, ft2=0, size=0, type=1, flags=0, parent_idx=-1))
+    ti.records.append(ThumbIndexRecord(path="plage_matin.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0))
+    ti.records.append(ThumbIndexRecord(path="plage_soir.jpg", ft1=0, ft2=0, size=100, type=2, flags=0, parent_idx=0))
+    db.thumbindex = ti
+    win.db = db
+
+    it1 = ThumbnailItem(
+        index=1,
+        path=str(p1),
+        filename="plage_matin.jpg",
+        folder="Vacances2026",
+        folder_path=str(folder_dir),
+    )
+    it2 = ThumbnailItem(
+        index=2,
+        path=str(p2),
+        filename="plage_soir.jpg",
+        folder="Vacances2026",
+        folder_path=str(folder_dir),
+    )
+    win.thumb_view.items = [it1, it2]
+    win.thumb_view.filtered_indices = [0, 1]
+
+    # 1. En mode Bibliothèque : 0 sélection -> "Aucune sélection"
+    win._on_selection_changed([])
+    assert win.photo_tray.lbl_selection.text() == "Aucune sélection"
+    assert win.one_up_view.transport_bar.isHidden() is True
+    assert win.photo_tray.zoom_slider.isHidden() is False
+    assert win.photo_tray.btn_toggle_left_drawer.isHidden() is True
+    assert win.photo_tray.btn_fit.isHidden() is True
+    assert win.photo_tray.btn_zoom_1to1.isHidden() is True
+    assert win.photo_tray.oneup_zoom_slider.isHidden() is True
+    assert win.photo_tray.btn_toggle_faces.isHidden() is True
+
+    # 2. En mode Bibliothèque : 1 photo sélectionnée -> nom, date, résolution WxH pixels, taille, Tags
+    win.thumb_view.selected_indices = {0}
+    win._on_selection_changed([0])
+    info_single = win.photo_tray.lbl_selection.text()
+    assert "plage_matin.jpg" in info_single
+    assert f"{sample_image.width}x{sample_image.height} pixels" in info_single
+    assert "Tags : mer, soleil" in info_single
+
+    # 3. En mode Bibliothèque : 2 photos sélectionnées avec dates différentes -> "2 photos     ... à ...     ... sur le disque"
+    win.thumb_view.selected_indices = {0, 1}
+    win._on_selection_changed([0, 1])
+    info_multi = win.photo_tray.lbl_selection.text()
+    assert info_multi.startswith("2 photos     ")
+    assert " à " in info_multi
+    assert "sur le disque" in info_multi
+    assert "Tags : mer, soleil" in info_multi
+
+    # 4. Double-clic / Ouverture en mode Édition 1-Up :
+    #    - UNE SEULE barre du bas (`win.one_up_view.transport_bar` reste masquée !)
+    #    - Les contrôles 1-Up (`btn_toggle_left_drawer`, `btn_fit`, `btn_zoom_1to1`, `oneup_zoom_slider`, `btn_toggle_faces`) sont visibles
+    #    - Le curseur d'échelle de la grille (`zoom_slider`) est masqué
+    #    - L'en-tête `thumbui/infotext` affiche "Vacances2026 > plage_matin.jpg     ...     WxH pixels     ...    (1 sur 2)    Tags : mer, soleil"
+    win._open_one_up_view(0)
+    assert win.stack.currentWidget() == win.one_up_view
+    assert win.one_up_view.transport_bar.isHidden() is True
+    assert win.photo_tray.isHidden() is False
+    assert win.photo_tray.zoom_slider.isHidden() is True
+    assert win.photo_tray.btn_toggle_left_drawer.isHidden() is False
+    assert win.photo_tray.btn_fit.isHidden() is False
+    assert win.photo_tray.btn_zoom_1to1.isHidden() is False
+    assert win.photo_tray.oneup_zoom_slider.isHidden() is False
+    assert win.photo_tray.btn_toggle_faces.isHidden() is False
+
+    info_oneup = win.photo_tray.lbl_selection.text()
+    assert info_oneup.startswith("Vacances2026 > plage_matin.jpg     ")
+    assert f"{sample_image.width}x{sample_image.height} pixels" in info_oneup
+    assert "(1 sur 2)" in info_oneup
+    assert "Tags : mer, soleil" in info_oneup
+
+    # 5. Clic sur la 2e miniature dans le bac en mode 1-Up : met à jour l'en-tête vers (2 sur 2) et garde 1 seule barre
+    from PySide6.QtCore import Qt
+    win.photo_tray.thumb_strip._on_widget_clicked_with_modifiers(it2, Qt.KeyboardModifier.NoModifier)
+    assert win.one_up_view.transport_bar.isHidden() is True
+    info_oneup_2 = win.photo_tray.lbl_selection.text()
+    assert info_oneup_2.startswith("Vacances2026 > plage_soir.jpg     ")
+    assert "(2 sur 2)" in info_oneup_2
+
+    # 6. En mode vidéo 1-Up : masque les contrôles de zoom et désactive la rotation
+    win.photo_tray.set_edit_mode(True, is_video=True)
+    assert win.photo_tray.btn_fit.isHidden() is True
+    assert win.photo_tray.btn_zoom_1to1.isHidden() is True
+    assert win.photo_tray.oneup_zoom_slider.isHidden() is True
+    assert win.photo_tray.btn_rotate_left.isEnabled() is False
+    assert win.photo_tray.btn_rotate_right.isEnabled() is False
+
+    # 7. Retour à la photothèque : restaure les contrôles de bibliothèque et l'en-tête de sélection
+    win._back_to_library()
+    assert win.stack.currentWidget() != win.one_up_view
+    assert win.photo_tray.zoom_slider.isHidden() is False
+    assert win.photo_tray.btn_toggle_left_drawer.isHidden() is True
+    assert win.photo_tray.btn_fit.isHidden() is True
+    assert win.photo_tray.oneup_zoom_slider.isHidden() is True
+    assert win.photo_tray.lbl_selection.text().startswith("2 photos     ")
+
+    win.stop_background_tasks()
+    win.close()
+
+
+

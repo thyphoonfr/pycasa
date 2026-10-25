@@ -101,7 +101,7 @@ def test_main_window_instantiation(qapp):
     # Check clear selection
     win.action_clear_selection()
     assert len(win.thumb_view.selected_indices) == 0
-    assert "0 photo" in win.photo_tray.lbl_selection.text() or "Aucune photo" in win.photo_tray.lbl_selection.text()
+    assert "0 photo" in win.photo_tray.lbl_selection.text() or "Aucune" in win.photo_tray.lbl_selection.text()
     win.close()
 
     win.stop_background_tasks()

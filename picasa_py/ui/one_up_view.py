@@ -128,6 +128,7 @@ class PicasaOneUpView(QWidget):
         self._active_rotate: int = 0
         self._is_tool_locked: bool = False
         self._active_tool_mode: int = 0
+        self._use_external_bottom_bar: bool = False
 
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -478,6 +479,19 @@ class PicasaOneUpView(QWidget):
             doc.write_file(ini_path)
         self.photo_edited.emit(target_path)
 
+    def set_use_external_bottom_bar(self, enabled: bool) -> None:
+        """
+        FR: Indique que la barre inférieure globale `thumbui/basecontrolset` (`PicasaMainWindow.photo_tray`)
+        est utilisée et maintient `self.transport_bar` masquée afin d'éviter toute double barre inférieure.
+        EN: Indicates that the global bottom bar `thumbui/basecontrolset` (`PicasaMainWindow.photo_tray`)
+        is used and keeps `self.transport_bar` hidden to prevent any duplicate bottom bar.
+
+        Ref: picasa3.exe @ 0x0057BB80..0x0057C3A3 (thumbui/basecontrolset)
+        """
+        self._use_external_bottom_bar = bool(enabled)
+        if self._use_external_bottom_bar and hasattr(self, "transport_bar") and self.transport_bar is not None:
+            self.transport_bar.hide()
+
     def _toggle_left_edit_drawer(self) -> None:
         """
         FR: Bascule l'affichage du volet gauche d'édition (`editpanel/toggle_left_drawer`).
@@ -487,7 +501,12 @@ class PicasaOneUpView(QWidget):
         """
         visible = not self.edit_panel.isVisible()
         self.edit_panel.setVisible(visible)
-        self.btn_toggle_left_drawer.setText("◀" if visible else "▶")
+        txt = "◀" if visible else "▶"
+        self.btn_toggle_left_drawer.setText(txt)
+        win = self.window()
+        if win is not None and win is not self and hasattr(win, "photo_tray") and win.photo_tray is not None:
+            if hasattr(win.photo_tray, "btn_toggle_left_drawer"):
+                win.photo_tray.btn_toggle_left_drawer.setText(txt)
 
     def _create_transport_bar(self) -> QWidget:
         """
@@ -995,6 +1014,10 @@ class PicasaOneUpView(QWidget):
         self.btn_panel_places.setChecked(is_open and curr == "places")
         self.btn_panel_tags.setChecked(is_open and curr == "tags")
         self.btn_panel_props.setChecked(is_open and curr == "properties")
+        win = self.window()
+        if win is not None and win is not self and hasattr(win, "photo_tray") and win.photo_tray is not None:
+            if hasattr(win, "stack") and win.stack.currentWidget() == self:
+                win.photo_tray.update_panel_buttons(is_open, curr)
 
     def _on_canvas_zoom_changed(self, zoom: float) -> None:
         """
@@ -1655,7 +1678,8 @@ class PicasaOneUpView(QWidget):
         # EN: Standard photo
         self.video_player.stop()
         self.center_stack.setCurrentWidget(self.canvas)
-        self.transport_bar.show()
+        if not self._use_external_bottom_bar:
+            self.transport_bar.show()
         self.btn_mode_a.setEnabled(True)
         self.btn_mode_ab.setEnabled(True)
         self.btn_mode_aa.setEnabled(True)

@@ -39,7 +39,7 @@ def test_photo_tray_selection_and_strip(qapp):
     """
     tray = PicasaPhotoTray()
 
-    assert tray.lbl_selection.text() == "Aucune photo sélectionnée"
+    assert tray.lbl_selection.text() == "Aucune sélection"
     assert tray.btn_add_to_album.isEnabled() is False
     assert tray.btn_export.isEnabled() is False
 
@@ -49,7 +49,7 @@ def test_photo_tray_selection_and_strip(qapp):
 
     # Sélection de 2 éléments
     tray.set_selected_items([item1, item2])
-    assert "2 photos sélectionnées" in tray.lbl_selection.text()
+    assert "2 photos" in tray.lbl_selection.text()
     assert tray.btn_add_to_album.isEnabled() is True
     assert tray.btn_export.isEnabled() is True
     assert len(tray.get_effective_items()) == 2
@@ -84,7 +84,7 @@ def test_photo_tray_hold_and_clear(qapp):
     tray._on_clear_clicked()
     assert tray.is_held is False
     assert len(tray.get_effective_items()) == 0
-    assert tray.lbl_selection.text() == "Aucune photo sélectionnée"
+    assert tray.lbl_selection.text() == "Aucune sélection"
     assert tray.btn_add_to_album.isEnabled() is False
 
 
