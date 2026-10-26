@@ -17,7 +17,7 @@ os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
 
 from PIL import Image
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer, QLoggingCategory
+from PySide6.QtCore import QTimer, QLoggingCategory, QtMsgType, qInstallMessageHandler
 from PySide6.QtGui import QImageReader
 from picasa_py.db.database import PicasaDatabase
 from picasa_py.ui.main_window import PicasaMainWindow
@@ -26,6 +26,23 @@ from picasa_py.version import APP_NAME, APP_VERSION, get_window_title
 
 # Désactiver les limites de décompression pour permettre l'ouverture des photos panoramiques / ultra haute résolution
 Image.MAX_IMAGE_PIXELS = None
+
+
+def _qt_message_filter(mode: QtMsgType, context, message: str) -> None:
+    """
+    FR: Filtre les messages d'avertissement internes bénins de Qt (ex. `QFont::setPointSize: Point size <= 0`
+    émis par Qt lorsqu'une feuille de style CSS utilise `font-size: ...px` et `qt.multimedia.ffmpeg`).
+    EN: Filters benign internal Qt warning messages (e.g. `QFont::setPointSize: Point size <= 0`
+    emitted by Qt when a CSS stylesheet uses `font-size: ...px`, and `qt.multimedia.ffmpeg`).
+    """
+    if not message:
+        return
+    if "QFont::setPointSize: Point size <= 0" in message or "qt.multimedia.ffmpeg" in message:
+        return
+    try:
+        sys.stderr.write(f"{message}\n")
+    except Exception:
+        pass
 
 
 def run_picasa(
@@ -41,10 +58,16 @@ def run_picasa(
     # Désactiver la limite d'allocation de 256 Mo de Qt pour autoriser les images volumineuses
     QImageReader.setAllocationLimit(0)
     QLoggingCategory.setFilterRules("qt.multimedia.ffmpeg*=false")
+    qInstallMessageHandler(_qt_message_filter)
 
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
+
+    default_font = app.font()
+    if default_font.pointSize() <= 0:
+        default_font.setPointSize(9)
+        app.setFont(default_font)
 
     app.setApplicationName(get_window_title())
     app.setApplicationVersion(APP_VERSION)

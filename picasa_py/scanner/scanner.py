@@ -15,6 +15,7 @@ Ref: picasa3.exe @ albumdata_date.pmp (OLE Automation Date)
 """
 
 from __future__ import annotations
+import contextlib
 import ctypes
 import hashlib
 import io
@@ -27,11 +28,49 @@ import threading
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.ffmpeg*=false")
 os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
 os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
+
+_STDERR_LOCK = threading.Lock()
+_DEVNULL_FD: Optional[int] = None
+
+
+@contextlib.contextmanager
+def _suppress_c_stderr() -> Iterator[None]:
+    """
+    FR: Redirige temporairement le descripteur C `stderr` (`fd 2`) vers `os.devnull` de manière
+    thread-safe afin d'empêcher `opencv_videoio_ffmpeg*.dll` / `libavformat` d'écrire des messages
+    de diagnostic bas niveau (`Truncating packet...`, `[matroska,webm @ ...] EBML header parsing failed`,
+    `moov atom not found`) sur la console utilisateur lors du décodage de vidéos.
+    EN: Temporarily redirects C file descriptor `stderr` (`fd 2`) to `os.devnull` in a thread-safe
+    manner so `opencv_videoio_ffmpeg*.dll` / `libavformat` never prints low-level diagnostic noise
+    to the user console when probing video files.
+    """
+    global _DEVNULL_FD
+    with _STDERR_LOCK:
+        saved_fd: Optional[int] = None
+        try:
+            if _DEVNULL_FD is None:
+                _DEVNULL_FD = os.open(os.devnull, os.O_WRONLY)
+            saved_fd = os.dup(2)
+            os.dup2(_DEVNULL_FD, 2)
+        except Exception:
+            saved_fd = None
+        try:
+            yield
+        finally:
+            if saved_fd is not None:
+                try:
+                    os.dup2(saved_fd, 2)
+                except Exception:
+                    pass
+                try:
+                    os.close(saved_fd)
+                except Exception:
+                    pass
 
 from PIL import Image, ImageOps, ExifTags
 from PySide6.QtCore import QThread, Signal
@@ -476,6 +515,23 @@ def extract_video_metadata_and_thumb(
 
         thumb_img: Optional[Image.Image] = None
 
+        # FR: Vérifier l'en-tête binaire avant d'invoquer OpenCV/FFmpeg afin d'écarter immédiatement
+        #     les fichiers texte renommés (ex. COPYING-GPLv3.mkv) ou les fichiers .mkv/.webm sans signature EBML.
+        # EN: Check the binary header before invoking OpenCV/FFmpeg to immediately reject renamed
+        #     plain-text files (e.g. COPYING-GPLv3.mkv) or .mkv/.webm files without an EBML signature.
+        ext_low = os.path.splitext(file_path)[1].lower()
+        try:
+            with open(file_path, "rb") as fh_vid:
+                head_vid = fh_vid.read(64)
+            if not head_vid:
+                return None
+            if len(head_vid) >= 32 and all(b in (9, 10, 13) or 32 <= b <= 126 for b in head_vid):
+                return None
+            if ext_low in (".mkv", ".webm") and not head_vid.startswith(b"\x1a\x45\xdf\xa3"):
+                return None
+        except Exception:
+            return None
+
         # FR: Tentative d'extraction rapide de frame via OpenCV / EN: Fast frame extraction attempt via OpenCV
         try:
             os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
@@ -486,38 +542,31 @@ def extract_video_metadata_and_thumb(
                     cv2.setLogLevel(0)
             except Exception:
                 pass
-            cap = cv2.VideoCapture(file_path)
-            if cap.isOpened():
-                w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                if w > 0 and h > 0:
-                    orig_w, orig_h = w, h
+            with _suppress_c_stderr():
+                cap = cv2.VideoCapture(file_path)
+                if cap.isOpened():
+                    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                    if w > 0 and h > 0:
+                        orig_w, orig_h = w, h
 
-                fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
-                cap.set(cv2.CAP_PROP_POS_FRAMES, int(fps * 0.5))
-                ret, frame = cap.read()
-                if not ret or frame is None:
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, int(fps * 0.5))
                     ret, frame = cap.read()
-                cap.release()
+                    if not ret or frame is None:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        ret, frame = cap.read()
+                    cap.release()
 
-                if ret and frame is not None:
-                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    thumb_img = Image.fromarray(rgb)
+                    if ret and frame is not None:
+                        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        thumb_img = Image.fromarray(rgb)
         except Exception:
             pass
 
         # FR: Fallback élégant : vignette sombre avec bande cinéma et icône vidéo Picasa
         # EN: Clean fallback: dark thumbnail with filmstripsprockets and Picasa play icon
         if thumb_img is None:
-            try:
-                with open(file_path, "rb") as fh_vid:
-                    head_vid = fh_vid.read(64)
-                if len(head_vid) >= 32 and all(b in (9, 10, 13) or 32 <= b <= 126 for b in head_vid):
-                    # Fichier texte pur portant une extension vidéo (ex. LICENSES/COPYING.MKV)
-                    return None
-            except Exception:
-                pass
             thumb_img = Image.new("RGB", (max_thumb_size, max_thumb_size), (30, 32, 36))
             from PIL import ImageDraw
             draw = ImageDraw.Draw(thumb_img)

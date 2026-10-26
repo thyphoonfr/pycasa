@@ -532,21 +532,25 @@ class PicasaVideoPlayer(QWidget):
         saved = False
         try:
             import cv2
-            cap = cv2.VideoCapture(self.current_video_path)
-            if cap.isOpened():
-                cap.set(cv2.CAP_PROP_POS_MSEC, pos_ms)
-                ret, frame = cap.read()
-                if not ret:
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            from picasa_py.scanner.scanner import _suppress_c_stderr
+            with _suppress_c_stderr():
+                cap = cv2.VideoCapture(self.current_video_path)
+                if cap.isOpened():
+                    cap.set(cv2.CAP_PROP_POS_MSEC, pos_ms)
                     ret, frame = cap.read()
-                cap.release()
+                    if not ret:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        ret, frame = cap.read()
+                    cap.release()
+                else:
+                    ret, frame = False, None
 
-                if ret and frame is not None:
-                    from PIL import Image
-                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    img = Image.fromarray(rgb)
-                    img.save(out_path, format="JPEG", quality=95)
-                    saved = True
+            if ret and frame is not None:
+                from PIL import Image
+                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                img = Image.fromarray(rgb)
+                img.save(out_path, format="JPEG", quality=95)
+                saved = True
         except Exception:
             pass
 

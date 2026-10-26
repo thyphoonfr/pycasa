@@ -119,6 +119,14 @@ class AlbumSection:
     all_person_indices: List[int] = field(default_factory=list)
     suggestion_item_indices: List[int] = field(default_factory=list)
 
+    @property
+    def total_height(self) -> int:
+        """
+        FR: Alias de compatibilité retournant la hauteur totale calculée de la section (`self.height`).
+        EN: Compatibility alias returning the computed total height of the section (`self.height`).
+        """
+        return self.height
+
 
 class ViewportThumbWorker:
     """
@@ -1242,7 +1250,7 @@ class PicasaThumbnailView(QWidget):
         anchor_offset: int = 0
         if not reset_scroll and self.scroll_y > 0 and self.visible_sections:
             for old_sec in self.visible_sections:
-                if old_sec.y_start + old_sec.total_height > self.scroll_y:
+                if old_sec.y_start + old_sec.height > self.scroll_y:
                     anchor_folder = old_sec.folder_path
                     anchor_offset = self.scroll_y - old_sec.y_start
                     break
