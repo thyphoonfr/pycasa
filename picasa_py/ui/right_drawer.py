@@ -204,35 +204,12 @@ def _setup_inline_completer(
     """
     if not names:
         return
-    st = style or getattr(edit, "style", None) or PicasaStyle()
-    is_dark = st.is_dark
-    bg = st.window_bgcolor.name() if is_dark else "#FFFFFF"
-    txt = st.alist_textcolor.name()
-    border = st.topbar_btn_border.name()
-    accent = st.accent_color.name()
-    hover_bg = st.topbar_btn_bg_end.name()
-    completer = QCompleter(sorted(list(set(names))), edit)
+    unique_names = sorted(set(names))
+    if not unique_names:
+        return
+    completer = QCompleter(unique_names, edit)
     completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
     completer.setFilterMode(Qt.MatchFlag.MatchContains)
-    popup = completer.popup()
-    if popup:
-        popup.setStyleSheet(f"""
-            QListView {{
-                background-color: {bg};
-                color: {txt};
-                border: 1px solid {border};
-                selection-background-color: {accent};
-                selection-color: #FFFFFF;
-                font-size: 11px;
-                padding: 2px;
-            }}
-            QListView::item {{
-                padding: 4px 6px;
-            }}
-            QListView::item:hover {{
-                background-color: {hover_bg};
-            }}
-        """)
     edit.setCompleter(completer)
 
 
@@ -529,10 +506,14 @@ class PicasaPeoplePanel(QWidget):
         db: Optional[PicasaDatabase],
         photo_indices: List[int],
         photo_paths: List[str],
+        explicit_clusters: Optional[List[List[Tuple[Optional[int], str, FaceRect]]]] = None,
     ) -> None:
         """
-        FR: Présente les personnes détectées et les grappes sans nom sur l'ensemble des photos sélectionnées.
-        EN: Presents detected people and unnamed face clusters across all selected photos.
+        FR: Présente les personnes détectées et les grappes sans nom sur l'ensemble des photos sélectionnées,
+            ou directement les grappes sélectionnées dans l'album "Sans nom" (`faceclusterpanel`).
+        EN: Presents detected people and unnamed face clusters across all selected photos,
+            or directly the selected clusters in the "Unnamed" album (`faceclusterpanel`).
+        Ref: picasa3.exe @ 0x0064C4C4 - 0x0064CD8D (faceclusterpanel::GetSelectedFaces -> PeoplePanel)
         Ref: picasa3.exe @ 0x00CA1264 ("People in these photos:"), 0x00CA11A0 ("Who is in these photos?")
         Ref: picasa3.exe @ PEOPLEPANEL_TEXT_FR.XML, Text5(peoplepanel/instructions)
         """
@@ -540,6 +521,7 @@ class PicasaPeoplePanel(QWidget):
         self.db = db
         self.multi_indices = list(photo_indices)
         self.multi_paths = list(photo_paths)
+        self._explicit_clusters = list(explicit_clusters) if explicit_clusters is not None else None
         self.photo_index = -1
         self.photo_path = ""
         self.faces = []
@@ -553,7 +535,7 @@ class PicasaPeoplePanel(QWidget):
             if widget:
                 widget.deleteLater()
 
-        if not photo_paths:
+        if not photo_paths and not explicit_clusters:
             self.header_lbl.setText("Personnes")
             empty_widget = QWidget()
             empty_widget.setStyleSheet("background: transparent;")
@@ -567,39 +549,81 @@ class PicasaPeoplePanel(QWidget):
             return
 
         # Agréger les personnes et visages sur l'ensemble de la sélection
+        # Ref: picasa3.exe @ 0x0064C4C4 - 0x0064CD8D (faceclusterpanel sélectionné)
+        # Ref: picasa3.exe @ 0x0064CE70 - 0x0064D250 (déduplication par photo parente et limite de clustering synchrone)
         known_people: Dict[str, Dict[str, Any]] = {}
         unnamed_faces_list: List[Tuple[Optional[int], str, FaceRect]] = []
-
-        for p_idx, p_path in zip(photo_indices, photo_paths):
-            photo_faces: List[FaceRect] = []
-            if db and p_idx >= 0:
-                photo_faces = db.face_manager.get_faces_for_photo(p_idx)
-            for fr in photo_faces:
-                name_str = fr.contact_name or ""
-                if fr.contact_id and name_str and not name_str.startswith("? ") and name_str != "Sans nom":
-                    cid = fr.contact_id.lower()
-                    if cid not in known_people:
-                        known_people[cid] = {
-                            "name": name_str,
-                            "photos": set(),
-                            "sample_face": fr,
-                            "sample_path": p_path,
-                            "sample_idx": p_idx,
-                        }
-                    known_people[cid]["photos"].add(p_path or str(p_idx))
-                else:
-                    unnamed_faces_list.append((p_idx, p_path, fr))
-
-        # Regrouper les visages similaires non nommés en grappes (face clustering)
-        # Ref: picasa3.exe @ 0x0064AE90, 0x00788090 (faceclusterpanel), FRSortThreshold (0x00881CC2)
         clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
-        if unnamed_faces_list and db and getattr(db, "face_manager", None):
-            try:
-                clusters = db.face_manager.cluster_unnamed_faces(unnamed_subset=unnamed_faces_list)
-            except Exception:
+
+        if explicit_clusters is not None:
+            # Ref: picasa3.exe @ 0x0064C4C4 - 0x0064CD8D : lorsque l'album "Sans nom" (faceclusterpanel) est actif,
+            # afficher uniquement les visages / grappes sélectionnés sans extraire les autres personnes de la même photo.
+            clusters = [list(cl) for cl in explicit_clusters if cl]
+        else:
+            seen_parent_keys: Set[Union[int, str]] = set()
+            seen_norm_paths: Set[str] = set()
+            seen_face_keys: Set[Tuple[str, float, float]] = set()
+
+            # Limiter l'inspection à un maximum raisonnable (ex. 500 éléments sélectionnés) pour éviter de bloquer le thread GUI
+            max_inspected = 500
+            for p_idx, p_path in list(zip(photo_indices, photo_paths))[:max_inspected]:
+                resolved_parent_idx = p_idx
+                if db is not None and p_idx >= 0 and hasattr(db, "is_face_record") and db.is_face_record(p_idx):
+                    parent_cand = db.get_face_parent_photo_idx(p_idx)
+                    if parent_cand is not None and parent_cand >= 0:
+                        resolved_parent_idx = parent_cand
+                norm_p = os.path.normcase(os.path.normpath(p_path)) if p_path else ""
+                parent_key: Union[int, str] = (
+                    resolved_parent_idx if resolved_parent_idx >= 0 else norm_p
+                )
+                if parent_key in seen_parent_keys or (norm_p and norm_p in seen_norm_paths):
+                    continue
+                seen_parent_keys.add(parent_key)
+                if norm_p:
+                    seen_norm_paths.add(norm_p)
+
+                photo_faces: List[FaceRect] = []
+                if db and resolved_parent_idx >= 0:
+                    photo_faces = db.face_manager.get_faces_for_photo(resolved_parent_idx, photo_path=p_path)
+                elif db and p_idx >= 0:
+                    photo_faces = db.face_manager.get_faces_for_photo(p_idx, photo_path=p_path)
+                for fr in photo_faces:
+                    name_str = fr.contact_name or ""
+                    if fr.contact_id and name_str and not name_str.startswith("? ") and name_str != "Sans nom":
+                        cid = fr.contact_id.lower()
+                        if cid not in known_people:
+                            known_people[cid] = {
+                                "name": name_str,
+                                "photos": set(),
+                                "sample_face": fr,
+                                "sample_path": p_path,
+                                "sample_idx": resolved_parent_idx if resolved_parent_idx >= 0 else p_idx,
+                            }
+                        known_people[cid]["photos"].add(norm_p or str(resolved_parent_idx))
+                    else:
+                        fk = (norm_p or p_path, round(fr.left, 4), round(fr.top, 4))
+                        if fk not in seen_face_keys:
+                            seen_face_keys.add(fk)
+                            eff_u_idx = getattr(fr, "record_index", None)
+                            if eff_u_idx is None and db is not None and getattr(db, "face_manager", None) is not None and resolved_parent_idx >= 0:
+                                eff_u_idx = db.face_manager._find_matching_1001_child(resolved_parent_idx, fr)
+                            if eff_u_idx is None:
+                                eff_u_idx = p_idx if (db is not None and p_idx >= 0 and hasattr(db, "is_face_record") and db.is_face_record(p_idx)) else (resolved_parent_idx if resolved_parent_idx >= 0 else p_idx)
+                            unnamed_faces_list.append((eff_u_idx, p_path, fr))
+
+            # Regrouper les visages similaires non nommés en grappes (face clustering)
+            # Ref: picasa3.exe @ 0x0064AE90, 0x00788090 (faceclusterpanel), FRSortThreshold (0x00881CC2)
+            MAX_SYNC_CLUSTER_FACES = 400
+            if unnamed_faces_list and db and getattr(db, "face_manager", None):
+                try:
+                    subset_to_cluster = unnamed_faces_list[:MAX_SYNC_CLUSTER_FACES]
+                    clusters = db.face_manager.cluster_unnamed_faces(unnamed_subset=subset_to_cluster)
+                    if len(unnamed_faces_list) > MAX_SYNC_CLUSTER_FACES:
+                        clusters.extend([[f] for f in unnamed_faces_list[MAX_SYNC_CLUSTER_FACES:]])
+                except Exception:
+                    clusters = [[f] for f in unnamed_faces_list]
+            elif unnamed_faces_list:
                 clusters = [[f] for f in unnamed_faces_list]
-        elif unnamed_faces_list:
-            clusters = [[f] for f in unnamed_faces_list]
 
         # Mettre à jour l'en-tête selon picasa3.exe (PeoplePanel::Known2 vs PeoplePanel::Who vs PeoplePanel::Unnamed)
         if known_people:
@@ -610,48 +634,108 @@ class PicasaPeoplePanel(QWidget):
             self.header_lbl.setText("Qui figure sur ces photos ?")
 
         card_idx = 0
-
-        # 1. Cartes des personnes identifiées
-        for cid, info in sorted(known_people.items(), key=lambda kv: len(kv[1]["photos"]), reverse=True):
-            card = self._create_multi_person_card(cid, info["name"], len(info["photos"]), info["sample_face"], info["sample_path"])
-            self.faces_layout.insertWidget(card_idx, card)
-            card_idx += 1
-
-        # 2. Section des visages similaires regroupés (Face Clusters)
-        if clusters:
-            if known_people:
-                # Séparateur / en-tête de section (Ref: PeoplePanel::Unnamed, 0x00CA12D0)
-                sec_header = QLabel(f"Groupes de personnes sans nom ({len(clusters)}) :")
-                sec_header.setStyleSheet(f"""
-                    QLabel {{
-                        color: {c['sub']};
-                        font-size: 11px;
-                        font-weight: bold;
-                        padding-top: 8px;
-                        padding-bottom: 4px;
-                        border-bottom: 1px solid {c['card_border']};
-                        background: transparent;
-                    }}
-                """)
-                self.faces_layout.insertWidget(card_idx, sec_header)
-                card_idx += 1
-
-            MAX_VISIBLE_CLUSTERS = 30
-            rendered_clusters = clusters[:MAX_VISIBLE_CLUSTERS]
-            remaining_clusters = clusters[MAX_VISIBLE_CLUSTERS:]
-
-            for c_i, cluster in enumerate(rendered_clusters):
-                card = self._create_cluster_card(c_i, cluster)
+        self.faces_container.setUpdatesEnabled(False)
+        try:
+            # 1. Cartes des personnes identifiées
+            for cid, info in sorted(known_people.items(), key=lambda kv: len(kv[1]["photos"]), reverse=True):
+                card = self._create_multi_person_card(cid, info["name"], len(info["photos"]), info["sample_face"], info["sample_path"])
                 self.faces_layout.insertWidget(card_idx, card)
                 card_idx += 1
 
-            if remaining_clusters:
-                more_widget = QWidget()
-                more_widget.setStyleSheet("background: transparent;")
-                mlay = QVBoxLayout(more_widget)
-                mlay.setContentsMargins(0, 4, 0, 8)
-                btn_more = QPushButton(f"+ Afficher les {len(remaining_clusters)} autres groupes...")
-                btn_more.setStyleSheet(f"""
+            # 2. Section des visages similaires regroupés (Face Clusters)
+            if clusters:
+                if known_people:
+                    # Séparateur / en-tête de section (Ref: PeoplePanel::Unnamed, 0x00CA12D0)
+                    sec_header = QLabel(f"Groupes de personnes sans nom ({len(clusters)}) :")
+                    sec_header.setStyleSheet(f"""
+                        QLabel {{
+                            color: {c['sub']};
+                            font-size: 11px;
+                            font-weight: bold;
+                            padding-top: 8px;
+                            padding-bottom: 4px;
+                            border-bottom: 1px solid {c['card_border']};
+                            background: transparent;
+                        }}
+                    """)
+                    self.faces_layout.insertWidget(card_idx, sec_header)
+                    card_idx += 1
+
+                MAX_VISIBLE_CLUSTERS = 15
+                rendered_clusters = clusters[:MAX_VISIBLE_CLUSTERS]
+                remaining_clusters = clusters[MAX_VISIBLE_CLUSTERS:]
+                cached_people = (
+                    self.db.face_manager.get_people()
+                    if self.db and getattr(self.db, "face_manager", None)
+                    else []
+                )
+                cached_contact_names = sorted({p.name for p in cached_people if p.name})
+
+                for c_i, cluster in enumerate(rendered_clusters):
+                    card = self._create_cluster_card(
+                        c_i,
+                        cluster,
+                        cached_people=cached_people,
+                        cached_contact_names=cached_contact_names,
+                    )
+                    self.faces_layout.insertWidget(card_idx, card)
+                    card_idx += 1
+
+                if remaining_clusters:
+                    more_widget = QWidget()
+                    more_widget.setStyleSheet("background: transparent;")
+                    mlay = QVBoxLayout(more_widget)
+                    mlay.setContentsMargins(0, 4, 0, 8)
+                    btn_more = QPushButton(f"+ Afficher les {len(remaining_clusters)} autres groupes...")
+                    btn_more.setStyleSheet(f"""
+                        QPushButton {{
+                            background-color: {c['btn_bg']};
+                            color: {c['accent']};
+                            border: 1px solid {c['accent']};
+                            border-radius: 4px;
+                            padding: 6px 12px;
+                            font-size: 11px;
+                            font-weight: bold;
+                        }}
+                        QPushButton:hover {{
+                            background-color: {c['accent']};
+                            color: #FFFFFF;
+                        }}
+                    """)
+                    def on_show_more():
+                        """
+                        FR: Affiche les grappes de visages restantes au-delà de la limite initiale.
+                        EN: Displays the remaining face clusters beyond the initial limit.
+                        """
+                        btn_more.setVisible(False)
+                        for r_i, r_cluster in enumerate(remaining_clusters):
+                            r_card = self._create_cluster_card(
+                                MAX_VISIBLE_CLUSTERS + r_i,
+                                r_cluster,
+                                cached_people=cached_people,
+                                cached_contact_names=cached_contact_names,
+                            )
+                            self.faces_layout.insertWidget(self.faces_layout.count() - 1, r_card)
+                    btn_more.clicked.connect(on_show_more)
+                    mlay.addWidget(btn_more, alignment=Qt.AlignmentFlag.AlignCenter)
+                    self.faces_layout.insertWidget(card_idx, more_widget)
+                    card_idx += 1
+
+            # Si aucun visage trouvé sur les photos sélectionnées
+            if card_idx == 0:
+                empty_widget = QWidget()
+                empty_widget.setStyleSheet("background: transparent;")
+                elay = QVBoxLayout(empty_widget)
+                elay.setContentsMargins(0, 20, 0, 20)
+                elay.setSpacing(10)
+
+                empty_lbl = QLabel(f"Aucun visage identifié dans la sélection ({len(photo_paths)} photos).")
+                empty_lbl.setStyleSheet(f"color: {c['sub']}; font-size: 11px; background: transparent;")
+                empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                elay.addWidget(empty_lbl)
+
+                btn_scan = QPushButton("🔍  Détecter les visages sur la sélection")
+                btn_scan.setStyleSheet(f"""
                     QPushButton {{
                         background-color: {c['btn_bg']};
                         color: {c['accent']};
@@ -666,58 +750,19 @@ class PicasaPeoplePanel(QWidget):
                         color: #FFFFFF;
                     }}
                 """)
-                def on_show_more():
-                    """
-                    FR: Affiche les grappes de visages restantes au-delà de la limite initiale.
-                    EN: Displays the remaining face clusters beyond the initial limit.
-                    """
-                    btn_more.setVisible(False)
-                    for r_i, r_cluster in enumerate(remaining_clusters):
-                        r_card = self._create_cluster_card(MAX_VISIBLE_CLUSTERS + r_i, r_cluster)
-                        self.faces_layout.insertWidget(self.faces_layout.count() - 1, r_card)
-                btn_more.clicked.connect(on_show_more)
-                mlay.addWidget(btn_more, alignment=Qt.AlignmentFlag.AlignCenter)
-                self.faces_layout.insertWidget(card_idx, more_widget)
-                card_idx += 1
+                btn_scan.clicked.connect(self._run_multi_face_detection)
+                elay.addWidget(btn_scan, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Si aucun visage trouvé sur les photos sélectionnées
-        if card_idx == 0:
-            empty_widget = QWidget()
-            empty_widget.setStyleSheet("background: transparent;")
-            elay = QVBoxLayout(empty_widget)
-            elay.setContentsMargins(0, 20, 0, 20)
-            elay.setSpacing(10)
-
-            empty_lbl = QLabel(f"Aucun visage identifié dans la sélection ({len(photo_paths)} photos).")
-            empty_lbl.setStyleSheet(f"color: {c['sub']}; font-size: 11px; background: transparent;")
-            empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            elay.addWidget(empty_lbl)
-
-            btn_scan = QPushButton("🔍  Détecter les visages sur la sélection")
-            btn_scan.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {c['btn_bg']};
-                    color: {c['accent']};
-                    border: 1px solid {c['accent']};
-                    border-radius: 4px;
-                    padding: 6px 12px;
-                    font-size: 11px;
-                    font-weight: bold;
-                }}
-                QPushButton:hover {{
-                    background-color: {c['accent']};
-                    color: #FFFFFF;
-                }}
-            """)
-            btn_scan.clicked.connect(self._run_multi_face_detection)
-            elay.addWidget(btn_scan, alignment=Qt.AlignmentFlag.AlignCenter)
-
-            self.faces_layout.insertWidget(0, empty_widget)
+                self.faces_layout.insertWidget(0, empty_widget)
+        finally:
+            self.faces_container.setUpdatesEnabled(True)
 
     def _create_cluster_card(
         self,
         cluster_idx: int,
         cluster: List[Tuple[Optional[int], str, FaceRect]],
+        cached_people: Optional[List[Any]] = None,
+        cached_contact_names: Optional[List[str]] = None,
     ) -> QWidget:
         """
         FR: Crée une carte pour un groupe de visages similaires sans nom (Face Cluster).
@@ -799,18 +844,26 @@ class PicasaPeoplePanel(QWidget):
 
         # Détecter si une suggestion existe pour ce cluster
         suggested_name: Optional[str] = None
-        for _, _, fr in cluster:
-            if fr.contact_name and fr.contact_name.startswith("? "):
-                suggested_name = fr.contact_name[2:].strip()
-                break
-        if not suggested_name and self.db and getattr(self.db, "face_manager", None):
-            feat = None
-            if sample_idx is not None and hasattr(self.db, "get_face_template"):
-                try:
-                    feat = self.db.get_face_template(sample_idx)
-                except Exception:
-                    feat = None
-            if feat is not None:
+        sug_names_in_cluster = {
+            fr.contact_name[2:].strip()
+            for _, _, fr in cluster
+            if fr.contact_name and fr.contact_name.startswith("? ") and fr.contact_name[2:].strip()
+        }
+        if len(sug_names_in_cluster) == 1 and (len(cluster) == 1 or all(
+            fr.contact_name and fr.contact_name.startswith("? ") for _, _, fr in cluster
+        )):
+            suggested_name = next(iter(sug_names_in_cluster))
+        if not suggested_name and self.db and getattr(self.db, "face_manager", None) and hasattr(self.db, "get_face_template"):
+            cluster_feats = []
+            for c_idx, _, _ in cluster:
+                if c_idx is not None:
+                    try:
+                        ft = self.db.get_face_template(c_idx)
+                        if ft is not None:
+                            cluster_feats.append(ft)
+                    except Exception:
+                        pass
+            if cluster_feats and len(cluster_feats) == len(cluster):
                 best_sim = -1.0
                 best_person = None
                 try:
@@ -820,16 +873,22 @@ class PicasaPeoplePanel(QWidget):
                         FR_SUGGESTION_SINGLE_THRESHOLD,
                     )
                     detector = PicasaFaceDetector.get()
-                    for p in self.db.face_manager.get_people():
+                    people_iter = (
+                        cached_people
+                        if cached_people is not None
+                        else self.db.face_manager.get_people()
+                    )
+                    for p in people_iter:
                         ref_vecs = p.feature_vectors if getattr(p, "feature_vectors", None) else (
                             [p.feature_vector] if p.feature_vector is not None else []
                         )
                         if not ref_vecs:
                             continue
-                        p_sim = max(detector.compare_face_features(feat, rv) for rv in ref_vecs)
                         req_t = FR_SUGGESTION_SINGLE_THRESHOLD if p.photo_count <= 1 else FR_SUGGESTION_THRESHOLD
-                        if p_sim >= req_t and p_sim > best_sim:
-                            best_sim = p_sim
+                        face_sims = [max(detector.compare_face_features(ft, rv) for rv in ref_vecs) for ft in cluster_feats]
+                        min_sim = min(face_sims)
+                        if min_sim >= req_t and min_sim > best_sim:
+                            best_sim = min_sim
                             best_person = p
                     if best_person is not None:
                         suggested_name = best_person.name
@@ -845,10 +904,32 @@ class PicasaPeoplePanel(QWidget):
         name_edit.setFixedHeight(24)
 
         # Autocomplétion avec tous les contacts connus (Ref: peopleautocomplete @ 0x008A1090)
-        all_contacts = []
-        if self.db and getattr(self.db, "face_manager", None):
+        if cached_contact_names is not None:
+            all_contacts = cached_contact_names
+        elif self.db and getattr(self.db, "face_manager", None):
             all_contacts = [p.name for p in self.db.face_manager.get_people() if p.name]
+        else:
+            all_contacts = []
         _setup_inline_completer(name_edit, all_contacts, style=self.style)
+
+        def _refresh_after_cluster_action():
+            """
+            FR: Rafraîchit le panneau Personnes après nomination ou exclusion d'une grappe.
+            EN: Refreshes the People panel after naming or ignoring a cluster.
+            """
+            rem_clusters = None
+            if getattr(self, "_explicit_clusters", None) is not None:
+                rem_clusters = [cl for cl in self._explicit_clusters if cl is not cluster and cl != cluster]
+                self._explicit_clusters = rem_clusters
+                if not rem_clusters:
+                    self.set_multiple_photos(self.db, [], [], explicit_clusters=None)
+                    return
+            self.set_multiple_photos(
+                self.db,
+                self.multi_indices,
+                self.multi_paths,
+                explicit_clusters=rem_clusters,
+            )
 
         def on_apply_cluster():
             """
@@ -859,7 +940,7 @@ class PicasaPeoplePanel(QWidget):
             if new_name and self.db and getattr(self.db, "face_manager", None):
                 self.db.face_manager.name_cluster(cluster, new_name)
                 self.people_changed.emit()
-                self.set_multiple_photos(self.db, self.multi_indices, self.multi_paths)
+                _refresh_after_cluster_action()
 
         name_edit.returnPressed.connect(on_apply_cluster)
         top_row.addWidget(name_edit, 1)
@@ -892,7 +973,7 @@ class PicasaPeoplePanel(QWidget):
                 for c_idx, c_path, c_fr in cluster:
                     self.db.face_manager.remove_face(c_path, c_fr, db_idx=c_idx)
                 self.people_changed.emit()
-                self.set_multiple_photos(self.db, self.multi_indices, self.multi_paths)
+                _refresh_after_cluster_action()
 
         btn_ignore.clicked.connect(on_ignore_cluster)
         top_row.addWidget(btn_ignore, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
@@ -965,7 +1046,7 @@ class PicasaPeoplePanel(QWidget):
                 if self.db and getattr(self.db, "face_manager", None):
                     self.db.face_manager.name_cluster(cluster, suggested_name)
                     self.people_changed.emit()
-                    self.set_multiple_photos(self.db, self.multi_indices, self.multi_paths)
+                    _refresh_after_cluster_action()
 
             btn_yes.clicked.connect(on_confirm_sug)
             sug_row.addWidget(btn_yes)
@@ -997,7 +1078,12 @@ class PicasaPeoplePanel(QWidget):
                 for _, _, fr in cluster:
                     if fr.contact_name and fr.contact_name.startswith("? "):
                         fr.contact_name = ""
-                self.set_multiple_photos(self.db, self.multi_indices, self.multi_paths)
+                self.set_multiple_photos(
+                    self.db,
+                    self.multi_indices,
+                    self.multi_paths,
+                    explicit_clusters=getattr(self, "_explicit_clusters", None),
+                )
 
             btn_no.clicked.connect(on_reject_sug)
             sug_row.addWidget(btn_no)
@@ -4210,9 +4296,10 @@ class PicasaRightDrawer(QWidget):
         if self._selection_mode == "multiple":
             indices = self._current_multi_indices
             paths = self._current_multi_paths
+            explicit_clusters = getattr(self, "_current_explicit_clusters", None)
             scope_label = self._album_scope_label
             if panel == "people":
-                self.panel_people.set_multiple_photos(db, indices, paths)
+                self.panel_people.set_multiple_photos(db, indices, paths, explicit_clusters=explicit_clusters)
             elif panel == "properties":
                 self.panel_properties.set_multiple_photos(paths)
             elif panel == "tags":
@@ -4239,10 +4326,20 @@ class PicasaRightDrawer(QWidget):
             photo_path = self._current_photo_path
             source_img = self._current_source_img
             if panel == "people":
+                effective_photo_idx = photo_index
+                if (
+                    db is not None
+                    and photo_index >= 0
+                    and hasattr(db, "is_face_record")
+                    and db.is_face_record(photo_index)
+                ):
+                    parent_cand = db.get_face_parent_photo_idx(photo_index)
+                    if parent_cand is not None and parent_cand >= 0:
+                        effective_photo_idx = parent_cand
                 faces: List[FaceRect] = []
                 if db and getattr(db, "face_manager", None):
-                    faces = db.face_manager.get_faces_for_photo(photo_index, photo_path=photo_path)
-                self.panel_people.set_photo_faces(db, photo_index, photo_path, faces, source_img=source_img)
+                    faces = db.face_manager.get_faces_for_photo(effective_photo_idx, photo_path=photo_path)
+                self.panel_people.set_photo_faces(db, effective_photo_idx, photo_path, faces, source_img=source_img)
             elif panel == "properties":
                 self.panel_properties.set_photo_metadata(photo_path, source_img=source_img, db=db, db_index=photo_index)
             elif panel == "tags":
@@ -4311,6 +4408,21 @@ class PicasaRightDrawer(QWidget):
         if not self._explicitly_hidden and self.current_panel_name == "places":
             self._sync_active_panel()
 
+    def is_user_editing_name(self) -> bool:
+        """
+        FR: Indique si l'utilisateur est actuellement en train de saisir un nom de personne
+            dans un champ de texte du volet Personnes (`PicasaInlineNameEdit` / `QLineEdit`).
+        EN: Returns whether the user is currently typing a person's name inside a text input
+            of the People panel (`PicasaInlineNameEdit` / `QLineEdit`).
+        Ref: picasa3.exe @ 0x00789C00 (faceclusterpanel::UpdateClusters préserve l'édition en cours)
+        """
+        if self._explicitly_hidden or not self.isVisible():
+            return False
+        for edit in self.panel_people.findChildren(QLineEdit):
+            if edit.hasFocus():
+                return True
+        return False
+
     def set_current_photo(
         self,
         db: Optional[PicasaDatabase],
@@ -4328,6 +4440,7 @@ class PicasaRightDrawer(QWidget):
         self._current_photo_index = photo_index
         self._current_photo_path = photo_path
         self._current_source_img = source_img
+        self._current_explicit_clusters = None
         self._album_context_only_dirty = False
         self._dirty_panels = {"people", "places", "tags", "properties"}
         if not self._explicitly_hidden:
@@ -4339,10 +4452,12 @@ class PicasaRightDrawer(QWidget):
         photo_indices: List[int],
         photo_paths: List[str],
         scope_label: str = "l'album",
+        explicit_clusters: Optional[List[List[Tuple[Optional[int], str, FaceRect]]]] = None,
     ) -> None:
         """
         FR: Enregistre la sélection multiple et met à jour le volet ouvert (les volets masqués sont rafraîchis à la demande).
         EN: Stores the multiple selection and updates the open panel (hidden panels are refreshed on demand).
+        Ref: picasa3.exe @ 0x0064C4C4 - 0x0064CD8D (faceclusterpanel::GetSelectedFaces -> PeoplePanel)
         Ref: picasa3.exe @ 0x00CA1264 ("People in these photos:"), 0x008A9A00 (GeoPanel::geo_info_format)
         """
         self._active_db = db
@@ -4352,13 +4467,19 @@ class PicasaRightDrawer(QWidget):
         self._selection_mode = "multiple"
         self._current_multi_indices = list(photo_indices)
         self._current_multi_paths = list(photo_paths)
+        self._current_explicit_clusters = list(explicit_clusters) if explicit_clusters is not None else None
         self._album_context_only_dirty = False
         self._dirty_panels = {"people", "places", "tags", "properties"}
         if not self._explicitly_hidden:
             self._sync_active_panel()
             if self.parentWidget() is None and "people" in self._dirty_panels:
                 self._dirty_panels.discard("people")
-                self.panel_people.set_multiple_photos(db, self._current_multi_indices, self._current_multi_paths)
+                self.panel_people.set_multiple_photos(
+                    db,
+                    self._current_multi_indices,
+                    self._current_multi_paths,
+                    explicit_clusters=self._current_explicit_clusters,
+                )
 
     def _on_places_location_changed(self, lat: float, lon: float) -> None:
         """

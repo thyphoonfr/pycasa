@@ -135,7 +135,12 @@ def test_thumbnail_view_multi_album_sections(qapp):
 
     # Check sections created
     assert len(view.sections) > 0
-    assert len(view.visible_sections) == len(view.sections)
+    hidden_folders = getattr(db, "_hidden_folders", set()) or set()
+    expected_visible_count = sum(
+        1 for s in view.sections
+        if s.folder_path.replace("\\", "/").rstrip("/").lower() not in hidden_folders
+    )
+    assert len(view.visible_sections) == expected_visible_count
     assert len(view.items) > 0
 
     # Layout recomputed

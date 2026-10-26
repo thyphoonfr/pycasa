@@ -17,6 +17,7 @@ Ref: contacts/contacts.xml
 
 from __future__ import annotations
 import io
+import math
 import os
 import secrets
 import threading
@@ -120,10 +121,17 @@ class PersonCluster:
     @property
     def photo_count(self) -> int:
         """
-        FR : Nombre total de photos associées à cette personne.
-        EN: Total number of photos associated with this person.
+        FR : Nombre total de photos/visages confirmés associés à cette personne.
+        Utilise en priorité `len(self.photo_indices)` (chaque entrée correspond à un enregistrement
+        confirmé dans `imagedata_personalbumid`), ou le nombre de chemins normalisés uniques.
+        EN: Total number of confirmed photos/faces associated with this person.
+        Ref: picasa3.exe @ 0x0048AA80 (FRSuggestionSingleThreshold = 0.90 when photo_count <= 1)
         """
-        return max(len(self.photo_indices), len(self.photo_paths))
+        if self.photo_indices:
+            return len(self.photo_indices)
+        if not self.photo_paths:
+            return 0
+        return len({os.path.normcase(os.path.normpath(p)) for p in self.photo_paths if p})
 
 
 class PicasaFaceManager:
@@ -143,6 +151,7 @@ class PicasaFaceManager:
         self._face_feature_cache: Dict[Tuple[Optional[int], float, float], np.ndarray] = {}
         self._avatar_cache: Dict[Tuple[Any, ...], QPixmap] = {}
         self._scanned_photo_indices: Set[int] = set()
+        self._rejected_suggestions: Set[Tuple[int, str]] = set()
         self._suggestions_rebuilt: bool = False
         self._load_all_faces()
 
@@ -192,7 +201,10 @@ class PicasaFaceManager:
         # EN: 1. Read contacts.xml
         if self.db.contacts:
             for c in self.db.contacts.contacts:
-                contact_id_to_name[c.id.lower()] = c.name
+                cname_clean = (c.name or "").strip()
+                if not cname_clean or cname_clean.lower() in ("sans nom", "unnamed", "<personne inconnue>", "<unknown person>"):
+                    continue
+                contact_id_to_name[c.id.lower()] = cname_clean
 
         # FR : 2. Lecture de albumdata (cat == 8 pour les albums de personnes)
         # EN: 2. Read albumdata (cat == 8 for Person albums)
@@ -203,10 +215,11 @@ class PicasaFaceManager:
         if ad_names and ad_cats:
             for i in range(len(ad_names.records)):
                 if ad_cats.records[i] == 8:
-                    pname = ad_names.records[i]
+                    pname = (ad_names.records[i] or "").strip()
                     # FR : Album 0 dans Picasa 3 est réservé aux visages sans nom (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
+                    # Ignorer également les albums factices "<Personne inconnue>" créés à partir d'IDs orphelins.
                     # EN: Album 0 in Picasa 3 is reserved for unnamed faces (Ref: CThumbDB::unknownfacealbum @ 0x008AAD76)
-                    if i == 0 or pname.strip().lower() in ("sans nom", "unnamed"):
+                    if i == 0 or not pname or pname.lower() in ("sans nom", "unnamed", "<personne inconnue>", "<unknown person>"):
                         continue
                     cid_hex = ""
                     if ad_cids and i < len(ad_cids.records) and ad_cids.records[i]:
@@ -261,17 +274,25 @@ class PicasaFaceManager:
         self._parent_to_1001: Dict[int, List[int]] = {}
         for i, r in enumerate(self.db.index):
             if r.type == 1001 and 0 <= r.parent_idx < len(self.db.index):
-                self._parent_to_1001.setdefault(r.parent_idx, []).append(i)
+                pr = self.db.index[r.parent_idx]
+                if pr.type not in (0, 1, 1001) and pr.path:
+                    self._parent_to_1001.setdefault(r.parent_idx, []).append(i)
 
         def _get_photo_path(idx: int) -> str:
             if idx < len(self.db.index):
                 r = self.db.index[idx]
-                if r.type == 1001 and 0 <= r.parent_idx < len(self.db.index):
-                    pr = self.db.index[r.parent_idx]
-                    fdir = folders_map.get(pr.parent_idx, "")
-                    return os.path.join(fdir, pr.path)
+                if r.type == 1001:
+                    if 0 <= r.parent_idx < len(self.db.index):
+                        pr = self.db.index[r.parent_idx]
+                        if pr.type in (0, 1, 1001) or not pr.path:
+                            return ""
+                        fdir = folders_map.get(pr.parent_idx, "")
+                        return os.path.normpath(os.path.join(fdir, pr.path)) if fdir else pr.path
+                    return ""
+                if r.type in (0, 1) or not r.path:
+                    return ""
                 fdir = folders_map.get(r.parent_idx, "")
-                return os.path.join(fdir, r.path)
+                return os.path.normpath(os.path.join(fdir, r.path)) if fdir else r.path
             return ""
 
         ignored_rec_ids = (
@@ -279,9 +300,22 @@ class PicasaFaceManager:
             if (self.db and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "search"))
             else set()
         )
+        self._ignored_rec_ids: Set[int] = ignored_rec_ids
         if pmp_facerect:
             for db_idx, rect_val in enumerate(pmp_facerect.records):
-                is_face_rec = bool(self.db and getattr(self.db, "is_face_record", lambda i: False)(db_idx))
+                if db_idx < len(self.db.index):
+                    rec_obj = self.db.index[db_idx]
+                    if rec_obj.type == 0:
+                        continue
+                    is_face_rec = bool(rec_obj.type == 1001)
+                    if is_face_rec:
+                        if not (0 <= rec_obj.parent_idx < len(self.db.index)):
+                            continue
+                        parent_rec = self.db.index[rec_obj.parent_idx]
+                        if parent_rec.type == 0:
+                            continue
+                else:
+                    is_face_rec = False
                 if rect_val:
                     self._scanned_photo_indices.add(db_idx)
                     if is_face_rec:
@@ -577,6 +611,7 @@ class PicasaFaceManager:
                 u_b = max(v & 0xFFFF for v in child_rects)
                 _setc("imagedata_facerect", parent_db_idx, (u_l << 48) | (u_t << 32) | (u_r << 16) | u_b)
                 _setc("imagedata_facerectdata", parent_db_idx, "1")
+                _setc("imagedata_deferredface", parent_db_idx, "")
             if getattr(self.db, "wordhash", None) is not None:
                 self.db.wordhash.add_word("]face", parent_db_idx)
                 self.db.wordhash.add_word("]unknownface", child_idx)
@@ -597,16 +632,29 @@ class PicasaFaceManager:
         FR : Parcourt les fichiers `.picasa.ini` pour extraire les balises `faces=` en complexité $O(N)$.
         EN: Scan `.picasa.ini` files to extract `faces=` tags in $O(N)$ complexity.
         """
-        # FR : Indexer les photos de la base par (dossier_norm, filename_lower)
-        # EN: Index database photos by (normalized_folder, filename_lower)
+        # FR : Indexer les photos de la base par (dossier_norm, filename_lower) en conservant la casse canonique
+        # EN: Index database photos by (normalized_folder, filename_lower) while preserving canonical casing
         folders_map = {i: r.path for i, r in enumerate(self.db.index) if r.type == 1}
         path_to_idx: Dict[Tuple[str, str], int] = {}
+        canonical_dirs: Dict[str, str] = {}
 
         for i, r in enumerate(self.db.index):
-            if r.type not in (1, 1001):
+            if r.type not in (0, 1, 1001) and r.path:
                 fpath = folders_map.get(r.parent_idx, "")
-                norm_d = fpath.replace("/", "\\").rstrip("\\").lower()
+                orig_d = fpath.replace("/", "\\").rstrip("\\")
+                norm_d = orig_d.lower()
+                if norm_d and norm_d not in canonical_dirs:
+                    canonical_dirs[norm_d] = orig_d
                 path_to_idx[(norm_d, r.path.lower())] = i
+
+        pmp_personalbum = self.db.pmps.get("imagedata_personalbumid") if self.db else None
+        pmp_suggestion = self.db.pmps.get("imagedata_suggestionpersonalbumid") if self.db else None
+        unknown_rec_ids = (
+            set(self.db.wordhash.search("]unknownface"))
+            if (self.db and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "search"))
+            else set()
+        )
+        ignored_set = getattr(self, "_ignored_rec_ids", set())
 
         # FR : Indexation O(1) de unnamed_faces et suggestions par db_idx et par chemin normalisé
         # pour éviter le filtrage quadratique O(N * U) à chaque visage nommé.
@@ -668,7 +716,7 @@ class PicasaFaceManager:
                             k_padded = k.zfill(16)
                             val = entry.value
                             cname = val.split(";")[0].strip() if ";" in val else val.strip()
-                            if cname:
+                            if cname and cname.lower() not in ("sans nom", "unnamed", "<personne inconnue>", "<unknown person>"):
                                 if k in contact_id_to_name or k_unpadded in contact_id_to_name or k_padded in contact_id_to_name:
                                     continue
                                 contact_id_to_name[k] = cname
@@ -676,6 +724,7 @@ class PicasaFaceManager:
 
                 # FR : Lire les faces de chaque image
                 # EN: Read face rectangles for each image section
+                orig_dir = canonical_dirs.get(dpath, dpath)
                 for sec in doc.sections:
                     sec_name = sec.name
                     if sec_name.lower() in ("contacts2", "picasa", "encoding"):
@@ -685,11 +734,14 @@ class PicasaFaceManager:
                         continue
 
                     photo_db_idx = path_to_idx.get((dpath.lower(), sec_name.lower()))
-                    full_file_path = os.path.join(dpath, sec_name)
-                    if photo_db_idx is not None and photo_db_idx >= 0:
+                    if photo_db_idx is not None and 0 <= photo_db_idx < len(self.db.index):
+                        canon_fname = self.db.index[photo_db_idx].path or sec_name
+                        full_file_path = os.path.normpath(os.path.join(orig_dir, canon_fname))
                         self._scanned_photo_indices.add(photo_db_idx)
-                    elif not os.path.exists(full_file_path):
-                        continue
+                    else:
+                        full_file_path = os.path.normpath(os.path.join(orig_dir, sec_name))
+                        if not os.path.exists(full_file_path):
+                            continue
 
                     norm_full = os.path.normpath(full_file_path).lower() if full_file_path else ""
 
@@ -703,12 +755,59 @@ class PicasaFaceManager:
                         r64_part, cid_part = p.split(",", 1)
                         cid_clean = cid_part.strip().lower()
 
-                        # FR : Visage sans nom ou non assigné (Ref: CThumbDB::unknownfacealbum)
-                        # EN: Unnamed or unassigned face (Ref: CThumbDB::unknownfacealbum)
-                        if not cid_clean or cid_clean in ("unknown", "unnamed", "0", "ffffffffffffffff"):
+                        # FR : Dans picasa3.exe @ 0x00484AE5..0x00484BE3 (WriteFacesToIni) :
+                        # - Si personalbumid == 0 et IsFaceIgnored(rec) != 0 (]ignoreface), picasa3.exe écrit
+                        #   `push -1; push -1; call 0x00413630` -> `rect64(...),ffffffffffffffff` dans .picasa.ini.
+                        # - Si personalbumid == 0 et IsFaceIgnored(rec) == 0 (visage sans nom), picasa3.exe NE l'écrit PAS
+                        #   dans .picasa.ini (`je 0x00484be3`).
+                        # EN: In picasa3.exe @ 0x00484AE5..0x00484BE3 (WriteFacesToIni):
+                        # - When personalbumid == 0 and IsFaceIgnored(rec) != 0 (]ignoreface), picasa3.exe writes
+                        #   `rect64(...),ffffffffffffffff` (-1) to .picasa.ini.
+                        # - When personalbumid == 0 and IsFaceIgnored(rec) == 0 (unnamed face), it is NOT written to .picasa.ini.
+                        if cid_clean == "ffffffffffffffff":
+                            fr_ignored = FaceRect.from_rect64(r64_part, contact_id="", contact_name=None)
+                            child_1001 = self._find_matching_1001_child(photo_db_idx, fr_ignored)
+                            eff_idx = child_1001 if child_1001 is not None else photo_db_idx
+                            u_cands_ign: List[int] = []
+                            if eff_idx is not None and eff_idx in unnamed_by_idx:
+                                u_cands_ign.extend(unnamed_by_idx[eff_idx])
+                            if photo_db_idx is not None and photo_db_idx != eff_idx and photo_db_idx in unnamed_by_idx:
+                                u_cands_ign.extend(unnamed_by_idx[photo_db_idx])
+                            if norm_full and norm_full in unnamed_by_path:
+                                u_cands_ign.extend(unnamed_by_path[norm_full])
+                            for pos in u_cands_ign:
+                                if pos not in unnamed_removed and _face_overlap(self.unnamed_faces[pos][2], fr_ignored) >= 0.45:
+                                    unnamed_removed.add(pos)
+                            s_cands_ign: List[Tuple[str, FaceSuggestion]] = []
+                            if eff_idx is not None and eff_idx in sug_by_idx:
+                                s_cands_ign.extend(sug_by_idx[eff_idx])
+                            if photo_db_idx is not None and photo_db_idx != eff_idx and photo_db_idx in sug_by_idx:
+                                s_cands_ign.extend(sug_by_idx[photo_db_idx])
+                            if norm_full and norm_full in sug_by_path:
+                                s_cands_ign.extend(sug_by_path[norm_full])
+                            for _, s_obj in s_cands_ign:
+                                if id(s_obj) not in sug_removed_ids and _face_overlap(s_obj.face_rect, fr_ignored) >= 0.45:
+                                    sug_removed_ids.add(id(s_obj))
+                            continue
+
+                        # FR : Visage sans nom ou non assigné explicite (ex. base de test synthétique sans enregistrements 1001)
+                        # Dans picasa3.exe (@ 0x00484B10..0x00484BE3), les visages sans nom sont portés exclusivement
+                        # par les enregistrements `type == 1001` dans `thumbindex.db` / `imagedata_facerect.pmp` et ne
+                        # sont jamais écrits avec `,0` dans `.picasa.ini`. Si la base possède des enregistrements 1001
+                        # (`self._parent_to_1001` non vide), ignorer toute entrée `,0` orpheline sans enfant `1001`.
+                        # EN: Explicit unnamed or unassigned face (e.g. synthetic test DB without 1001 records).
+                        # In picasa3.exe (@ 0x00484B10..0x00484BE3), unnamed faces live exclusively on `type == 1001`
+                        # records in `thumbindex.db` / `imagedata_facerect.pmp`. When the DB has 1001 records
+                        # (`self._parent_to_1001` non-empty), skip any orphan `,0` entry that has no matching 1001 child.
+                        if not cid_clean or cid_clean in ("unknown", "unnamed", "0"):
                             fr_unnamed = FaceRect.from_rect64(r64_part, contact_id="", contact_name=None)
                             child_1001 = self._find_matching_1001_child(photo_db_idx, fr_unnamed)
+                            if self._parent_to_1001 and child_1001 is None:
+                                continue
                             eff_idx = child_1001 if child_1001 is not None else photo_db_idx
+                            ignored_set = getattr(self, "_ignored_rec_ids", set())
+                            if eff_idx is not None and eff_idx in ignored_set:
+                                continue
                             # FR : Si ce visage est déjà nommé ou suggéré dans la base PMP (via son 1001), ne pas le ré-ajouter en sans-nom
                             # EN: If this face is already named or suggested in the PMP DB (via its 1001 record), do not re-add as unnamed
                             if eff_idx is not None and any(
@@ -751,15 +850,53 @@ class PicasaFaceManager:
                             elif cid_padded in contact_id_to_name:
                                 cid_clean = cid_padded
 
+                        fr = FaceRect.from_rect64(r64_part, contact_id=cid_clean, contact_name=contact_id_to_name.get(cid_clean, cid_clean))
+                        child_1001 = self._find_matching_1001_child(photo_db_idx, fr)
+                        eff_idx = child_1001 if child_1001 is not None else photo_db_idx
+
+                        # FR : Si l'enregistrement 1001 existe déjà dans la base PMP (thumbindex.db) :
+                        # - s'il est marqué ]ignoreface, ne jamais le promouvoir en visage confirmé ;
+                        # - s'il a imagedata_personalbumid == 0 et qu'il s'agit d'une suggestion en attente
+                        #   (imagedata_suggestionpersonalbumid != 0) ou d'un visage sans nom (]unknownface),
+                        #   la base PMP fait foi (Ref: picasa3.exe @ 0x0041A8B0..0x0041AF20) : une ancienne
+                        #   ligne faces= dans .picasa.ini ne doit jamais valider automatiquement une suggestion !
+                        # EN: When the 1001 child record already exists in the PMP database:
+                        # - if marked ]ignoreface, never promote it to a confirmed face;
+                        # - if imagedata_personalbumid == 0 and it is a pending suggestion or ]unknownface,
+                        #   the PMP database is authoritative (Ref: picasa3.exe @ 0x0041A8B0..0x0041AF20):
+                        #   a stale faces= entry in .picasa.ini must never auto-confirm a suggestion!
+                        if child_1001 is not None:
+                            if child_1001 in ignored_set:
+                                continue
+                            pa_val = (
+                                pmp_personalbum.records[child_1001]
+                                if (pmp_personalbum is not None and 0 <= child_1001 < len(pmp_personalbum.records))
+                                else 0
+                            )
+                            sug_val = (
+                                pmp_suggestion.records[child_1001]
+                                if (pmp_suggestion is not None and 0 <= child_1001 < len(pmp_suggestion.records))
+                                else 0
+                            )
+                            if pa_val == 0 and (sug_val != 0 or child_1001 in unknown_rec_ids):
+                                continue
+
+                        # FR : Si l'identifiant de contact est orphelin (absent de contacts.xml, albumdata et [Contacts2])
+                        # et que la base possède des enregistrements 1001, ne pas créer de personne factice "<Personne inconnue>"
+                        # EN: If the contact ID is orphaned (missing from contacts.xml, albumdata, and [Contacts2])
+                        # and the DB has 1001 records, do not create a dummy "<Personne inconnue>" person
+                        if cid_clean not in contact_id_to_name and cid_clean not in self.people:
+                            if self._parent_to_1001:
+                                continue
+
                         cname = contact_id_to_name.get(cid_clean, cid_clean)
+                        if cname.strip().lower() in ("sans nom", "unnamed", "<personne inconnue>", "<unknown person>"):
+                            continue
                         cluster = self.people.get(cid_clean)
                         if not cluster:
                             cluster = PersonCluster(contact_id=cid_clean, name=cname)
                             self.people[cid_clean] = cluster
-
-                        fr = FaceRect.from_rect64(r64_part, contact_id=cid_clean, contact_name=cname)
-                        child_1001 = self._find_matching_1001_child(photo_db_idx, fr)
-                        eff_idx = child_1001 if child_1001 is not None else photo_db_idx
+                        fr.contact_name = cname
 
                         if eff_idx is not None:
                             if eff_idx not in cluster.photo_indices:
@@ -818,7 +955,8 @@ class PicasaFaceManager:
                         if cluster.primary_face_rect is None:
                             cluster.primary_face_rect = fr
 
-                        if full_file_path not in cluster.photo_paths:
+                        norm_target_p = os.path.normcase(os.path.normpath(full_file_path))
+                        if not any(os.path.normcase(os.path.normpath(p)) == norm_target_p for p in cluster.photo_paths):
                             cluster.photo_paths.append(full_file_path)
             except Exception:
                 pass
@@ -1291,12 +1429,24 @@ class PicasaFaceManager:
         is_direct_1001 = False
         if db_idx is not None and db_idx >= 0 and self.db:
             if 0 <= db_idx < len(self.db.index) and getattr(self.db, "is_face_record", lambda i: False)(db_idx):
-                is_direct_1001 = True
-                face_rec_idx = db_idx
                 parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
+                # Ref: picasa3.exe @ 0x0064CE70 - 0x0064D250 (PeoplePanel::BuildFaceCards) :
+                # Lorsque db_idx pointe sur un enregistrement visage enfant 1001 mais que face_rect
+                # désigne une AUTRE personne présente sur la même photo parente, ne jamais réutiliser
+                # la miniature 1001 de db_idx (qui afficherait le même visage plusieurs fois).
+                own_faces = self.photo_to_faces.get(db_idx, [])
+                if face_rect is None or not own_faces or any(
+                    _face_overlap(face_rect, of) >= 0.45 for of in own_faces
+                ):
+                    is_direct_1001 = True
+                    face_rec_idx = db_idx
+                elif parent_photo_idx is not None and parent_photo_idx >= 0:
+                    face_rec_idx = self._find_matching_1001_child(parent_photo_idx, face_rect)
+                    is_direct_1001 = face_rec_idx is not None
             else:
                 parent_photo_idx = db_idx
                 face_rec_idx = self._find_matching_1001_child(db_idx, face_rect)
+                is_direct_1001 = face_rec_idx is not None
 
         # FR : Chemin ultra-rapide O(1) lorsque db_idx est un enregistrement 1001 :
         # lit directement la miniature pré-découpée dans thumbs_0.db / bigthumbs_0.db via QImage.fromData
@@ -1463,39 +1613,105 @@ class PicasaFaceManager:
 
     def cluster_unnamed_faces(
         self,
-        threshold: float = 0.65,
+        threshold: float = 0.85,
         progress_callback: Optional[Callable[[int, int], None]] = None,
         unnamed_subset: Optional[List[Tuple[Optional[int], str, FaceRect]]] = None
     ) -> List[List[Tuple[Optional[int], str, FaceRect]]]:
         """
-        FR : Regroupe les visages sans nom similaires en grappes (`clusters`).
-        Utilise les gabarits faciaux Neven FaceSDK précalculés dans `facetemplatesV2_0.db`
-        et un calcul matriciel vectorisé ultra-rapide (5–20 ms).
-        EN: Group similar unnamed faces into clusters.
-        Uses pre-computed Neven FaceSDK face templates from `facetemplatesV2_0.db`
-        and fast vectorized matrix multiplication (5–20 ms).
-        Ref: picasa3.exe @ unknownfaceheaderpanel/cluster, 0x00881CC0, FRSortThreshold (0x00881CC2)
+        FR : Regroupe les visages sans nom similaires en grappes (`clusters`) selon l'algorithme
+        désassemblé exact `vfr_SowGrowStampClusterer::createClusters` de `Red.dll` + `picasa3.exe` :
+        1. Seuil par défaut `FRSortThreshold = 0x55 = 85` (`0.85`, `picasa3.exe @ 0x0078A220`).
+        2. Découpage par lots de `max_batch = 5000` visages (`int(sqrt(25_000_000))`, `Red.dll @ 0x100A09F0`).
+        3. Contrainte de tampon photo (`image_stamp` à `+0x0C` de `vqc_Cue`, `f_0c = 0.98`, `Red.dll @ 0x1009F180`) :
+           deux visages issus de la même photo ne peuvent pas appartenir à la même grappe (sauf doublon `sim > 0.98`).
+        4. Étape Sow (`Red.dll @ 0x100A6420`) : sélection gloutonne des graines par poids de voisinage
+           `w = max(0, min(sim, 0.98) - thr) / (1 - thr)` avec soustraction à 2 sauts et masquage des voisins directs.
+        5. Étape Grow (`Red.dll @ 0x1009F500`) : croissance par file de priorité (`best_sim >= thr`) sous contrainte
+           de non-collision de `image_stamp` dans chaque grappe.
+        6. Étape d'élagage des graines isolées (`Red.dll @ 0x1009FF50`) : dissolution des graines de taille 1
+           et rattachement éventuel au meilleur groupe voisin valide.
+        7. Tri des grappes multi-visages (`len >= 2`) par taille décroissante (`picasa3.exe @ 0x006C8400`, `0x006C8820`),
+           suivies des visages isolés (`cluster_id == -1`).
+
+        EN: Group similar unnamed faces into clusters using the exact disassembled
+        `vfr_SowGrowStampClusterer::createClusters` algorithm from `Red.dll` + `picasa3.exe`.
+        Ref: picasa3.exe @ 0x006C4A30, 0x006C8400, 0x006C8820, 0x00789C00, 0x0078A220 (FRSortThreshold = 85)
+        Ref: Red.dll @ 0x1009F180, 0x1009F470, 0x1009F500, 0x1009FF50, 0x100A0190, 0x100A09F0, 0x100A6420
         """
-        target_unnamed = unnamed_subset if unnamed_subset is not None else self.unnamed_faces
+        import zlib
+
+        target_unnamed = list(unnamed_subset if unnamed_subset is not None else self.unnamed_faces)
         if not target_unnamed:
             return []
 
-        features: List[Optional[np.ndarray]] = []
         total = len(target_unnamed)
+
+        # FR : Cache intelligent des grappes (Ref: picasa3.exe @ 0x007898B0 SetGrouped, 0x0078A360 RemoveCluster)
+        # Si les grappes ont déjà été calculées et que seuls quelques visages ont été nommés/ignorés,
+        # filtrer les grappes existantes en O(N) au lieu de recalculer la matrice.
+        if unnamed_subset is None:
+            cached_clusters = getattr(self, "_cached_unnamed_clusters", None)
+            cached_th = getattr(self, "_cached_unnamed_threshold", None)
+            cached_total = getattr(self, "_cached_unnamed_total", 0)
+            if (
+                cached_clusters is not None
+                and cached_th == threshold
+                and cached_total >= total
+                and (cached_total - total) <= max(500, cached_total // 5)
+            ):
+                current_keys = {
+                    (db_idx, ppath, round(fr.left, 4), round(fr.top, 4)): (db_idx, ppath, fr)
+                    for db_idx, ppath, fr in target_unnamed
+                }
+                filtered_clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
+                matched_count = 0
+                for c in cached_clusters:
+                    new_c = []
+                    for db_idx, ppath, fr in c:
+                        k = (db_idx, ppath, round(fr.left, 4), round(fr.top, 4))
+                        item = current_keys.pop(k, None)
+                        if item is not None:
+                            new_c.append(item)
+                            matched_count += 1
+                    if new_c:
+                        filtered_clusters.append(new_c)
+                if not current_keys and matched_count == total:
+                    multi_c = [c for c in filtered_clusters if len(c) > 1]
+                    single_c = [c for c in filtered_clusters if len(c) == 1]
+                    multi_c.sort(key=lambda c: len(c), reverse=True)
+                    res = multi_c + single_c
+                    self._cached_unnamed_clusters = res
+                    self._cached_unnamed_total = total
+                    if progress_callback:
+                        try:
+                            progress_callback(total, total)
+                        except Exception:
+                            pass
+                    return res
+
+        features: List[Optional[np.ndarray]] = []
+        stamps: List[int] = []
         has_templates_db = bool(self.db and hasattr(self.db, "get_face_template"))
+        has_cue_db = bool(self.db and hasattr(self.db, "get_face_template_cue"))
 
         for i, (db_idx, ppath, fr) in enumerate(target_unnamed):
             cache_key = (db_idx, round(fr.left, 4), round(fr.top, 4))
             feat = self._face_feature_cache.get(cache_key)
+            img_stamp = 0
+
+            if db_idx is not None and has_cue_db:
+                cue_res = self.db.get_face_template_cue(db_idx)
+                if cue_res is not None:
+                    c_vec, _c_inv, c_stamp = cue_res
+                    img_stamp = int(c_stamp)
+                    if feat is None:
+                        # Note: get_face_template_cue retourne déjà `vals * (inv_norm * sqrt_w)`
+                        feat = c_vec
+                        self._face_feature_cache[cache_key] = feat
 
             if feat is None:
-                # FR : 1. Priorité absolue : gabarit précalculé Neven FaceSDK dans facetemplatesV2_0.db (Ref: 0x00415790, 0x0064D1B6)
-                # EN: 1. Highest priority: pre-computed Neven FaceSDK template in facetemplatesV2_0.db (Ref: 0x00415790, 0x0064D1B6)
                 if db_idx is not None and has_templates_db:
                     feat = self.db.get_face_template(db_idx)
-
-                # FR : 2. Fallback rapide depuis la miniature (uniquement si facetemplatesV2 n'existe pas du tout dans la base)
-                # EN: 2. Fast fallback from thumbnail (only when facetemplatesV2 is absent from the database)
                 if feat is None and not has_templates_db:
                     if db_idx is not None and self.db:
                         raw_thumb = self.db.get_thumbnail(db_idx, size="small")
@@ -1506,61 +1722,381 @@ class PicasaFaceManager:
                                     feat = PicasaFaceDetector.get().compute_face_feature(t_img.crop(box))
                             except Exception:
                                 pass
-
                 if feat is not None:
                     self._face_feature_cache[cache_key] = feat
 
+            # FR : Si le tampon image_stamp de vqc_Cue vaut 0 (ex. gabarit PurePythonRedEngine ou test),
+            # dériver un identifiant de photo parente non nul pour garantir que deux visages d'une même photo
+            # partagent le même tampon (Ref: picasa3.exe @ 0x0047B040, Red.dll @ 0x1009F180).
+            if img_stamp == 0:
+                parent_idx: Optional[int] = None
+                if db_idx is not None and self.db and hasattr(self.db, "get_face_parent_photo_idx"):
+                    parent_idx = self.db.get_face_parent_photo_idx(db_idx)
+                if parent_idx is not None and parent_idx >= 0:
+                    img_stamp = int(parent_idx) + 1
+                elif ppath:
+                    img_stamp = (zlib.crc32(os.path.normpath(ppath).lower().encode("utf-8")) & 0x7FFFFFFF) | 1
+                elif db_idx is not None and db_idx >= 0:
+                    img_stamp = int(db_idx) + 1
+
             features.append(feat)
-            if progress_callback and (i % 100 == 0 or i == total - 1):
+            stamps.append(img_stamp)
+            if progress_callback and (i % 1000 == 0 or i == total - 1):
                 try:
-                    progress_callback(i + 1, total)
+                    progress_callback(max(1, int((i + 1) * 0.20)), total)
                 except Exception:
                     pass
 
-        # FR : Calcul vectorisé matriciel ultra-rapide (O(N) vs O(N^2))
-        # EN: Ultra-fast vectorized matrix similarity calculation (O(N) vs O(N^2))
         valid_indices = [idx for idx, f in enumerate(features) if f is not None]
         if not valid_indices:
             return [[f] for f in target_unnamed]
 
+        n_valid = len(valid_indices)
         mat = np.array([features[idx] for idx in valid_indices], dtype=np.float32)
-        if mat.shape[1] == 2000:
-            # Ref: Red.dll @ 0x10100A10 (vqc_Relator::sim : sim_factor=13.5, sim_delta=-0.45, logistic_map=1)
-            dots = np.dot(mat, mat.T)
-            lin = np.clip(13.5 * dots - 0.45, -30.0, 30.0)
-            sim_mat = 1.0 / (1.0 + np.exp(-lin))
-            effective_threshold = threshold
+        valid_stamps = np.array([stamps[idx] for idx in valid_indices], dtype=np.int64)
+
+        # FR : Préparation des vecteurs pour vqc_Relator::sim (sim_factor=13.5, sim_delta=-0.45, logistic_map=1)
+        # Ref: Red.dll @ 0x10100A10 (vqc_Relator::sim), 0x1009F470 (vfr_SowGrowStampClusterer)
+        is_2000d = (mat.shape[1] == 2000)
+        centered_scale = 1.0
+        if is_2000d:
+            col_mean = mat.mean(axis=0, keepdims=True)
+            cm_norm2 = float(np.dot(col_mean.ravel(), col_mean.ravel()))
+            if cm_norm2 > 0.05 and n_valid >= 64:
+                # FR : Gabarits 2000-D issus de PurePythonRedEngine possédant une moyenne de population non nulle :
+                # centrer par colonne uniquement lorsque l'échantillon est statistiquement significatif (n_valid >= 64),
+                # normaliser L2 et appliquer le facteur d'échelle 0.62 qui aligne la distribution
+                # des produits scalaires centrés sur la courbe logistique de vqc_Relator::sim (seuil 0.85 -> cos >= 0.261).
+                mat_c = mat - col_mean
+                norms_c = np.linalg.norm(mat_c, axis=1, keepdims=True)
+                norms_c[norms_c == 0] = 1.0
+                mat_work = (mat_c / norms_c).astype(np.float32, copy=False)
+                centered_scale = 0.62
+            else:
+                mat_work = mat
+            clamped_t = min(max(float(threshold), 1e-6), 1.0 - 1e-6)
+            dot_thr = float((math.log(clamped_t / (1.0 - clamped_t)) + 0.45) / 13.5)
         else:
             mat_c = mat - mat.mean(axis=1, keepdims=True)
             norms_c = np.linalg.norm(mat_c, axis=1, keepdims=True)
             norms_c[norms_c == 0] = 1.0
-            mat_c = mat_c / norms_c
-            sim_mat = np.dot(mat_c, mat_c.T)
-            # Ref: picasa3.exe @ FRSortThreshold (0x00881CC2) - default 0.28 pour vecteurs centrés / for centered vectors
-            effective_threshold = 0.28 if mat.shape[1] >= 512 else threshold
+            mat_work = (mat_c / norms_c).astype(np.float32, copy=False)
+            clamped_t = min(max(float(threshold), 1e-6), 1.0 - 1e-6)
+            dot_thr = float(0.28 if mat.shape[1] >= 512 else clamped_t)
 
-        visited = [False] * len(valid_indices)
-        clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
+        # FR :Constantes exactes de vfr_SowGrowStampClusterer dans red.cfg Root 5 :
+        # - f_0c = 0.98 (plafond de similarité pour le poids Sow et seuil de fusion même-photo)
+        # - ref14 = 25_000_000 -> max_batch = int(sqrt(25_000_000)) = 5000 (Red.dll @ 0x100A09F0..0x100A0C5C)
+        f_0c = 0.98
+        inv_one_minus_thr = 1.0 / max(1e-6, 1.0 - clamped_t)
+        dot_98 = float((math.log(0.98 / 0.02) + 0.45) / 13.5)
+        max_batch = 5000
 
-        for i in range(len(valid_indices)):
-            if visited[i]:
-                continue
-            curr_cluster = [target_unnamed[valid_indices[i]]]
-            visited[i] = True
-            matches = np.where((~np.array(visited)) & (sim_mat[i] >= effective_threshold))[0]
-            for m in matches:
-                curr_cluster.append(target_unnamed[valid_indices[m]])
-                visited[m] = True
-            clusters.append(curr_cluster)
+        multi_clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
+        single_clusters: List[List[Tuple[Optional[int], str, FaceRect]]] = []
+
+        for b_start in range(0, n_valid, max_batch):
+            b_end = min(b_start + max_batch, n_valid)
+            B = b_end - b_start
+            b_mat = mat_work[b_start:b_end]
+            b_stamps = valid_stamps[b_start:b_end]
+
+            # FR : Étape 1 — Matrice de similarité du lot B x B et graphe clairsemé (Red.dll @ 0x1009F470)
+            dots = np.dot(b_mat, b_mat.T)
+            if centered_scale != 1.0:
+                dots *= centered_scale
+
+            adj_nb: List[np.ndarray] = []
+            adj_sim: List[np.ndarray] = []
+            adj_w: List[np.ndarray] = []
+            node_w = np.zeros(B, dtype=np.float64)
+
+            for i in range(B):
+                row_dots = dots[i]
+                mask = row_dots >= dot_thr
+                mask[i] = False
+                st_i = int(b_stamps[i])
+                if st_i != 0:
+                    # Ref: Red.dll @ 0x1009F180 (canJoinCluster : exclure les visages de la même photo si sim <= f_0c)
+                    same_st = (b_stamps == st_i)
+                    if is_2000d:
+                        same_st &= (row_dots <= dot_98)
+                    mask &= ~same_st
+                nb = np.flatnonzero(mask).astype(np.int32)
+                if nb.size == 0:
+                    adj_nb.append(nb)
+                    adj_sim.append(np.empty(0, dtype=np.float32))
+                    adj_w.append(np.empty(0, dtype=np.float32))
+                else:
+                    d_nb = row_dots[nb].astype(np.float64)
+                    if is_2000d:
+                        s_nb = 1.0 / (1.0 + np.exp(-(13.5 * d_nb - 0.45)))
+                    else:
+                        s_nb = np.clip(d_nb, 0.0, 1.0)
+                    w_nb = np.maximum(0.0, np.minimum(s_nb, f_0c) - clamped_t) * inv_one_minus_thr
+                    adj_nb.append(nb)
+                    adj_sim.append(s_nb.astype(np.float32))
+                    adj_w.append(w_nb.astype(np.float32))
+                    node_w[i] = float(np.sum(w_nb))
+
+            del dots
+
+            # FR : Étape 2 — Sow : sélection des graines et soustraction des poids à 2 sauts (Red.dll @ 0x100A6420)
+            rem_w = node_w.copy()
+            avail = rem_w > 0.0
+            seeds: List[int] = []
+            cluster_of = np.full(B, -1, dtype=np.int32)
+            cluster_stamps: List[Set[int]] = []
+            cluster_members: List[List[int]] = []
+
+            while True:
+                masked_w = np.where(avail, rem_w, -1.0)
+                best_u = int(np.argmax(masked_w))
+                if masked_w[best_u] <= 0.0:
+                    break
+                cid = len(seeds)
+                seeds.append(best_u)
+                cluster_of[best_u] = cid
+                st_u = int(b_stamps[best_u])
+                cluster_stamps.append({st_u} if st_u != 0 else set())
+                cluster_members.append([best_u])
+
+                avail[best_u] = False
+                u_nbs = adj_nb[best_u]
+                u_ws = adj_w[best_u]
+                avail[u_nbs] = False
+
+                for k_idx in range(u_nbs.size):
+                    v = int(u_nbs[k_idx])
+                    rem_w[best_u] -= float(u_ws[k_idx])
+                    v_nbs = adj_nb[v]
+                    v_ws = adj_w[v]
+                    rem_w[v_nbs] -= v_ws
+
+            # FR : Étape 3 — Grow : croissance par meilleur voisin sous contrainte de tampon photo (Red.dll @ 0x1009F500)
+            best_sim_to_seed = np.full(B, -1.0, dtype=np.float32)
+            best_cid_for_node = np.full(B, -1, dtype=np.int32)
+
+            for cid, s in enumerate(seeds):
+                s_nbs = adj_nb[s]
+                s_sims = adj_sim[s]
+                c_stamps = cluster_stamps[cid]
+                for k_idx in range(s_nbs.size):
+                    v = int(s_nbs[k_idx])
+                    if cluster_of[v] != -1:
+                        continue
+                    st_v = int(b_stamps[v])
+                    if st_v != 0 and st_v in c_stamps:
+                        continue
+                    sim_val = float(s_sims[k_idx])
+                    if sim_val > best_sim_to_seed[v]:
+                        best_sim_to_seed[v] = sim_val
+                        best_cid_for_node[v] = cid
+
+            while True:
+                u = int(np.argmax(best_sim_to_seed))
+                best_s = float(best_sim_to_seed[u])
+                if best_s < clamped_t:
+                    break
+                cid = int(best_cid_for_node[u])
+                best_sim_to_seed[u] = -1.0
+                if cluster_of[u] != -1 or cid < 0:
+                    continue
+
+                st_u = int(b_stamps[u])
+                if st_u != 0 and st_u in cluster_stamps[cid]:
+                    # FR : Le tampon de la photo est déjà présent dans la grappe cid -> chercher le meilleur autre groupe valide
+                    u_nbs = adj_nb[u]
+                    u_sims = adj_sim[u]
+                    alt_sim = -1.0
+                    alt_cid = -1
+                    for k_idx in range(u_nbs.size):
+                        nb_node = int(u_nbs[k_idx])
+                        nb_cid = int(cluster_of[nb_node])
+                        if nb_cid >= 0 and nb_cid != cid:
+                            if st_u == 0 or st_u not in cluster_stamps[nb_cid]:
+                                s_val = float(u_sims[k_idx])
+                                if s_val > alt_sim:
+                                    alt_sim = s_val
+                                    alt_cid = nb_cid
+                    if alt_cid >= 0 and alt_sim >= clamped_t:
+                        best_sim_to_seed[u] = alt_sim
+                        best_cid_for_node[u] = alt_cid
+                    continue
+
+                cluster_of[u] = cid
+                cluster_members[cid].append(u)
+                if st_u != 0:
+                    cluster_stamps[cid].add(st_u)
+
+                # FR : Propager depuis u vers ses voisins non encore assignés
+                u_nbs = adj_nb[u]
+                u_sims = adj_sim[u]
+                c_stamps = cluster_stamps[cid]
+                for k_idx in range(u_nbs.size):
+                    v = int(u_nbs[k_idx])
+                    if cluster_of[v] != -1:
+                        continue
+                    st_v = int(b_stamps[v])
+                    if st_v != 0 and st_v in c_stamps:
+                        continue
+                    sim_val = float(u_sims[k_idx])
+                    if sim_val > best_sim_to_seed[v]:
+                        best_sim_to_seed[v] = sim_val
+                        best_cid_for_node[v] = cid
+
+            # FR : Étape 4 — Élagage des graines restées seules (taille 1) et rattachement éventuel (Red.dll @ 0x1009FF50)
+            singleton_seeds: List[int] = []
+            for cid, members in enumerate(cluster_members):
+                if len(members) == 1:
+                    s = members[0]
+                    cluster_of[s] = -1
+                    members.clear()
+                    cluster_stamps[cid].clear()
+                    singleton_seeds.append(s)
+
+            for s in singleton_seeds:
+                s_nbs = adj_nb[s]
+                s_sims = adj_sim[s]
+                st_s = int(b_stamps[s])
+                best_c = -1
+                best_sim_val = clamped_t
+                for k_idx in range(s_nbs.size):
+                    v = int(s_nbs[k_idx])
+                    c_v = int(cluster_of[v])
+                    if c_v >= 0 and len(cluster_members[c_v]) >= 2:
+                        if st_s == 0 or st_s not in cluster_stamps[c_v]:
+                            sv = float(s_sims[k_idx])
+                            if sv >= best_sim_val:
+                                best_sim_val = sv
+                                best_c = c_v
+                if best_c >= 0:
+                    cluster_of[s] = best_c
+                    cluster_members[best_c].append(s)
+                    if st_s != 0:
+                        cluster_stamps[best_c].add(st_s)
+
+            for members in cluster_members:
+                if len(members) >= 2:
+                    multi_clusters.append([target_unnamed[valid_indices[b_start + m]] for m in members])
+
+            for i in range(B):
+                if cluster_of[i] == -1:
+                    single_clusters.append([target_unnamed[valid_indices[b_start + i]]])
+
+            if progress_callback:
+                try:
+                    prog_val = int(total * 0.20 + (b_end / max(1, n_valid)) * (total * 0.80))
+                    progress_callback(min(total, max(1, prog_val)), total)
+                except Exception:
+                    pass
 
         # FR : Ajouter les visages sans signature calculable comme visages isolés
         # EN: Append faces without a computable feature vector as singleton clusters
         for idx, f in enumerate(features):
             if f is None:
-                clusters.append([target_unnamed[idx]])
+                single_clusters.append([target_unnamed[idx]])
 
-        clusters.sort(key=lambda c: len(c), reverse=True)
-        return clusters
+        # Ref: picasa3.exe @ 0x006C8400, 0x006C8820 : les groupes multi-visages d'abord (triés par taille décroissante),
+        # suivis des visages isolés (cluster_id == -1) dans leur ordre d'origine.
+        multi_clusters.sort(key=lambda c: len(c), reverse=True)
+        result = multi_clusters + single_clusters
+
+        if unnamed_subset is None:
+            self._cached_unnamed_clusters = result
+            self._cached_unnamed_threshold = threshold
+            self._cached_unnamed_total = total
+
+        return result
+
+    def ignore_unnamed_faces(self, items: List[Tuple[Optional[int], str, FaceRect]]) -> None:
+        """
+        FR : Marque un ou plusieurs visages sans nom comme ignorés (`]ignoreface`), les retire de
+        `unnamed_faces` et persiste `rect64(...),ffffffffffffffff` dans `.picasa.ini` ainsi que
+        `]ignoreface` dans `wordhash.dat`.
+        EN: Mark one or more unnamed faces as ignored (`]ignoreface`), remove them from
+        `unnamed_faces`, and persist `rect64(...),ffffffffffffffff` in `.picasa.ini` as well as
+        `]ignoreface` in `wordhash.dat`.
+        Ref: picasa3.exe @ 0x00484BD0 (WriteFacesToIni -1), 0x006470D0 (SetFaceIgnored), 0x00786C28 (faceclusterpanel ignore)
+        """
+        if not items:
+            return
+        to_ignore_keys: Set[Tuple[str, float, float]] = set()
+        by_photo: Dict[str, List[FaceRect]] = {}
+        ignored_set = getattr(self, "_ignored_rec_ids", None)
+        if ignored_set is None:
+            ignored_set = set()
+            self._ignored_rec_ids = ignored_set
+
+        for db_idx, ppath, fr in items:
+            if fr is None:
+                continue
+            to_ignore_keys.add((ppath, round(fr.left, 4), round(fr.top, 4)))
+            if ppath:
+                by_photo.setdefault(ppath, []).append(fr)
+
+            eff_idx = db_idx
+            if eff_idx is not None and self.db and not getattr(self.db, "is_face_record", lambda i: False)(eff_idx):
+                child_1001 = self._find_matching_1001_child(eff_idx, fr)
+                if child_1001 is not None:
+                    eff_idx = child_1001
+            if eff_idx is not None and eff_idx >= 0:
+                ignored_set.add(eff_idx)
+                if self.db and getattr(self.db, "wordhash", None) is not None:
+                    with self.db._lock:
+                        if hasattr(self.db.wordhash, "remove_word"):
+                            self.db.wordhash.remove_word("]unknownface", eff_idx)
+                        if hasattr(self.db.wordhash, "add_word"):
+                            self.db.wordhash.add_word("]ignoreface", eff_idx)
+
+        if to_ignore_keys:
+            self.unnamed_faces = [
+                (i, p, f)
+                for (i, p, f) in self.unnamed_faces
+                if (p, round(f.left, 4), round(f.top, 4)) not in to_ignore_keys
+            ]
+            cached = getattr(self, "_cached_unnamed_clusters", None)
+            if cached is not None:
+                new_cached = []
+                for c in cached:
+                    nc = [
+                        (i, p, f)
+                        for (i, p, f) in c
+                        if (p, round(f.left, 4), round(f.top, 4)) not in to_ignore_keys
+                    ]
+                    if nc:
+                        new_cached.append(nc)
+                self._cached_unnamed_clusters = new_cached
+                self._cached_unnamed_total = len(self.unnamed_faces)
+
+        # FR : Persister `rect64(...),ffffffffffffffff` dans .picasa.ini (Ref: picasa3.exe @ 0x00484BD0)
+        if self.db and hasattr(self.db, "update_photo_ini"):
+            for ppath, fr_list in by_photo.items():
+                if not ppath or not os.path.exists(ppath):
+                    continue
+                def _persist_ignored(doc: PicasaIniDocument, section_name: str, rects: List[FaceRect] = fr_list) -> None:
+                    sec = doc.get_or_create_section(section_name)
+                    curr = sec.get("faces") or ""
+                    tokens = [t.strip() for t in curr.split(";") if t.strip()]
+                    for r_ign in rects:
+                        r64 = r_ign.to_rect64()
+                        new_tok = f"{r64},ffffffffffffffff"
+                        replaced = False
+                        for t_idx, tok in enumerate(tokens):
+                            if tok.startswith(r64 + ","):
+                                tokens[t_idx] = new_tok
+                                replaced = True
+                                break
+                        if not replaced:
+                            tokens.append(new_tok)
+                    if tokens:
+                        sec.set("faces", ";".join(tokens))
+                try:
+                    self.db.update_photo_ini(ppath, _persist_ignored, invalidate_albums_starred=False)
+                except TypeError:
+                    self.db.update_photo_ini(ppath, _persist_ignored)
+                except Exception:
+                    pass
 
     def name_cluster(self, cluster: List[Tuple[Optional[int], str, FaceRect]], name: str) -> None:
         """
@@ -1822,7 +2358,11 @@ class PicasaFaceManager:
             if feat is not None and auto_suggest and self.people:
                 self._ensure_person_feature_vectors()
                 detector = PicasaFaceDetector.get()
+                sug_cand_idx = child_idx if child_idx is not None else db_idx
+                rejected_set = getattr(self, "_rejected_suggestions", set())
                 for cluster in self.people.values():
+                    if sug_cand_idx is not None and (sug_cand_idx, cluster.contact_id.lower()) in rejected_set:
+                        continue
                     ref_vecs = cluster.feature_vectors if cluster.feature_vectors else (
                         [cluster.feature_vector] if cluster.feature_vector is not None else []
                     )
@@ -1852,8 +2392,10 @@ class PicasaFaceManager:
                 )
                 self.suggestions.setdefault(matched_cluster.contact_id, []).append(sug)
                 # FR : Persister la suggestion dans imagedata_suggestionpersonalbumid, personalbumrecs et wordhash.dat
+                # Dans picasa3.exe @ 0x0044CD60, tant que personalbumid == 0 (suggestion non confirmée),
+                # l'enregistrement 1001 conserve ]unknownface et reçoit ]facealbum:%d.
                 # EN: Persist suggestion in imagedata_suggestionpersonalbumid, personalbumrecs, and wordhash.dat
-                # Ref: picasa3.exe @ 0x00880B94 (suggestionpersonalbumid), 0x00880BBC (personalbumrecs), 0x008AAD76 (]facealbum:%d)
+                # Ref: picasa3.exe @ 0x0044CD60, 0x00880B94 (suggestionpersonalbumid), 0x00880BBC (personalbumrecs), 0x008AAD76 (]facealbum:%d)
                 if sug_target_idx is not None and sug_target_idx >= 0 and self.db:
                     with self.db._lock:
                         sug_alb_idx = self._get_or_create_person_album_id(matched_cluster.contact_id, matched_cluster.name)
@@ -1878,8 +2420,8 @@ class PicasaFaceManager:
                                 pmp_parecvals.dirty = True
                             if getattr(self.db, "wordhash", None) is not None:
                                 if hasattr(self.db.wordhash, "remove_word"):
-                                    self.db.wordhash.remove_word("]unknownface", sug_target_idx)
                                     self.db.wordhash.remove_word("]ignoreface", sug_target_idx)
+                                self.db.wordhash.add_word("]unknownface", sug_target_idx)
                                 self.db.wordhash.add_word(f"]facealbum:{sug_alb_idx}", sug_target_idx)
             else:
                 df.contact_id = ""
@@ -2302,6 +2844,14 @@ class PicasaFaceManager:
                         old_pa = pmp_pa.records[pa_target_idx]
                         pmp_pa.records[pa_target_idx] = alb_idx
                         pmp_pa.dirty = True
+                        # Ref: picasa3.exe @ 0x0044B112, 0x0044BC83, 0x0044C84A (imagedata_tagdate = VariantTime now)
+                        pmp_td = self.db.pmps.get("imagedata_tagdate")
+                        if pmp_td is not None:
+                            import time
+                            while len(pmp_td.records) <= pa_target_idx:
+                                pmp_td.records.append(0.0)
+                            pmp_td.records[pa_target_idx] = 25569.0 + (time.time() / 86400.0)
+                            pmp_td.dirty = True
                         if getattr(self.db, "wordhash", None) is not None:
                             if hasattr(self.db.wordhash, "remove_word"):
                                 self.db.wordhash.remove_word("]unknownface", pa_target_idx)
@@ -2346,6 +2896,10 @@ class PicasaFaceManager:
                     pass
             if not found:
                 faces.append(FaceItem(rect64=r64_clean, contact_id=contact_id))
+            faces = [
+                f_it for f_it in faces
+                if (f_it.contact_id or "").strip().lower() not in ("", "0", "unknown", "unnamed")
+            ]
 
             doc.set_faces(fname, faces)
             doc.write_file(ini_path)
@@ -2587,6 +3141,11 @@ class PicasaFaceManager:
                     if old_alb and getattr(self.db, "wordhash", None) is not None:
                         if hasattr(self.db.wordhash, "remove_word"):
                             self.db.wordhash.remove_word(f"]facealbum:{old_alb}", face_rec_idx)
+            # Ref: picasa3.exe @ 0x0044B963..0x0044BC83 (imagedata_tagdate = 0.0 when personalbumid cleared)
+            pmp_td = self.db.pmps.get("imagedata_tagdate")
+            if pmp_td is not None and 0 <= face_rec_idx < len(pmp_td.records) and pmp_td.records[face_rec_idx] != 0.0:
+                pmp_td.records[face_rec_idx] = 0.0
+                pmp_td.dirty = True
             if getattr(self.db, "wordhash", None) is not None:
                 if hasattr(self.db.wordhash, "remove_word"):
                     self.db.wordhash.remove_word("]unknownface", face_rec_idx)
@@ -2998,6 +3557,14 @@ class PicasaFaceManager:
                                     if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
                                         self.db.wordhash.remove_word(f"]facealbum:{val}", r_idx)
 
+                # Ref: picasa3.exe @ 0x0044C623..0x0044C84A (imagedata_tagdate = 0.0 when personalbumid cleared)
+                pmp_td = self.db.pmps.get("imagedata_tagdate")
+                if pmp_td is not None:
+                    for r_idx in reset_face_indices:
+                        if 0 <= r_idx < len(pmp_td.records) and pmp_td.records[r_idx] != 0.0:
+                            pmp_td.records[r_idx] = 0.0
+                            pmp_td.dirty = True
+
                 if getattr(self.db, "wordhash", None) is not None:
                     for r_idx in reset_face_indices:
                         if getattr(self.db, "is_face_record", lambda i: False)(r_idx):
@@ -3106,6 +3673,10 @@ class PicasaFaceManager:
                     ef.contact_name = None
 
         eff_idx = face_rec_idx if face_rec_idx is not None else parent_photo_idx
+        if eff_idx is not None and cid:
+            if not hasattr(self, "_rejected_suggestions"):
+                self._rejected_suggestions = set()
+            self._rejected_suggestions.add((eff_idx, cid))
         norm_p = os.path.normpath(suggestion.photo_path).lower() if suggestion.photo_path else ""
         already_unnamed = any(
             (
@@ -3132,6 +3703,45 @@ class PicasaFaceManager:
                                     self.db.wordhash.remove_word(f"]facealbum:{old_sug}", t_idx)
                                 if getattr(self.db, "is_face_record", lambda i: False)(t_idx):
                                     self.db.wordhash.add_word("]unknownface", t_idx)
+
+        # FR : Si .picasa.ini contenait une entrée obsolète faces=rect64(...),cid pour ce visage rejeté, la nettoyer
+        # EN: If .picasa.ini had a stale faces=rect64(...),cid entry for this rejected face, clean it up
+        if suggestion.photo_path and os.path.exists(os.path.dirname(suggestion.photo_path)):
+            try:
+                pdir = os.path.dirname(suggestion.photo_path)
+                pfname = os.path.basename(suggestion.photo_path)
+                ini_p = os.path.join(pdir, ".picasa.ini")
+                if os.path.exists(ini_p):
+                    doc = PicasaIniParser.parse_file(ini_p)
+                    sec = doc.get_section(pfname)
+                    if sec is not None:
+                        faces_str = sec.get("faces")
+                        if faces_str:
+                            kept_parts: List[str] = []
+                            changed_ini = False
+                            for part in faces_str.split(";"):
+                                part_s = part.strip()
+                                if not part_s or "," not in part_s:
+                                    continue
+                                r_part, c_part = part_s.split(",", 1)
+                                try:
+                                    fr_ini = FaceRect.from_rect64(r_part)
+                                    if _face_overlap(fr_ini, suggestion.face_rect) >= 0.45 and c_part.strip().lower() != "ffffffffffffffff":
+                                        changed_ini = True
+                                        continue
+                                except Exception:
+                                    pass
+                                kept_parts.append(part_s)
+                            if changed_ini:
+                                if kept_parts:
+                                    sec.set("faces", ";".join(kept_parts))
+                                else:
+                                    sec.remove("faces")
+                                doc.write_file(ini_p)
+                                if self.db and hasattr(self.db, "invalidate_ini_cache"):
+                                    self.db.invalidate_ini_cache(ini_p)
+            except Exception:
+                pass
 
         self.notify_people_changed()
 

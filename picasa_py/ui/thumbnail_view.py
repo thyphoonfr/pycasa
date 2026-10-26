@@ -88,6 +88,7 @@ class ThumbnailItem:
     is_synthetic_suggestion: bool = False
     is_person_item: bool = False
     suggestion: Optional[Any] = None
+    cluster_faces: Optional[List[Any]] = None  # Grappe de visages représentée par cette vignette (Ref: 0x0077FBB0, 0x0078A6C0)
 
 
 @dataclass
@@ -364,10 +365,11 @@ class FaceClusterWorker(QThread):
     progress = Signal(int, int)
     finished = Signal(list)
 
-    def __init__(self, face_manager, threshold: float = 0.65, parent: Optional[QObject] = None):
+    def __init__(self, face_manager, threshold: float = 0.85, parent: Optional[QObject] = None):
         """
-        FR: Initialise le worker de regroupement des visages avec le seuil de similarité.
-        EN: Initializes the face clustering worker with the similarity threshold.
+        FR: Initialise le worker de regroupement des visages avec le seuil de similarité (FRSortThreshold = 0x55 = 85 -> 0.85).
+        EN: Initializes the face clustering worker with the similarity threshold (FRSortThreshold = 0x55 = 85 -> 0.85).
+        Ref: picasa3.exe @ 0x0078A220 (FRSortThreshold)
         """
         super().__init__(parent)
         self.face_manager = face_manager
@@ -641,6 +643,10 @@ class PicasaThumbnailView(QWidget):
         self.db = db
         self.items.clear()
         self.sections.clear()
+        self.visible_sections.clear()
+        self.filtered_indices.clear()
+        self._unfiltered_special_sections.clear()
+        self._base_items_count = 0
         self.selected_indices.clear()
         self.anchor_index = None
         self._pixmap_cache.clear()
@@ -768,6 +774,7 @@ class PicasaThumbnailView(QWidget):
             )
             self.sections.append(sec)
 
+        self._base_items_count = len(self.items)
         self._synced_db_len = len(db.index)
         self.filter_by_folder(saved_filter)
         if preserve_view_state:
@@ -853,6 +860,17 @@ class PicasaThumbnailView(QWidget):
                 norm_fp = sec.folder_path.replace("\\", "/").rstrip("/").lower()
                 sec_by_norm_fp[norm_fp] = sec
 
+        # Extraire temporairement toute queue d'éléments synthétiques (Personnes / Sans nom)
+        # afin que les nouveaux éléments de base soient toujours insérés dans la tranche de base
+        # self.items[:self._base_items_count] et que self._base_items_count reste synchronisé.
+        base_slice = self._get_base_items()
+        old_base_cnt = len(base_slice)
+        synthetic_tail: List[ThumbnailItem] = (
+            list(self.items[old_base_cnt:]) if len(self.items) > old_base_cnt else []
+        )
+        if synthetic_tail:
+            del self.items[old_base_cnt:]
+
         added_any = False
         for i in range(self._synced_db_len, new_len):
             entry = db.index[i]
@@ -917,6 +935,43 @@ class PicasaThumbnailView(QWidget):
             else:
                 sec.item_indices.append(item_list_idx)
 
+        new_base_cnt = len(self.items)
+        self._base_items_count = new_base_cnt
+        num_added = new_base_cnt - old_base_cnt
+        if synthetic_tail:
+            self.items.extend(synthetic_tail)
+            if num_added > 0:
+                for sec_s in self.visible_sections:
+                    sec_s.item_indices = [
+                        idx + num_added if idx >= old_base_cnt else idx for idx in sec_s.item_indices
+                    ]
+                    if sec_s.all_person_indices:
+                        sec_s.all_person_indices = [
+                            idx + num_added if idx >= old_base_cnt else idx for idx in sec_s.all_person_indices
+                        ]
+                    if sec_s.suggestion_item_indices:
+                        sec_s.suggestion_item_indices = [
+                            idx + num_added if idx >= old_base_cnt else idx for idx in sec_s.suggestion_item_indices
+                        ]
+                for sec_u in self._unfiltered_special_sections:
+                    sec_u.item_indices = [
+                        idx + num_added if idx >= old_base_cnt else idx for idx in sec_u.item_indices
+                    ]
+                    if sec_u.all_person_indices:
+                        sec_u.all_person_indices = [
+                            idx + num_added if idx >= old_base_cnt else idx for idx in sec_u.all_person_indices
+                        ]
+                    if sec_u.suggestion_item_indices:
+                        sec_u.suggestion_item_indices = [
+                            idx + num_added if idx >= old_base_cnt else idx for idx in sec_u.suggestion_item_indices
+                        ]
+                self.filtered_indices = [
+                    idx + num_added if idx >= old_base_cnt else idx for idx in self.filtered_indices
+                ]
+                self.selected_indices = {
+                    idx + num_added if idx >= old_base_cnt else idx for idx in self.selected_indices
+                }
+
         self._synced_db_len = new_len
         if not added_any:
             return True
@@ -931,6 +986,29 @@ class PicasaThumbnailView(QWidget):
             self._apply_current_filters(reset_scroll=False)
         return True
 
+    def _get_base_items(self) -> List[ThumbnailItem]:
+        """
+        FR: Retourne en O(1) la tranche de base des photos/vidéos réelles sans reconstruire la liste complète.
+        EN: Returns in O(1) the base slice of real photo/video items without rebuilding the full list.
+        """
+        base_cnt = getattr(self, "_base_items_count", None)
+        if base_cnt is not None and 0 <= base_cnt <= len(self.items):
+            if base_cnt == 0 or (
+                not getattr(self.items[base_cnt - 1], "is_synthetic_unnamed", False)
+                and not getattr(self.items[base_cnt - 1], "is_person_item", False)
+            ):
+                if base_cnt == len(self.items) or (
+                    getattr(self.items[base_cnt], "is_synthetic_unnamed", False)
+                    or getattr(self.items[base_cnt], "is_person_item", False)
+                ):
+                    return self.items[:base_cnt]
+        base = [
+            it for it in self.items
+            if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)
+        ]
+        self._base_items_count = len(base)
+        return base
+
     def filter_by_folder(self, folder_path: Optional[str]) -> None:
         """
         FR: Filtre les vignettes par dossier spécifique, ou affiche l'ensemble
@@ -939,7 +1017,10 @@ class PicasaThumbnailView(QWidget):
         continuous scrolling stream if None (authentic Picasa 3 behavior).
         """
         if folder_path is None or (not folder_path.startswith("person:") and folder_path != "unnamed_faces"):
-            self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)]
+            base_slice = self._get_base_items()
+            base_cnt = len(base_slice)
+            if len(self.items) > base_cnt:
+                del self.items[base_cnt:]
         self.current_folder_filter = folder_path
         self._apply_current_filters()
 
@@ -1107,7 +1188,10 @@ class PicasaThumbnailView(QWidget):
                     continue
 
             filtered_sec_indices = []
+            items_len = len(self.items)
             for idx in sec.item_indices:
+                if idx < 0 or idx >= items_len:
+                    continue
                 item = self.items[idx]
                 # Ref: picasa3.exe @ 0x00660C80 - 0x00660E2E (Exclut ]hidden lorsque ShowHidden == 0)
                 if not self.show_hidden and getattr(item, "hidden", False):
@@ -1152,6 +1236,17 @@ class PicasaThumbnailView(QWidget):
                 new_visible_sections.append(display_sec)
                 self.filtered_indices.extend(filtered_sec_indices)
 
+        # Mémoriser la section visible en haut de l'écran avant recalcul afin de stabiliser
+        # la position verticale (scroll_y) si des photos sont ajoutées dans un dossier au-dessus
+        anchor_folder: Optional[str] = None
+        anchor_offset: int = 0
+        if not reset_scroll and self.scroll_y > 0 and self.visible_sections:
+            for old_sec in self.visible_sections:
+                if old_sec.y_start + old_sec.total_height > self.scroll_y:
+                    anchor_folder = old_sec.folder_path
+                    anchor_offset = self.scroll_y - old_sec.y_start
+                    break
+
         self.visible_sections = new_visible_sections
         if reset_scroll:
             self.selected_indices.clear()
@@ -1159,8 +1254,14 @@ class PicasaThumbnailView(QWidget):
             self.scrollbar.set_value(0)
         self._recompute_layout()
         if not reset_scroll and self.scroll_y > 0:
+            target_scroll = self.scroll_y
+            if anchor_folder:
+                for new_sec in self.visible_sections:
+                    if new_sec.folder_path == anchor_folder:
+                        target_scroll = new_sec.y_start + anchor_offset
+                        break
             max_scroll = max(0, self.total_content_height - self.height())
-            clamped_scroll = min(self.scroll_y, max_scroll)
+            clamped_scroll = max(0, min(target_scroll, max_scroll))
             self.scroll_y = clamped_scroll
             self.scrollbar.set_value(clamped_scroll)
         self.update()
@@ -1180,7 +1281,7 @@ class PicasaThumbnailView(QWidget):
 
         # Rétablir l'ensemble des sections visibles pour le flux continu en respectant ShowHidden et les filtres rapides
         if self.current_folder_filter is not None:
-            self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)]
+            self.items = list(self._get_base_items())
             self.current_folder_filter = None
             self._unfiltered_special_sections.clear()
             self._apply_current_filters(reset_scroll=False)
@@ -1216,7 +1317,7 @@ class PicasaThumbnailView(QWidget):
         self.current_folder_filter = f"person:{contact_id}"
 
         # Nettoyer les items spécifiques précédents (personne, suggestions ou sans nom synthétiques)
-        self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False) and not getattr(it, "is_person_item", False)]
+        self.items = list(self._get_base_items())
 
         # 1. Récupérer / créer un item pour chaque enregistrement confirmé associé à cette personne
         person_item_indices: List[int] = []
@@ -1356,30 +1457,33 @@ class PicasaThumbnailView(QWidget):
         """
         self.current_folder_filter = "unnamed_faces"
 
-        # Retirer les items synthétiques précédents
-        self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False)]
+        # Retirer les items synthétiques précédents en O(1) via la tranche de base
+        self.items = list(self._get_base_items())
+        start_idx = len(self.items)
 
-        unnamed_items: List[ThumbnailItem] = []
-        for db_idx, ppath, fr in unnamed_faces:
-            item = ThumbnailItem(
+        unnamed_items = [
+            ThumbnailItem(
                 index=db_idx if db_idx is not None else -1,
                 path=ppath,
-                filename=os.path.basename(ppath) if ppath else "Sans nom",
+                filename=ppath.replace("/", "\\").rsplit("\\", 1)[-1] if ppath else "Sans nom",
                 folder="Sans nom",
                 folder_path="unnamed_faces",
                 face_rect=fr,
                 is_synthetic_unnamed=True,
+                cluster_faces=[(db_idx, ppath, fr)],
             )
-            self.items.append(item)
-            unnamed_items.append(item)
+            for db_idx, ppath, fr in unnamed_faces
+        ]
+        self.items.extend(unnamed_items)
 
         if not grouped:
-            item_indices = [len(self.items) - len(unnamed_items) + i for i in range(len(unnamed_items))]
+            item_indices = list(range(start_idx, start_idx + len(unnamed_items)))
+            # Ref: picasa3.exe @ 0x0074C2F2 (CAlbumLabel::ToggleUnGrouped)
             sec = AlbumSection(
                 name="Visages sans nom",
                 folder_path="unnamed_faces",
-                date_str=f"{len(item_indices)} visage(s) à identifier",
-                item_indices=list(item_indices),
+                date_str=f"{len(item_indices)} visage(s) à identifier — Sélectionnez une personne que vous connaissez et ajoutez un nom.",
+                item_indices=item_indices,
                 is_person=True,
                 is_unnamed=True,
                 face_zoom=True,
@@ -1395,17 +1499,173 @@ class PicasaThumbnailView(QWidget):
             self.update()
             self.selection_changed.emit(list(self.selected_indices))
         else:
-            clusters = self.db.face_manager.cluster_unnamed_faces() if (self.db and getattr(self.db, "face_manager", None)) else [[f] for f in unnamed_faces]
-            self._apply_unnamed_clusters(clusters)
+            self._start_cluster_worker()
+
+    def sync_unnamed_faces_incremental(
+        self,
+        unnamed_faces: List[Tuple[Optional[int], str, Any]],
+    ) -> None:
+        """
+        FR: Synchronise incrémentalement la vue "Visages sans nom" (`faceclusterpanel`)
+            sans effacer la sélection (`self.selected_indices`), sans réinitialiser le défilement (`self.scroll_y`),
+            sans détruire les grappes calculées et sans émettre `selection_changed([])` pendant que
+            l'utilisateur saisit un nom dans le volet Personnes.
+        EN: Incrementally synchronizes the "Unnamed Faces" (`faceclusterpanel`) view
+            without clearing the selection (`self.selected_indices`), without resetting scroll (`self.scroll_y`),
+            without destroying computed clusters, and without emitting `selection_changed([])` while
+            the user is typing a name in the People panel.
+        Ref: picasa3.exe @ 0x00789C00 - 0x00789D50 (faceclusterpanel::UpdateClusters, sauvegarde/restauration sélection @ 0x0078AE90 / 0x007897B0)
+        """
+        if self.current_folder_filter != "unnamed_faces" or not self.visible_sections:
+            self.filter_by_unnamed_faces(unnamed_faces, grouped=False)
+            return
+
+        # Si le regroupement en arrière-plan est en cours, ne pas interrompre le worker
+        if getattr(self, "_cluster_worker", None) is not None and self._cluster_worker.isRunning():
+            return
+
+        sec = self.visible_sections[0]
+        if not sec.is_unnamed:
+            self.filter_by_unnamed_faces(unnamed_faces, grouped=False)
+            return
+
+        def _face_sig(db_idx: Optional[int], ppath: str, fr: Any) -> Tuple[Any, ...]:
+            if db_idx is not None and db_idx >= 0 and self.db and getattr(self.db, "is_face_record", lambda i: False)(db_idx):
+                return ("rec", db_idx)
+            norm_p = ppath.replace("\\", "/").lower() if ppath else ""
+            return (
+                "rect",
+                norm_p,
+                round(getattr(fr, "left", 0.0), 3),
+                round(getattr(fr, "top", 0.0), 3),
+                round(getattr(fr, "right", 0.0), 3),
+                round(getattr(fr, "bottom", 0.0), 3),
+            )
+
+        incoming_by_sig: Dict[Tuple[Any, ...], Tuple[Optional[int], str, Any]] = {}
+        incoming_order: List[Tuple[Any, ...]] = []
+        for entry in unnamed_faces:
+            sig = _face_sig(*entry)
+            if sig not in incoming_by_sig:
+                incoming_by_sig[sig] = entry
+                incoming_order.append(sig)
+
+        # Cas 1 : Mode groupé (`sec.cluster_faces is not None`) — conserver les grappes existantes
+        # et retirer uniquement les visages qui viennent d'être nommés ou ignorés (Ref: 0x00789C09 - 0x00789C30)
+        if sec.cluster_faces is not None:
+            kept_item_indices: List[int] = []
+            multi_cnt = 0
+            multi_faces_cnt = 0
+            all_kept_faces: List[Tuple[Optional[int], str, Any]] = []
+            selection_modified = False
+
+            for item_idx in list(sec.item_indices):
+                if item_idx < 0 or item_idx >= len(self.items):
+                    continue
+                it = self.items[item_idx]
+                c_list = getattr(it, "cluster_faces", None) or [(it.index, it.path, it.face_rect)]
+                rem_c = [f_entry for f_entry in c_list if _face_sig(*f_entry) in incoming_by_sig]
+                if not rem_c:
+                    if item_idx in self.selected_indices:
+                        self.selected_indices.discard(item_idx)
+                        selection_modified = True
+                    continue
+                if len(rem_c) != len(c_list):
+                    db_idx0, ppath0, fr0 = rem_c[0]
+                    it.index = db_idx0 if db_idx0 is not None else -1
+                    it.path = ppath0
+                    it.filename = ppath0.replace("/", "\\").rsplit("\\", 1)[-1] if ppath0 else "Sans nom"
+                    it.face_rect = fr0
+                    it.cluster_faces = rem_c
+                    self._pixmap_cache.pop(item_idx, None)
+                if len(rem_c) > 1:
+                    multi_cnt += 1
+                    multi_faces_cnt += len(rem_c)
+                all_kept_faces.extend(rem_c)
+                kept_item_indices.append(item_idx)
+
+            sec.item_indices = kept_item_indices
+            sec.cluster_faces = all_kept_faces
+            sec.unnamed_faces = all_kept_faces
+            sec.date_str = (
+                f"{multi_cnt} groupe(s) ({multi_faces_cnt} visages) — "
+                "Sélectionnez une personne que vous connaissez et ajoutez un nom, ou cliquez sur \"x\" pour l'ignorer."
+            )
+            self.filtered_indices = list(kept_item_indices)
+            self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+            self._recompute_layout()
+            if self.scroll_y > 0:
+                max_scroll = max(0, self.total_content_height - self.height())
+                self.scroll_y = min(self.scroll_y, max_scroll)
+                self.scrollbar.set_value(self.scroll_y)
+            self.update()
+            if selection_modified:
+                self.selection_changed.emit(list(self.selected_indices))
+            return
+
+        # Cas 2 : Mode non groupé — conserver les items existants à leurs indices (préservant self.selected_indices),
+        # retirer ceux qui ont été nommés/ignorés, et ajouter les nouveaux visages détectés en fin de liste
+        existing_sigs: Set[Tuple[Any, ...]] = set()
+        kept_indices: List[int] = []
+        selection_modified = False
+
+        for item_idx in list(sec.item_indices):
+            if item_idx < 0 or item_idx >= len(self.items):
+                continue
+            it = self.items[item_idx]
+            sig = _face_sig(it.index if it.index >= 0 else None, it.path, it.face_rect)
+            if sig in incoming_by_sig and sig not in existing_sigs:
+                existing_sigs.add(sig)
+                kept_indices.append(item_idx)
+            else:
+                if item_idx in self.selected_indices:
+                    self.selected_indices.discard(item_idx)
+                    selection_modified = True
+
+        for sig in incoming_order:
+            if sig not in existing_sigs:
+                db_idx, ppath, fr = incoming_by_sig[sig]
+                new_item = ThumbnailItem(
+                    index=db_idx if db_idx is not None else -1,
+                    path=ppath,
+                    filename=ppath.replace("/", "\\").rsplit("\\", 1)[-1] if ppath else "Sans nom",
+                    folder="Sans nom",
+                    folder_path="unnamed_faces",
+                    face_rect=fr,
+                    is_synthetic_unnamed=True,
+                    cluster_faces=[(db_idx, ppath, fr)],
+                )
+                self.items.append(new_item)
+                kept_indices.append(len(self.items) - 1)
+                existing_sigs.add(sig)
+
+        sec.item_indices = kept_indices
+        sec.unnamed_faces = list(unnamed_faces)
+        sec.date_str = f"{len(kept_indices)} visage(s) à identifier — Sélectionnez une personne que vous connaissez et ajoutez un nom."
+        self.filtered_indices = list(kept_indices)
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+        self._recompute_layout()
+        if self.scroll_y > 0:
+            max_scroll = max(0, self.total_content_height - self.height())
+            self.scroll_y = min(self.scroll_y, max_scroll)
+            self.scrollbar.set_value(self.scroll_y)
+        self.update()
+        if selection_modified:
+            self.selection_changed.emit(list(self.selected_indices))
 
     def _start_cluster_worker(self) -> None:
         """
         FR: Lance le groupement des visages en arrière-plan (QThread) pour préserver
         une réactivité parfaite de l'interface graphique.
         EN: Starts background face clustering (QThread) to preserve UI responsiveness.
-        Ref: picasa3.exe @ CAlbumLabel::LoadingGrouped (0x00881CC0), AGENTS.md §4 ter
+        Ref: picasa3.exe @ CAlbumLabel::LoadingGrouped (0x0074C2E4, 0x00881CC0), AGENTS.md §4 ter
         """
         if not self.db or not getattr(self.db, "face_manager", None):
+            return
+
+        if len(self.db.face_manager.unnamed_faces) <= 16:
+            clusters = self.db.face_manager.cluster_unnamed_faces()
+            self._apply_unnamed_clusters(clusters)
             return
 
         # Protection essentielle contre les clics répétés (destruction accidentelle du QThread en cours)
@@ -1413,6 +1673,9 @@ class PicasaThumbnailView(QWidget):
             if self._cluster_worker.isRunning():
                 return
 
+        # Ref: picasa3.exe @ 0x0074C2E4 (CAlbumLabel::LoadingGrouped : "Regroupement des visages. Merci de patienter...")
+        if self.visible_sections and self.visible_sections[0].is_unnamed:
+            self.visible_sections[0].date_str = "Regroupement des visages. Merci de patienter..."
         main_win = self.window()
         if hasattr(main_win, "status_bar"):
             main_win.status_bar.showMessage("Regroupement des visages. Merci de patienter...")
@@ -1420,20 +1683,27 @@ class PicasaThumbnailView(QWidget):
         self.setCursor(Qt.CursorShape.WaitCursor)
         worker = FaceClusterWorker(self.db.face_manager, parent=None)
         self._cluster_worker = worker
+        self.update()
 
         def _on_prog(cur, total):
             """
-            FR: Affiche la progression du regroupement des visages dans la barre d'état.
-            EN: Displays face clustering progress in the status bar.
+            FR: Affiche la progression du regroupement des visages dans l'en-tête et la barre d'état.
+            EN: Displays face clustering progress in the section header and status bar.
             """
+            pct = int(cur * 100 / max(1, total))
+            if self.visible_sections and self.visible_sections[0].is_unnamed:
+                self.visible_sections[0].date_str = f"Regroupement des visages. Merci de patienter... ({pct}%)"
+                self.update()
             if hasattr(main_win, "status_bar"):
-                main_win.status_bar.showMessage(f"Regroupement des visages en cours : {cur}/{total}...")
+                main_win.status_bar.showMessage(f"Regroupement des visages en cours : {cur}/{total} ({pct}%)...")
 
         def _on_done(clusters):
             """
             FR: Applique les groupes de visages calculés et restaure le curseur à la fin du thread.
             EN: Applies computed face clusters and restores the cursor when the worker finishes.
             """
+            if getattr(self, "_cluster_worker", None) is worker:
+                self._cluster_worker = None
             self.unsetCursor()
             self._apply_unnamed_clusters(clusters)
             multi_cnt = sum(1 for c in clusters if len(c) > 1)
@@ -1442,8 +1712,6 @@ class PicasaThumbnailView(QWidget):
                     f"Regroupement terminé : {multi_cnt} groupe(s) de visages identifié(s).", 4000
                 )
             worker.wait()
-            if getattr(self, "_cluster_worker", None) is worker:
-                self._cluster_worker = None
 
         worker.progress.connect(_on_prog)
         worker.finished.connect(_on_done)
@@ -1451,90 +1719,73 @@ class PicasaThumbnailView(QWidget):
 
     def _apply_unnamed_clusters(self, clusters: List[List[Tuple[Optional[int], str, Any]]]) -> None:
         """
-        FR: Applique les clusters de visages sans nom dans la vue.
-        Regroupe les visages similaires dans des sections de groupe et réunit les visages
-        isolés non groupés dans une section finale unique.
-        EN: Applies unnamed face clusters to the view.
-        Groups similar faces into cluster sections and gathers isolated faces into a single trailing section.
-        Ref: picasa3.exe @ 0x00CA1278 ("Unnamed people in these groups:"), 0x00CA12A5 (PeoplePanel::UnnamedCluster)
+        FR: Applique les clusters de visages sans nom dans la vue selon l'architecture exacte de `faceclusterpanel` :
+        - Une seule section `unknownfaceheaderpanel` en haut avec le bouton "⊞ Développer les groupes" (`showall`)
+          et le sous-titre `CAlbumLabel::ToggleGrouped` (`0x0074C2D6`).
+        - Dans la grille (`faceclusterpanel` @ `0x00783590`, `0x0077FBB0`, `0x00782C12`), chaque grappe `clusters[i]`
+          est représentée par une tuile unique (pile de cartes empilées avec `clusters[i][0]` en couverture lorsque
+          `len(clusters[i]) > 1`), suivie des visages isolés (`len == 1`).
+        - La liste plate `face_manager.unnamed_faces` est triée par rang de grappe (`0x00789DE2`, `0x0078BB40`)
+          afin que "Développer les groupes" affiche les visages similaires côte à côte.
+        EN: Applies unnamed face clusters to the view following `faceclusterpanel`'s exact architecture.
+        Ref: picasa3.exe @ 0x0074C200 (unknownfaceheaderpanel), 0x0077FBB0, 0x00782C12, 0x00783590, 0x00789C00 (faceclusterpanel)
         """
         self.current_folder_filter = "unnamed_faces"
-        self.items = [it for it in self.items if not getattr(it, "is_synthetic_unnamed", False)]
+        self.items = list(self._get_base_items())
+        start_idx = len(self.items)
 
-        all_cluster_faces = []
+        all_cluster_faces: List[Tuple[Optional[int], str, Any]] = []
+        cluster_items: List[ThumbnailItem] = []
+        multi_cnt = 0
+        multi_faces_cnt = 0
+
         for c in clusters:
+            if not c:
+                continue
             all_cluster_faces.extend(c)
-
-        unnamed_items: List[ThumbnailItem] = []
-        for db_idx, ppath, fr in all_cluster_faces:
-            item = ThumbnailItem(
-                index=db_idx if db_idx is not None else -1,
-                path=ppath,
-                filename=os.path.basename(ppath) if ppath else "Sans nom",
-                folder="Sans nom",
-                folder_path="unnamed_faces",
-                face_rect=fr,
-                is_synthetic_unnamed=True,
+            if len(c) > 1:
+                multi_cnt += 1
+                multi_faces_cnt += len(c)
+            # Ref: picasa3.exe @ 0x0077FBB0 : la tuile du groupe i affiche le 1er visage clusters[i][0]
+            db_idx, ppath, fr = c[0]
+            cluster_items.append(
+                ThumbnailItem(
+                    index=db_idx if db_idx is not None else -1,
+                    path=ppath,
+                    filename=ppath.replace("/", "\\").rsplit("\\", 1)[-1] if ppath else "Sans nom",
+                    folder="Sans nom",
+                    folder_path="unnamed_faces",
+                    face_rect=fr,
+                    is_synthetic_unnamed=True,
+                    cluster_faces=list(c),
+                )
             )
-            self.items.append(item)
-            unnamed_items.append(item)
 
-        self.visible_sections = []
-        self.filtered_indices = []
+        # Ref: picasa3.exe @ 0x00789DE2 - 0x00789E29, 0x0078BB40 : trier la liste plate par rang de grappe
+        if self.db and getattr(self.db, "face_manager", None) and all_cluster_faces:
+            self.db.face_manager.unnamed_faces = list(all_cluster_faces)
 
-        unnamed_map: Dict[Tuple[str, float, float], int] = {}
-        start_idx = len(self.items) - len(unnamed_items)
-        for i, it in enumerate(unnamed_items):
-            if it.face_rect:
-                unnamed_map[(it.path, round(it.face_rect.left, 4), round(it.face_rect.top, 4))] = start_idx + i
+        self.items.extend(cluster_items)
+        item_indices = list(range(start_idx, start_idx + len(cluster_items)))
 
-        multi_clusters = [c for c in clusters if len(c) > 1]
-        single_faces = [c[0] for c in clusters if len(c) == 1]
-
-        # 1. Sections pour chaque groupe de visages similaires
-        for c_idx, cluster in enumerate(multi_clusters):
-            c_indices = []
-            for db_idx, ppath, fr in cluster:
-                k = (ppath, round(fr.left, 4), round(fr.top, 4))
-                if k in unnamed_map:
-                    c_indices.append(unnamed_map[k])
-
-            sec = AlbumSection(
-                name=f"Groupe de visages similaires #{c_idx + 1}",
-                folder_path=f"unnamed_cluster:{c_idx}",
-                date_str=f"{len(c_indices)} visage(s)",
-                item_indices=list(c_indices),
-                is_person=True,
-                is_unnamed=True,
-                face_zoom=True,
-                cluster_faces=cluster,
-                unnamed_faces=cluster,
-            )
-            self.visible_sections.append(sec)
-            self.filtered_indices.extend(c_indices)
-
-        # 2. Section unifiée pour tous les visages isolés (non groupés)
-        if single_faces:
-            s_indices = []
-            for db_idx, ppath, fr in single_faces:
-                k = (ppath, round(fr.left, 4), round(fr.top, 4))
-                if k in unnamed_map:
-                    s_indices.append(unnamed_map[k])
-
-            sec_single = AlbumSection(
-                name="Autres visages (isolés)",
-                folder_path="unnamed_cluster:singles",
-                date_str=f"{len(s_indices)} visage(s)",
-                item_indices=list(s_indices),
-                is_person=True,
-                is_unnamed=True,
-                face_zoom=True,
-                cluster_faces=single_faces,
-                unnamed_faces=single_faces,
-            )
-            self.visible_sections.append(sec_single)
-            self.filtered_indices.extend(s_indices)
-
+        # Ref: picasa3.exe @ 0x0074C2D6 (CAlbumLabel::ToggleGrouped)
+        subtitle = (
+            f"{multi_cnt} groupe(s) ({multi_faces_cnt} visages) — "
+            "Sélectionnez une personne que vous connaissez et ajoutez un nom, ou cliquez sur \"x\" pour l'ignorer."
+        )
+        sec = AlbumSection(
+            name="Visages sans nom",
+            folder_path="unnamed_faces",
+            date_str=subtitle,
+            item_indices=item_indices,
+            is_person=True,
+            is_unnamed=True,
+            face_zoom=True,
+            cluster_faces=all_cluster_faces,
+            unnamed_faces=all_cluster_faces,
+        )
+        self.visible_sections = [sec]
+        self.filtered_indices = list(item_indices)
         self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
         self.selected_indices.clear()
         self.scroll_y = 0
@@ -2000,6 +2251,14 @@ class PicasaThumbnailView(QWidget):
         btn_no = QRect(rect.right() - btn_w - 6, btn_y, btn_w, btn_h)
         return (btn_ok, btn_no)
 
+    def _get_unnamed_ignore_btn_rect(self, rect: QRect) -> QRect:
+        """
+        FR: Retourne le rectangle du bouton '✕' d'ignorance sur une tuile de visage/grappe sans nom.
+        EN: Returns the bounding rectangle of the '✕' ignore button on an unnamed face/cluster tile.
+        Ref: picasa3.exe @ 0x00788BA8 (faceclusterpanel_%d_ignore, globalbuttons/square_close_n)
+        """
+        return QRect(rect.right() - 22, rect.top() + 4, 18, 18)
+
     def _get_cluster_action_btn_rect(self, y: int) -> QRect:
         """
         FR: Retourne le rectangle du bouton d'action principal de regroupement ou de nommage de groupe.
@@ -2042,41 +2301,107 @@ class PicasaThumbnailView(QWidget):
         btn_x = btn_ungroup_x - btn_ign_w - 8
         return QRect(btn_x, y + 7, btn_ign_w, 24)
 
+    def _remove_unnamed_items_in_place(self, removed_item_indices: List[int]) -> None:
+        """
+        FR: Supprime en O(1) une ou plusieurs tuiles de visages/grappes sans nom de la section courante
+        sans relancer le thread de regroupement complet.
+        EN: Removes one or more unnamed face/cluster tiles in O(1) from the current section
+        without re-running the background clustering thread.
+        Ref: picasa3.exe @ 0x0078A360 (faceclusterpanel::RemoveCluster)
+        """
+        removed_set = set(removed_item_indices)
+        if not removed_set:
+            return
+        for sec in self.visible_sections:
+            if sec.is_unnamed:
+                sec.item_indices = [idx for idx in sec.item_indices if idx not in removed_set]
+                if sec.cluster_faces is not None:
+                    multi_cnt = sum(
+                        1
+                        for idx in sec.item_indices
+                        if idx < len(self.items) and len(getattr(self.items[idx], "cluster_faces", None) or ()) > 1
+                    )
+                    multi_faces_cnt = sum(
+                        len(getattr(self.items[idx], "cluster_faces", None) or ())
+                        for idx in sec.item_indices
+                        if idx < len(self.items) and len(getattr(self.items[idx], "cluster_faces", None) or ()) > 1
+                    )
+                    sec.date_str = (
+                        f"{multi_cnt} groupe(s) ({multi_faces_cnt} visages) — "
+                        "Sélectionnez une personne que vous connaissez et ajoutez un nom, ou cliquez sur \"x\" pour l'ignorer."
+                    )
+                else:
+                    sec.date_str = (
+                        f"{len(sec.item_indices)} visage(s) à identifier — "
+                        "Sélectionnez une personne que vous connaissez et ajoutez un nom."
+                    )
+        self.filtered_indices = [idx for idx in self.filtered_indices if idx not in removed_set]
+        self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
+        self.selected_indices.difference_update(removed_set)
+        self._recompute_layout()
+        self.update()
+        self.selection_changed.emit(sorted(self.selected_indices))
+
+    def _ignore_unnamed_items(self, item_indices: List[int]) -> None:
+        """
+        FR: Ignore les visages ou grappes des tuiles spécifiées en les retirant de `unnamed_faces`,
+        en persistant `]ignoreface` dans `wordhash.dat` et `rect64(...),ffffffffffffffff` dans `.picasa.ini`,
+        puis en les retirant de la grille en O(1) (`faceclusterpanel_%d_ignore`).
+        EN: Ignores the faces or clusters of the specified tiles by removing them from `unnamed_faces`,
+        persisting `]ignoreface` in `wordhash.dat` and `rect64(...),ffffffffffffffff` in `.picasa.ini`,
+        and removing them from the grid in O(1) (`faceclusterpanel_%d_ignore`).
+        Ref: picasa3.exe @ 0x00484BD0 (WriteFacesToIni -1), 0x006470D0 (SetFaceIgnored), 0x00786C28 (OnCommand ignore), 0x0078A360 (RemoveCluster)
+        """
+        if not item_indices or not self.db or not getattr(self.db, "face_manager", None):
+            return
+        to_ignore_items: List[Tuple[Optional[int], str, Any]] = []
+        for idx in item_indices:
+            if 0 <= idx < len(self.items):
+                it = self.items[idx]
+                c_faces = getattr(it, "cluster_faces", None)
+                if c_faces:
+                    for db_i, ppath, fr in c_faces:
+                        if fr is not None:
+                            to_ignore_items.append((db_i, ppath, fr))
+                elif it.face_rect is not None:
+                    to_ignore_items.append((it.index if it.index >= 0 else None, it.path, it.face_rect))
+
+        if to_ignore_items:
+            fm = self.db.face_manager
+            if hasattr(fm, "ignore_unnamed_faces"):
+                fm.ignore_unnamed_faces(to_ignore_items)
+            else:
+                to_ignore = {(p, round(f.left, 4), round(f.top, 4)) for (_, p, f) in to_ignore_items if f is not None}
+                fm.unnamed_faces = [
+                    (i, p, f)
+                    for (i, p, f) in fm.unnamed_faces
+                    if (p, round(f.left, 4), round(f.top, 4)) not in to_ignore
+                ]
+
+        self._remove_unnamed_items_in_place(item_indices)
+
     def _handle_unnamed_cluster_action(self, sec: AlbumSection) -> None:
         """
         FR: Déclenche l'action de groupement ou de nommage en masse pour les visages sans nom.
         EN: Triggers the clustering or batch-naming action for unnamed faces.
-        Ref: picasa3.exe @ unknownfaceheaderpanel/cluster, addname
+        Ref: picasa3.exe @ unknownfaceheaderpanel/cluster (0x0074C200), addname (0x00786B50)
         """
         if sec.cluster_faces is not None:
-            from PySide6.QtWidgets import QInputDialog
-            name, ok = QInputDialog.getText(
-                self, "Nommer le groupe de visages",
-                f"Nom de la personne correspondant à ce groupe ({len(sec.cluster_faces)} visages) :"
-            )
-            if ok and name.strip() and self.db and getattr(self.db, "face_manager", None):
-                self.db.face_manager.name_cluster(sec.cluster_faces, name.strip())
-                self._start_cluster_worker()
+            target_indices = sorted(self.selected_indices) if self.selected_indices else (sec.item_indices[:1])
+            if target_indices and target_indices[0] < len(self.items):
+                self._open_name_unnamed_face_dialog(self.items[target_indices[0]], batch_indices=target_indices)
         else:
             self._start_cluster_worker()
 
     def _handle_ignore_cluster_action(self, sec: AlbumSection) -> None:
         """
-        FR: Ignore tous les visages de ce groupe en les retirant des visages sans nom.
-        EN: Ignores all faces in this cluster by removing them from unnamed faces.
-        Ref: picasa3.exe @ unknownfaceheaderpanel/ignore, CThumbDB::ignorefacealbum (0x00c833d2)
+        FR: Ignore les tuiles/groupes sélectionnés (ou le premier groupe) en O(1) sans bloquer l'interface.
+        EN: Ignores the selected tiles/clusters (or the first cluster) in O(1) without blocking the UI.
+        Ref: picasa3.exe @ unknownfaceheaderpanel/ignore, 0x00786C28, 0x0078A360
         """
-        if not sec.cluster_faces or not self.db or not getattr(self.db, "face_manager", None):
-            return
-        to_ignore = set()
-        for db_idx, ppath, fr in sec.cluster_faces:
-            to_ignore.add((ppath, round(fr.left, 4), round(fr.top, 4)))
-
-        self.db.face_manager.unnamed_faces = [
-            (i, p, f) for (i, p, f) in self.db.face_manager.unnamed_faces
-            if (p, round(f.left, 4), round(f.top, 4)) not in to_ignore
-        ]
-        self._start_cluster_worker()
+        target_indices = sorted(self.selected_indices) if self.selected_indices else (sec.item_indices[:1])
+        if target_indices:
+            self._ignore_unnamed_items(target_indices)
 
     def _confirm_single_suggestion(self, sec: AlbumSection, item: ThumbnailItem) -> None:
         """
@@ -2261,7 +2586,7 @@ class PicasaThumbnailView(QWidget):
         if btn_rect.contains(pos):
             paths = [self.items[idx].path for idx in sec.item_indices if idx < len(self.items) and self.items[idx].path]
             self.slideshow_requested.emit(paths)
-        else:
+        elif not (sec.is_unnamed and sec.cluster_faces is None):
             self.selected_indices = set(sec.item_indices)
             if sec.item_indices:
                 self.anchor_index = sec.item_indices[0]
@@ -2317,9 +2642,12 @@ class PicasaThumbnailView(QWidget):
                                     return
                             elif getattr(it, "is_synthetic_unnamed", False):
                                 r = self._get_item_rect(sec, slot_idx)
+                                if self._get_unnamed_ignore_btn_rect(r).contains(pos):
+                                    self._ignore_unnamed_items([it_idx])
+                                    return
                                 caption_rect = QRect(r.x() - 4, r.bottom() + 1, r.width() + 8, 18)
                                 if caption_rect.contains(pos):
-                                    self._open_name_unnamed_face_dialog(it)
+                                    self._open_name_unnamed_face_dialog(it, batch_indices=[it_idx])
                                     return
 
             # 2. Vérifier d'abord le clic sur l'en-tête épinglé en haut (Sticky Header)
@@ -2363,7 +2691,7 @@ class PicasaThumbnailView(QWidget):
                         star_box = QRect(r.right() - 24, r.bottom() - 24, 24, 24)
                         if star_box.contains(pos) and it_idx < len(self.items):
                             target_it = self.items[it_idx]
-                            if target_it.path:
+                            if not getattr(target_it, "is_synthetic_unnamed", False) and target_it.path:
                                 target_it.starred = not target_it.starred
                                 self.star_toggled.emit(target_it.path, target_it.starred)
                                 self.update()
@@ -2500,7 +2828,28 @@ class PicasaThumbnailView(QWidget):
             """
             if self._get_slideshow_btn_rect(hdr_y).contains(pos):
                 return ("slideshow", sec_idx)
-            if not sec.is_person and not sec.is_unnamed:
+            if sec.is_unnamed:
+                if sec.cluster_faces is not None:
+                    if self._get_ungroup_action_btn_rect(hdr_y).contains(pos):
+                        return ("ungroup", sec_idx)
+                    if self._get_cluster_action_btn_rect(hdr_y).contains(pos):
+                        return ("cluster", sec_idx)
+                    if self._get_ignore_action_btn_rect(hdr_y).contains(pos):
+                        return ("ignore", sec_idx)
+                else:
+                    if self._get_cluster_action_btn_rect(hdr_y).contains(pos):
+                        return ("cluster", sec_idx)
+            elif sec.is_person:
+                if self._get_face_zoom_btn_rect(hdr_y).contains(pos):
+                    return ("face_zoom", sec_idx)
+                if self._get_picture_zoom_btn_rect(hdr_y).contains(pos):
+                    return ("picture_zoom", sec_idx)
+                if sec.suggestions:
+                    if self._get_sug_filter_btn_rect(hdr_y).contains(pos):
+                        return ("sug_filter", sec_idx)
+                    if self._get_confirm_sug_btn_rect(hdr_y).contains(pos):
+                        return ("confirm_sug", sec_idx)
+            else:
                 if self._get_collage_btn_rect(hdr_y).contains(pos):
                     return ("collage", sec_idx)
                 if self._get_movie_btn_rect(hdr_y).contains(pos):
@@ -2531,7 +2880,7 @@ class PicasaThumbnailView(QWidget):
             self._hovered_header_btn = hovered
             self.update()
 
-        # Suivi du survol des boutons ✓ et ✕ sur les vignettes de suggestions
+        # Suivi du survol des boutons ✓ et ✕ sur les vignettes de suggestions et visages sans nom
         hovered_sug_btn = None
         cols, _, slot_height, _ = self._get_grid_metrics()
         header_height = 42
@@ -2542,7 +2891,7 @@ class PicasaThumbnailView(QWidget):
             sec_bottom = sec_top + sec.height
             if sec_bottom < 0:
                 continue
-            if getattr(self, "_person_selection_mode", False) or sec.is_person or sec.suggestions:
+            if getattr(self, "_person_selection_mode", False) or sec.is_person or sec.is_unnamed or sec.suggestions:
                 if not (sec_top <= pos.y() <= sec_bottom):
                     continue
                 rel_y = pos.y() - (sec_top + header_height)
@@ -2553,15 +2902,26 @@ class PicasaThumbnailView(QWidget):
                 end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
                 for slot_idx in range(start_slot, end_slot):
                     it_idx = sec.item_indices[slot_idx]
-                    if it_idx < len(self.items) and getattr(self.items[it_idx], "is_synthetic_suggestion", False):
-                        r = self._get_item_rect(sec, slot_idx)
-                        btn_ok, btn_no = self._get_suggestion_item_buttons(r)
-                        if btn_ok.contains(pos):
-                            hovered_sug_btn = (it_idx, "ok")
-                            break
-                        elif btn_no.contains(pos):
-                            hovered_sug_btn = (it_idx, "no")
-                            break
+                    if it_idx < len(self.items):
+                        it = self.items[it_idx]
+                        if getattr(it, "is_synthetic_suggestion", False):
+                            r = self._get_item_rect(sec, slot_idx)
+                            btn_ok, btn_no = self._get_suggestion_item_buttons(r)
+                            if btn_ok.contains(pos):
+                                hovered_sug_btn = (it_idx, "ok")
+                                break
+                            elif btn_no.contains(pos):
+                                hovered_sug_btn = (it_idx, "no")
+                                break
+                        elif getattr(it, "is_synthetic_unnamed", False):
+                            r = self._get_item_rect(sec, slot_idx)
+                            if self._get_unnamed_ignore_btn_rect(r).contains(pos):
+                                hovered_sug_btn = (it_idx, "ignore_unnamed")
+                                break
+                            caption_rect = QRect(r.x() - 4, r.bottom() + 1, r.width() + 8, 18)
+                            if caption_rect.contains(pos):
+                                hovered_sug_btn = (it_idx, "addname_unnamed")
+                                break
             if hovered_sug_btn:
                 break
 
@@ -2569,7 +2929,7 @@ class PicasaThumbnailView(QWidget):
             self._hovered_sug_btn = hovered_sug_btn
             self.update()
 
-        if (hovered and hovered[0] in ("slideshow", "collage", "movie", "star", "save", "header")) or hovered_sug_btn:
+        if hovered or hovered_sug_btn:
             self.setCursor(Qt.CursorShape.PointingHandCursor)
         else:
             self.setCursor(Qt.CursorShape.ArrowCursor)
@@ -2884,11 +3244,16 @@ class PicasaThumbnailView(QWidget):
                 if cluster:
                     self.filter_by_person(cid, cluster.name, cluster.photo_indices, only_suggestions=self.visible_sections[0].only_suggestions)
 
-    def _open_name_unnamed_face_dialog(self, item: ThumbnailItem) -> None:
+    def _open_name_unnamed_face_dialog(
+        self, item: ThumbnailItem, batch_indices: Optional[List[int]] = None
+    ) -> None:
         """
-        FR: Ouvre le dialogue pour nommer, réassigner ou supprimer un visage sans nom.
-        EN: Opens the dialog to name, reassign, or delete an unnamed face.
-        Ref: picasa3.exe @ unknownfaceheaderpanel/addname (0x008A13B8), ignore
+        FR: Ouvre le dialogue pour nommer, réassigner ou supprimer un visage sans nom ou une grappe
+        de visages similaires (`faceclusterpanel_%d_addname`), puis retire la tuile en O(1).
+        EN: Opens the dialog to name, reassign, or delete an unnamed face or cluster (`faceclusterpanel_%d_addname`),
+        then removes the tile in O(1).
+        Ref: picasa3.exe @ 0x00786B50 (OnCommand addname), 0x00788604 (faceclusterpanel_%d_addname),
+             0x0078A360 (RemoveCluster), 0x0078A6C0 (GetSelectedFaces)
         """
         if not item.face_rect or not self.db or not getattr(self.db, "face_manager", None):
             return
@@ -2903,18 +3268,61 @@ class PicasaThumbnailView(QWidget):
             parent=self.window(),
         )
         if dlg.exec():
+            target_indices = batch_indices if batch_indices else []
+            if not target_indices:
+                try:
+                    target_indices = [self.items.index(item)]
+                except ValueError:
+                    target_indices = []
+
+            # Collecter tous les visages représentés par la ou les tuiles (Ref: 0x0078A6C0 GetSelectedFaces)
+            faces_to_process: List[Tuple[Optional[int], str, Any]] = []
+            for idx in target_indices:
+                if 0 <= idx < len(self.items):
+                    it = self.items[idx]
+                    c_faces = getattr(it, "cluster_faces", None)
+                    if c_faces:
+                        faces_to_process.extend(c_faces)
+                    elif it.face_rect is not None:
+                        faces_to_process.append((it.index if it.index >= 0 else None, it.path, it.face_rect))
+            if not faces_to_process:
+                faces_to_process.append((item.index if item.index >= 0 else None, item.path, item.face_rect))
+
+            fm = self.db.face_manager
+            processed_keys: Set[Tuple[str, float, float]] = set()
             if dlg.is_delete_requested():
-                self.db.face_manager.remove_face(
-                    item.path, item.face_rect, db_idx=item.index if item.index >= 0 else None
-                )
+                for db_idx, ppath, fr in faces_to_process:
+                    if fr is not None:
+                        processed_keys.add((ppath, round(fr.left, 4), round(fr.top, 4)))
+                        fm.remove_face(ppath, fr, db_idx=db_idx if (db_idx is not None and db_idx >= 0) else None)
             else:
                 cname = dlg.get_contact_name()
-                if cname:
-                    self.db.face_manager.add_face(
-                        item.path, item.face_rect, cname, db_idx=item.index if item.index >= 0 else None
-                    )
-            unnamed = self.db.face_manager.unnamed_faces
-            self.filter_by_unnamed_faces(unnamed)
+                if not cname:
+                    return
+                for db_idx, ppath, fr in faces_to_process:
+                    if fr is not None:
+                        processed_keys.add((ppath, round(fr.left, 4), round(fr.top, 4)))
+                        fm.add_face(ppath, fr, cname, db_idx=db_idx if (db_idx is not None and db_idx >= 0) else None)
+
+            # Mettre à jour le cache de grappes en place (Ref: 0x0078A360 RemoveCluster)
+            cached = getattr(fm, "_cached_unnamed_clusters", None)
+            if cached is not None and processed_keys:
+                new_cached = []
+                for c in cached:
+                    nc = [
+                        (i, p, f)
+                        for (i, p, f) in c
+                        if (p, round(f.left, 4), round(f.top, 4)) not in processed_keys
+                    ]
+                    if nc:
+                        new_cached.append(nc)
+                fm._cached_unnamed_clusters = new_cached
+                fm._cached_unnamed_total = len(fm.unnamed_faces)
+
+            if target_indices:
+                self._remove_unnamed_items_in_place(target_indices)
+            else:
+                self.filter_by_unnamed_faces(fm.unnamed_faces)
 
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         """
@@ -3237,35 +3645,39 @@ class PicasaThumbnailView(QWidget):
 
         if sec.is_unnamed:
             if sec.cluster_faces is not None:
-                # 1. Bouton "Développer les groupes" (Ref: unknownfaceheaderpanel/showall)
+                # 1. Bouton "Développer les groupes" (Ref: unknownfaceheaderpanel/showall @ 0x0074C28E)
                 btn_ungroup = self._get_ungroup_action_btn_rect(y)
-                painter.setPen(QPen(btn_brd_norm, 1))
-                painter.setBrush(_make_btn_brush(btn_ungroup))
+                hov_ug = (self._hovered_header_btn == ("ungroup", sec_idx))
+                painter.setPen(QPen(accent_col if hov_ug else btn_brd_norm, 1))
+                painter.setBrush(_make_btn_brush(btn_ungroup, hovered=hov_ug))
                 painter.drawRoundedRect(btn_ungroup, 3, 3)
-                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Normal))
+                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold if hov_ug else QFont.Weight.Normal))
                 painter.setPen(btn_txt_norm)
                 painter.drawText(btn_ungroup, Qt.AlignmentFlag.AlignCenter, "⊞ Développer les groupes")
 
-                # 2. Bouton "Ajouter un nom" pour ce groupe (Ref: unknownfaceheaderpanel/addname)
+                # 2. Bouton "Ajouter un nom" pour la sélection / grappe (Ref: unknownfaceheaderpanel/addname)
                 btn_cluster = self._get_cluster_action_btn_rect(y)
+                hov_cl = (self._hovered_header_btn == ("cluster", sec_idx))
                 painter.setPen(QPen(accent_col.darker(120), 1))
-                painter.setBrush(_make_btn_brush(btn_cluster, is_accent=True))
+                painter.setBrush(_make_btn_brush(btn_cluster, hovered=hov_cl, is_accent=True))
                 painter.drawRoundedRect(btn_cluster, 3, 3)
                 painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
                 painter.setPen(QColor("#FFFFFF"))
                 painter.drawText(btn_cluster, Qt.AlignmentFlag.AlignCenter, "➕ Ajouter un nom")
 
-                # 3. Bouton "Ignorer" pour ce groupe (Ref: unknownfaceheaderpanel/ignore)
+                # 3. Bouton "Ignorer" pour la sélection / grappe (Ref: unknownfaceheaderpanel/ignore)
                 btn_ign = self._get_ignore_action_btn_rect(y)
-                painter.setPen(QPen(QColor("#8A4040") if is_dark else QColor("#B08080"), 1))
-                painter.setBrush(QColor("#4A262A") if is_dark else QColor("#FCE8E8"))
+                hov_ig = (self._hovered_header_btn == ("ignore", sec_idx))
+                painter.setPen(QPen(QColor("#C62828") if hov_ig else (QColor("#8A4040") if is_dark else QColor("#B08080")), 1))
+                painter.setBrush(QColor("#6E2C30") if (is_dark and hov_ig) else (QColor("#4A262A") if is_dark else (QColor("#FAD2D2") if hov_ig else QColor("#FCE8E8"))))
                 painter.drawRoundedRect(btn_ign, 3, 3)
-                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Normal))
+                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold if hov_ig else QFont.Weight.Normal))
                 painter.setPen(QColor("#FF9999") if is_dark else QColor("#902020"))
                 painter.drawText(btn_ign, Qt.AlignmentFlag.AlignCenter, "✖ Ignorer")
             else:
-                # Mode non groupé : Bouton "Grouper par visage" (Ref: unknownfaceheaderpanel/cluster)
+                # Mode non groupé : Bouton "Grouper par visage" (Ref: unknownfaceheaderpanel/cluster @ 0x0074C2A6)
                 btn_cluster = self._get_cluster_action_btn_rect(y)
+                hov_cl = (self._hovered_header_btn == ("cluster", sec_idx))
                 is_working = getattr(self, "_cluster_worker", None) is not None and self._cluster_worker.isRunning()
                 if is_working:
                     painter.setPen(QPen(btn_brd_norm, 1))
@@ -3276,7 +3688,7 @@ class PicasaThumbnailView(QWidget):
                     painter.drawText(btn_cluster, Qt.AlignmentFlag.AlignCenter, "⏳ Regroupement...")
                 else:
                     painter.setPen(QPen(accent_col.darker(120), 1))
-                    painter.setBrush(_make_btn_brush(btn_cluster, is_accent=True))
+                    painter.setBrush(_make_btn_brush(btn_cluster, hovered=hov_cl, is_accent=True))
                     painter.drawRoundedRect(btn_cluster, 3, 3)
                     painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
                     painter.setPen(QColor("#FFFFFF"))
@@ -3414,13 +3826,28 @@ class PicasaThumbnailView(QWidget):
         item = self.items[item_idx]
         is_selected = item_idx in self.selected_indices
         is_hovered = (self._hovered_item_idx == item_idx)
+        c_faces = getattr(item, "cluster_faces", None)
+        cluster_count = len(c_faces) if c_faces else 0
+        card_bg = getattr(self.style, "thumb_card_bgcolor", QColor("#FFFFFF"))
+        is_dark = getattr(self.style, "is_dark", False)
+
+        # Ref: picasa3.exe @ 0x00782C12 ([esi + 0x44] = 0x10) : rendu en pile de cartes empilées pour les grappes > 1
+        if cluster_count > 1:
+            back2 = rect.adjusted(5, -5, 5, -5)
+            back1 = rect.adjusted(2, -2, 2, -2)
+            painter.fillRect(back2.adjusted(2, 2, 2, 2), QColor(0, 0, 0, 35))
+            painter.setPen(QPen(QColor("#888888") if is_dark else QColor("#B8B8B8"), 1))
+            painter.setBrush(card_bg.darker(110) if not is_dark else card_bg.lighter(115))
+            painter.drawRect(back2)
+            painter.setBrush(card_bg.darker(104) if not is_dark else card_bg.lighter(108))
+            painter.drawRect(back1)
 
         # Ombre portée
         shadow_rect = rect.adjusted(3, 3, 3, 3)
-        painter.fillRect(shadow_rect, QColor(0, 0, 0, 55 if getattr(self.style, "is_dark", False) else 35))
+        painter.fillRect(shadow_rect, QColor(0, 0, 0, 55 if is_dark else 35))
 
         # Cadre de la photo
-        painter.fillRect(rect, getattr(self.style, "thumb_card_bgcolor", QColor("#FFFFFF")))
+        painter.fillRect(rect, card_bg)
 
         # Image de vignette (cadrage visage ou photo complète)
         is_face_mode = bool(sec and sec.is_person and sec.face_zoom)
@@ -3488,7 +3915,7 @@ class PicasaThumbnailView(QWidget):
             painter.drawRect(rect)
 
         # Étoile dorée Picasa si la photo est favorite (Ref: star=yes, ID_PICTURE_STAR)
-        if item.starred or is_hovered:
+        if not getattr(item, "is_synthetic_unnamed", False) and (item.starred or is_hovered):
             star_box = QRect(rect.right() - 20, rect.bottom() - 20, 18, 18)
             cx, cy = star_box.center().x(), star_box.center().y()
             r_out, r_in = 7.5, 3.2
@@ -3506,6 +3933,30 @@ class PicasaThumbnailView(QWidget):
                 painter.setPen(QPen(QColor(255, 255, 255, 200), 1))
                 painter.setBrush(QColor(0, 0, 0, 70))
                 painter.drawPolygon(QPolygon(pts))
+
+        # Badge de nombre de visages et bouton d'ignorance "✕" sur les tuiles sans nom (faceclusterpanel)
+        # Ref: picasa3.exe @ 0x00782C12 ([esi + 0x44] = 0x10), 0x00788BA8 (faceclusterpanel_%d_ignore)
+        if getattr(item, "is_synthetic_unnamed", False):
+            if cluster_count > 1:
+                cnt_txt = f"👥 {cluster_count}"
+                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
+                bw = max(34, painter.fontMetrics().horizontalAdvance(cnt_txt) + 12)
+                cnt_rect = QRect(rect.left() + 5, rect.top() + 5, bw, 18)
+                painter.setPen(QPen(QColor(255, 255, 255, 180), 1))
+                painter.setBrush(QColor(24, 90, 157, 220))
+                painter.drawRoundedRect(cnt_rect, 4, 4)
+                painter.setPen(QColor("#FFFFFF"))
+                painter.drawText(cnt_rect, Qt.AlignmentFlag.AlignCenter, cnt_txt)
+
+            is_ign_hov = (self._hovered_sug_btn == (item_idx, "ignore_unnamed"))
+            if is_hovered or is_ign_hov or cluster_count > 1:
+                btn_ign = self._get_unnamed_ignore_btn_rect(rect)
+                painter.setPen(QPen(QColor("#FFCDD2") if is_ign_hov else QColor(255, 255, 255, 190), 1))
+                painter.setBrush(QColor("#D32F2F") if is_ign_hov else QColor(0, 0, 0, 145))
+                painter.drawRoundedRect(btn_ign, 3, 3)
+                painter.setFont(QFont("Tahoma", 8, QFont.Weight.Bold))
+                painter.setPen(QColor("#FFFFFF"))
+                painter.drawText(btn_ign, Qt.AlignmentFlag.AlignCenter, "✕")
 
         # Badge vidéo Picasa (Ref: picasa3.exe @ movie badge / DirEntry.IsMovie)
         if item.is_video:
@@ -3556,8 +4007,13 @@ class PicasaThumbnailView(QWidget):
         caption_rect = QRect(rect.x() - 4, rect.bottom() + 2, rect.width() + 8, 14)
         painter.setFont(QFont(self.style.alayout_titleFont, 8, QFont.Weight.Bold if is_selected else QFont.Weight.Normal))
         if getattr(item, "is_synthetic_unnamed", False):
-            painter.setPen(QColor("#63B3ED") if getattr(self.style, "is_dark", False) else QColor("#1F65A6"))
-            painter.drawText(caption_rect, Qt.AlignmentFlag.AlignCenter, "➕ Ajouter un nom")
+            is_add_hov = (self._hovered_sug_btn == (item_idx, "addname_unnamed"))
+            f_add = QFont(self.style.alayout_titleFont, 8, QFont.Weight.Bold if (is_selected or is_add_hov) else QFont.Weight.Normal)
+            f_add.setUnderline(is_add_hov)
+            painter.setFont(f_add)
+            painter.setPen(QColor("#90CDF4") if (is_dark and is_add_hov) else (QColor("#63B3ED") if is_dark else (QColor("#0D47A1") if is_add_hov else QColor("#1F65A6"))))
+            add_lbl = f"➕ Ajouter un nom ({cluster_count})" if cluster_count > 1 else "➕ Ajouter un nom"
+            painter.drawText(caption_rect, Qt.AlignmentFlag.AlignCenter, add_lbl)
         elif getattr(item, "is_synthetic_suggestion", False):
             # Ref: picasa3.exe @ PeoplePanel::SuggestionFmt (0x00CA160C) -> "%s?"
             sug_name = sec.name if (sec and sec.name) else "Suggestion"
@@ -3584,6 +4040,18 @@ class PicasaThumbnailView(QWidget):
 
         if self._in_paint_event:
             if self._paint_sync_decodes >= 6 or (time.perf_counter() - self._paint_start_ts) > 0.0035:
+                self._thumb_worker.schedule(
+                    item_idx,
+                    item.index,
+                    item.path,
+                    is_backup_only=False,
+                    db=self.db,
+                    db_fast=True,
+                    is_face=True,
+                    face_rect=item.face_rect,
+                    contact_id=contact_id,
+                    avatar_size=self.thumb_base_size,
+                )
                 if not self._thumb_flush_timer.isActive():
                     self._thumb_flush_timer.start()
                 return None
@@ -3756,13 +4224,23 @@ class PicasaThumbnailView(QWidget):
         completed = self._thumb_worker.pop_completed()
         if not completed:
             has_unloaded_visible_faces = False
+            cols, _, slot_height, _ = self._get_grid_metrics()
+            header_height = 42
+            viewport_h = self.height()
             for sec in self.visible_sections:
                 if sec.is_person or sec.is_unnamed:
                     sec_top = sec.y_start - self.scroll_y
                     sec_bottom = sec_top + sec.height
-                    if sec_bottom < -20 or sec_top > self.height() + 20:
+                    if sec_bottom < -20 or sec_top > viewport_h + 20:
                         continue
-                    for idx in sec.item_indices:
+                    rel_top = -20 - (sec_top + header_height)
+                    rel_bottom = (viewport_h + 20) - (sec_top + header_height)
+                    first_row = max(0, rel_top // slot_height - 1)
+                    last_row = max(0, rel_bottom // slot_height + 1)
+                    start_slot = first_row * cols
+                    end_slot = min(len(sec.item_indices), (last_row + 1) * cols)
+                    for slot_idx in range(start_slot, end_slot):
+                        idx = sec.item_indices[slot_idx]
                         if 0 <= idx < len(self.items):
                             it = self.items[idx]
                             if (sec.face_zoom and it.face_pixmap is None) or (
@@ -3779,8 +4257,20 @@ class PicasaThumbnailView(QWidget):
                 self._thumb_flush_timer.stop()
             return
         any_updated = False
-        for item_idx, db_idx, qimg, pil_img in completed:
-            if 0 <= item_idx < len(self.items):
+        for queue_key, db_idx, qimg, pil_img in completed:
+            if queue_key < 0:
+                item_idx = -queue_key - 1
+                if 0 <= item_idx < len(self.items):
+                    if qimg.height() != self.thumb_base_size and qimg.height() > 0:
+                        qimg = qimg.scaledToHeight(self.thumb_base_size, Qt.TransformationMode.SmoothTransformation)
+                    pix = QPixmap.fromImage(qimg)
+                    if not pix.isNull():
+                        self.items[item_idx].face_pixmap = pix
+                        for k in [k for k in self._scaled_pixmap_cache if k[0] == queue_key]:
+                            self._scaled_pixmap_cache.pop(k, None)
+                        any_updated = True
+            elif 0 <= queue_key < len(self.items):
+                item_idx = queue_key
                 pix = QPixmap.fromImage(qimg)
                 if not pix.isNull():
                     self._pixmap_cache[item_idx] = pix

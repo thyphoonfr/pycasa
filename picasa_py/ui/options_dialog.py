@@ -675,9 +675,40 @@ class PicasaOptionsDialog(QDialog):
             self.mail_group.button(mail_mode).setChecked(True)
         self.cb_mail_size.setCurrentIndex(self.settings.value("Email/SizeIdx", 2, type=int))
 
-        # FR: Types de fichiers / EN: File types
+        # FR: Types de fichiers (valeurs par défaut exactes de picasa3.exe @ 0x004E04A0..0x004E0780)
+        # EN: File types (exact defaults from picasa3.exe @ 0x004E04A0..0x004E0780)
+        default_ft = {
+            "bmp": True,
+            "gif": False,
+            "png": False,
+            "tga": False,
+            "tiff": True,
+            "webp": True,
+            "psd": True,
+            "raw": True,
+            "movies": True,
+        }
+        pref_key_map = {
+            "bmp": "SupportBMP",
+            "gif": "SupportGIF",
+            "png": "SupportPNG",
+            "tga": "SupportTGA",
+            "tiff": "SupportTIF",
+            "webp": "SupportWEBP",
+            "psd": "SupportPSD",
+            "raw": "SupportRAW",
+            "movies": "SupportMovies",
+        }
         for ext_id, chk in self.ft_checkboxes.items():
-            chk.setChecked(self.settings.value(f"FileTypes/{ext_id}", True, type=bool))
+            def_val = default_ft.get(ext_id, True)
+            raw_ft = self.settings.value(f"FileTypes/{ext_id}", None)
+            if raw_ft is None:
+                pk = pref_key_map.get(ext_id)
+                raw_ft = self.settings.value(pk, None) if pk else None
+            if raw_ft is None:
+                chk.setChecked(def_val)
+            else:
+                chk.setChecked(self.settings.value(f"FileTypes/{ext_id}", def_val, type=bool))
 
         # FR: Diaporama / EN: Slideshow
         self.chk_slideshow_loop.setChecked(self.settings.value("Slideshow/Loop", False, type=bool))
@@ -758,8 +789,22 @@ class PicasaOptionsDialog(QDialog):
         self.settings.setValue("Email/Mailer", data["email_mailer"])
         self.settings.setValue("Email/SizeIdx", data["email_size_idx"])
 
+        pref_key_map = {
+            "bmp": "SupportBMP",
+            "gif": "SupportGIF",
+            "png": "SupportPNG",
+            "tga": "SupportTGA",
+            "tiff": "SupportTIF",
+            "webp": "SupportWEBP",
+            "psd": "SupportPSD",
+            "raw": "SupportRAW",
+            "movies": "SupportMovies",
+        }
         for ext_id, checked in data["file_types"].items():
             self.settings.setValue(f"FileTypes/{ext_id}", checked)
+            pk = pref_key_map.get(ext_id)
+            if pk:
+                self.settings.setValue(pk, 1 if checked else 0)
 
         self.settings.setValue("Slideshow/Loop", data["slideshow_loop"])
         self.settings.setValue("Slideshow/PlayMusic", data["slideshow_music"])

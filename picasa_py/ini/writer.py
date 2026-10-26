@@ -174,10 +174,14 @@ class PicasaIniWriter:
                 kernel32 = ctypes.windll.kernel32
                 if os.path.exists(abs_path):
                     attrs = kernel32.GetFileAttributesW(abs_path)
-                    # FR: Si le fichier a le bit READONLY (0x01), le retirer temporairement
-                    # EN: If the file has the READONLY bit (0x01), clear it temporarily
-                    if attrs != -1 and (attrs & 0x01):
-                        kernel32.SetFileAttributesW(abs_path, attrs & ~0x01)
+                    # FR: Si le fichier a les bits READONLY (0x01), HIDDEN (0x02) ou SYSTEM (0x04),
+                    # les retirer temporairement car MoveFileExW (os.replace) et open("r+b") échouent
+                    # avec PermissionError [WinError 5] sur un fichier caché sous Windows.
+                    # EN: If the file has READONLY (0x01), HIDDEN (0x02), or SYSTEM (0x04) bits,
+                    # clear them temporarily because MoveFileExW (os.replace) and open("r+b") fail
+                    # with PermissionError [WinError 5] on hidden files on Windows.
+                    if attrs != -1 and (attrs & 0x07):
+                        kernel32.SetFileAttributesW(abs_path, attrs & ~0x07)
             except Exception:
                 kernel32 = None
 

@@ -7,11 +7,17 @@ Ref: picasa3.exe @ 0x0087FC90 (SplashThread, runtime\\splashbk.jpg, /nosplash)
 """
 
 import argparse
+import os
 import sys
 from typing import Optional
+
+os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.ffmpeg*=false")
+os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
+os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
+
 from PIL import Image
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QLoggingCategory
 from PySide6.QtGui import QImageReader
 from picasa_py.db.database import PicasaDatabase
 from picasa_py.ui.main_window import PicasaMainWindow
@@ -34,6 +40,7 @@ def run_picasa(
     """
     # Désactiver la limite d'allocation de 256 Mo de Qt pour autoriser les images volumineuses
     QImageReader.setAllocationLimit(0)
+    QLoggingCategory.setFilterRules("qt.multimedia.ffmpeg*=false")
 
     app = QApplication.instance()
     if app is None:

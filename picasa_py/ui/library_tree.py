@@ -15,13 +15,14 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QTreeWidget, QTreeWidgetItem, QHeaderView, QWidget, QVBoxLayout, QLabel
 )
-from PySide6.QtCore import Qt, Signal, QSize, QMimeData, QTimer
-from PySide6.QtGui import QColor, QFont, QIcon, QContextMenuEvent, QDragEnterEvent, QDragMoveEvent, QDropEvent
+from PySide6.QtCore import Qt, Signal, QSize, QMimeData, QTimer, QSignalBlocker
+from PySide6.QtGui import QColor, QFont, QIcon, QContextMenuEvent, QDragEnterEvent, QDragMoveEvent, QDropEvent, QWheelEvent, QMouseEvent
 
 from picasa_py.ui.style import PicasaStyle
 from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.context_menu import PicasaContextMenuBuilder
 from picasa_py.db.database import PicasaDatabase
+from picasa_py.scanner.scanner import BackgroundScanWorker
 
 
 def _norm(path: str) -> str:
@@ -106,6 +107,24 @@ class _PicasaDropTreeWidget(QTreeWidget):
         else:
             event.ignore()
 
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        """
+        FR: Signale l'activité de défilement de l'arborescence afin de suspendre les rafraîchissements de scan concurrents.
+        EN: Signals library tree wheel scrolling activity to defer concurrent background scan UI refreshes.
+        Ref: picasa3.exe @ 0x005D41F4 (CAlbumListUI::UpdateCategory)
+        """
+        BackgroundScanWorker.notify_gui_activity()
+        super().wheelEvent(event)
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """
+        FR: Signale l'interaction souris dans l'arborescence pour éviter toute interruption par un scan en arrière-plan.
+        EN: Signals mouse press interaction in the library tree to avoid interruption by background scanning.
+        Ref: picasa3.exe @ 0x005D41F4 (CAlbumListUI::UpdateCategory)
+        """
+        BackgroundScanWorker.notify_gui_activity()
+        super().mousePressEvent(event)
+
 
 # Ref: constants.ui [Picasa2] alist_*
 class PicasaLibraryTree(QWidget):
@@ -141,6 +160,8 @@ class PicasaLibraryTree(QWidget):
         self.tree.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tree.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tree.verticalScrollBar().setSingleStep(self.style.alist_height)
+        self.tree.verticalScrollBar().valueChanged.connect(lambda _: BackgroundScanWorker.notify_gui_activity())
+        self.tree.verticalScrollBar().sliderPressed.connect(BackgroundScanWorker.notify_gui_activity)
         header = self.tree.header()
         header.setStretchLastSection(True)
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
@@ -460,159 +481,189 @@ class PicasaLibraryTree(QWidget):
         """
         FR: Met à jour dynamiquement la section Dossiers (Folders) dans l'arborescence.
         Supporte la vue à plat (flat) et la vue arborescente hiérarchique (tree).
+        Préserve l'expansion, la sélection et la position de la barre de défilement verticale
+        (mise à jour sur place lorsque la liste des dossiers n'a pas changé de structure).
         EN: Dynamically updates the Folders section in the library tree.
         Supports both flat list mode (flat) and hierarchical folder tree mode (tree).
+        Preserves expansion, selection, and vertical scrollbar position (in-place update when structure matches).
         Ref: picasa3.exe @ 0x005D41F4 (CAlbumListUI::UpdateCategory Folders)
         """
         if not self.cat_folders or not self.db:
             return
 
+        vbar = self.tree.verticalScrollBar()
+        saved_scroll = vbar.value() if vbar is not None else 0
+        was_expanded = self.cat_folders.isExpanded()
         self.tree.setUpdatesEnabled(False)
         try:
-            selected_key = None
-            curr = self.tree.currentItem()
-            if curr:
-                ud = curr.data(0, Qt.ItemDataRole.UserRole)
-                if ud and ud.get("type") == "folder":
-                    selected_key = ud.get("key")
+            with QSignalBlocker(self.tree):
+                selected_key = None
+                curr = self.tree.currentItem()
+                if curr:
+                    ud = curr.data(0, Qt.ItemDataRole.UserRole)
+                    if ud and ud.get("type") == "folder":
+                        selected_key = ud.get("key")
+
+                # Compter par parent_idx entier d'abord O(N), puis normaliser uniquement par dossier unique O(F)
+                ti_folders: Dict[int, str] = {}
+                idx_media_count: Dict[int, int] = {}
+                for i, r in enumerate(self.db.index):
+                    rt = r.type
+                    if rt == 1:
+                        ti_folders[i] = r.path
+                    elif rt in (2, 6, 7, 13, 18, 31, 32):
+                        p_idx = r.parent_idx
+                        idx_media_count[p_idx] = idx_media_count.get(p_idx, 0) + 1
+
+                folder_media_count: Dict[str, int] = {}
+                norm_by_idx: Dict[int, str] = {}
+                for idx, fpath in ti_folders.items():
+                    if fpath:
+                        k = _norm(fpath)
+                        norm_by_idx[idx] = k
+                        c = idx_media_count.get(idx, 0)
+                        if c > 0:
+                            folder_media_count[k] = folder_media_count.get(k, 0) + c
+
+                ad_names = self.db.pmps.get("albumdata_name")
+                ad_cats = self.db.pmps.get("albumdata_category")
+                ad_files = self.db.pmps.get("albumdata_filename")
+
+                folder_items: List[Tuple[str, int, str, str]] = []
+                hidden_folder_items: List[Tuple[str, int, str, str]] = []
+                added_norm_paths: Set[str] = set()
+                hidden_norm_paths: Set[str] = set()
+                db_hidden_folders = getattr(self.db, "_hidden_folders", None)
+                if db_hidden_folders:
+                    for hp in db_hidden_folders:
+                        hidden_norm_paths.add(_norm(hp))
+
+                if ad_names and ad_cats and ad_files:
+                    names = ad_names.records
+                    cats = ad_cats.records
+                    files = ad_files.records
+                    for i in range(len(names)):
+                        fpath = files[i] if i < len(files) else ""
+                        if not fpath:
+                            continue
+                        norm_k = _norm(fpath)
+                        cat_val = cats[i] if i < len(cats) else 2
+                        if cat_val == 7 or norm_k in hidden_norm_paths:
+                            hidden_norm_paths.add(norm_k)
+                            count = folder_media_count.get(norm_k, 0)
+                            if count > 0 and norm_k not in added_norm_paths:
+                                hidden_folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
+                                added_norm_paths.add(norm_k)
+                        elif cat_val == 2:  # FR: Dossier réel visible dans Picasa / EN: Real folder visible in Picasa
+                            count = folder_media_count.get(norm_k, 0)
+                            if count > 0 and norm_k not in added_norm_paths:
+                                folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
+                                added_norm_paths.add(norm_k)
+
+                # FR: Dossiers trouvés dans thumbindex / EN: Folders found in thumbindex
+                for idx, fpath in ti_folders.items():
+                    norm_k = norm_by_idx.get(idx) or _norm(fpath)
+                    if norm_k not in added_norm_paths:
+                        count = folder_media_count.get(norm_k, 0)
+                        if count > 0:
+                            dname = os.path.basename(fpath.rstrip("\\/")) or fpath
+                            if norm_k in hidden_norm_paths:
+                                hidden_folder_items.append((dname, count, fpath, norm_k))
+                            else:
+                                folder_items.append((dname, count, fpath, norm_k))
+                            added_norm_paths.add(norm_k)
+
+                # Synchroniser self.db._hidden_folders avec l'ensemble des dossiers cat==7 détectés
+                if hidden_norm_paths:
+                    if not hasattr(self.db, "_hidden_folders") or not isinstance(self.db._hidden_folders, set):
+                        self.db._hidden_folders = set()
+                    self.db._hidden_folders.update(hidden_norm_paths)
+
+                self._cached_hidden_folder_items = hidden_folder_items
+                self._update_hidden_folders_category()
+
+                sorted_flat = sorted(folder_items, key=lambda x: x[0].lower())
+                # Mise à jour sur place O(F) en mode flat si la liste des dossiers est identique (ex. incrément de compteur pendant le scan)
+                if self.folder_view_mode != "tree" and self.cat_folders.childCount() == len(sorted_flat) and len(sorted_flat) > 0:
+                    same_keys = True
+                    for i, (_, _, _, norm_k) in enumerate(sorted_flat):
+                        ch = self.cat_folders.child(i)
+                        ud = ch.data(0, Qt.ItemDataRole.UserRole) if ch else None
+                        if not ud or _norm(ud.get("key", "")) != norm_k:
+                            same_keys = False
+                            break
+                    if same_keys:
+                        for i, (name, count, fpath, _) in enumerate(sorted_flat):
+                            ch = self.cat_folders.child(i)
+                            lbl = f"{name} ({count})"
+                            if ch.text(0) != lbl:
+                                ch.setText(0, lbl)
+                        return
+
+                if selected_key:
                     self.tree.setCurrentItem(None)
+                # Détacher tous les enfants d'un seul bloc O(1)
+                self.cat_folders.setExpanded(False)
+                self.cat_folders.takeChildren()
 
-            # Détacher tous les enfants d'un seul bloc O(1) (évite les 797 signaux QTreeModel::removeChild de 2,3 s)
-            self.cat_folders.setExpanded(False)
-            self.cat_folders.takeChildren()
+                folder_icon = self.res_mgr.get_icon(150)
+                norm_selected_key = _norm(selected_key) if selected_key else None
+                item_to_reselect = None
+                if self.folder_view_mode == "tree":
+                    # FR: Mode arborescent (ID_VIEW_ALL) : hiérarchie parent -> sous-dossier
+                    # EN: Hierarchical tree mode (ID_VIEW_ALL): parent -> subfolder hierarchy
+                    nodes_by_norm: Dict[str, QTreeWidgetItem] = {}
+                    sorted_by_depth = sorted(folder_items, key=lambda x: (x[3].count("/"), x[0].lower()))
+                    for name, count, fpath, norm_k in sorted_by_depth:
+                        parent_node = self.cat_folders
+                        parent_dir = _norm(os.path.dirname(fpath.rstrip("\\/")))
+                        while parent_dir and "/" in parent_dir:
+                            if parent_dir in nodes_by_norm:
+                                parent_node = nodes_by_norm[parent_dir]
+                                break
+                            next_p = _norm(os.path.dirname(parent_dir))
+                            if next_p == parent_dir:
+                                break
+                            parent_dir = next_p
+                        item = QTreeWidgetItem(parent_node)
+                        item.setText(0, f"{name} ({count})")
+                        item.setIcon(0, folder_icon)
+                        item.setData(0, Qt.ItemDataRole.UserRole, {
+                            "type": "folder",
+                            "key": fpath,
+                            "name": name,
+                        })
+                        item.setExpanded(True)
+                        nodes_by_norm[norm_k] = item
+                        if norm_selected_key and norm_k == norm_selected_key:
+                            item_to_reselect = item
+                else:
+                    # FR: Mode à plat (ID_VIEW_FOLDERS) — insertion groupée addChildren / EN: Flat list mode
+                    flat_items: List[QTreeWidgetItem] = []
+                    for name, count, fpath, norm_k in sorted_flat:
+                        item = QTreeWidgetItem()
+                        item.setText(0, f"{name} ({count})")
+                        item.setIcon(0, folder_icon)
+                        item.setData(0, Qt.ItemDataRole.UserRole, {
+                            "type": "folder",
+                            "key": fpath,
+                            "name": name,
+                        })
+                        flat_items.append(item)
+                        if norm_selected_key and norm_k == norm_selected_key:
+                            item_to_reselect = item
+                    if flat_items:
+                        self.cat_folders.addChildren(flat_items)
 
-            # Compter par parent_idx entier d'abord O(N), puis normaliser uniquement par dossier unique O(F)
-            ti_folders: Dict[int, str] = {}
-            idx_media_count: Dict[int, int] = {}
-            for i, r in enumerate(self.db.index):
-                rt = r.type
-                if rt == 1:
-                    ti_folders[i] = r.path
-                elif rt in (2, 6, 7, 13, 18, 31, 32):
-                    p_idx = r.parent_idx
-                    idx_media_count[p_idx] = idx_media_count.get(p_idx, 0) + 1
-
-            folder_media_count: Dict[str, int] = {}
-            norm_by_idx: Dict[int, str] = {}
-            for idx, fpath in ti_folders.items():
-                if fpath:
-                    k = _norm(fpath)
-                    norm_by_idx[idx] = k
-                    c = idx_media_count.get(idx, 0)
-                    if c > 0:
-                        folder_media_count[k] = folder_media_count.get(k, 0) + c
-
-            ad_names = self.db.pmps.get("albumdata_name")
-            ad_cats = self.db.pmps.get("albumdata_category")
-            ad_files = self.db.pmps.get("albumdata_filename")
-
-            folder_items: List[Tuple[str, int, str, str]] = []
-            hidden_folder_items: List[Tuple[str, int, str, str]] = []
-            added_norm_paths: Set[str] = set()
-            hidden_norm_paths: Set[str] = set()
-            db_hidden_folders = getattr(self.db, "_hidden_folders", None)
-            if db_hidden_folders:
-                for hp in db_hidden_folders:
-                    hidden_norm_paths.add(_norm(hp))
-
-            if ad_names and ad_cats and ad_files:
-                names = ad_names.records
-                cats = ad_cats.records
-                files = ad_files.records
-                for i in range(len(names)):
-                    fpath = files[i] if i < len(files) else ""
-                    if not fpath:
-                        continue
-                    norm_k = _norm(fpath)
-                    cat_val = cats[i] if i < len(cats) else 2
-                    if cat_val == 7 or norm_k in hidden_norm_paths:
-                        hidden_norm_paths.add(norm_k)
-                        count = folder_media_count.get(norm_k, 0)
-                        if count > 0 and norm_k not in added_norm_paths:
-                            hidden_folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
-                            added_norm_paths.add(norm_k)
-                    elif cat_val == 2:  # FR: Dossier réel visible dans Picasa / EN: Real folder visible in Picasa
-                        count = folder_media_count.get(norm_k, 0)
-                        if count > 0 and norm_k not in added_norm_paths:
-                            folder_items.append((names[i] or os.path.basename(fpath.rstrip("\\/")), count, fpath, norm_k))
-                            added_norm_paths.add(norm_k)
-
-            # FR: Dossiers trouvés dans thumbindex / EN: Folders found in thumbindex
-            for idx, fpath in ti_folders.items():
-                norm_k = norm_by_idx.get(idx) or _norm(fpath)
-                if norm_k not in added_norm_paths:
-                    count = folder_media_count.get(norm_k, 0)
-                    if count > 0:
-                        dname = os.path.basename(fpath.rstrip("\\/")) or fpath
-                        if norm_k in hidden_norm_paths:
-                            hidden_folder_items.append((dname, count, fpath, norm_k))
-                        else:
-                            folder_items.append((dname, count, fpath, norm_k))
-                        added_norm_paths.add(norm_k)
-
-            # Synchroniser self.db._hidden_folders avec l'ensemble des dossiers cat==7 détectés
-            if hidden_norm_paths:
-                if not hasattr(self.db, "_hidden_folders") or not isinstance(self.db._hidden_folders, set):
-                    self.db._hidden_folders = set()
-                self.db._hidden_folders.update(hidden_norm_paths)
-
-            self._cached_hidden_folder_items = hidden_folder_items
-            self._update_hidden_folders_category()
-
-            folder_icon = self.res_mgr.get_icon(150)
-            norm_selected_key = _norm(selected_key) if selected_key else None
-            item_to_reselect = None
-            if self.folder_view_mode == "tree":
-                # FR: Mode arborescent (ID_VIEW_ALL) : hiérarchie parent -> sous-dossier
-                # EN: Hierarchical tree mode (ID_VIEW_ALL): parent -> subfolder hierarchy
-                nodes_by_norm: Dict[str, QTreeWidgetItem] = {}
-                sorted_by_depth = sorted(folder_items, key=lambda x: (x[3].count("/"), x[0].lower()))
-                for name, count, fpath, norm_k in sorted_by_depth:
-                    parent_node = self.cat_folders
-                    parent_dir = _norm(os.path.dirname(fpath.rstrip("\\/")))
-                    while parent_dir and "/" in parent_dir:
-                        if parent_dir in nodes_by_norm:
-                            parent_node = nodes_by_norm[parent_dir]
-                            break
-                        next_p = _norm(os.path.dirname(parent_dir))
-                        if next_p == parent_dir:
-                            break
-                        parent_dir = next_p
-                    item = QTreeWidgetItem(parent_node)
-                    item.setText(0, f"{name} ({count})")
-                    item.setIcon(0, folder_icon)
-                    item.setData(0, Qt.ItemDataRole.UserRole, {
-                        "type": "folder",
-                        "key": fpath,
-                        "name": name,
-                    })
-                    item.setExpanded(True)
-                    nodes_by_norm[norm_k] = item
-                    if norm_selected_key and norm_k == norm_selected_key:
-                        item_to_reselect = item
-            else:
-                # FR: Mode à plat (ID_VIEW_FOLDERS) — insertion groupée addChildren / EN: Flat list mode
-                flat_items: List[QTreeWidgetItem] = []
-                for name, count, fpath, norm_k in sorted(folder_items, key=lambda x: x[0].lower()):
-                    item = QTreeWidgetItem()
-                    item.setText(0, f"{name} ({count})")
-                    item.setIcon(0, folder_icon)
-                    item.setData(0, Qt.ItemDataRole.UserRole, {
-                        "type": "folder",
-                        "key": fpath,
-                        "name": name,
-                    })
-                    flat_items.append(item)
-                    if norm_selected_key and norm_k == norm_selected_key:
-                        item_to_reselect = item
-                if flat_items:
-                    self.cat_folders.addChildren(flat_items)
-
-            self.cat_folders.setExpanded(True)
-            if item_to_reselect:
-                self.tree.setCurrentItem(item_to_reselect)
+                self.cat_folders.setExpanded(was_expanded or bool(folder_items))
+                if item_to_reselect:
+                    item_to_reselect.setSelected(True)
+                if vbar is not None and saved_scroll > 0:
+                    vbar.setValue(saved_scroll)
         finally:
             self.tree.setUpdatesEnabled(True)
+            if vbar is not None and saved_scroll > 0:
+                vbar.setValue(saved_scroll)
 
     def refresh_albums(self) -> None:
         """
@@ -623,184 +674,236 @@ class PicasaLibraryTree(QWidget):
         if not self.cat_albums or not self.db:
             return
 
+        vbar = self.tree.verticalScrollBar()
+        saved_scroll = vbar.value() if vbar is not None else 0
+        was_expanded = self.cat_albums.isExpanded()
         self.tree.setUpdatesEnabled(False)
         try:
-            selected_key = None
-            curr = self.tree.currentItem()
-            if curr:
-                ud = curr.data(0, Qt.ItemDataRole.UserRole)
-                if ud and ud.get("type") in ("album", "starred"):
-                    selected_key = ud.get("key")
-                    self.tree.setCurrentItem(None)
+            with QSignalBlocker(self.tree):
+                selected_key = None
+                curr = self.tree.currentItem()
+                if curr:
+                    ud = curr.data(0, Qt.ItemDataRole.UserRole)
+                    if ud and ud.get("type") in ("album", "starred"):
+                        selected_key = ud.get("key")
+                        self.tree.setCurrentItem(None)
 
-            self.cat_albums.setExpanded(False)
-            self.cat_albums.takeChildren()
+                self.cat_albums.setExpanded(False)
+                self.cat_albums.takeChildren()
 
-            # FR: Album virtuel épinglé "Photos favorites" / EN: Sticky virtual album "Starred Photos"
-            # (Ref: picasa3.exe @ CThumbDB::starredphotos, 0x0088F6FC, alist_stickycolor)
-            starred_paths = self.db.get_starred_photo_paths() if hasattr(self.db, "get_starred_photo_paths") else []
-            starred_count = len(starred_paths)
-            count_str = f" ({starred_count})" if starred_count > 0 else " (0)"
-            item_starred = QTreeWidgetItem()
-            item_starred.setText(0, f"Photos favorites{count_str}")
-            item_starred.setIcon(0, self.res_mgr.get_star_icon(18))
-            item_starred.setBackground(0, self.style.alist_stickycolor)
-            item_starred.setForeground(0, self.style.alist_textcolor)
-            item_starred.setData(0, Qt.ItemDataRole.UserRole, {
-                "type": "starred",
-                "key": "special_starred",
-                "name": "Photos favorites",
-                "token": "starred",
-                "photo_paths": starred_paths,
-            })
-            album_children: List[QTreeWidgetItem] = [item_starred]
-            item_to_reselect = None
-            if selected_key == "special_starred":
-                item_to_reselect = item_starred
-
-            albums = self.db.get_all_albums()
-            album_icon = self.res_mgr.get_icon(152)
-
-            for alb in sorted(albums, key=lambda a: a["name"].lower()):
-                count = len(alb.get("photo_paths", []))
-                count_str = f" ({count})" if count > 0 else ""
-                item = QTreeWidgetItem()
-                item.setText(0, f"{alb['name']}{count_str}")
-                item.setIcon(0, album_icon)
-                item.setData(0, Qt.ItemDataRole.UserRole, {
-                    "type": "album",
-                    "key": alb["token"],
-                    "name": alb["name"],
-                    "token": alb["token"],
-                    "photo_paths": alb.get("photo_paths", []),
+                # FR: Album virtuel épinglé "Photos favorites" / EN: Sticky virtual album "Starred Photos"
+                # (Ref: picasa3.exe @ CThumbDB::starredphotos, 0x0088F6FC, alist_stickycolor)
+                starred_paths = self.db.get_starred_photo_paths() if hasattr(self.db, "get_starred_photo_paths") else []
+                starred_count = len(starred_paths)
+                count_str = f" ({starred_count})" if starred_count > 0 else " (0)"
+                item_starred = QTreeWidgetItem()
+                item_starred.setText(0, f"Photos favorites{count_str}")
+                item_starred.setIcon(0, self.res_mgr.get_star_icon(18))
+                item_starred.setBackground(0, self.style.alist_stickycolor)
+                item_starred.setForeground(0, self.style.alist_textcolor)
+                item_starred.setData(0, Qt.ItemDataRole.UserRole, {
+                    "type": "starred",
+                    "key": "special_starred",
+                    "name": "Photos favorites",
+                    "token": "starred",
+                    "photo_paths": starred_paths,
                 })
-                album_children.append(item)
-                if selected_key and (alb["token"] == selected_key or alb["name"] == selected_key):
-                    item_to_reselect = item
+                album_children: List[QTreeWidgetItem] = [item_starred]
+                item_to_reselect = None
+                if selected_key == "special_starred":
+                    item_to_reselect = item_starred
 
-            self.cat_albums.addChildren(album_children)
-            self.cat_albums.setExpanded(True)
-            if item_to_reselect:
-                self.tree.setCurrentItem(item_to_reselect)
+                albums = self.db.get_all_albums()
+                album_icon = self.res_mgr.get_icon(152)
+
+                for alb in sorted(albums, key=lambda a: a["name"].lower()):
+                    count = len(alb.get("photo_paths", []))
+                    count_str = f" ({count})" if count > 0 else ""
+                    item = QTreeWidgetItem()
+                    item.setText(0, f"{alb['name']}{count_str}")
+                    item.setIcon(0, album_icon)
+                    item.setData(0, Qt.ItemDataRole.UserRole, {
+                        "type": "album",
+                        "key": alb["token"],
+                        "name": alb["name"],
+                        "token": alb["token"],
+                        "photo_paths": alb.get("photo_paths", []),
+                    })
+                    album_children.append(item)
+                    if selected_key and (alb["token"] == selected_key or alb["name"] == selected_key):
+                        item_to_reselect = item
+
+                self.cat_albums.addChildren(album_children)
+                self.cat_albums.setExpanded(was_expanded or True)
+                if item_to_reselect:
+                    item_to_reselect.setSelected(True)
+                if vbar is not None and saved_scroll > 0:
+                    vbar.setValue(saved_scroll)
         finally:
             self.tree.setUpdatesEnabled(True)
+            if vbar is not None and saved_scroll > 0:
+                vbar.setValue(saved_scroll)
 
     def refresh_people(self) -> None:
         """
         FR: Met à jour dynamiquement la section Personnes (People) dans l'arborescence.
+        Préserve les nœuds existants sur place lorsque l'ordre des personnes n'a pas changé
+        afin d'éviter tout saut de défilement ou perte de clic pendant la détection de visages.
         EN: Dynamically updates the People section in the library tree.
+        Preserves existing nodes in-place when the person list order is unchanged
+        to avoid any scroll jump or lost click during background face detection.
         Ref: picasa3.exe @ 0x008AAD76, 0x005D41F4 (CAlbumListUI::UpdateCategory People)
         """
         if not self.cat_people or not self.db or not getattr(self.db, "face_manager", None):
             return
 
-        self._avatar_timer.stop()
-        self._pending_tree_avatars.clear()
+        vbar = self.tree.verticalScrollBar()
+        saved_scroll = vbar.value() if vbar is not None else 0
+        was_expanded = self.cat_people.isExpanded()
         self.tree.setUpdatesEnabled(False)
         try:
-            selected_key = None
-            curr = self.tree.currentItem()
-            if curr:
-                ud = curr.data(0, Qt.ItemDataRole.UserRole)
-                if ud and ud.get("type") in ("person", "unnamed_faces"):
-                    selected_key = ud.get("key")
+            with QSignalBlocker(self.tree):
+                selected_key = None
+                curr = self.tree.currentItem()
+                if curr:
+                    ud = curr.data(0, Qt.ItemDataRole.UserRole)
+                    if ud and ud.get("type") in ("person", "unnamed_faces"):
+                        selected_key = ud.get("key")
+
+                people = list(self.db.face_manager.get_people())
+                known_ids = {p.contact_id.lower() for p in people}
+
+                # FR: Inclure également les personnes enregistrées dans contacts.xml même sans photo
+                # EN: Also include people registered in contacts.xml even if they have 0 photos
+                if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
+                    from picasa_py.faces.face_manager import PersonCluster
+                    c_data = self.db.contacts.contacts
+                    c_list = c_data.values() if isinstance(c_data, dict) else c_data
+                    for c in c_list:
+                        cid = (getattr(c, "id", None) or "").strip().lower()
+                        if cid and cid not in known_ids:
+                            cluster = PersonCluster(contact_id=cid, name=getattr(c, "name", "") or cid)
+                            self.db.face_manager.people[cid] = cluster
+                            people.append(cluster)
+                            known_ids.add(cid)
+
+                # FR: Trier : d'abord ceux qui ont des photos (par photo_count décroissant), puis par ordre alphabétique
+                # EN: Sort: first by descending photo_count, then alphabetically by name
+                people_sorted = sorted(people, key=lambda p: (-p.photo_count, p.name.lower()))
+
+                unnamed_list = self.db.face_manager.unnamed_faces if hasattr(self.db.face_manager, "unnamed_faces") else []
+                unnamed_count = len(unnamed_list)
+                unnamed_title = self.res_mgr.get_stringres("CThumbDB::unknownfacealbum", "Sans nom")
+
+                expected_keys: List[str] = []
+                if unnamed_count > 0:
+                    expected_keys.append("unnamed")
+                expected_keys.extend(p.contact_id.lower() for p in people_sorted)
+
+                # Mise à jour sur place O(P) si la liste des nœuds enfants est identique
+                if self.cat_people.childCount() == len(expected_keys) and len(expected_keys) > 0:
+                    same_people_keys = True
+                    for i, exp_k in enumerate(expected_keys):
+                        ch = self.cat_people.child(i)
+                        ud = ch.data(0, Qt.ItemDataRole.UserRole) if ch else None
+                        if not ud or str(ud.get("key", "")).lower() != exp_k:
+                            same_people_keys = False
+                            break
+                    if same_people_keys:
+                        offset = 0
+                        if unnamed_count > 0:
+                            ch_u = self.cat_people.child(0)
+                            u_lbl = f"{unnamed_title} ({unnamed_count})"
+                            if ch_u.text(0) != u_lbl:
+                                ch_u.setText(0, u_lbl)
+                            offset = 1
+                        for j, person in enumerate(people_sorted):
+                            ch_p = self.cat_people.child(offset + j)
+                            p_lbl = f"{person.name} ({person.photo_count})"
+                            if ch_p.text(0) != p_lbl:
+                                ch_p.setText(0, p_lbl)
+                        return
+
+                self._avatar_timer.stop()
+                self._pending_tree_avatars.clear()
+                if selected_key:
                     self.tree.setCurrentItem(None)
 
-            # FR: Détacher tous les enfants en O(1) / EN: Detach all children in O(1)
-            self.cat_people.setExpanded(False)
-            self.cat_people.takeChildren()
+                # FR: Détacher tous les enfants en O(1) / EN: Detach all children in O(1)
+                self.cat_people.setExpanded(False)
+                self.cat_people.takeChildren()
 
-            people = list(self.db.face_manager.get_people())
-            known_ids = {p.contact_id.lower() for p in people}
+                item_to_reselect = None
+                people_children: List[QTreeWidgetItem] = []
 
-            # FR: Inclure également les personnes enregistrées dans contacts.xml même sans photo
-            # EN: Also include people registered in contacts.xml even if they have 0 photos
-            if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
-                from picasa_py.faces.face_manager import PersonCluster
-                c_data = self.db.contacts.contacts
-                c_list = c_data.values() if isinstance(c_data, dict) else c_data
-                for c in c_list:
-                    cid = (getattr(c, "id", None) or "").strip().lower()
-                    if cid and cid not in known_ids:
-                        cluster = PersonCluster(contact_id=cid, name=getattr(c, "name", "") or cid)
-                        self.db.face_manager.people[cid] = cluster
-                        people.append(cluster)
-                        known_ids.add(cid)
+                # FR: Section spéciale épinglée "Sans nom" / EN: Sticky special section "Unnamed"
+                # (Ref: CThumbDB::unknownfacealbum, 0x008AAD76, alist_stickycolor)
+                if unnamed_count > 0:
+                    item_unnamed = QTreeWidgetItem()
+                    item_unnamed.setText(0, f"{unnamed_title} ({unnamed_count})")
+                    item_unnamed.setIcon(0, self.res_mgr.get_icon(159))
+                    item_unnamed.setBackground(0, self.style.alist_stickycolor)
+                    item_unnamed.setForeground(0, self.style.alist_textcolor)
+                    font_u = item_unnamed.font(0)
+                    if font_u.pointSize() <= 0:
+                        font_u.setPointSize(8)
+                    font_u.setItalic(True)
+                    item_unnamed.setFont(0, font_u)
+                    item_unnamed.setData(0, Qt.ItemDataRole.UserRole, {
+                        "type": "unnamed_faces",
+                        "key": "unnamed",
+                        "name": unnamed_title,
+                    })
+                    people_children.append(item_unnamed)
+                    if selected_key == "unnamed":
+                        item_to_reselect = item_unnamed
 
-            # FR: Trier : d'abord ceux qui ont des photos (par photo_count décroissant), puis par ordre alphabétique
-            # EN: Sort: first by descending photo_count, then alphabetically by name
-            people_sorted = sorted(people, key=lambda p: (-p.photo_count, p.name.lower()))
+                fm = self.db.face_manager
+                avatar_cache = getattr(fm, "_avatar_cache", {})
+                default_person_icon = self.res_mgr.get_icon(159)
+                sync_avatar_decodes = 0
 
-            item_to_reselect = None
-            people_children: List[QTreeWidgetItem] = []
-
-            # FR: Section spéciale épinglée "Sans nom" / EN: Sticky special section "Unnamed"
-            # (Ref: CThumbDB::unknownfacealbum, 0x008AAD76, alist_stickycolor)
-            unnamed_list = self.db.face_manager.unnamed_faces if hasattr(self.db.face_manager, "unnamed_faces") else []
-            unnamed_count = len(unnamed_list)
-            if unnamed_count > 0:
-                item_unnamed = QTreeWidgetItem()
-                unnamed_title = self.res_mgr.get_stringres("CThumbDB::unknownfacealbum", "Sans nom")
-                item_unnamed.setText(0, f"{unnamed_title} ({unnamed_count})")
-                item_unnamed.setIcon(0, self.res_mgr.get_icon(159))
-                item_unnamed.setBackground(0, self.style.alist_stickycolor)
-                item_unnamed.setForeground(0, self.style.alist_textcolor)
-                font_u = item_unnamed.font(0)
-                if font_u.pointSize() <= 0:
-                    font_u.setPointSize(8)
-                font_u.setItalic(True)
-                item_unnamed.setFont(0, font_u)
-                item_unnamed.setData(0, Qt.ItemDataRole.UserRole, {
-                    "type": "unnamed_faces",
-                    "key": "unnamed",
-                    "name": unnamed_title,
-                })
-                people_children.append(item_unnamed)
-                if selected_key == "unnamed":
-                    item_to_reselect = item_unnamed
-
-            fm = self.db.face_manager
-            avatar_cache = getattr(fm, "_avatar_cache", {})
-            default_person_icon = self.res_mgr.get_icon(159)
-            sync_avatar_decodes = 0
-
-            for person in people_sorted:
-                item = QTreeWidgetItem()
-                item.setText(0, f"{person.name} ({person.photo_count})")
-                cid_low = person.contact_id.lower()
-                cached_av = avatar_cache.get((cid_low, 48, True)) or getattr(person, "_avatar_pixmap", None)
-                if cached_av is not None and not isinstance(cached_av, property) and not cached_av.isNull():
-                    item.setIcon(0, QIcon(cached_av))
-                elif sync_avatar_decodes < 6:
-                    sync_avatar_decodes += 1
-                    avatar = fm.get_person_avatar(
-                        person.contact_id, size=48, allow_disk_fallback=False
-                    )
-                    if avatar and not avatar.isNull():
-                        item.setIcon(0, QIcon(avatar))
+                for person in people_sorted:
+                    item = QTreeWidgetItem()
+                    item.setText(0, f"{person.name} ({person.photo_count})")
+                    cid_low = person.contact_id.lower()
+                    cached_av = avatar_cache.get((cid_low, 48, True)) or getattr(person, "_avatar_pixmap", None)
+                    if cached_av is not None and not isinstance(cached_av, property) and not cached_av.isNull():
+                        item.setIcon(0, QIcon(cached_av))
+                    elif sync_avatar_decodes < 6:
+                        sync_avatar_decodes += 1
+                        avatar = fm.get_person_avatar(
+                            person.contact_id, size=48, allow_disk_fallback=False
+                        )
+                        if avatar and not avatar.isNull():
+                            item.setIcon(0, QIcon(avatar))
+                        else:
+                            item.setIcon(0, default_person_icon)
                     else:
                         item.setIcon(0, default_person_icon)
-                else:
-                    item.setIcon(0, default_person_icon)
-                    if person.photo_count > 0:
-                        self._pending_tree_avatars.append((item, person.contact_id))
+                        if person.photo_count > 0:
+                            self._pending_tree_avatars.append((item, person.contact_id))
 
-                item.setData(0, Qt.ItemDataRole.UserRole, {
-                    "type": "person",
-                    "key": person.contact_id,
-                    "name": person.name,
-                })
-                people_children.append(item)
-                if selected_key and cid_low == selected_key.lower():
-                    item_to_reselect = item
+                    item.setData(0, Qt.ItemDataRole.UserRole, {
+                        "type": "person",
+                        "key": person.contact_id,
+                        "name": person.name,
+                    })
+                    people_children.append(item)
+                    if selected_key and cid_low == selected_key.lower():
+                        item_to_reselect = item
 
-            if people_children:
-                self.cat_people.addChildren(people_children)
-            self.cat_people.setExpanded(True)
-            if item_to_reselect:
-                self.tree.setCurrentItem(item_to_reselect)
+                if people_children:
+                    self.cat_people.addChildren(people_children)
+                self.cat_people.setExpanded(was_expanded or bool(people_children))
+                if item_to_reselect:
+                    item_to_reselect.setSelected(True)
+                if vbar is not None and saved_scroll > 0:
+                    vbar.setValue(saved_scroll)
         finally:
             self.tree.setUpdatesEnabled(True)
+            if vbar is not None and saved_scroll > 0:
+                vbar.setValue(saved_scroll)
 
         if self._pending_tree_avatars:
             self._avatar_timer.start()

@@ -29,6 +29,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, Union
 
+os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.ffmpeg*=false")
+os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
+os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
+
 from PIL import Image, ImageOps, ExifTags
 from PySide6.QtCore import QThread, Signal
 
@@ -105,9 +109,11 @@ def compute_originfast_hash(file_path: Union[str, Path]) -> int:
         return 0
 
 
+# Ref: picasa3.exe @ 0x00D33418 (table d'extensions LookupExtensionType @ 0x00A4C140, type 18 = 0x12)
 RAW_EXTENSIONS = {
-    ".pef", ".cr2", ".nef", ".arw", ".dng", ".orf",
-    ".rw2", ".sr2", ".raf", ".mrw", ".x3f"
+    ".raw", ".crw", ".cr2", ".nef", ".orf", ".dcr", ".mrw", ".pef", ".raf",
+    ".srf", ".dng", ".kdc", ".sr2", ".arw", ".3fr", ".rw2", ".nrw", ".rdc",
+    ".mos", ".erf", ".qtk", ".mdc", ".mef", ".k25", ".dc2", ".x3f", ".srw",
 }
 
 VIDEO_EXTENSIONS = {
@@ -118,12 +124,11 @@ VIDEO_EXTENSIONS = {
 IMAGE_EXTENSIONS = {
     ".jpg", ".jpeg", ".jpe", ".png", ".bmp", ".gif",
     ".tif", ".tiff", ".webp", ".psd",
-    ".pef", ".cr2", ".nef", ".arw", ".dng", ".orf",
-    ".rw2", ".sr2", ".raf", ".mrw", ".x3f",
-}
+} | RAW_EXTENSIONS
 
 SUPPORTED_EXTENSIONS = IMAGE_EXTENSIONS | VIDEO_EXTENSIONS
 
+# Ref: picasa3.exe @ 0x00D33418 (LookupExtensionType @ 0x00A4C140, RegisterExtensions @ 0x004FADB0)
 EXTENSION_TYPE_MAP = {
     ".jpg": 2,
     ".jpeg": 2,
@@ -132,18 +137,8 @@ EXTENSION_TYPE_MAP = {
     ".psd": 7,
     ".tif": 13,
     ".tiff": 13,
-    # FR: Formats RAW appareil photo / EN: Camera RAW formats (type 18 = 0x12, Ref: 0x00412826, 0x00434FB0)
-    ".pef": 18,
-    ".cr2": 18,
-    ".nef": 18,
-    ".arw": 18,
-    ".dng": 18,
-    ".orf": 18,
-    ".rw2": 18,
-    ".sr2": 18,
-    ".raf": 18,
-    ".mrw": 18,
-    ".x3f": 18,
+    # FR: Formats RAW appareil photo / EN: Camera RAW formats (type 18 = 0x12, Ref: 0x00D33418, 0x00412826, 0x00434FB0)
+    **{ext: 18 for ext in RAW_EXTENSIONS},
     ".webp": 31,
     ".png": 31,
     ".gif": 31,
@@ -367,14 +362,73 @@ def wordhash_tokens_for_media(
     return out
 
 
+def compute_thumbnail_avgcolor(img_or_bytes: Union[Image.Image, bytes]) -> Optional[int]:
+    """
+    FR: Calcule la couleur moyenne ARGB 32 bits (`imagedata_avgcolor`) sur tous les pixels
+    `N = width * height` de la miniature 144 px par division entière non signée (`sum_c // N`),
+    conformément à `FUN_009ac640` (`0x009AC640`) appelée en `0x004280C9` :
+    `0xFF000000 | ((sum_R // N) << 16) | ((sum_G // N) << 8) | (sum_B // N)`.
+    EN: Computes the 32-bit ARGB average color (`imagedata_avgcolor`) across all `N = width * height`
+    pixels of the 144 px thumbnail using unsigned integer floor division (`sum_c // N`),
+    matching `FUN_009ac640` (`0x009AC640`) called at `0x004280C9`.
+    Ref: picasa3.exe @ 0x009AC640 (div ecx @ 0x009AC70B..0x009AC72E), 0x004280C9 ("avgcolor" @ 0x00C813F0)
+    """
+    try:
+        if isinstance(img_or_bytes, (bytes, bytearray)):
+            with Image.open(io.BytesIO(img_or_bytes)) as opened:
+                rgb = opened.convert("RGB")
+                raw = rgb.tobytes()
+            has_alpha = False
+        elif isinstance(img_or_bytes, Image.Image):
+            if img_or_bytes.mode == "RGBA":
+                raw = img_or_bytes.tobytes()
+                has_alpha = True
+            else:
+                rgb = img_or_bytes if img_or_bytes.mode == "RGB" else img_or_bytes.convert("RGB")
+                raw = rgb.tobytes()
+                has_alpha = False
+        else:
+            return None
+        if has_alpha:
+            n_pixels = len(raw) // 4
+            if n_pixels <= 0:
+                return None
+            avg_r = sum(raw[0::4]) // n_pixels
+            avg_g = sum(raw[1::4]) // n_pixels
+            avg_b = sum(raw[2::4]) // n_pixels
+            avg_a = sum(raw[3::4]) // n_pixels
+            return (
+                ((avg_a & 0xFF) << 24)
+                | ((avg_r & 0xFF) << 16)
+                | ((avg_g & 0xFF) << 8)
+                | (avg_b & 0xFF)
+            )
+        n_pixels = len(raw) // 3
+        if n_pixels <= 0:
+            return None
+        avg_r = sum(raw[0::3]) // n_pixels
+        avg_g = sum(raw[1::3]) // n_pixels
+        avg_b = sum(raw[2::3]) // n_pixels
+        return (
+            0xFF000000
+            | ((avg_r & 0xFF) << 16)
+            | ((avg_g & 0xFF) << 8)
+            | (avg_b & 0xFF)
+        )
+    except Exception:
+        return None
+
+
 def detect_media_type(file_path: Union[str, Path]) -> int:
     """
-    FR: Détermine le code `type` de thumbindex.db. Les RAW et vidéos gardent le type de leur extension ;
-    pour les autres images, la signature du fichier prime sur l'extension.
-    EN: Determines the thumbindex.db `type` code. RAW and video files keep their extension's type;
-    for other images, the file signature takes precedence over the extension.
-    Ref: db3 (enregistrement 17176 : « *.jpg.jpg » de signature RIFF/WEBP indexé type 31).
-    TODO(unverified): routine de détection de signature non localisée dans le désassemblage.
+    FR: Détermine le code `type` de `thumbindex.db` conformément à `LookupExtensionType` (`0x00A4C140`,
+    table `0x00D33418`) et `DetectSignatureType` (`0x00A4C600`, appelée par `0x005B1460` / `0x005B1570`).
+    Dans `0x00A4C600`, les en-têtes TIFF (`II*\\0`, `MM\\0*`, `IIN1`) retournent `0` afin que les fichiers
+    TIFF (`13`) et RAW basés sur TIFF (`18`) conservent le code de leur extension ; pour les autres formats
+    (`JPEG -> 2`, `BMP -> 6`, `PNG/GIF/WEBP -> 31`), la signature prime sur l'extension.
+    EN: Determines the `thumbindex.db` `type` code matching `LookupExtensionType` (`0x00A4C140`,
+    table `0x00D33418`) and `DetectSignatureType` (`0x00A4C600`, called by `0x005B1460` / `0x005B1570`).
+    Ref: picasa3.exe @ 0x00A4C600, 0x00A4C140, 0x005B1460, 0x005B1570, 0x004FADB0, 0x00D33418
     """
     ext = os.path.splitext(str(file_path))[1].lower()
     ext_type = EXTENSION_TYPE_MAP.get(ext, 2)
@@ -393,8 +447,8 @@ def detect_media_type(file_path: Union[str, Path]) -> int:
         return 6
     if head[:4] == b"8BPS":
         return 7
-    if head[:4] in (b"II*\x00", b"MM\x00*"):
-        return 13
+    if head[:4] in (b"II*\x00", b"MM\x00*", b"IIN1"):
+        return ext_type if ext_type in (13, 18) else 13
     return ext_type
 
 
@@ -424,7 +478,14 @@ def extract_video_metadata_and_thumb(
 
         # FR: Tentative d'extraction rapide de frame via OpenCV / EN: Fast frame extraction attempt via OpenCV
         try:
+            os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
+            os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
             import cv2
+            try:
+                if hasattr(cv2, "setLogLevel"):
+                    cv2.setLogLevel(0)
+            except Exception:
+                pass
             cap = cv2.VideoCapture(file_path)
             if cap.isOpened():
                 w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -449,6 +510,14 @@ def extract_video_metadata_and_thumb(
         # FR: Fallback élégant : vignette sombre avec bande cinéma et icône vidéo Picasa
         # EN: Clean fallback: dark thumbnail with filmstripsprockets and Picasa play icon
         if thumb_img is None:
+            try:
+                with open(file_path, "rb") as fh_vid:
+                    head_vid = fh_vid.read(64)
+                if len(head_vid) >= 32 and all(b in (9, 10, 13) or 32 <= b <= 126 for b in head_vid):
+                    # Fichier texte pur portant une extension vidéo (ex. LICENSES/COPYING.MKV)
+                    return None
+            except Exception:
+                pass
             thumb_img = Image.new("RGB", (max_thumb_size, max_thumb_size), (30, 32, 36))
             from PIL import ImageDraw
             draw = ImageDraw.Draw(thumb_img)
@@ -631,32 +700,248 @@ def _extract_exif_gps(raw_img: Image.Image, exif_data) -> Tuple[Optional[float],
     return lat, lon
 
 
+def _scale_box_dimensions(sw: int, sh: int, target: int) -> Tuple[int, int]:
+    """
+    FR: Calcule les dimensions `(nw, nh)` d'une boîte englobante `target x target` selon la formule
+    FPU exacte de `FUN_009b4aa0` (`0x009B4AA0`, appelée par `0x00A405A0` en `0x00A4060A` et par
+    `0x00425210` en `0x004257B7` lors de `0x00424CA0`) :
+      1. `scale = min((target + 0.499) / sw, (target + 0.499) / sh)` (constante `0.499` @ `0x00CF4160`)
+      2. Conversion `float32` de `sw * scale + 1e-5` et `sh * scale + 1e-5` (constante `1e-5` @ `0x00CF41E0`,
+         `fstp dword ptr` + `fld dword ptr` en `0x009B4B19..0x009B4B37`)
+      3. Arrondi FPU au plus proche (`fistp dword ptr`, round-to-even).
+    Vérifié sur `db3` : `99.98 %` (`4391 / 4392`) de correspondance exacte sur `thumbs2`.
+    EN: Computes bounding-box dimensions `(nw, nh)` inside `target x target` using the exact FPU
+    formula of `FUN_009b4aa0` (`0x009B4AA0`).
+    Ref: picasa3.exe @ 0x009B4AA0, 0x00A405A0, 0x00424CA0, 0x00425210 (0x00CF4160 = 0.499, 0x00CF41E0 = 1e-5)
+    """
+    if sw <= 0 or sh <= 0 or target <= 0:
+        return max(1, sw), max(1, sh)
+    t_bias = float(target) + 0.499
+    scale = min(t_bias / float(sw), t_bias / float(sh))
+    fw = struct.unpack("<f", struct.pack("<f", float(sw) * scale + 1e-5))[0]
+    fh = struct.unpack("<f", struct.pack("<f", float(sh) * scale + 1e-5))[0]
+    return max(1, int(round(fw))), max(1, int(round(fh)))
+
+
 def _fit_long_side(img: Image.Image, target: int, src_size: Optional[Tuple[int, int]] = None) -> Image.Image:
     """
-    FR: Redimensionne pour que le plus grand côté vaille exactement `target` (agrandissement compris),
-    le petit côté étant arrondi à l'entier supérieur. Vérifié sur db3 : 2000/2000 vignettes `thumbs` ont un
-    grand côté de 144 px (y compris les sources plus petites), `thumbs2` 72 px.
-    EN: Resizes so the longest side is exactly `target` (upscaling included), the short side rounded
-    up. Verified on db3: 2000/2000 `thumbs` have a 144 px long side (smaller sources included),
-    `thumbs2` 72 px.
-    Ref: picasa3.exe @ 0x00424CA0 ; db3 : plafond (ceil) exact sur 1950/2006 (thumbs) et 1969/2006 (thumbs2),
-    contre 1537 / 1168 avec un arrondi au plus proche.
-    TODO(unverified): les ~3 % restants (valeurs très proches d'un entier) suggèrent un calcul sur
-    l'image intermédiaire décodée ; routine non localisée.
+    FR: Redimensionne l'image dans une boîte `target x target` selon `FUN_009b4aa0` (`0x009B4AA0`)
+    appelée par `0x00A405A0` dans `0x00424CA0` (`288 -> 144 -> 72`).
+    EN: Resizes the image into a `target x target` bounding box matching `FUN_009b4aa0` (`0x009B4AA0`)
+    called by `0x00A405A0` in `0x00424CA0` (`288 -> 144 -> 72`).
+    Ref: picasa3.exe @ 0x009B4AA0, 0x00A405A0, 0x00424CA0, 0x00425210
     """
     w, h = img.size
     if w <= 0 or h <= 0:
         return img.copy()
-    # FR: Proportions calculées sur les dimensions d'origine (évite un double arrondi via l'intermédiaire)
-    # EN: Aspect computed from the original dimensions (avoids double rounding through the intermediate)
     sw, sh = src_size if (src_size and src_size[0] > 0 and src_size[1] > 0) else (w, h)
-    if sw >= sh:
-        nw, nh = target, max(1, int(math.ceil(target * sh / float(sw))))
-    else:
-        nw, nh = max(1, int(math.ceil(target * sw / float(sh)))), target
+    nw, nh = _scale_box_dimensions(sw, sh, target)
     if (nw, nh) == (w, h):
         return img.copy()
     return img.resize((nw, nh), Image.Resampling.BILINEAR)
+
+
+def _extract_tiff_raw_metadata_and_preview(
+    file_path: Union[str, Path]
+) -> Optional[Tuple[int, int, int, float, Optional[bytes]]]:
+    """
+    FR: Analyse binaire directe des en-têtes TIFF / SubIFD / ExifIFD des fichiers RAW (`.pef`, `.cr2`,
+    `.nef`, `.arw`, `.dng`, `.orf`, `.rw2`, `.sr2`, etc.) conformément à `dcraw::parse_tiff_ifd`
+    (`0x008BD740`) et `dcraw::identify` (`0x008C925E..0x008C93C8`) :
+    - Parcourt `IFD0`, `SubIFDs` (`0x014A`), `ExifIFD` (`0x8769`) et la chaîne `NextIFD`
+    - Identifie les dimensions du capteur RAW (`Compression` != 6 et != 7, ou plus grand IFD) et applique
+      les ajustements de largeur/hauteur active Pentax de `0x008C928E..0x008C93B7` (`K-x`/`K-r` : `4352 -> 4309`,
+      `K-5` : `>=4960 -> 4950, h-10`, `K-7` : `4736 -> 4684x3122`, `(2624,3936) -> (2616,3896)`,
+      `(3136,4864) -> (3124,4688)`)
+    - Extrait l'orientation EXIF (`0x0112`), la date de prise de vue (`0x9003` / `0x0132`) et le plus grand
+      aperçu JPEG intégré (`0x0201` + `0x0202`, ou `0x0111` + `0x0117` si flux `0xFF 0xD8 0xFF`).
+    EN: Direct binary TIFF / SubIFD / ExifIFD parser for RAW files matching `dcraw::parse_tiff_ifd`
+    (`0x008BD740`) and `dcraw::identify` (`0x008C925E..0x008C93C8`).
+    Ref: picasa3.exe @ 0x008BD740, 0x008C925E..0x008C93C8
+    """
+    try:
+        with open(file_path, "rb") as f:
+            head = f.read(8)
+            if len(head) < 8:
+                return None
+            endian_tag = head[:2]
+            if endian_tag == b"II":
+                bo = "<"
+            elif endian_tag == b"MM":
+                bo = ">"
+            else:
+                return None
+            magic, ifd0_off = struct.unpack(bo + "HI", head[2:8])
+            if magic not in (42, 0x4F52, 0x5352, 0x0055):
+                return None
+
+            f.seek(0, os.SEEK_END)
+            file_len = f.tell()
+
+            type_sizes = {1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 6: 1, 7: 1, 8: 2, 9: 4, 10: 8, 11: 4, 12: 8}
+
+            def _read_tag_values(ttype: int, count: int, val_bytes: bytes):
+                sz = type_sizes.get(ttype, 1) * count
+                if sz <= 0 or count <= 0:
+                    return []
+                if sz <= 4:
+                    raw_b = val_bytes[:sz]
+                else:
+                    off = struct.unpack(bo + "I", val_bytes)[0]
+                    if off <= 0 or off + sz > file_len:
+                        return []
+                    pos = f.tell()
+                    f.seek(off)
+                    raw_b = f.read(sz)
+                    f.seek(pos)
+                if ttype == 2:
+                    return [raw_b.rstrip(b"\x00").decode("latin-1", errors="ignore")]
+                if ttype in (1, 6, 7):
+                    return list(raw_b)
+                if ttype == 3:
+                    return list(struct.unpack(bo + f"{len(raw_b) // 2}H", raw_b))
+                if ttype == 4:
+                    return list(struct.unpack(bo + f"{len(raw_b) // 4}I", raw_b))
+                if ttype == 8:
+                    return list(struct.unpack(bo + f"{len(raw_b) // 2}h", raw_b))
+                if ttype == 9:
+                    return list(struct.unpack(bo + f"{len(raw_b) // 4}i", raw_b))
+                return []
+
+            visited: Set[int] = set()
+            queue: List[int] = [ifd0_off]
+            raw_candidates: List[Tuple[int, int, int]] = []
+            all_dims: List[Tuple[int, int]] = []
+            jpeg_spans: List[Tuple[int, int]] = []
+            orient = 1
+            model_str = ""
+            date_strs: List[Tuple[int, str]] = []
+
+            while queue:
+                ifd_off = queue.pop(0)
+                if ifd_off <= 0 or ifd_off in visited or ifd_off + 2 > file_len or len(visited) > 32:
+                    continue
+                visited.add(ifd_off)
+                f.seek(ifd_off)
+                cnt_b = f.read(2)
+                if len(cnt_b) < 2:
+                    continue
+                n_entries = struct.unpack(bo + "H", cnt_b)[0]
+                if n_entries <= 0 or n_entries > 512:
+                    continue
+                entries_b = f.read(n_entries * 12)
+                if len(entries_b) < n_entries * 12:
+                    continue
+                nxt_b = f.read(4)
+                if len(nxt_b) == 4:
+                    nxt_off = struct.unpack(bo + "I", nxt_b)[0]
+                    if nxt_off > 0 and nxt_off not in visited:
+                        queue.append(nxt_off)
+
+                ifd_w = 0
+                ifd_h = 0
+                ifd_comp = 0
+                jpg_off = 0
+                jpg_len = 0
+                strip_off = 0
+                strip_len = 0
+
+                for i in range(n_entries):
+                    eb = entries_b[i * 12 : (i + 1) * 12]
+                    tag, ttype, count = struct.unpack(bo + "HHI", eb[:8])
+                    val_b = eb[8:12]
+                    if tag in (
+                        0x0100, 0x0101, 0x0103, 0x0110, 0x0111, 0x0112, 0x0117,
+                        0x0132, 0x014A, 0x0201, 0x0202, 0x8769, 0x9003, 0xA002, 0xA003,
+                    ):
+                        vals = _read_tag_values(ttype, count, val_b)
+                        if not vals:
+                            continue
+                        if tag in (0x0100, 0xA002):
+                            ifd_w = max(ifd_w, int(vals[0]))
+                        elif tag in (0x0101, 0xA003):
+                            ifd_h = max(ifd_h, int(vals[0]))
+                        elif tag == 0x0103:
+                            ifd_comp = int(vals[0])
+                        elif tag == 0x0110 and isinstance(vals[0], str):
+                            model_str = vals[0].strip()
+                        elif tag == 0x0112 and orient == 1:
+                            orient = int(vals[0])
+                        elif tag in (0x9003, 0x0132) and isinstance(vals[0], str):
+                            date_strs.append((0 if tag == 0x9003 else 1, vals[0].strip()))
+                        elif tag in (0x014A, 0x8769):
+                            for sub_off in vals:
+                                if isinstance(sub_off, int) and sub_off > 0 and sub_off not in visited:
+                                    queue.append(sub_off)
+                        elif tag == 0x0201:
+                            jpg_off = int(vals[0])
+                        elif tag == 0x0202:
+                            jpg_len = int(vals[0])
+                        elif tag == 0x0111 and len(vals) == 1:
+                            strip_off = int(vals[0])
+                        elif tag == 0x0117 and len(vals) == 1:
+                            strip_len = int(vals[0])
+
+                if ifd_w > 0 and ifd_h > 0:
+                    all_dims.append((ifd_w, ifd_h))
+                    if ifd_comp not in (6, 7):
+                        raw_candidates.append((ifd_w, ifd_h, ifd_comp))
+                if jpg_off > 0 and jpg_len > 0 and jpg_off + jpg_len <= file_len:
+                    jpeg_spans.append((jpg_len, jpg_off))
+                elif strip_off > 0 and strip_len > 0 and strip_off + strip_len <= file_len and ifd_comp in (6, 7):
+                    jpeg_spans.append((strip_len, strip_off))
+
+            if raw_candidates:
+                raw_w, raw_h, _ = max(raw_candidates, key=lambda item: item[0] * item[1])
+            elif all_dims:
+                raw_w, raw_h = max(all_dims, key=lambda item: item[0] * item[1])
+            else:
+                return None
+
+            # Ref: picasa3.exe @ 0x008C928E..0x008C93B7 (dcraw::identify — dimensions actives capteur Pentax)
+            if (raw_h, raw_w) == (2624, 3936):
+                raw_h, raw_w = 2616, 3896
+            elif (raw_h, raw_w) == (3136, 4864):
+                raw_h, raw_w = 3124, 4688
+            if model_str:
+                m_up = model_str.upper()
+                if raw_w == 4352 and ("K-R" in m_up or "K-X" in m_up):
+                    raw_w = 4309
+                elif raw_w >= 4960 and "K-5" in m_up:
+                    raw_w = 4950
+                    raw_h = max(1, raw_h - 10)
+                elif raw_w == 4736 and "K-7" in m_up:
+                    raw_w = 4684
+                    raw_h = 3122
+
+            ole_date = 0.0
+            date_strs.sort(key=lambda item: item[0])
+            for _, d_str in date_strs:
+                try:
+                    dt = datetime.strptime(d_str[:19], "%Y:%m:%d %H:%M:%S")
+                    ole_date = datetime_to_ole(dt)
+                    break
+                except Exception:
+                    pass
+            if ole_date == 0.0:
+                try:
+                    ole_date = datetime_to_ole(datetime.fromtimestamp(os.path.getmtime(file_path)))
+                except Exception:
+                    ole_date = 0.0
+
+            preview_bytes: Optional[bytes] = None
+            if jpeg_spans:
+                jpeg_spans.sort(reverse=True)
+                for j_len, j_off in jpeg_spans:
+                    f.seek(j_off)
+                    cand_b = f.read(j_len)
+                    if cand_b[:3] == b"\xff\xd8\xff":
+                        preview_bytes = cand_b
+                        break
+
+            return raw_w, raw_h, orient, ole_date, preview_bytes
+    except Exception:
+        return None
 
 
 def extract_image_metadata_and_thumb(
@@ -666,128 +951,195 @@ def extract_image_metadata_and_thumb(
     FR: Ouvre l'image, oriente selon l'EXIF, extrait les dimensions et coordonnées GPS,
     calcule la date OLE, et génère le buffer JPEG de la vignette (144px max, qualité 90,
     ainsi que la vignette `thumbs2` 72px max, qualité 90).
-    Utilise le décodage DCT sous-échantillonné (`Image.draft`) sur les fichiers JPEG haute résolution
-    afin de diviser par 10 le temps CPU et la contention GIL sans modifier les dimensions ni la qualité.
+    Pour les fichiers RAW (`.pef`, `.cr2`, `.nef`, `.arw`, `.dng`, etc.), extrait les dimensions
+    capteur exactes et l'aperçu JPEG intégré conformément à `dcraw::parse_tiff_ifd` (`0x008BD740`)
+    et `dcraw::identify` (`0x008C925E..0x008C93C8`).
     EN: Opens the image, applies EXIF orientation, extracts dimensions and GPS coordinates,
     computes the OLE date, and generates the thumbnail JPEG buffer (144px max, quality 90,
     along with the `thumbs2` 72px max, quality 90 thumbnail).
-    Uses subsampled DCT decoding (`Image.draft`) on high-resolution JPEG files to cut CPU time
-    and GIL contention by 10x without altering dimensions or thumbnail quality.
-    Ref: picasa3.exe @ 0x00424CA0 (FUN_00424ca0 -> thumbs=144px, thumbs2=72px, quality=90)
+    Ref: picasa3.exe @ 0x00424CA0 (thumbs=144px, thumbs2=72px, quality=90), 0x009B4AA0, 0x008BD740, 0x008C92E8
     """
+    ext_low = os.path.splitext(file_path)[1].lower()
+    raw_info = _extract_tiff_raw_metadata_and_preview(file_path) if ext_low in RAW_EXTENSIONS else None
+
     try:
-        with Image.open(file_path) as raw_img:
-            exif_data = raw_img.getexif()
-            gps_lat, gps_lon = _extract_exif_gps(raw_img, exif_data)
+        if raw_info is not None and raw_info[4] is not None:
+            raw_w, raw_h, exif_orient, ole_date, preview_bytes = raw_info
+            gps_lat, gps_lon = None, None
+            with Image.open(io.BytesIO(preview_bytes)) as prev_img:
+                prev_img.load()
+                if exif_orient in (5, 6, 7, 8):
+                    orig_w, orig_h = raw_h, raw_w
+                else:
+                    orig_w, orig_h = raw_w, raw_h
 
-            # 1. FR: Dimensions réelles (avec orientation EXIF 0x0112) extraites avant tout draft()
-            #    EN: True pixel dimensions (accounting for EXIF Orientation 0x0112) extracted before draft()
-            raw_w, raw_h = raw_img.size
-            exif_orient = exif_data.get(0x0112, 1) if exif_data else 1
-            if exif_orient in (5, 6, 7, 8):
-                orig_w, orig_h = raw_h, raw_w
-            else:
-                orig_w, orig_h = raw_w, raw_h
+                # Ref: libtiff @ picasa3.exe — rejette les TIFF malformés dépourvus de StripByteCounts (279) et TileByteCounts (325)
+                if raw_info is None and getattr(raw_img, "format", None) == "TIFF":
+                    tag_v2 = getattr(raw_img, "tag_v2", None)
+                    if tag_v2 is not None and 279 not in tag_v2 and 325 not in tag_v2:
+                        return None
 
-            # 2. FR: Extraction de la date (EXIF DateTimeOriginal ou date fichier)
-            #    EN: Date extraction (EXIF DateTimeOriginal or file modification time)
-            ole_date = 0.0
-            date_found = False
+                # Ref: PSD loader @ picasa3.exe — rejette les fichiers PSD dépassant 8192 px de côté
+                if ext_low == ".psd" and (orig_w > 8192 or orig_h > 8192):
+                    return None
 
-            if exif_data:
-                # 0x9003 = DateTimeOriginal, 0x0132 = DateTime
-                for tag_id in (0x9003, 0x0132):
-                    date_str = exif_data.get(tag_id)
-                    if date_str and isinstance(date_str, str):
-                        try:
-                            # Format standard EXIF : 'YYYY:MM:DD HH:MM:SS'
-                            dt = datetime.strptime(date_str.strip()[:19], "%Y:%m:%d %H:%M:%S")
-                            ole_date = datetime_to_ole(dt)
-                            date_found = True
-                            break
-                        except Exception:
-                            pass
+                # Ref: picasa3.exe @ 0x009B4AA0, 0x00424CA0 — rejette les images dégénérées dont la miniature 72px a une dimension nulle (<= 0)
+                if orig_w <= 0 or orig_h <= 0 or int((min(orig_w, orig_h) * 72.0) / max(orig_w, orig_h) + 0.499) <= 0:
+                    return None
+                img = prev_img.copy()
+                if exif_orient != 1 and img.width >= img.height and orig_w < orig_h:
+                    if exif_orient == 6:
+                        img = img.transpose(Image.Transpose.ROTATE_270)
+                    elif exif_orient == 8:
+                        img = img.transpose(Image.Transpose.ROTATE_90)
+                elif exif_orient == 3:
+                    img = img.transpose(Image.Transpose.ROTATE_180)
+        else:
+            with Image.open(file_path) as raw_img:
+                exif_data = raw_img.getexif()
+                gps_lat, gps_lon = _extract_exif_gps(raw_img, exif_data)
 
-            if not date_found:
-                try:
-                    mtime = os.path.getmtime(file_path)
-                    dt = datetime.fromtimestamp(mtime)
-                    ole_date = datetime_to_ole(dt)
-                except Exception:
+                # 1. FR: Dimensions réelles (avec orientation EXIF 0x0112) extraites avant tout draft()
+                #    EN: True pixel dimensions (accounting for EXIF Orientation 0x0112) extracted before draft()
+                if raw_info is not None:
+                    raw_w, raw_h, exif_orient, ole_date, _ = raw_info
+                else:
+                    raw_w, raw_h = raw_img.size
+                    exif_orient = exif_data.get(0x0112, 1) if exif_data else 1
+                if exif_orient in (5, 6, 7, 8):
+                    orig_w, orig_h = raw_h, raw_w
+                else:
+                    orig_w, orig_h = raw_w, raw_h
+
+                # Ref: libtiff @ picasa3.exe — rejette les TIFF malformés dépourvus de StripByteCounts (279) et TileByteCounts (325)
+                if raw_info is None and getattr(raw_img, "format", None) == "TIFF":
+                    tag_v2 = getattr(raw_img, "tag_v2", None)
+                    if tag_v2 is not None and 279 not in tag_v2 and 325 not in tag_v2:
+                        return None
+
+                # Ref: PSD loader @ picasa3.exe — rejette les fichiers PSD dépassant 8192 px de côté
+                if ext_low == ".psd" and (orig_w > 8192 or orig_h > 8192):
+                    return None
+
+                # Ref: picasa3.exe @ 0x009B4AA0, 0x00424CA0 — rejette les images dégénérées dont la miniature 72px a une dimension nulle (<= 0)
+                if orig_w <= 0 or orig_h <= 0 or int((min(orig_w, orig_h) * 72.0) / max(orig_w, orig_h) + 0.499) <= 0:
+                    return None
+
+                # 2. FR: Extraction de la date (EXIF DateTimeOriginal ou date fichier)
+                #    EN: Date extraction (EXIF DateTimeOriginal or file modification time)
+                if raw_info is None:
                     ole_date = 0.0
+                    date_found = False
 
-            # 3. FR: Décodage DCT sous-échantillonné (libjpeg draft 1/2, 1/4, 1/8) pour les grands JPEG
-            #    EN: Subsampled DCT decoding (libjpeg draft 1/2, 1/4, 1/8) for large JPEGs
-            draft_target = max(max_thumb_size * 2, 288)
-            if getattr(raw_img, "format", None) == "JPEG" and (raw_w > draft_target * 2 or raw_h > draft_target * 2):
+                    if exif_data:
+                        # 0x9003 = DateTimeOriginal, 0x0132 = DateTime
+                        for tag_id in (0x9003, 0x0132):
+                            date_str = exif_data.get(tag_id)
+                            if date_str and isinstance(date_str, str):
+                                try:
+                                    # Format standard EXIF : 'YYYY:MM:DD HH:MM:SS'
+                                    dt = datetime.strptime(date_str.strip()[:19], "%Y:%m:%d %H:%M:%S")
+                                    ole_date = datetime_to_ole(dt)
+                                    date_found = True
+                                    break
+                                except Exception:
+                                    pass
+
+                    if not date_found:
+                        try:
+                            mtime = os.path.getmtime(file_path)
+                            dt = datetime.fromtimestamp(mtime)
+                            ole_date = datetime_to_ole(dt)
+                        except Exception:
+                            ole_date = 0.0
+
+                # 3. FR: Décodage DCT sous-échantillonné (libjpeg draft 1/2, 1/4, 1/8) pour les grands JPEG
+                #    EN: Subsampled DCT decoding (libjpeg draft 1/2, 1/4, 1/8) for large JPEGs
+                draft_target = max(max_thumb_size * 2, 288)
+                if getattr(raw_img, "format", None) == "JPEG" and (raw_w > draft_target * 2 or raw_h > draft_target * 2):
+                    try:
+                        raw_img.draft("RGB", (draft_target, draft_target))
+                    except Exception:
+                        pass
+
+                # 4. FR: Orientation automatique selon les balises EXIF et conversion propre de la transparence
+                #    EN: Automatic EXIF orientation and clean transparency conversion
+                if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
+                    raw_img = raw_img.convert("RGBA")
                 try:
-                    raw_img.draft("RGB", (draft_target, draft_target))
+                    img = ImageOps.exif_transpose(raw_img)
                 except Exception:
-                    pass
+                    img = raw_img.copy()
+                if img is raw_img:
+                    img = raw_img.copy()
 
-            # 4. FR: Orientation automatique selon les balises EXIF et conversion propre de la transparence
-            #    EN: Automatic EXIF orientation and clean transparency conversion
-            if raw_img.mode in ("P", "PA") or "transparency" in raw_img.info:
-                raw_img = raw_img.convert("RGBA")
-            try:
-                img = ImageOps.exif_transpose(raw_img)
-            except Exception:
-                img = raw_img
+        # 5. FR: Cascade de miniatures conforme à 0x00424CA0 -> 0x00A405A0 -> 0x009B4AA0 :
+        #        bigthumbs (288px max, q=90) -> thumbs (144px, q=90) -> thumbs2 (72px, q=90)
+        #    EN: Thumbnail cascade matching 0x00424CA0 -> 0x00A405A0 -> 0x009B4AA0:
+        #        bigthumbs (288px max, q=90) -> thumbs (144px, q=90) -> thumbs2 (72px, q=90)
+        bt_max = max(288, max_thumb_size)
+        if max(orig_w, orig_h) > bt_max:
+            bt_img = _fit_long_side(img, bt_max, (orig_w, orig_h))
+        else:
+            bt_img = img.copy()
+        if bt_img.mode in ("RGBA", "LA"):
+            bg = Image.new("RGB", bt_img.size, (255, 255, 255))
+            bg.paste(bt_img, mask=bt_img.split()[3])
+            bt_img = bg
+        elif bt_img.mode != "RGB":
+            bt_img = bt_img.convert("RGB")
 
-            # 5. FR: Génération des miniatures bigthumbs (288px max, q=90), thumbs (144px max, q=90) et thumbs2 (72px max, q=90)
-            #    EN: Generation of bigthumbs (288px max, q=90), thumbs (144px max, q=90), and thumbs2 (72px max, q=90) thumbnails
-            bt_max = max(288, max_thumb_size)
-            bt_img = img if img is not raw_img else img.copy()
-            bt_img.thumbnail((bt_max, bt_max), Image.Resampling.BILINEAR)
-            if bt_img.mode in ("RGBA", "LA"):
-                bg = Image.new("RGB", bt_img.size, (255, 255, 255))
-                bg.paste(bt_img, mask=bt_img.split()[3])
-                bt_img = bg
-            elif bt_img.mode != "RGB":
-                bt_img = bt_img.convert("RGB")
+        buf_bt = io.BytesIO()
+        bt_img.save(buf_bt, format="JPEG", quality=90)
+        bigthumb_bytes = buf_bt.getvalue()
 
-            buf_bt = io.BytesIO()
-            bt_img.save(buf_bt, format="JPEG", quality=90)
-            bigthumb_bytes = buf_bt.getvalue()
+        thumb_img = _fit_long_side(bt_img, max_thumb_size, bt_img.size)
+        buf = io.BytesIO()
+        thumb_img.save(buf, format="JPEG", quality=90)
+        jpeg_bytes = buf.getvalue()
 
-            thumb_img = _fit_long_side(bt_img, max_thumb_size, (orig_w, orig_h))
-            buf = io.BytesIO()
-            thumb_img.save(buf, format="JPEG", quality=90)
-            jpeg_bytes = buf.getvalue()
+        t2_img = _fit_long_side(thumb_img, 72, thumb_img.size)
+        buf2 = io.BytesIO()
+        t2_img.save(buf2, format="JPEG", quality=90)
+        thumb2_bytes = buf2.getvalue()
 
-            t2_img = _fit_long_side(thumb_img, 72, (orig_w, orig_h))
-            buf2 = io.BytesIO()
-            t2_img.save(buf2, format="JPEG", quality=90)
-            thumb2_bytes = buf2.getvalue()
-
-            return _MediaMetadataResult(
-                jpeg_bytes,
-                orig_w,
-                orig_h,
-                ole_date,
-                lat=gps_lat,
-                lon=gps_lon,
-                thumb2_bytes=thumb2_bytes,
-                bigthumb_bytes=bigthumb_bytes,
-            )
+        return _MediaMetadataResult(
+            jpeg_bytes,
+            orig_w,
+            orig_h,
+            ole_date,
+            lat=gps_lat,
+            lon=gps_lon,
+            thumb2_bytes=thumb2_bytes,
+            bigthumb_bytes=bigthumb_bytes,
+        )
     except Exception:
-        ext_low = os.path.splitext(file_path)[1].lower()
         if ext_low in RAW_EXTENSIONS and os.path.exists(file_path):
             try:
-                mtime = os.path.getmtime(file_path)
-                ole_date = datetime_to_ole(datetime.fromtimestamp(mtime))
-                raw_fallback = Image.new("RGB", (max_thumb_size, max_thumb_size), (48, 50, 54))
+                if raw_info is not None:
+                    fb_w, fb_h, fb_orient, ole_date, _ = raw_info
+                    if fb_orient in (5, 6, 7, 8):
+                        fb_w, fb_h = fb_h, fb_w
+                elif ext_low == ".raw":
+                    # FR: Un fichier binaire .raw générique sans en-tête TIFF/RAW valide n'est pas une photo RAW
+                    # EN: A generic .raw binary file without a valid TIFF/RAW header is not a camera RAW photo
+                    return None
+                else:
+                    fb_w, fb_h = 640, 480
+                    mtime = os.path.getmtime(file_path)
+                    ole_date = datetime_to_ole(datetime.fromtimestamp(mtime))
+                t1_w, t1_h = _scale_box_dimensions(fb_w, fb_h, max_thumb_size)
+                raw_fallback = Image.new("RGB", (t1_w, t1_h), (48, 50, 54))
                 b_sm = io.BytesIO()
                 raw_fallback.save(b_sm, format="JPEG", quality=90)
                 sm_bytes = b_sm.getvalue()
-                t2_fb = raw_fallback.copy()
-                t2_fb.thumbnail((72, 72), Image.Resampling.BILINEAR)
+                t2_fb = _fit_long_side(raw_fallback, 72, (t1_w, t1_h))
                 b_t2 = io.BytesIO()
                 t2_fb.save(b_t2, format="JPEG", quality=90)
                 return _MediaMetadataResult(
                     sm_bytes,
-                    640,
-                    480,
+                    fb_w,
+                    fb_h,
                     ole_date,
                     thumb2_bytes=b_t2.getvalue(),
                     bigthumb_bytes=sm_bytes,
@@ -797,27 +1149,38 @@ def extract_image_metadata_and_thumb(
         return None
 
 
-# Ref: runtime/filters.txt @ 0x00D0AD70 (DirectoryFilters) & .picasaoriginals @ 0x0085A0B0
+# Ref: style/filters.txt @ 0x004FBFF0 (DirectoryFilters), 0x004FBBFE..0x004FBCFA (thumbs, RECYCLER, Originals, .picasaoriginals)
 DEFAULT_EXCLUDED_DIRS: Set[str] = {
     "windows",
     "winnt",
     "temp",
     "program files",
+    "program files (x86)",
+    "programdata",
+    "appdata",
+    "application data",
+    "local settings",
     "originals",
     ".picasaoriginals",
+    "thumbs",
+    "recycler",
+    "$recycle.bin",
+    "system volume information",
+    "pytest_tmp",
 }
 
 
 def load_directory_filters() -> Set[str]:
     """
-    FR: Charge la liste d'exclusion des répertoires depuis runtime/filters.txt (section DirectoryFilters).
-    EN: Loads the directory exclusion list from runtime/filters.txt (DirectoryFilters section).
-    Ref: picasa3.exe @ 0x00D0AD70 (runtime\\filters.txt -> DirectoryFilters)
+    FR: Charge la liste d'exclusion des répertoires depuis style/filters.txt ou runtime/filters.txt (section DirectoryFilters).
+    EN: Loads the directory exclusion list from style/filters.txt or runtime/filters.txt (DirectoryFilters section).
+    Ref: picasa3.exe @ 0x004FBFF0, 0x00D0AD70 (filters.txt -> DirectoryFilters)
     """
     excluded = set(DEFAULT_EXCLUDED_DIRS)
     candidates: List[Path] = []
     try:
         from picasa_py.ui.resources import RES_DIR
+        candidates.append(RES_DIR / "style" / "filters.txt")
         candidates.append(RES_DIR / "runtime" / "filters.txt")
     except Exception:
         pass
@@ -868,14 +1231,24 @@ class PicasaDirScanner:
         self.excluded_dirs: Set[str] = load_directory_filters()
         self._discovered_albums: Dict[str, Dict[str, object]] = {}
 
-    def is_excluded_dir(self, dir_name: str) -> bool:
+    def is_excluded_dir(self, dir_name: str, full_path: Optional[str] = None) -> bool:
         """
-        FR: Indique si un sous-dossier doit être ignoré lors du scan récursif.
-        EN: Indicates whether a subfolder should be skipped during recursive scanning.
-        Ref: picasa3.exe @ 0x00415790, 0x0085A0B0 (.picasaoriginals), runtime/filters.txt
+        FR: Indique si un sous-dossier doit être ignoré lors du scan récursif
+        (filtres DirectoryFilters, dossiers système/AppData/Temp et répertoire de base db3).
+        EN: Indicates whether a subfolder should be skipped during recursive scanning
+        (DirectoryFilters, Windows system/AppData/Temp folders, and the db3 database directory).
+        Ref: picasa3.exe @ 0x00415790, 0x004FBB90..0x004FC050, 0x0085A0B0 (.picasaoriginals), style/filters.txt
         """
         clean = os.path.basename(dir_name.rstrip("\\/")).lower()
-        return clean in self.excluded_dirs or clean.startswith(".")
+        if clean in self.excluded_dirs or clean.startswith(".") or clean.startswith("$"):
+            return True
+        if full_path and self.db and getattr(self.db, "db3_dir", None):
+            try:
+                if os.path.normcase(os.path.abspath(full_path)) == os.path.normcase(os.path.abspath(str(self.db.db3_dir))):
+                    return True
+            except Exception:
+                pass
+        return False
 
     def is_folder_face_excluded(self, folder_path: str) -> bool:
         """
@@ -901,15 +1274,85 @@ class PicasaDirScanner:
                         return True
         return False
 
+    def get_enabled_extensions(self) -> Set[str]:
+        """
+        FR: Retourne l'ensemble des extensions de fichiers activées selon les préférences Picasa 3
+        (`SupportBMP`, `SupportGIF`, `SupportPNG`, `SupportTGA`, `SupportTIF`, `SupportWEBP`,
+        `SupportPSD`, `SupportRAW`, `SupportMovies`).
+        Conformément à `picasa3.exe @ 0x004E04A0..0x004E0780`, `.gif`, `.png` et `.tga` sont
+        désactivés par défaut (`0`), tandis que `.jpg`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW et vidéos
+        sont activés par défaut (`1`).
+        EN: Returns the set of enabled file extensions according to Picasa 3 preferences.
+        Per `picasa3.exe @ 0x004E04A0..0x004E0780`, `.gif`, `.png`, and `.tga` are disabled by
+        default (`0`), while `.jpg`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW, and videos are enabled (`1`).
+        Ref: picasa3.exe @ 0x004E04A0..0x004E0985, 0x004FADB0, 0x004FB948
+        """
+        exts: Set[str] = {".jpg", ".jpeg", ".jpe"}
+        try:
+            from picasa_py.db.preferences import PicasaPreferences
+            prefs = PicasaPreferences()
+
+            def _is_enabled(support_key: str, default: bool) -> bool:
+                raw = prefs.value(support_key, None)
+                if raw is None:
+                    return default
+                if isinstance(raw, bool):
+                    return raw
+                s = str(raw).strip().lower()
+                if s in ("1", "true", "yes"):
+                    return True
+                if s in ("0", "false", "no"):
+                    return False
+                return default
+
+            if _is_enabled("SupportBMP", True):
+                exts.add(".bmp")
+            if _is_enabled("SupportGIF", False):
+                exts.add(".gif")
+            if _is_enabled("SupportPNG", False):
+                exts.add(".png")
+            if _is_enabled("SupportTGA", False):
+                exts.add(".tga")
+            if _is_enabled("SupportTIF", True):
+                exts.update({".tif", ".tiff"})
+            if _is_enabled("SupportWEBP", True):
+                exts.add(".webp")
+            if _is_enabled("SupportPSD", True):
+                exts.add(".psd")
+            if _is_enabled("SupportRAW", True):
+                exts.update(RAW_EXTENSIONS)
+            if _is_enabled("SupportMovies", True):
+                exts.update(VIDEO_EXTENSIONS)
+        except Exception:
+            exts.update({".bmp", ".tif", ".tiff", ".webp", ".psd"} | RAW_EXTENSIONS | VIDEO_EXTENSIONS)
+        return exts
+
     def scan_folder_for_media(self, folder_path: str, recursive: bool = True, is_cancelled=None) -> List[str]:
         """
-        FR: Énumère l'ensemble des fichiers média d'un répertoire avec support d'annulation.
-        EN: Enumerates all media files in a directory with cancellation support.
+        FR: Énumère l'ensemble des fichiers média d'un répertoire avec support d'annulation,
+        filtrage des extensions activées (`0x004E04A0`) et exclusion des sous-dossiers retirés (`-` dans `scanlist.txt`).
+        EN: Enumerates all media files in a directory with cancellation support,
+        enabled extension filtering (`0x004E04A0`), and exclusion of removed subfolders (`-` in `scanlist.txt`).
+        Ref: picasa3.exe @ 0x00415790, 0x004E04A0, 0x004F6380
         """
         results: List[str] = []
         host_folder = folder_path.replace("\\", os.sep) if os.sep != "\\" else folder_path
         if not os.path.exists(host_folder) or not os.path.isdir(host_folder):
             return results
+        if self.is_excluded_dir(os.path.basename(host_folder.rstrip("\\/")), host_folder):
+            return results
+
+        enabled_exts = self.get_enabled_extensions()
+        excluded_watched_dirs: Set[str] = set()
+        if self.db and hasattr(self.db, "get_watched_folders"):
+            try:
+                for wp, st in self.db.get_watched_folders().items():
+                    if st == "0":
+                        excluded_watched_dirs.add(
+                            os.path.normcase(os.path.abspath(wp.replace("\\", os.sep).rstrip("\\/")))
+                        )
+            except Exception:
+                pass
 
         if not recursive:
             try:
@@ -917,8 +1360,17 @@ class PicasaDirScanner:
                 for entry in os.scandir(host_folder):
                     if is_cancelled and is_cancelled():
                         break
-                    if entry.is_file() and Path(entry.name).suffix.lower() in SUPPORTED_EXTENSIONS:
-                        results.append(os.path.abspath(entry.path))
+                    if entry.is_file() and not entry.name.startswith("."):
+                        ext_l = Path(entry.name).suffix.lower()
+                        if ext_l in enabled_exts:
+                            try:
+                                if entry.stat().st_size <= 0:
+                                    continue
+                            except Exception:
+                                continue
+                            if ext_l == ".raw" and _extract_tiff_raw_metadata_and_preview(entry.path) is None:
+                                continue
+                            results.append(os.path.abspath(entry.path))
             except Exception:
                 pass
             return results
@@ -928,11 +1380,26 @@ class PicasaDirScanner:
             for root, dirs, files in os.walk(host_folder):
                 if is_cancelled and is_cancelled():
                     break
-                dirs[:] = [d for d in dirs if not self.is_excluded_dir(d)]
+                dirs[:] = [
+                    d for d in dirs
+                    if not self.is_excluded_dir(d, os.path.join(root, d))
+                    and os.path.normcase(os.path.abspath(os.path.join(root, d))) not in excluded_watched_dirs
+                ]
                 self._collect_ini_albums_from_folder(root)
                 for fname in files:
-                    if Path(fname).suffix.lower() in SUPPORTED_EXTENSIONS:
-                        results.append(os.path.abspath(os.path.join(root, fname)))
+                    if fname.startswith("."):
+                        continue
+                    ext_l = Path(fname).suffix.lower()
+                    if ext_l in enabled_exts:
+                        full_p = os.path.abspath(os.path.join(root, fname))
+                        try:
+                            if os.path.getsize(full_p) <= 0:
+                                continue
+                        except Exception:
+                            continue
+                        if ext_l == ".raw" and _extract_tiff_raw_metadata_and_preview(full_p) is None:
+                            continue
+                        results.append(full_p)
                 dir_counter += 1
                 if dir_counter % 10 == 0:
                     time.sleep(0.001)
@@ -1269,13 +1736,18 @@ class PicasaDirScanner:
         # EN: Map existing indexed records: (folder_norm, filename_lower) outside global lock
         with self.db._lock:
             raw_records = [
-                (i, r.type, r.path, r.parent_idx)
+                (i, r.type, r.path, r.parent_idx, getattr(r, "ft2", 0))
                 for i, r in enumerate(self.db.index)
             ]
         indexed: Set[Tuple[str, str]] = set()
-        folders_map = {i: path for i, rtype, path, _ in raw_records if rtype == 1}
+        folders_map = {i: path for i, rtype, path, _, _ in raw_records if rtype == 1}
+        folder_ft2_by_norm = {
+            path.replace("/", "\\").rstrip("\\").lower(): ft2
+            for _, rtype, path, _, ft2 in raw_records
+            if rtype == 1 and path
+        }
 
-        for _, rtype, rpath, rparent in raw_records:
+        for _, rtype, rpath, rparent, _ in raw_records:
             if rtype in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
                 fpath = folders_map.get(rparent, "")
                 norm_f = fpath.replace("/", "\\").rstrip("\\").lower()
@@ -1294,6 +1766,14 @@ class PicasaDirScanner:
                 parent_dir = os.path.dirname(file_path).replace("/", "\\").rstrip("\\").lower()
                 fname = os.path.basename(file_path).lower()
                 if (parent_dir, fname) not in indexed:
+                    f_ft2 = folder_ft2_by_norm.get(parent_dir, 0)
+                    if f_ft2 > 0:
+                        try:
+                            file_ft1, file_ft2, _ = file_filetimes(file_path)
+                            if (file_ft2 <= f_ft2 + 600_000_000 or file_ft1 <= f_ft2) and extract_media_metadata_and_thumb(file_path) is None:
+                                continue
+                        except Exception:
+                            pass
                     unindexed.append(file_path)
 
         with self.db._lock:
@@ -1352,8 +1832,8 @@ class PicasaDirScanner:
                 continue
             try:
                 disk_mtime = int(os.path.getmtime(full_path))
-                disk_size = os.path.getsize(full_path)
-                if r_fsize and (disk_size != r_fsize or abs(disk_mtime - (r_mtime or disk_mtime)) > 2):
+                disk_size = os.path.getsize(full_path) & 0xFFFFFFFF
+                if r_fsize and (disk_size != (r_fsize & 0xFFFFFFFF) or abs(disk_mtime - (r_mtime or disk_mtime)) > 2):
                     modified.append((idx, full_path))
             except Exception:
                 pass
@@ -1373,17 +1853,19 @@ class PicasaDirScanner:
         jpeg_bytes, w, h, ole_date = meta
         ft1_val, ft2_val, fsize = file_filetimes(file_path)
         is_video_rec = int(self.db.index[record_idx].type) == 32 or os.path.splitext(file_path)[1].lower() in VIDEO_EXTENSIONS
-        # Ref: db3 — originfast = 0 pour les vidéos (199/199)
-        originfast_val = 0 if is_video_rec else compute_originfast_hash(file_path)
+        # Ref: picasa3.exe @ 0x00513741..0x0051374A — préserve imagedata_originfast s'il est déjà non nul ; 0 pour les vidéos
+        existing_ofast = 0
+        if not is_video_rec and "imagedata_originfast" in self.db.pmps:
+            ofast_recs = self.db.pmps["imagedata_originfast"].records
+            if record_idx < len(ofast_recs):
+                existing_ofast = int(ofast_recs[record_idx] or 0)
+        originfast_val = 0 if is_video_rec else (existing_ofast if existing_ofast != 0 else compute_originfast_hash(file_path))
 
         t2_bytes: Optional[bytes] = getattr(meta, "thumb2_bytes", None)
         if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                    t2 = t_img.copy()
-                    t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
-                    if t2.mode != "RGB":
-                        t2 = t2.convert("RGB")
+                    t2 = _fit_long_side(t_img.convert("RGB"), 72, t_img.size)
                     b2 = io.BytesIO()
                     t2.save(b2, format="JPEG", quality=90)
                     t2_bytes = b2.getvalue()
@@ -1392,23 +1874,15 @@ class PicasaDirScanner:
 
         bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
 
-        avg_u32: Optional[int] = None
+        avg_u32: Optional[int] = 0 if is_video_rec else None
         color_toks: List[str] = []
-        if jpeg_bytes:
+        if jpeg_bytes and not is_video_rec:
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
                     rgb_t = t_img.convert("RGB")
                     if "imagedata_avgcolor" in self.db.pmps:
-                        px = rgb_t.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                        if isinstance(px, tuple) and len(px) >= 3:
-                            avg_u32 = (
-                                0xFF000000
-                                | ((int(px[0]) & 0xFF) << 16)
-                                | ((int(px[1]) & 0xFF) << 8)
-                                | (int(px[2]) & 0xFF)
-                            )
-                    if not is_video_rec:
-                        color_toks = classify_image_color_tokens(rgb_t)
+                        avg_u32 = compute_thumbnail_avgcolor(rgb_t)
+                    color_toks = classify_image_color_tokens(rgb_t)
             except Exception:
                 avg_u32 = None
 
@@ -1522,10 +1996,7 @@ class PicasaDirScanner:
         if not t2_bytes and jpeg_bytes and "thumbs2" in getattr(self.db, "block_indices", {}):
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
-                    t2 = t_img.copy()
-                    t2.thumbnail((72, 72), Image.Resampling.LANCZOS)
-                    if t2.mode != "RGB":
-                        t2 = t2.convert("RGB")
+                    t2 = _fit_long_side(t_img.convert("RGB"), 72, t_img.size)
                     b2 = io.BytesIO()
                     t2.save(b2, format="JPEG", quality=90)
                     t2_bytes = b2.getvalue()
@@ -1534,23 +2005,15 @@ class PicasaDirScanner:
 
         bigthumb_bytes: Optional[bytes] = getattr(meta, "bigthumb_bytes", None)
 
-        avg_u32: Optional[int] = None
+        avg_u32: Optional[int] = 0 if is_video_rec else None
         color_toks: List[str] = []
-        if jpeg_bytes:
+        if jpeg_bytes and not is_video_rec:
             try:
                 with Image.open(io.BytesIO(jpeg_bytes)) as t_img:
                     rgb_t = t_img.convert("RGB")
                     if "imagedata_avgcolor" in self.db.pmps:
-                        px = rgb_t.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                        if isinstance(px, tuple) and len(px) >= 3:
-                            avg_u32 = (
-                                0xFF000000
-                                | ((int(px[0]) & 0xFF) << 16)
-                                | ((int(px[1]) & 0xFF) << 8)
-                                | (int(px[2]) & 0xFF)
-                            )
-                    if not is_video_rec:
-                        color_toks = classify_image_color_tokens(rgb_t)
+                        avg_u32 = compute_thumbnail_avgcolor(rgb_t)
+                    color_toks = classify_image_color_tokens(rgb_t)
             except Exception:
                 avg_u32 = None
 
@@ -1588,7 +2051,7 @@ class PicasaDirScanner:
             # en heure locale pour les vidéos (199/199)
             _set_pmp_col("imagedata_tagdate", float(ole_date) if is_video_rec else 0.0)
             _set_pmp_col("imagedata_filetype", media_type)
-            _set_pmp_col("imagedata_fileflags", 1 if media_type == 18 else 0)
+            _set_pmp_col("imagedata_fileflags", 0)
             _set_pmp_col("imagedata_originfast", originfast_val)
             _set_pmp_col("imagedata_colorspace", 0)
             _set_pmp_col("imagedata_facerect", 0)
@@ -1834,24 +2297,28 @@ class BackgroundScanWorker(QThread):
                     if (now - last_progress_emit) >= 0.15 or (j + 1) == len(to_update):
                         _flush_pending_batches(force=True)
 
+        if self._is_cancelled:
+            return
+
         if pending_by_folder:
             _flush_pending_batches(force=True)
 
         with self.db._lock:
             alb_synced = scanner._sync_ini_albums_to_pmp()
-        if alb_synced > 0 and changed == 0:
+        if alb_synced > 0 and changed == 0 and not self._is_cancelled:
             try:
                 self.db.save_database()
             except Exception:
                 pass
 
         # FR: Sauvegarder les modifications atomiquement sur disque / EN: Save changes atomically to disk
-        if changed > 0:
+        if changed > 0 and not self._is_cancelled:
             try:
                 self.db.save_database()
             except Exception:
                 pass
 
-        self.finished.emit(changed)
+        if not self._is_cancelled:
+            self.finished.emit(changed)
 
 

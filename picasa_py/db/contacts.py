@@ -106,9 +106,11 @@ class ContactsFile:
         """
         root = ET.fromstring(xml_text.strip())
         contacts: List[Contact] = []
-        known_keys = {"id", "name", "display", "modified_time", "local_contact"}
+        known_keys = {"id", "name", "modified_time", "local_contact"}
         for elem in root.findall("contact"):
             extra = {k: v for k, v in elem.attrib.items() if k not in known_keys}
+            if "name" not in elem.attrib and "display" in extra:
+                extra.pop("display", None)
             # Ref: picasa3.exe @ 0x00580403 (email0="..."), 0x00580DB5 (email%d / email)
             if "email" in extra and "email0" not in extra:
                 extra["email0"] = extra.pop("email")

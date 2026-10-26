@@ -328,6 +328,7 @@ class PicasaDatabase:
         self._thumb_save_timer: Optional[threading.Timer] = None
         self._min_aligned_idx: int = -1
         self._aligned_pmp_count: int = 0
+        self._scanlist: Dict[str, str] = {}
 
     @property
     def _deleted_or_Reset_indices(self) -> Set[int]:
@@ -420,7 +421,7 @@ class PicasaDatabase:
         if ti_path.exists():
             self.thumbindex = ThumbIndexFile.from_bytes(ti_path.read_bytes())
 
-        # 2. repository.dat & usernames.dat (FR: Tables clé-valeur / EN: Key-value tables)
+        # 2. repository.dat, usernames.dat & scanlist.txt (Ref: 0x004A4860, 0x004F6380)
         repo_path = self.db3_dir / "repository.dat"
         if repo_path.exists():
             self.repository = KeyValueTableFile.from_bytes(repo_path.read_bytes())
@@ -428,6 +429,33 @@ class PicasaDatabase:
         un_path = self.db3_dir / "usernames.dat"
         if un_path.exists():
             self.usernames = KeyValueTableFile.from_bytes(un_path.read_bytes())
+
+        self._scanlist.clear()
+        scanlist_path = self.db3_dir / "scanlist.txt"
+        if scanlist_path.exists():
+            try:
+                repo_map = dict(self.repository.pairs) if self.repository else {}
+                raw_sl = scanlist_path.read_bytes().decode("utf-8", errors="surrogateescape")
+                for raw_line in raw_sl.splitlines():
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    if line.startswith("-"):
+                        fpath = line[1:].strip()
+                        st = "0"
+                    elif line.startswith("+"):
+                        fpath = line[1:].strip()
+                        # Si repository.dat indique explicitement "1" (Scan Always), conserver "1"
+                        st = "1" if repo_map.get(fpath) == "1" else "2"
+                    else:
+                        fpath = line
+                        st = "1"
+                    if fpath:
+                        if not fpath.endswith("\\") and ("\\" in fpath or ":" in fpath):
+                            fpath += "\\"
+                        self._scanlist[fpath] = st
+            except Exception:
+                pass
 
         # 3. wordhash.dat (FR: Index inversé de recherche / EN: Inverted search index)
         wh_path = self.db3_dir / "wordhash.dat"
@@ -473,6 +501,7 @@ class PicasaDatabase:
                             idx_obj.offsets[entry_idx] = 0
                             idx_obj.sizes_and_blocks[entry_idx] = 0
                             idx_obj.checksums[entry_idx] = 0
+                            idx_obj._compacted_on_disk = True
 
         # 6. contacts.xml (FR: Carnet de contacts / EN: Contacts address book)
         if self.contacts_dir and (self.contacts_dir / "contacts.xml").exists():
@@ -562,6 +591,22 @@ class PicasaDatabase:
         p_db3, p_cont = cls.resolve_database_dirs(target_dir, contacts_dir, for_creation=True)
         p_db3.mkdir(parents=True, exist_ok=True)
         p_cont.mkdir(parents=True, exist_ok=True)
+
+        # FR: Purger tout fichier résiduel (*.pmp, *.db, *.dat, *.tmp, *.txt, albums/*.pal) si le dossier contenait une ancienne base
+        # EN: Purge any residual file (*.pmp, *.db, *.dat, *.tmp, *.txt, albums/*.pal) if the folder previously held a database
+        for pattern in ("*.pmp", "*.db", "*.dat", "*.tmp", "*.txt"):
+            for old_f in p_db3.glob(pattern):
+                try:
+                    old_f.unlink()
+                except Exception:
+                    pass
+        albums_subdir = p_db3 / "albums"
+        if albums_subdir.is_dir():
+            for old_pal in albums_subdir.glob("*.pal"):
+                try:
+                    old_pal.unlink()
+                except Exception:
+                    pass
 
         db = cls(db3_dir=p_db3, contacts_dir=p_cont)
         db.thumbindex = ThumbIndexFile(records=[], dirty=True)
@@ -1247,15 +1292,18 @@ class PicasaDatabase:
             has_orig_backup = bool(
                 photo_path_str
                 and fname
-                and os.path.exists(os.path.join(os.path.dirname(photo_path_str), ".picasaoriginals", fname))
+                and any(
+                    os.path.exists(os.path.join(os.path.dirname(photo_path_str), orig_dir, fname))
+                    for orig_dir in (".picasaoriginals", "Originals")
+                )
             )
-            if bhash_int != 0 or has_orig_backup:
+            if has_orig_backup:
                 _set_pmp("imagedata_revertable", 1)
             elif photo_path_str and os.path.exists(photo_path_str):
                 _set_pmp("imagedata_revertable", 0)
 
             raw_faces = sec.get("faces") or ""
-            if raw_faces:
+            if raw_faces and not self._get_face_children(idx):
                 valid_faces = [
                     fp.strip()
                     for fp in raw_faces.split(";")
@@ -2376,50 +2424,142 @@ class PicasaDatabase:
         self._albums_cache = None
         return renamed
 
+    @staticmethod
+    def _is_tree_expansion_ancestor_entry(path_key: str, all_keys_lower: Set[str]) -> bool:
+        """
+        FR: Identifie les clés de `repository.dat` qui enregistrent uniquement l'état de dépliage
+        d'un nœud parent de l'arbre de dossiers (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`)
+        conformément à `picasa3.exe @ 0x004A4860` / `0x004A4A90`, lorsqu'un sous-dossier enfant
+        existe dans la liste des chemins configurés.
+        EN: Identifies `repository.dat` keys that only record the expansion state of a parent
+        folder-tree node (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`) per `0x004A4860` / `0x004A4A90`,
+        when a child folder exists in the configured path set.
+        Ref: picasa3.exe @ 0x004A4860, 0x004A4A90 (repository.dat left-tree expanded states)
+        """
+        norm = path_key.replace("/", "\\").rstrip("\\").lower()
+        parts = [p for p in norm.split("\\") if p]
+        if not parts:
+            return True
+        is_candidate_ancestor = False
+        if len(parts) == 1 and len(parts[0]) == 2 and parts[0].endswith(":"):
+            # Racine de lecteur (ex. "c:")
+            is_candidate_ancestor = True
+        elif len(parts) == 2 and len(parts[0]) == 2 and parts[0].endswith(":") and parts[1] in ("users", "documents and settings"):
+            # Dossier profils système (ex. "c:\\users")
+            is_candidate_ancestor = True
+        elif len(parts) == 3 and len(parts[0]) == 2 and parts[0].endswith(":") and parts[1] in ("users", "documents and settings"):
+            # Racine du profil utilisateur (ex. "c:\\users\\thyph")
+            is_candidate_ancestor = True
+        if not is_candidate_ancestor:
+            return False
+        prefix = norm + "\\"
+        return any(other != norm and other.startswith(prefix) for other in all_keys_lower)
+
     def get_watched_folders(self) -> Dict[str, str]:
         """
-        FR: Renvoie le dictionnaire {chemin_dossier: statut} des dossiers configurés dans repository.dat.
+        FR: Renvoie le dictionnaire `{chemin_dossier: statut}` des dossiers configurés dans
+        `scanlist.txt` (`0x004F61C0` / `0x004F6380`) et `repository.dat`, en excluant les nœuds
+        parents d'expansion d'arborescence UI (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`, Ref: `0x004A4860`).
         Statuts Picasa :
-        "1" -> Toujours analyser (Scan Always)
-        "2" -> Analyser une seule fois (Scan Once)
-        "0" -> Supprimer de Picasa (Remove)
-        EN: Returns the {folder_path: status} dictionary of watched folders configured in repository.dat.
-        Picasa statuses:
-        "1" -> Scan Always
-        "2" -> Scan Once
-        "0" -> Remove from Picasa
-        Ref: picasa3.exe @ 0x008B7F90 (foldermgr/watched_folders, repository.dat)
+        - `"1"` -> Toujours analyser (Scan Always : sans préfixe dans `scanlist.txt`)
+        - `"2"` -> Analyser une seule fois (Scan Once : préfixe `+` dans `scanlist.txt`)
+        - `"0"` -> Supprimer de Picasa (Excluded : préfixe `-` dans `scanlist.txt`)
+        EN: Returns the `{folder_path: status}` dictionary of watched folders configured in
+        `scanlist.txt` (`0x004F61C0` / `0x004F6380`) and `repository.dat`, excluding UI tree
+        expansion ancestor nodes (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`, Ref: `0x004A4860`).
+        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x004F6380 (LoadScanList), 0x004A4860 (repository.dat)
         """
-        if not self.repository:
+        raw_candidates: Dict[str, str] = {}
+        if self.repository:
+            for k, v in self.repository.pairs:
+                if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
+                    raw_candidates[k] = v
+        if self._scanlist:
+            for k, v in self._scanlist.items():
+                if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
+                    raw_candidates[k] = v
+
+        if not raw_candidates:
             return {}
+
+        db_in_pytest = "pytest" in str(self.db3_dir).lower() if self.db3_dir else False
+        filtered: Dict[str, str] = {}
+        for k, v in raw_candidates.items():
+            if not db_in_pytest and "pytest" in k.lower():
+                continue
+            filtered[k] = v
+
+        all_keys_lower = {k.replace("/", "\\").rstrip("\\").lower() for k in filtered}
+        stage1: Dict[str, str] = {}
+        for k, v in filtered.items():
+            if v in ("1", "2") and self._is_tree_expansion_ancestor_entry(k, all_keys_lower):
+                continue
+            stage1[k] = v
+
+        # Exclure les sous-dossiers marqués "1" dans repository.dat (dépliage UI @ 0x004A4860)
+        # lorsqu'un dossier parent est déjà en mode "1" (Scan Always récursif)
+        scan_always_roots = {
+            k.replace("/", "\\").rstrip("\\").lower()
+            for k, v in stage1.items()
+            if v == "1"
+        }
         res: Dict[str, str] = {}
-        for k, v in self.repository.pairs:
-            if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
-                res[k] = v
+        for k, v in stage1.items():
+            if v == "1":
+                norm_k = k.replace("/", "\\").rstrip("\\").lower()
+                if any(
+                    other != norm_k and norm_k.startswith(other + "\\")
+                    for other in scan_always_roots
+                ):
+                    continue
+            res[k] = v
         return res
 
     def set_watched_folder(self, folder_path: str, status: str) -> None:
         """
-        FR: Définit le statut d'un dossier dans repository.dat (format Picasa avec '\\' final).
-        EN: Sets a folder's status in repository.dat (Picasa format with trailing '\\').
+        FR: Définit le statut d'un dossier dans `scanlist.txt` et `repository.dat` (format Picasa avec `'\\'` final).
+        EN: Sets a folder's status in `scanlist.txt` and `repository.dat` (Picasa format with trailing `'\\'`).
+        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x008B7F90 (foldermgr)
         """
         norm_path = folder_path.replace("/", "\\")
         if not norm_path.endswith("\\"):
             norm_path += "\\"
         if not self.repository:
             self.repository = KeyValueTableFile()
-        self.repository.set(norm_path, str(status))
+        st_str = str(status)
+        self.repository.set(norm_path, st_str)
+        self._scanlist[norm_path] = st_str
         self._albums_cache = None
         self._starred_cache = None
 
+    def _serialize_scanlist_bytes(self) -> bytes:
+        """
+        FR: Sérialise `scanlist.txt` au format exact de `SaveScanList` (`0x004F61C0`) :
+        - `"1"` (Scan Always) : `<folder>\\r\\n` (sans préfixe, `0x00C7EBE8 = "%s\\n"`)
+        - `"2"` (Scan Once)   : `+<folder>\\r\\n` (`0x00C865B4 = "+%s\\n"`)
+        - `"0"` (Excluded)    : `-<folder>\\r\\n` (`0x00C865AC = "-%s\\n"`)
+        EN: Serializes `scanlist.txt` in the exact `SaveScanList` (`0x004F61C0`) format.
+        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x004F6380 (LoadScanList)
+        """
+        scan_lines: List[str] = []
+        for k, v in self.get_watched_folders().items():
+            if v == "0":
+                scan_lines.append(f"-{k}\r\n")
+            elif v == "2":
+                scan_lines.append(f"+{k}\r\n")
+            elif v == "1":
+                scan_lines.append(f"{k}\r\n")
+        return "".join(scan_lines).encode("utf-8", errors="surrogateescape")
+
     def save_repository_only(self) -> None:
         """
-        FR: Sauvegarde atomiquement sur disque uniquement `repository.dat` (configuration des dossiers
-        surveillés) sans réécrire les 56 tables `.pmp` ni `thumbindex.db`, évitant tout gel de l'UI
-        à la fermeture du Gestionnaire de dossiers.
-        EN: Atomically saves only `repository.dat` (watched folder settings) to disk without rewriting
-        all 56 `.pmp` tables or `thumbindex.db`, preventing any UI freeze when closing the Folder Manager.
-        Ref: picasa3.exe @ 0x008B1BF0, 0x008B7F90 (repository.dat)
+        FR: Sauvegarde atomiquement sur disque uniquement `repository.dat` et `scanlist.txt`
+        (configuration des dossiers surveillés) sans réécrire les 56 tables `.pmp` ni `thumbindex.db`,
+        évitant tout gel de l'UI à la fermeture du Gestionnaire de dossiers.
+        EN: Atomically saves only `repository.dat` and `scanlist.txt` (watched folder settings)
+        to disk without rewriting all 56 `.pmp` tables or `thumbindex.db`, preventing any UI freeze
+        when closing the Folder Manager.
+        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x008B1BF0, 0x008B7F90 (repository.dat)
         """
         if not self.db3_dir or self.db3_dir == Path(".") or not self.repository:
             return
@@ -2427,6 +2567,7 @@ class PicasaDatabase:
             self.db3_dir.mkdir(parents=True, exist_ok=True)
         with self._lock:
             repo_bytes = self.repository.to_bytes()
+            scanlist_bytes = self._serialize_scanlist_bytes()
         target = self.db3_dir / "repository.dat"
         tmp = target.with_suffix(target.suffix + ".tmp")
         tmp.write_bytes(repo_bytes)
@@ -2437,6 +2578,10 @@ class PicasaDatabase:
                 target.write_bytes(repo_bytes)
             finally:
                 tmp.unlink(missing_ok=True)
+        try:
+            (self.db3_dir / "scanlist.txt").write_bytes(scanlist_bytes)
+        except Exception:
+            pass
 
     def get_media_full_path(self, index: int) -> Optional[str]:
         """
@@ -2728,7 +2873,29 @@ class PicasaDatabase:
                 ft_pmp.records[index] = 1
                 ft_pmp.dirty = True
                 self._dirty = True
+            cache = getattr(self, "_face_template_cache", None)
+            if cache is not None:
+                cache.pop(index, None)
         return blob
+
+    _vqc_byte_lut: Optional[np.ndarray] = None
+
+    @classmethod
+    def _get_vqc_byte_lut(cls) -> np.ndarray:
+        """
+        FR: Table de correspondance (256, 2) float32 précalculée convertissant un octet de deux nibbles 4 bits
+        en deux valeurs déquantifiées `[(b & 0x0F)*2.0 - 15.0, ((b >> 4) & 0x0F)*2.0 - 15.0]`.
+        Permet un décodage vectorisé ~25x plus rapide pour le regroupement de dizaines de milliers de visages.
+        EN: Precomputed (256, 2) float32 lookup table mapping a packed 2-nibble byte to two dequantized values.
+        Ref: Red.dll @ 0x10102020 (vqc_Cue::exportArr), picasa3.exe @ 0x0048B840
+        """
+        if cls._vqc_byte_lut is None:
+            b = np.arange(256, dtype=np.uint8)
+            lut = np.empty((256, 2), dtype=np.float32)
+            lut[:, 0] = (b & 0x0F).astype(np.float32) * 2.0 - 15.0
+            lut[:, 1] = ((b >> 4) & 0x0F).astype(np.float32) * 2.0 - 15.0
+            cls._vqc_byte_lut = lut
+        return cls._vqc_byte_lut
 
     def get_face_template_cue(self, index: int) -> Optional[Tuple[np.ndarray, float, int]]:
         """
@@ -2756,18 +2923,32 @@ class PicasaDatabase:
             container = self._get_container_for_entry("facetemplatesV2", entry.block)
             if not container:
                 return None
+            if getattr(container, "_payload", None) is None:
+                _ = container.payload
             blob = container.get_blob(entry)
         if len(blob) < 1044:
             return None
-        decoded = decode_face_template_blob(blob)
-        if decoded is not None:
-            packed_1000, inv_norm, image_stamp = decoded
-            raw_bytes = np.frombuffer(packed_1000, dtype=np.uint8)
-            vals = np.empty(2000, dtype=np.float32)
-            vals[0::2] = (raw_bytes & 0x0F).astype(np.float32) * 2.0 - 15.0
-            vals[1::2] = ((raw_bytes >> 4) & 0x0F).astype(np.float32) * 2.0 - 15.0
+        u0, u1, u2, u3, u4, u5, u6, inv_norm, image_stamp, u9, _ = struct.unpack_from("<7If3I", blob, 0)
+        if (
+            u0 == 1044
+            and u1 == 0x00423002
+            and u2 == 0
+            and u3 == 0x0044DD4D
+            and u4 == 2000
+            and u5 == 4
+            and u6 == 8
+            and u9 == 250
+        ):
+            raw_bytes = np.frombuffer(blob, dtype=np.uint8, count=1000, offset=44)
+            vals = self._get_vqc_byte_lut()[raw_bytes].ravel()
             sqrt_w, _ = self._get_vqc_relator_weights()
-            return vals * (inv_norm * sqrt_w), inv_norm, image_stamp
+            vec = vals * (inv_norm * sqrt_w)
+            cache = getattr(self, "_face_template_cache", None)
+            if cache is None:
+                cache = {}
+                self._face_template_cache = cache
+            cache[index] = vec
+            return vec, float(inv_norm), int(image_stamp)
         # FR: Fallback pour blobs synthétiques de test / EN: Fallback for synthetic test blobs
         raw = np.frombuffer(blob[20:1044], dtype=np.int8).astype(np.float32)
         norm = float(np.linalg.norm(raw))
@@ -2786,13 +2967,19 @@ class PicasaDatabase:
         """
         if not blob or len(blob) < 1044:
             return None
-        decoded = decode_face_template_blob(blob)
-        if decoded is not None:
-            packed_1000, inv_norm, _ = decoded
-            raw_bytes = np.frombuffer(packed_1000, dtype=np.uint8)
-            vals = np.empty(2000, dtype=np.float32)
-            vals[0::2] = (raw_bytes & 0x0F).astype(np.float32) * 2.0 - 15.0
-            vals[1::2] = ((raw_bytes >> 4) & 0x0F).astype(np.float32) * 2.0 - 15.0
+        u0, u1, u2, u3, u4, u5, u6, inv_norm, _, u9, _ = struct.unpack_from("<7If3I", blob, 0)
+        if (
+            u0 == 1044
+            and u1 == 0x00423002
+            and u2 == 0
+            and u3 == 0x0044DD4D
+            and u4 == 2000
+            and u5 == 4
+            and u6 == 8
+            and u9 == 250
+        ):
+            raw_bytes = np.frombuffer(blob, dtype=np.uint8, count=1000, offset=44)
+            vals = cls._get_vqc_byte_lut()[raw_bytes].ravel()
             sqrt_w, _ = cls._get_vqc_relator_weights()
             return vals * (inv_norm * sqrt_w)
         return None
@@ -2801,8 +2988,13 @@ class PicasaDatabase:
         """
         FR: Extrait le vecteur de modèle facial précalculé (Neven FaceSDK vqc_Cue) depuis facetemplatesV2_*.db.
         EN: Extracts the precomputed facial template vector (Neven FaceSDK vqc_Cue) from facetemplatesV2_*.db.
-        Ref: picasa3.exe @ 0x0048050B, 0x006CE4A0 & Red.dll @ 0x10100A10 (vqc_Relator::sim)
+        Ref: picasa3.exe @ 0x0048050B, 0x0048B840, 0x006CE4A0 & Red.dll @ 0x10100A10 (vqc_Relator::sim)
         """
+        cache = getattr(self, "_face_template_cache", None)
+        if cache is not None:
+            cached = cache.get(index)
+            if cached is not None:
+                return cached
         cue = self.get_face_template_cue(index)
         return cue[0] if cue is not None else None
 
@@ -3015,13 +3207,13 @@ class PicasaDatabase:
 
     def ensure_folder_album_row(self, folder_path: str) -> str:
         """
-        FR: Garantit l'existence d'une ligne d'album de dossier (`albumdata_category == 2`) dans
+        FR: Garantit l'existence d'une ligne d'album de dossier (`albumdata_category == 2` ou `7`) dans
         `albumdata_*.pmp` pour `folder_path`, synchronise `albumdata_inisync` avec le `FILETIME`
         exact (100 ns) de `.picasa.ini`, et retourne le jeton `]album:<uid>` du dossier.
-        EN: Ensures a folder album row (`albumdata_category == 2`) exists in `albumdata_*.pmp`
+        EN: Ensures a folder album row (`albumdata_category == 2` or `7`) exists in `albumdata_*.pmp`
         for `folder_path`, synchronizes `albumdata_inisync` with the exact 100 ns `FILETIME`
         of `.picasa.ini`, and returns the folder's `]album:<uid>` token.
-        Ref: picasa3.exe @ 0x00415790, 0x00456A15, 0x008AAD76 (vérifié sur db3 : 206 dossiers cat=2)
+        Ref: picasa3.exe @ 0x00415790, 0x00440D82, 0x0041CA51, 0x004DCF60, 0x00456A15, 0x008AAD76
         """
         ad_names = self.pmps.get("albumdata_name")
         ad_cats = self.pmps.get("albumdata_category")
@@ -3378,7 +3570,7 @@ class PicasaDatabase:
             encoded_small = _encode_scaled_jpeg(144, 90) if "thumbs" in self.block_indices else None
             encoded_med = _encode_scaled_jpeg(72, 90) if "thumbs2" in self.block_indices else None
             encoded_large = _encode_scaled_jpeg(288, 90) if _has_existing_block_entry("bigthumbs", resolved_idx) else None
-            encoded_prev = _encode_scaled_jpeg(640, 90) if _has_existing_block_entry("previews", resolved_idx) else None
+            encoded_prev = _encode_scaled_jpeg(640, 90) if "previews" in self.block_indices else None
 
             avg_u32: Optional[int] = None
             if "imagedata_avgcolor" in self.pmps:
@@ -3729,11 +3921,14 @@ class PicasaDatabase:
             idx_path = self.db3_dir / f"{prefix}_index.db"
             idx_bytes: Optional[bytes] = None
             with self._get_block_lock(prefix):
-                if force_all or getattr(idx_file, "dirty", True) or not idx_path.exists():
+                if getattr(idx_file, "dirty", True) or not idx_path.exists() or (
+                    force_all and not getattr(idx_file, "_compacted_on_disk", False)
+                ):
                     idx_bytes = idx_file.to_bytes()
             if idx_bytes is not None:
                 _atomic_write(idx_path, idx_bytes)
                 idx_file.dirty = False
+                idx_file._compacted_on_disk = False
 
         # 3. Tables PMP (*.pmp) : alignement strict des tables imagedata_*, albumdata_*, catdata_*
         with self._lock:
@@ -3829,15 +4024,11 @@ class PicasaDatabase:
         if not self.db3_dir or self.db3_dir == Path(".") or not self.db3_dir.exists():
             return
 
-        # 1. scanlist.txt (Ref: 0x004F61C0 : "+<folder>\r\n" pour status 1/2, "-<folder>\r\n" pour status 0)
-        if self.repository is not None:
-            scan_lines: List[str] = []
-            for k, v in self.repository.pairs:
-                if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
-                    prefix_ch = "-" if v == "0" else "+"
-                    scan_lines.append(f"{prefix_ch}{k}\r\n")
-            if scan_lines or not (self.db3_dir / "scanlist.txt").exists():
-                (self.db3_dir / "scanlist.txt").write_bytes("".join(scan_lines).encode("utf-8", errors="surrogateescape"))
+        # 1. scanlist.txt (Ref: 0x004F61C0 : "<folder>\r\n" pour status 1, "+<folder>\r\n" pour status 2, "-<folder>\r\n" pour status 0)
+        if self.repository is not None or self._scanlist:
+            scanlist_bytes = self._serialize_scanlist_bytes()
+            if scanlist_bytes or not (self.db3_dir / "scanlist.txt").exists():
+                (self.db3_dir / "scanlist.txt").write_bytes(scanlist_bytes)
 
         # 2. starlist.txt & saverlist.txt (Ref: 0x004755F0 : chemins des photos ]star et ]screensaver)
         if self.wordhash is not None and self.thumbindex is not None:

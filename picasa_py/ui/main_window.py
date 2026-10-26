@@ -486,11 +486,30 @@ class PicasaMainWindow(QMainWindow):
 
             if self.watcher is not None:
                 try:
-                    self.watcher.debounce_timer.stop()
-                    self.watcher.pending_changed_paths.clear()
-                    self.watcher.set_watched_directories([])
+                    if hasattr(self.watcher, "stop"):
+                        self.watcher.stop()
+                    else:
+                        self.watcher.debounce_timer.stop()
+                        self.watcher.pending_changed_paths.clear()
+                        self.watcher.set_watched_directories([])
+                    try:
+                        self.watcher.scan_requested.disconnect(self._on_watcher_scan_requested)
+                    except Exception:
+                        pass
+                    self.watcher.deleteLater()
                 except Exception:
                     pass
+                self.watcher = None
+
+            if hasattr(self, "notifier_popup") and self.notifier_popup:
+                try:
+                    self.notifier_popup.clear_notifications()
+                    self.notifier_popup.hide()
+                except Exception:
+                    pass
+
+            if hasattr(self, "_unlocked_collections") and isinstance(self._unlocked_collections, set):
+                self._unlocked_collections.clear()
 
             if self.db is not None and getattr(self.db, "_face_manager", None) is not None:
                 try:
@@ -502,10 +521,39 @@ class PicasaMainWindow(QMainWindow):
             if self.stack.currentWidget() == self.one_up_view:
                 self._back_to_library()
 
+            if hasattr(self, "one_up_view") and self.one_up_view is not None:
+                try:
+                    if hasattr(self.one_up_view, "_full_res_preview_timer"):
+                        self.one_up_view._full_res_preview_timer.stop()
+                    if hasattr(self.one_up_view, "_ flush_pending_thumb_db_sync"):
+                        self.one_up_view._flush_pending_thumb_db_sync()
+                    elif hasattr(self.one_up_view, "_flush_pending_thumb_db_sync"):
+                        self.one_up_view._flush_pending_thumb_db_sync()
+                    if hasattr(self.one_up_view, "_thumb_db_sync_timer"):
+                        self.one_up_view._thumb_db_sync_timer.stop()
+                except Exception:
+                    pass
+
+            # FR: Annuler tout timer d'écriture différée sur l'ancienne base avant de basculer
+            # EN: Cancel any deferred save timer on the old database before switching
+            if self.db is not None and self.db is not new_db_or_path:
+                try:
+                    t_timer = getattr(self.db, "_thumb_save_timer", None)
+                    if t_timer is not None:
+                        t_timer.cancel()
+                        self.db._thumb_save_timer = None
+                except Exception:
+                    pass
+
             if isinstance(new_db_or_path, PicasaDatabase):
                 self.db = new_db_or_path
             else:
                 self.db = PicasaDatabase.open(str(new_db_or_path))
+
+            if hasattr(self, "one_up_view") and self.one_up_view is not None:
+                self.one_up_view.db = self.db
+                self.one_up_view.current_index = -1
+                self.one_up_view.available_indices = []
 
             if persist_preference and self.db:
                 from picasa_py.db.preferences import PicasaPreferences
@@ -514,9 +562,9 @@ class PicasaMainWindow(QMainWindow):
             self.photo_tray.set_database(self.db)
             self.photo_tray.held_items = []
             self.photo_tray.set_selected_items([])
-            self.library_tree.populate_from_database(self.db)
             self.thumb_view.set_database(self.db)
-            if self.right_drawer.isVisible():
+            self.library_tree.populate_from_database(self.db)
+            if hasattr(self, "right_drawer") and self.right_drawer is not None:
                 self.right_drawer.set_current_photo(self.db, -1, "")
 
             if self.db and getattr(self.db, "face_manager", None):
@@ -526,12 +574,8 @@ class PicasaMainWindow(QMainWindow):
             count = len(self.db.index)
             self.status_bar.showMessage(f"Base de données chargée ({self.db.db3_dir}) : {count} photos indexées")
 
-            if self.watcher is None:
-                self.watcher = PicasaFolderWatcher(self.db, self)
-                self.watcher.scan_requested.connect(self._on_watcher_scan_requested)
-            else:
-                self.watcher.db = self.db
-                self.watcher.reload_from_database()
+            self.watcher = PicasaFolderWatcher(self.db, self)
+            self.watcher.scan_requested.connect(self._on_watcher_scan_requested)
 
             if self.auto_scan:
                 QTimer.singleShot(500, self._launch_deferred_startup_scan)
@@ -560,10 +604,26 @@ class PicasaMainWindow(QMainWindow):
             return
         if self.face_worker is not None and self.face_worker.isRunning():
             return
-        watched = [p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")]
+        indexed_dirs_lower: Set[str] = set()
+        if self.db.thumbindex:
+            for r in self.db.thumbindex.records:
+                if r.type == 1 and r.is_active and r.path:
+                    indexed_dirs_lower.add(r.path.replace("/", "\\").rstrip("\\").lower())
+        watched: List[str] = []
+        for p, st in self.db.get_watched_folders().items():
+            clean_p = p.rstrip("\\/")
+            if st == "1":
+                watched.append(clean_p)
+            elif st == "2":
+                # Ref: picasa3.exe @ 0x004F6380 — un dossier "Scan Once" (+) n'est balayé au démarrage
+                # que s'il ne possède encore aucun dossier indexé dans thumbindex.db.
+                norm_p = clean_p.replace("/", "\\").lower()
+                prefix_p = norm_p + "\\"
+                if not any(d == norm_p or d.startswith(prefix_p) for d in indexed_dirs_lower):
+                    watched.append(clean_p)
         if watched:
             self._start_background_scan(watched)
-        else:
+        elif len(self.db.index) > 0:
             self._start_background_face_detection()
 
     def _open_one_up_view(self, item_idx: int) -> None:
@@ -743,9 +803,23 @@ class PicasaMainWindow(QMainWindow):
     def _on_people_changed(self) -> None:
         """
         FR: Appelé dès qu'une personne ou un visage est ajouté, renommé, réassigné ou supprimé.
+        Préserve la sélection et tout champ de saisie de nom actif dans le volet Personnes
+        lorsque la mise à jour provient du thread de détection en arrière-plan (`BackgroundFaceDetectionWorker`).
         EN: Called whenever a person or face is added, renamed, reassigned, or deleted.
+        Preserves selection and any active name input box in the People panel
+        when the update originates from the background detection worker (`BackgroundFaceDetectionWorker`).
         Ref: picasa3.exe @ 0x008AAD76 (NOTIFY_PEOPLE_CHANGED, CAlbumListUI::UpdateCategory People)
+        Ref: picasa3.exe @ 0x00789C00 - 0x00789D50 (faceclusterpanel::UpdateClusters)
         """
+        sender = self.sender()
+        is_bg_face_worker = sender is not None and sender is getattr(self, "face_worker", None)
+        user_editing_name = (
+            hasattr(self, "right_drawer")
+            and self.right_drawer is not None
+            and hasattr(self.right_drawer, "is_user_editing_name")
+            and self.right_drawer.is_user_editing_name()
+        )
+
         if self.library_tree:
             self.library_tree.refresh_people()
         if (
@@ -760,34 +834,41 @@ class PicasaMainWindow(QMainWindow):
             )
             self.one_up_view.canvas.set_face_rects(faces)
             if hasattr(self.one_up_view, "right_drawer"):
-                self.one_up_view.right_drawer._dirty_panels.add("people")
-                if not getattr(self.one_up_view.right_drawer, "_explicitly_hidden", True):
-                    self.one_up_view.right_drawer._sync_active_panel()
+                one_up_editing = (
+                    hasattr(self.one_up_view.right_drawer, "is_user_editing_name")
+                    and self.one_up_view.right_drawer.is_user_editing_name()
+                )
+                if not (is_bg_face_worker and one_up_editing):
+                    self.one_up_view.right_drawer._dirty_panels.add("people")
+                    if not getattr(self.one_up_view.right_drawer, "_explicitly_hidden", True):
+                        self.one_up_view.right_drawer._sync_active_panel()
         if (
             self.thumb_view
             and self.thumb_view.current_folder_filter
             and self.thumb_view.current_folder_filter.startswith("person:")
         ):
+            if is_bg_face_worker and (user_editing_name or bool(self.thumb_view.selected_indices)):
+                return
             cid = self.thumb_view.current_folder_filter[7:]
             person = self.db.face_manager.get_person(cid) if self.db and self.db.face_manager else None
             if person:
                 only_sug = False
                 if self.thumb_view.visible_sections and self.thumb_view.visible_sections[0].only_suggestions:
                     only_sug = True
-                self.thumb_view.filter_by_person(cid, person.name, person.photo_indices, only_suggestions=only_sug)
-        elif (
-            self.thumb_view
-            and self.thumb_view.current_folder_filter == "unnamed_faces"
-        ):
-            if self.db and getattr(self.db, "face_manager", None):
                 saved_scroll = self.thumb_view.scroll_y
-                self.thumb_view.filter_by_unnamed_faces(self.db.face_manager.unnamed_faces)
+                self.thumb_view.filter_by_person(cid, person.name, person.photo_indices, only_suggestions=only_sug)
                 if saved_scroll > 0:
                     max_scroll = max(0, self.thumb_view.total_content_height - self.thumb_view.height())
                     clamped_scroll = min(saved_scroll, max_scroll)
                     self.thumb_view.scroll_y = clamped_scroll
                     self.thumb_view.scrollbar.set_value(clamped_scroll)
                     self.thumb_view.update()
+        elif (
+            self.thumb_view
+            and self.thumb_view.current_folder_filter == "unnamed_faces"
+        ):
+            if self.db and getattr(self.db, "face_manager", None):
+                self.thumb_view.sync_unnamed_faces_incremental(self.db.face_manager.unnamed_faces)
 
     def _on_person_filter_requested(self, contact_id: str, name: str) -> None:
         """
@@ -943,18 +1024,18 @@ class PicasaMainWindow(QMainWindow):
             paths = [self.thumb_view.items[i].path for i in indices if i < len(self.thumb_view.items)]
             if self.db:
                 self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
-                if indices and self.right_drawer.isVisible():
-                    self.right_drawer.set_multiple_photos(self.db, indices, paths)
+                if not self.thumb_view.selected_indices:
+                    self.right_drawer.set_current_photo(self.db, -1, "")
             self.status_bar.showMessage(f"Dossier sélectionné : {display_name}")
         elif target_type == "person":
             person = self.db.face_manager.get_person(key) if self.db and self.db.face_manager else None
             indices = person.photo_indices if person else []
             self.thumb_view.filter_by_person(key, display_name, indices)
-            paths = [self.thumb_view.items[i].path for i in indices if i < len(self.thumb_view.items)]
+            paths = [self.thumb_view.items[i].path for i in self.thumb_view.filtered_indices if i < len(self.thumb_view.items)]
             if self.db:
                 self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
-                if indices and self.right_drawer.isVisible():
-                    self.right_drawer.set_multiple_photos(self.db, indices, paths)
+                if not self.thumb_view.selected_indices:
+                    self.right_drawer.set_current_photo(self.db, -1, "")
             self.status_bar.showMessage(f"Personne : {display_name} ({len(indices)} photos)")
         elif target_type == "album":
             indices = self._get_album_item_indices(key, display_name)
@@ -962,8 +1043,8 @@ class PicasaMainWindow(QMainWindow):
             paths = [self.thumb_view.items[i].path for i in indices if i < len(self.thumb_view.items)]
             if self.db:
                 self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
-                if indices and self.right_drawer.isVisible():
-                    self.right_drawer.set_multiple_photos(self.db, indices, paths)
+                if not self.thumb_view.selected_indices:
+                    self.right_drawer.set_current_photo(self.db, -1, "")
             self.status_bar.showMessage(f"Album : {display_name} ({len(indices)} photos)")
         elif target_type == "starred":
             self.thumb_view.filter_by_starred()
@@ -971,18 +1052,17 @@ class PicasaMainWindow(QMainWindow):
             paths = [self.thumb_view.items[i].path for i in self.thumb_view.filtered_indices if i < len(self.thumb_view.items)]
             if self.db:
                 self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
-                if paths and self.right_drawer.isVisible():
-                    self.right_drawer.set_multiple_photos(self.db, self.thumb_view.filtered_indices, paths)
+                if not self.thumb_view.selected_indices:
+                    self.right_drawer.set_current_photo(self.db, -1, "")
             self.status_bar.showMessage(f"Photos favorites : {count} photo(s)")
         elif target_type == "unnamed_faces":
+            # Ref: picasa3.exe @ 0x0074AE80 - 0x0074AF79 (unknownfaceheaderpanel) & 0x00647F79 (PeoplePanel selection state)
             if self.db and getattr(self.db, "face_manager", None):
                 unnamed = self.db.face_manager.unnamed_faces
+                # Réinitialiser le contexte d'album du tiroir droit AVANT filter_by_unnamed_faces
+                # afin que selection_changed([]) n'invoque jamais set_multiple_photos sur 33 000+ visages
+                self.right_drawer.set_album_paths(self.db, [], scope_label="l'album")
                 self.thumb_view.filter_by_unnamed_faces(unnamed)
-                indices = [u[0] for u in unnamed if u[0] is not None]
-                paths = [u[1] for u in unnamed]
-                self.right_drawer.set_album_paths(self.db, paths, scope_label="l'album")
-                if self.right_drawer.isVisible():
-                    self.right_drawer.set_multiple_photos(self.db, indices, paths)
                 self.status_bar.showMessage(f"Visages sans nom : {len(unnamed)} visages à identifier")
             else:
                 self.status_bar.showMessage("Aucun visage sans nom détecté.")
@@ -1054,26 +1134,92 @@ class PicasaMainWindow(QMainWindow):
         if self.db is None:
             return
 
-        if count == 1:
-            idx = indices[0]
-            if idx < len(self.thumb_view.items):
-                item = self.thumb_view.items[idx]
-                self.right_drawer.set_current_photo(self.db, item.index, item.path)
-        elif count > 1:
-            selected_paths = [
-                self.thumb_view.items[i].path for i in indices
-                if i < len(self.thumb_view.items) and self.thumb_view.items[i].path
-            ]
-            self.right_drawer.set_multiple_photos(self.db, indices, selected_paths)
-        elif count == 0:
-            # Aucune sélection : afficher le contexte de l'album courant s'il est défini
-            if self.right_drawer._album_paths:
-                self.right_drawer.set_multiple_photos(self.db, [], self.right_drawer._album_paths)
-            else:
-                self.right_drawer.set_current_photo(self.db, -1, "")
+        self._sync_right_drawer_from_selection(indices)
 
         if self.right_drawer.isVisible():
             self.right_drawer._ensure_splitter_width(520 if self.right_drawer._is_expanded else 280)
+
+    def _sync_right_drawer_from_selection(self, indices: List[int]) -> None:
+        """
+        FR: Synchronise le tiroir latéral droit (`PicasaRightDrawer`) selon les éléments actuellement sélectionnés :
+        - En vue "Visages sans nom" (`unnamed_faces` / `faceclusterpanel` @ `0x0064C4C4 - 0x0064CD8D`),
+          affiche uniquement les visages ou grappes sélectionnés (`explicit_clusters`), sans extraire les autres
+          personnes figurant sur la même photo parente et sans jamais dupliquer la photo.
+          Si 0 élément est sélectionné (`0x00647F79`), affiche l'invite vide ("Sélectionner des photos...").
+        - Dans les autres vues, résout les index de base de données (`item.index`) et déduplique par photo parente.
+        EN: Synchronizes the right side drawer (`PicasaRightDrawer`) based on the currently selected items.
+        Ref: picasa3.exe @ 0x0064C4C4 - 0x0064CD8D, 0x00647F79, 0x0078A6C0 (faceclusterpanel::GetSelectedFaces)
+        """
+        if self.db is None:
+            return
+        count = len(indices)
+        is_unnamed_view = getattr(self.thumb_view, "current_folder_filter", None) == "unnamed_faces"
+
+        if count == 0:
+            # Ref: picasa3.exe @ 0x00647F79 (PeoplePanel: 0 photo sélectionnée -> état vide "Sélectionner des photos...")
+            self.right_drawer.set_current_photo(self.db, -1, "")
+            return
+
+        if is_unnamed_view:
+            explicit_clusters: List[List[Tuple[Optional[int], str, Any]]] = []
+            selected_db_indices: List[int] = []
+            selected_paths: List[str] = []
+            for i in indices:
+                if 0 <= i < len(self.thumb_view.items):
+                    it = self.thumb_view.items[i]
+                    c_faces = getattr(it, "cluster_faces", None)
+                    if c_faces:
+                        explicit_clusters.append(list(c_faces))
+                        for db_idx, ppath, _ in c_faces:
+                            if ppath:
+                                selected_db_indices.append(db_idx if db_idx is not None else -1)
+                                selected_paths.append(ppath)
+                    elif getattr(it, "face_rect", None) is not None and it.path:
+                        explicit_clusters.append([(it.index if it.index >= 0 else None, it.path, it.face_rect)])
+                        selected_db_indices.append(it.index)
+                        selected_paths.append(it.path)
+            if explicit_clusters:
+                self.right_drawer.set_multiple_photos(
+                    self.db,
+                    selected_db_indices,
+                    selected_paths,
+                    explicit_clusters=explicit_clusters,
+                )
+                return
+
+        if count == 1:
+            idx = indices[0]
+            if 0 <= idx < len(self.thumb_view.items):
+                item = self.thumb_view.items[idx]
+                c_faces = getattr(item, "cluster_faces", None)
+                if c_faces and len(c_faces) > 1:
+                    # Ref: picasa3.exe @ 0x0078A6C0 (faceclusterpanel::GetSelectedFaces étend la grappe au tiroir PeoplePanel)
+                    c_db_indices = [db_idx if db_idx is not None else -1 for db_idx, _, _ in c_faces]
+                    c_paths = [ppath for _, ppath, _ in c_faces if ppath]
+                    self.right_drawer.set_multiple_photos(
+                        self.db,
+                        c_db_indices,
+                        c_paths,
+                        explicit_clusters=[list(c_faces)],
+                    )
+                else:
+                    self.right_drawer.set_current_photo(self.db, item.index, item.path)
+        elif count > 1:
+            selected_db_indices = []
+            selected_paths = []
+            for i in indices:
+                if 0 <= i < len(self.thumb_view.items):
+                    it = self.thumb_view.items[i]
+                    c_faces = getattr(it, "cluster_faces", None)
+                    if c_faces and len(c_faces) > 1:
+                        for db_idx, ppath, _ in c_faces:
+                            if ppath:
+                                selected_db_indices.append(db_idx if db_idx is not None else -1)
+                                selected_paths.append(ppath)
+                    elif it.path:
+                        selected_db_indices.append(it.index)
+                        selected_paths.append(it.path)
+            self.right_drawer.set_multiple_photos(self.db, selected_db_indices, selected_paths)
 
     def _on_tray_add_to_album(self) -> None:
         """
@@ -1275,20 +1421,29 @@ class PicasaMainWindow(QMainWindow):
         if is_open:
             self.right_drawer._ensure_splitter_width(520 if self.right_drawer._is_expanded else 280)
         if is_open and self.db is not None:
-            selected_indices = list(self.thumb_view.selected_indices)
-            if len(selected_indices) == 1:
-                item = self.thumb_view.items[selected_indices[0]]
-                self.right_drawer.set_current_photo(self.db, item.index, item.path)
-            elif len(selected_indices) > 1:
-                paths = [self.thumb_view.items[i].path for i in selected_indices if i < len(self.thumb_view.items)]
-                self.right_drawer.set_multiple_photos(self.db, selected_indices, paths)
+            selected_indices = sorted(self.thumb_view.selected_indices)
+            if selected_indices or getattr(self.thumb_view, "current_folder_filter", None) == "unnamed_faces":
+                self._sync_right_drawer_from_selection(selected_indices)
             elif self.thumb_view.current_folder_filter:
                 disp_indices = self.thumb_view.filtered_indices if self.thumb_view.filtered_indices is not None else []
                 if disp_indices and len(disp_indices) <= 200:
-                    paths = [self.thumb_view.items[i].path for i in disp_indices if i < len(self.thumb_view.items)]
-                    self.right_drawer.set_multiple_photos(self.db, disp_indices, paths)
+                    db_indices = [
+                        self.thumb_view.items[i].index
+                        for i in disp_indices
+                        if 0 <= i < len(self.thumb_view.items) and self.thumb_view.items[i].path
+                    ]
+                    paths = [
+                        self.thumb_view.items[i].path
+                        for i in disp_indices
+                        if 0 <= i < len(self.thumb_view.items) and self.thumb_view.items[i].path
+                    ]
+                    self.right_drawer.set_multiple_photos(self.db, db_indices, paths)
+                else:
+                    self.right_drawer.set_current_photo(self.db, -1, "")
             elif self.right_drawer._album_paths:
                 self.right_drawer.set_multiple_photos(self.db, [], self.right_drawer._album_paths)
+            else:
+                self.right_drawer.set_current_photo(self.db, -1, "")
 
     def _on_search_query(self, query: str) -> None:
         """
@@ -2758,6 +2913,12 @@ class PicasaMainWindow(QMainWindow):
                 if rep != QMessageBox.StandardButton.Yes:
                     return None
 
+            # FR: Arrêter impérativement tout scan/watcher de l'ancienne base AVANT d'écrire la nouvelle base sur disque
+            # EN: Strictly stop any active scan/watcher on the old database BEFORE writing the new database to disk
+            self.stop_background_tasks()
+            if self.watcher is not None and hasattr(self.watcher, "stop"):
+                self.watcher.stop()
+
             new_db = PicasaDatabase.create_new(target_dir)
             self.switch_database(new_db, persist_preference=persist_pref)
             self.status_bar.showMessage(f"Nouvelle base de données créée et activée : {new_db.db3_dir}")
@@ -2819,6 +2980,12 @@ class PicasaMainWindow(QMainWindow):
                     if rep == QMessageBox.StandardButton.Yes:
                         return self.action_create_database(target_dir)
                     return None
+
+            # FR: Arrêter impérativement tout scan/watcher de l'ancienne base AVANT d'ouvrir la nouvelle base
+            # EN: Strictly stop any active scan/watcher on the old database BEFORE opening the new database
+            self.stop_background_tasks()
+            if self.watcher is not None and hasattr(self.watcher, "stop"):
+                self.watcher.stop()
 
             opened_db = PicasaDatabase.open(target_dir)
             self.switch_database(opened_db, persist_preference=persist_pref)
@@ -3101,8 +3268,8 @@ class PicasaMainWindow(QMainWindow):
             added = scanner.index_file(fn)
             if added is not None:
                 self.db.save_database()
-                self.library_tree.populate_from_database(self.db)
                 self.thumb_view.set_database(self.db)
+                self.library_tree.populate_from_database(self.db)
                 if hasattr(self, "notifier_popup") and self.notifier_popup:
                     self.notifier_popup.notify_photo_indexed(
                         os.path.dirname(fn),
@@ -4691,9 +4858,18 @@ class PicasaMainWindow(QMainWindow):
     def _on_watcher_scan_requested(self, paths: List[str]) -> None:
         """
         FR: Déclenché par le watcher après le délai de stabilisation de 500 ms.
+        Ignore toute demande si la base active ne possède aucun dossier surveillé ni indexé.
         EN: Triggered by the folder watcher after the 500 ms debounce delay.
+        Ignores any request if the active database has no watched or indexed folders.
         Ref: picasa3.exe @ 0x00704F20 (ReadDirectoryChangesW debounce 500 ms)
         """
+        if not self.db or not paths:
+            return
+        if self.sender() is not None and self.sender() is not self.watcher:
+            return
+        watched = [p for p, st in self.db.get_watched_folders().items() if st in ("1", "2")]
+        if not watched and not self.db.index:
+            return
         self.status_bar.showMessage(f"Modification détectée dans {len(paths)} dossier(s)...")
         self._start_background_scan(paths, notify_popup=True)
 
@@ -4733,7 +4909,10 @@ class PicasaMainWindow(QMainWindow):
         `CThumbDB` (`thumbs_0.db`) without ever decoding the full-resolution image on the GUI thread.
         Ref: picasa3.exe @ 0x00571850 (CThumbUI::NotifyPhotoAddedOrUpdated -> CNotifierPopup @ 0x00659340)
         """
-        if getattr(self, "_is_closing", False):
+        if getattr(self, "_is_closing", False) or not self.db:
+            return
+        sender = self.sender()
+        if sender is not None and (sender is not self.scan_worker or getattr(sender, "db", None) is not self.db):
             return
         full_path = os.path.join(folder_path, filename) if folder_path and filename else ""
         if getattr(self, "_active_scan_notify", True) and hasattr(self, "notifier_popup") and self.notifier_popup:
@@ -4806,7 +4985,10 @@ class PicasaMainWindow(QMainWindow):
         EN: Refreshes the library when indexing finishes, drains any queued folders,
         and chains into background face detection.
         """
-        if getattr(self, "_is_closing", False):
+        if getattr(self, "_is_closing", False) or not self.db:
+            return
+        sender = self.sender()
+        if sender is not None and (sender is not self.scan_worker or getattr(sender, "db", None) is not self.db):
             return
         if total_added > 0 and self.db:
             self.library_tree.refresh_folders()
@@ -4877,20 +5059,46 @@ class PicasaMainWindow(QMainWindow):
 
     def stop_background_tasks(self) -> None:
         """
-        FR: Interrompt et attend la fin de tous les threads d'arrière-plan.
-        EN: Cancels and waits for all background threads to finish.
+        FR: Interrompt, déconnecte et attend la fin de tous les threads d'arrière-plan
+        afin qu'aucun signal en file d'attente de l'ancienne base ne pollue la nouvelle base.
+        EN: Cancels, disconnects, and waits for all background threads to finish so no
+        queued signal from the previous database can pollute the new database.
         """
         self._pending_scan_folders.clear()
+        self._pending_scan_notify = False
         if self.scan_worker:
-            self.scan_worker.cancel()
-            if self.scan_worker.isRunning():
-                self.scan_worker.wait(5000)
+            sw = self.scan_worker
+            self.scan_worker = None
+            sw.cancel()
+            for sig, slot in (
+                (sw.progress, self._on_scan_progress),
+                (sw.batch_indexed, self._on_scan_batch_indexed),
+                (sw.finished, self._on_scan_finished),
+            ):
+                try:
+                    sig.disconnect(slot)
+                except Exception:
+                    pass
+            if sw.isRunning():
+                sw.wait(5000)
         if self.face_worker:
-            self.face_worker.cancel()
-            if self.face_worker.isRunning():
-                self.face_worker.wait(5000)
+            fw = self.face_worker
+            self.face_worker = None
+            fw.cancel()
+            for sig, slot in (
+                (fw.progress, self._on_face_detect_progress),
+                (fw.people_updated, self._on_people_changed),
+                (fw.finished, self._on_face_detect_finished),
+            ):
+                try:
+                    sig.disconnect(slot)
+                except Exception:
+                    pass
+            if fw.isRunning():
+                fw.wait(5000)
         if hasattr(self, "thumb_view") and getattr(self.thumb_view, "_cluster_worker", None):
             cw = self.thumb_view._cluster_worker
+            self.thumb_view._cluster_worker = None
             if cw and cw.isRunning():
                 cw.wait(5000)
 

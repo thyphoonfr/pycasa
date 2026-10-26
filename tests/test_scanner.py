@@ -34,6 +34,10 @@ from picasa_py.scanner.scanner import (
     datetime_to_ole,
     PicasaDirScanner,
     BackgroundScanWorker,
+    _scale_box_dimensions,
+    compute_thumbnail_avgcolor,
+    detect_media_type,
+    _extract_tiff_raw_metadata_and_preview,
 )
 from picasa_py.scanner.watcher import PicasaFolderWatcher
 from picasa_py.ui.folder_manager import PicasaFolderManagerDialog
@@ -214,3 +218,50 @@ def test_folder_manager_dialog(temp_picasa_env, qapp):
     watched = db.get_watched_folders()
     norm_target = target + "\\" if not target.endswith("\\") else target
     assert watched.get(norm_target) == "1"
+
+
+def test_disassembly_verified_thumb_scaling_avgcolor_and_raw(tmp_path):
+    """
+    FR: Vérifie la formule FPU exacte de dimensionnement de vignettes (`0x009B4AA0` : `+0.499` / `+1e-5`),
+    la moyenne entière `imagedata_avgcolor` (`0x009AC640`), la détection par signature (`0x00A4C600`)
+    et l'extraction des dimensions actives capteur Pentax RAW (`0x008BD740` & `0x008C92E8`).
+    EN: Verifies the exact FPU thumbnail scaling formula (`0x009B4AA0`), integer floor mean
+    `imagedata_avgcolor` (`0x009AC640`), signature detection (`0x00A4C600`), and Pentax RAW
+    active sensor dimensions (`0x008BD740` & `0x008C92E8`).
+    """
+    # 1. 0x009B4AA0 : 4288x2848 -> 288x192 -> 144x96 -> 72x48 ; 2144x1424 -> 144x96 (et non 97)
+    assert _scale_box_dimensions(4288, 2848, 288) == (288, 192)
+    assert _scale_box_dimensions(288, 192, 144) == (144, 96)
+    assert _scale_box_dimensions(144, 96, 72) == (72, 48)
+    assert _scale_box_dimensions(2144, 1424, 144) == (144, 96)
+
+    # 2. 0x009AC640 : moyenne entière non signée sum_c // (w * h)
+    img = Image.new("RGB", (2, 2))
+    img.putdata([(10, 20, 30), (11, 21, 31), (12, 22, 32), (10, 20, 30)])
+    # sum_R = 43 // 4 = 10, sum_G = 83 // 4 = 20, sum_B = 123 // 4 = 30
+    assert compute_thumbnail_avgcolor(img) == (0xFF000000 | (10 << 16) | (20 << 8) | 30)
+
+    # 3. 0x00A4C600 & 0x00D33418 : un fichier .pef de signature TIFF ("MM\x00*") conserve le type RAW 18
+    import struct
+    pef_path = tmp_path / "sample_kx.pef"
+    # Construire un TIFF minimal (big-endian MM) avec ImageWidth=4352, ImageLength=2868, Compression=65535, Model="PENTAX K-x"
+    model_bytes = b"PENTAX K-x\x00\x00"
+    ifd_off = 8
+    n_tags = 4
+    model_off = ifd_off + 2 + n_tags * 12 + 4
+    buf = bytearray()
+    buf += struct.pack(">2sHI", b"MM", 42, ifd_off)
+    buf += struct.pack(">H", n_tags)
+    buf += struct.pack(">HHII", 0x0100, 4, 1, 4352)
+    buf += struct.pack(">HHII", 0x0101, 4, 1, 2868)
+    buf += struct.pack(">HHIH2x", 0x0103, 3, 1, 65535)
+    buf += struct.pack(">HHII", 0x0110, 2, len(model_bytes), model_off)
+    buf += struct.pack(">I", 0)
+    buf += model_bytes
+    pef_path.write_bytes(bytes(buf))
+
+    assert detect_media_type(pef_path) == 18
+    raw_meta = _extract_tiff_raw_metadata_and_preview(pef_path)
+    assert raw_meta is not None
+    rw, rh, orient, _, _ = raw_meta
+    assert (rw, rh, orient) == (4309, 2868, 1)

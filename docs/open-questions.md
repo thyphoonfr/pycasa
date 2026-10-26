@@ -192,22 +192,24 @@ modification pour les vidéos), `originfast` = 0 et pas de `thumbs2` pour les vi
 créés au scan, grand côté des vignettes forcé à 144 / 72 px avec petit côté arrondi au supérieur, `ft1`/`ft2`
 FILETIME exacts (100 ns), type détecté par signature, jetons `wordhash` (nom de fichier + dimensions JPEG).
 
-Points non résolus (`# TODO(unverified)`) :
+Points résolus par désassemblage (`bin/Picasa3.exe` via REA + Ghidra / Capstone) :
 
-1. **Arrondi du petit côté des vignettes** : `ceil` exact sur 97–98 % des cas ; les cas restants (valeur très
-   proche d'un entier, ex. 96,009 → 96) suggèrent un calcul sur l'image intermédiaire décodée. Routine à localiser
-   autour de `0x00424CA0`.
-2. **`imagedata_avgcolor`** : écart > 2 niveaux sur ~70 % de l'échantillon. L'original ne moyenne pas comme
-   `resize((1,1), BILINEAR)` sur la vignette 144 px (espace, gamma ou source différents). Routine non localisée.
-3. **Jetons `wordhash` non reproduits** : `]album:<jeton du dossier>` (album de dossier, catégorie 2),
-   `color:<teinte>` (10 teintes), mots EXIF/IPTC (`adobe`, `photoshop`, `iptc`…), étiquettes `]face`, `]star`,
-   `]edited`, `]updated`, `]geo`, `]hidden`… Algorithmes à localiser (indexeur de mots, classification de couleur).
-4. **Albums de dossier dans `albumdata_*`** : chaque dossier semble disposer d'une ligne `albumdata` de catégorie 2
-   (ex. « Pictures » → `]album:3926…`). Création et maintien de ces lignes non reproduits.
-5. **Dimensions des RAW** (`.PEF`…) : l'original stocke la taille capteur (ex. 4309×2868) ; `picasa_py` ne sait
-   pas décoder ces fichiers et écrit 640×480.
-6. **Détection par signature** : observée sur un seul enregistrement (WEBP nommé `.jpg` → type 31) ; routine de
-   détection non localisée dans le désassemblage.
+1. **Arrondi du petit côté des vignettes — Résolu (`0x009B4AA0`, `0x00A405A0`, `0x00424CA0`, `0x00425210`)** :
+   - La fonction `FUN_009b4aa0` (`0x009B4AA0`) ajoute `0.499` (`qword ptr [0x00CF4160]`) à la cible (`144` ou `72`) :
+     `scale = min((target + 0.499) / src_w, (target + 0.499) / src_h)`, puis calcule `src_w * scale + 1e-5` et
+     `src_h * scale + 1e-5` (`1e-5` @ `0x00CF41E0`), convertit en `float32` (`fstp dword ptr` / `fld dword ptr`)
+     et arrondit au plus proche via `fistp dword ptr`.
+   - De plus, `0x00424CA0` effectue la cascade `288 px` (`0x00424E65`) → `144 px` (`0x00424EEB`, qualité `90`) → `72 px` (`0x00425008`, qualité `90`). Vérifié sur `db3` : **4391 / 4392 (`99.98 %`)** des vignettes `thumbs2` correspondent au pixel près.
+2. **`imagedata_avgcolor` — Résolu (`0x009AC640`, appelée en `0x004280C9`)** :
+   - `FUN_009ac640` (`0x009AC640`) somme `R`, `G`, `B` sur les `N = width * height` pixels de la miniature `144 px` et divise par `N` par division entière non signée (`div ecx` en `0x009AC70B..0x009AC72E`), puis assemble `0xFF000000 | (avg_R << 16) | (avg_G << 8) | avg_B`. Implémenté dans `compute_thumbnail_avgcolor`.
+3. **Jetons `wordhash` — Résolu (`0x00987DA0`, `0x00428566`, `0x00424C20`, `0x009DBD10`, `0x0041CA51`)** :
+   - `CIndexer::Tokenize` (`0x00987DA0`, table `0x00D30BD0`), classification de teinte `color:<hue>` (`0x00428566` → `0x00424C20` → `0x009DBD10`), jetons `]album:<uid>` (`0x0041CA51..0x0041CB48`), `]face`, `]star`, `]edited`, `]updated`, `]geo`, `]hidden`, `]movie`, `]raw`, `]original` sont intégralement reproduits.
+4. **Albums de dossier dans `albumdata_*` — Résolu (`0x00415790`, `0x00440D82`, `0x0041CA51`, `0x004DCF60`, `0x00456A15`)** :
+   - Reproduit dans `PicasaDatabase.ensure_folder_album_row` (`cat=2` pour les dossiers normaux, `cat=7` pour les dossiers masqués, synchronisation `albumdata_inisync` sur le `FILETIME` 100 ns de `.picasa.ini`).
+5. **Dimensions et aperçu des RAW (`.PEF`…) — Résolu (`0x008BD740` `dcraw::parse_tiff_ifd`, `0x008C925E..0x008C93C8` `dcraw::identify`)** :
+   - Analyse binaire directe des IFD / `SubIFDs` (`0x014A`) / `ExifIFD` (`0x8769`), extraction du plus grand JPEG intégré (`0x0201` + `0x0202`) et application des dimensions actives capteur Pentax (`4352 -> 4309` pour `K-x` / `K-r`, `>=4960 -> 4950, h-10` pour `K-5`, `4736 -> 4684×3122` pour `K-7`, `(2624,3936) -> (2616,3896)`, `(3136,4864) -> (3124,4688)`). Vérifié sur `_IGP8998.PEF` (`4309×2868`, vignettes `144×96` et `72×48`).
+6. **Détection par signature et table d'extensions — Résolu (`0x00A4C600`, `0x00A4C140`, `0x005B1460`, `0x005B1570`, `0x004FADB0`, `0x00D33418`)** :
+   - `LookupExtensionType` (`0x00A4C140`) consulte la table de 73 extensions en `0x00D33418` ; `DetectSignatureType` (`0x00A4C600`) inspecte les 4 premiers octets en big-endian (`0xFFD8FFxx -> 2`, `\x89PNG -> 14/31`, `GIF8 -> 3/31`, `BM -> 6`, `RIFF -> 31`, et retourne `0` pour `II*\0`, `MM\0*`, `IIN1` afin que les TIFF `13` et RAW `18` conservent leur code d'extension).
 
 ---
 

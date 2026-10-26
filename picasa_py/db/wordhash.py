@@ -212,9 +212,18 @@ class WordHashFile:
         token_matches: List[set[int]] = []
         for token in tokens:
             matched_ids: set[int] = set()
-            for entry in self.entries:
-                if entry.word.lower().startswith(token):
-                    matched_ids.update(entry.image_ids)
+            if token.startswith("]"):
+                # FR: Les jetons internes Picasa (]facealbum:%d, ]album:..., ]unknownface, ]ignoreface, ]star, ]face)
+                # utilisent une correspondance exacte O(1) afin que ]facealbum:1 ne capture jamais ]facealbum:10.
+                # EN: Internal Picasa tokens use exact O(1) matching so ]facealbum:1 never matches ]facealbum:10.
+                # Ref: picasa3.exe @ 0x004DB180 (CWordHash::HasWord / exact token lookup)
+                ent = self._word_map.get(token)
+                if ent is not None:
+                    matched_ids.update(ent.image_ids)
+            else:
+                for entry in self.entries:
+                    if entry.word.lower().startswith(token):
+                        matched_ids.update(entry.image_ids)
             token_matches.append(matched_ids)
 
         if not token_matches:

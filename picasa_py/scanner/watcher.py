@@ -63,14 +63,16 @@ class PicasaFolderWatcher(QObject):
         if self.db:
             self.reload_from_database()
 
-    def _is_excluded_dir_name(self, name: str) -> bool:
+    def _is_excluded_dir_name(self, name: str, full_path: Optional[str] = None) -> bool:
         """
-        FR: Indique si un nom de sous-dossier doit être ignoré par la surveillance (ex: .git, .picasaoriginals).
-        EN: Indicates whether a subdirectory name should be ignored by the watcher (e.g. .git, .picasaoriginals).
-        Ref: picasa3.exe @ 0x00415790, 0x0085A0B0 (.picasaoriginals), runtime/filters.txt
+        FR: Indique si un nom de sous-dossier doit être ignoré par la surveillance
+        (ex: .git, .picasaoriginals, AppData, Temp, Windows, Program Files, dossiers cachés/système).
+        EN: Indicates whether a subdirectory name should be ignored by the watcher
+        (e.g. .git, .picasaoriginals, AppData, Temp, Windows, Program Files, hidden/system folders).
+        Ref: picasa3.exe @ 0x00415790, 0x004FBB90..0x004FC050, 0x0085A0B0 (.picasaoriginals), style/filters.txt
         """
         clean = name.strip().lower()
-        if not clean or clean.startswith("."):
+        if not clean or clean.startswith(".") or clean.startswith("$"):
             return True
         if clean in {
             "__pycache__",
@@ -78,11 +80,46 @@ class PicasaFolderWatcher(QObject):
             "venv",
             ".venv",
             "originals",
+            ".picasaoriginals",
+            "thumbs",
+            "recycler",
             "$recycle.bin",
             "system volume information",
+            "windows",
+            "winnt",
+            "temp",
+            "tmp",
+            "appdata",
+            "application data",
+            "local settings",
+            "program files",
+            "program files (x86)",
+            "programdata",
         }:
             return True
         return False
+
+    def stop(self) -> None:
+        """
+        FR: Arrête immédiatement tous les minuteurs et vide l'ensemble des chemins surveillés
+        afin qu'aucun événement résiduel ne soit émis après un changement de base de données.
+        EN: Immediately stops all timers and clears all watched paths so no residual events
+        are emitted after a database switch.
+        """
+        self.debounce_timer.stop()
+        self._walk_chunk_timer.stop()
+        self._pending_walk_roots.clear()
+        self.pending_changed_paths.clear()
+        self.watched_paths.clear()
+        try:
+            dirs = self.watcher.directories()
+            if dirs:
+                self.watcher.removePaths(dirs)
+            files = self.watcher.files()
+            if files:
+                self.watcher.removePaths(files)
+        except Exception:
+            pass
 
     def reload_from_database(self) -> None:
         """
@@ -106,7 +143,9 @@ class PicasaFolderWatcher(QObject):
             if status in ("0", "2"):
                 excluded_norm.add(norm_key)
             elif status == "1" and os.path.isdir(clean_path):
-                paths_to_watch.add(clean_path)
+                bname = os.path.basename(clean_path)
+                if not bname or not self._is_excluded_dir_name(bname, clean_path):
+                    paths_to_watch.add(clean_path)
 
         # Si aucun dossier n'est explicitement en statut '1' dans repository.dat mais que la base
         # contient déjà des dossiers indexés (rec.type == 1) non exclus, les surveiller également.
@@ -117,7 +156,12 @@ class PicasaFolderWatcher(QObject):
                     if os.sep != "\\":
                         clean_p = clean_p.replace("\\", os.sep)
                     norm_p = os.path.normcase(os.path.abspath(clean_p))
-                    if norm_p not in excluded_norm and os.path.isdir(clean_p):
+                    bname_p = os.path.basename(clean_p)
+                    if (
+                        norm_p not in excluded_norm
+                        and os.path.isdir(clean_p)
+                        and (not bname_p or not self._is_excluded_dir_name(bname_p, clean_p))
+                    ):
                         paths_to_watch.add(clean_p)
 
         self.set_watched_directories(list(paths_to_watch))
@@ -148,7 +192,7 @@ class PicasaFolderWatcher(QObject):
                 try:
                     with os.scandir(norm) as it:
                         for entry in it:
-                            if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                            if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name, entry.path):
                                 sub_abs = os.path.abspath(entry.path)
                                 new_dirs.add(sub_abs)
                                 if sync_budget > 0:
@@ -156,7 +200,7 @@ class PicasaFolderWatcher(QObject):
                                     try:
                                         with os.scandir(sub_abs) as sub_it:
                                             for sub_e in sub_it:
-                                                if sub_e.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(sub_e.name):
+                                                if sub_e.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(sub_e.name, sub_e.path):
                                                     new_dirs.add(os.path.abspath(sub_e.path))
                                                     deferred_roots.append(os.path.abspath(sub_e.path))
                                     except Exception:
@@ -203,7 +247,7 @@ class PicasaFolderWatcher(QObject):
             try:
                 with os.scandir(curr) as it:
                     for entry in it:
-                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name, entry.path):
                             sub_abs = os.path.abspath(entry.path)
                             if sub_abs not in self.watched_paths:
                                 self.watched_paths.add(sub_abs)
@@ -246,19 +290,28 @@ class PicasaFolderWatcher(QObject):
     def _on_directory_changed(self, path: str) -> None:
         """
         FR: Gère la notification de modification d'un dossier et enregistre les nouveaux sous-dossiers directs.
-        Ignore immédiatement les notifications provoquées par une écriture `.picasa.ini` interne récente.
+        Ignore immédiatement les notifications provoquées par une écriture `.picasa.ini` interne récente
+        ou provenant d'un dossier qui n'appartient plus à `self.watched_paths` (ex: après changement de base).
         EN: Handles a directory change notification and registers any newly created direct subdirectories.
-        Immediately ignores notifications triggered by a recent internal `.picasa.ini` write.
+        Immediately ignores notifications triggered by a recent internal `.picasa.ini` write or coming
+        from a folder no longer in `self.watched_paths` (e.g. after switching databases).
         Ref: picasa3.exe @ 0x00456A15, 0x0068BABA, 0x00704F20
         """
+        if not self.watched_paths:
+            return
+        norm_path = os.path.abspath(path)
+        if norm_path not in self.watched_paths and path not in self.watched_paths:
+            return
+        if self._is_excluded_dir_name(os.path.basename(norm_path.rstrip("\\/")), norm_path):
+            return
         if PicasaIniWriter.is_recent_internal_write(path, 2.0):
             return
-        self.pending_changed_paths.add(path)
-        if os.path.isdir(path):
+        self.pending_changed_paths.add(norm_path)
+        if os.path.isdir(norm_path):
             try:
-                with os.scandir(path) as it:
+                with os.scandir(norm_path) as it:
                     for entry in it:
-                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name):
+                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name, entry.path):
                             norm_sub = os.path.abspath(entry.path)
                             if norm_sub not in self.watched_paths:
                                 self.add_directory(norm_sub)
@@ -268,7 +321,7 @@ class PicasaFolderWatcher(QObject):
                     self._walk_chunk_timer.start()
             except Exception:
                 pass
-        self.directory_changed.emit(path)
+        self.directory_changed.emit(norm_path)
         # FR: Relance le timer debounce de 500 ms / EN: Restart the 500 ms debounce timer
         self.debounce_timer.start()
 
@@ -277,12 +330,14 @@ class PicasaFolderWatcher(QObject):
         FR: Gère la notification de modification d'un fichier surveillé.
         EN: Handles a file change notification.
         """
+        if not self.watched_paths:
+            return
         if PicasaIniWriter.is_recent_internal_write(path, 2.0):
             return
-        parent_dir = os.path.dirname(path)
-        if parent_dir:
+        parent_dir = os.path.dirname(os.path.abspath(path))
+        if parent_dir and parent_dir in self.watched_paths:
             self.pending_changed_paths.add(parent_dir)
-        self.debounce_timer.start()
+            self.debounce_timer.start()
 
     def _on_debounce_timeout(self) -> None:
         """

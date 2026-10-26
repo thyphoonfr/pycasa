@@ -13,7 +13,18 @@ Ref: picasa3.exe @ 0x009838D0 (WinMain / Window initialization)
 Ref: AGENTS.md §4 bis (Fidélité de l'interface / UI Fidelity)
 """
 
+import os
 import sys
+
+# FR: Désactiver les bannières de diagnostic verbeuses de Qt Multimedia FFmpeg et du démultiplexeur
+#     libavformat/OpenCV (ex. « qt.multimedia.ffmpeg: Using Qt multimedia... » et
+#     « [matroska,webm @ ...] Unsupported encoding type ») avant tout import Qt / cv2.
+# EN: Silence verbose diagnostic banners from Qt Multimedia FFmpeg and OpenCV/libavformat
+#     before any Qt / cv2 import.
+os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.ffmpeg*=false")
+os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
+os.environ.setdefault("OPENCV_LOG_LEVEL", "OFF")
+
 from picasa_py.ui.app import run_picasa
 
 

@@ -195,10 +195,10 @@ def _ensure_bridge_executable() -> Path | None:
 
 
 # Ref: picasa3.exe @ 0x0048AA80..0x0048AE80 (FRSuggestionThreshold, FRSuggestionSingleThreshold)
-# Ref: picasa3.exe @ 0x00881CC2 (FRSortThreshold)
+# Ref: picasa3.exe @ 0x0078A220, 0x00881CC2 (FRSortThreshold default = 0x55 = 85 -> 0.85)
 FR_SUGGESTION_THRESHOLD: float = 0.65
 FR_SUGGESTION_SINGLE_THRESHOLD: float = 0.90
-FR_SORT_THRESHOLD: float = 0.28
+FR_SORT_THRESHOLD: float = 0.85
 
 
 class PicasaFaceDetector:
