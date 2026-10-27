@@ -289,8 +289,11 @@ class ThumbIndexFile:
             raise ValueError(f"Fichier thumbindex.db trop court : {len(data)} octets (min 8)")
 
         magic, record_count = HEADER_STRUCT.unpack_from(data, 0)
-        if magic != THUMBINDEX_MAGIC:
+        # Ref: picasa3.exe @ 0x004F2EF0 (v3.0 = 0x40400000 float 3.0f, v3.1+ = 0x40466666 float 3.1f)
+        if magic not in (THUMBINDEX_MAGIC, 0x40400000):
             raise ValueError(f"Magic thumbindex invalide : 0x{magic:08X} (attendu 0x{THUMBINDEX_MAGIC:08X})")
+        if record_count > 0x0FFFFFFF:
+            raise ValueError(f"Nombre d'entrées thumbindex invalide (> 0x0FFFFFFF) : 0x{record_count:08X}")
 
         pos = 8
         records: List[ThumbIndexRecord] = []
@@ -403,19 +406,31 @@ class ThumbIndexFile:
             parts.append(rec.to_bytes(encoding=encoding))
         return b"".join(parts)
 
+    def validate_parent_indices(self) -> int:
+        """
+        FR: Vérifie que `parent_idx < len(self.records)` pour chaque entrée active et invalide les parents hors bornes.
+        Ref: picasa3.exe @ 0x004F4F95 (cmp eax, ecx -> parent_idx >= record_count)
+        EN: Validates that `parent_idx < len(self.records)` for each active entry and resets out-of-bounds parents.
+        """
+        count = len(self.records)
+        fixed = 0
+        for idx, rec in enumerate(self.records):
+            if rec.parent_idx != 0xFFFFFFFF and (rec.parent_idx < 0 or rec.parent_idx >= count or rec.parent_idx == idx):
+                rec.mark_deleted()
+                fixed += 1
+        return fixed
+
     def write(self, path: Union[str, Path], encoding: str = "utf-8") -> None:
         """
-        FR: Écrit `thumbindex.db` sur disque en appliquant le nettoyage des enregistrements supprimés/inactifs (`FUN_004f54b0`).
-        EN: Writes `thumbindex.db` to disk while sanitizing deleted/inactive records (`FUN_004f54b0`).
+        FR: Écrit directement `thumbindex.db` sur disque en appliquant le nettoyage des enregistrements supprimés/inactifs (`FUN_004f54b0`).
+        EN: Directly writes `thumbindex.db` to disk while sanitizing deleted/inactive records (`FUN_004f54b0`).
         Ref: picasa3.exe @ 0x004F54B0 (SaveThumbIndex)
         """
         data = self.to_bytes(encoding=encoding, sanitize=True)
         abs_path = os.path.abspath(str(path))
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
-        tmp_path = abs_path + ".tmp"
-        with open(tmp_path, "wb") as f:
+        with open(abs_path, "wb") as f:
             f.write(data)
-        os.replace(tmp_path, abs_path)
         self.dirty = False
 
     @classmethod

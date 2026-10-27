@@ -13,8 +13,20 @@ Ref: picasa3.exe @ 0x009838D0 (WinMain / Window initialization)
 Ref: AGENTS.md §4 bis (Fidélité de l'interface / UI Fidelity)
 """
 
+import gc
 import os
 import sys
+
+# FR: Désactiver le ramasse-miettes cyclique incrémental automatique de CPython 3.14 (`_PyGC_VisitFrameStacks`
+#     @ `python314.dll + 0x0b2928` -> `0x0b2a37`) qui parcourt `tstate->current_frame` sur tous les threads
+#     (`QThread` / `threading.Thread`) simultanément et provoque une violation d'accès `0xC0000005` en présence
+#     d'objets Shiboken6/PySide6 inter-threads. Le comptage de références déterministe (`Py_INCREF`/`Py_DECREF`)
+#     reste intégralement actif.
+# EN: Disable CPython 3.14 automatic incremental cyclic GC (`_PyGC_VisitFrameStacks` @ `python314.dll + 0x0b2928`
+#     -> `0x0b2a37`) which walks `tstate->current_frame` across all threads concurrently and triggers a
+#     `0xC0000005` Access Violation with cross-thread Shiboken6/PySide6 objects. Deterministic reference counting
+#     (`Py_INCREF`/`Py_DECREF`) remains 100% active.
+gc.disable()
 
 # FR: Désactiver les bannières de diagnostic verbeuses de Qt Multimedia FFmpeg et du démultiplexeur
 #     libavformat/OpenCV (ex. « qt.multimedia.ffmpeg: Using Qt multimedia... » et

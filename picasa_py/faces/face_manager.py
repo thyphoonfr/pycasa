@@ -301,6 +301,31 @@ class PicasaFaceManager:
             else set()
         )
         self._ignored_rec_ids: Set[int] = ignored_rec_ids
+        self._has_saturated_legacy_templates: bool = False
+        all_sampled_saturated: bool = False
+        if self._parent_to_1001 and self.db:
+            sample_1001: List[int] = []
+            for ch_list in self._parent_to_1001.values():
+                for c_idx in ch_list:
+                    sample_1001.append(c_idx)
+                    if len(sample_1001) >= 16:
+                        break
+                if len(sample_1001) >= 16:
+                    break
+            sat_cnt = 0
+            valid_cnt = 0
+            for c_idx in sample_1001:
+                raw_tpl = self.db.get_thumbnail(c_idx, size="facetemplatesV2")
+                if raw_tpl and len(raw_tpl) >= 108:
+                    valid_cnt += 1
+                    if self._is_saturated_legacy_cue_blob(raw_tpl):
+                        sat_cnt += 1
+            if sat_cnt > 0:
+                self._has_saturated_legacy_templates = True
+                all_sampled_saturated = (sat_cnt == valid_cnt and valid_cnt >= 4)
+
+        pmp_parecvals = self.db.pmps.get("imagedata_personalbumrecvalues")
+        cleaned_legacy_sugs = 0
         if pmp_facerect:
             for db_idx, rect_val in enumerate(pmp_facerect.records):
                 if db_idx < len(self.db.index):
@@ -338,6 +363,33 @@ class PicasaFaceManager:
 
                 alb_idx = pmp_personalbum.records[db_idx] if pmp_personalbum and db_idx < len(pmp_personalbum.records) else 0
                 sug_idx = pmp_suggestion.records[db_idx] if pmp_suggestion and db_idx < len(pmp_suggestion.records) else 0
+
+                # FR : Si une suggestion non confirmée (alb_idx == 0) provient d'un gabarit saturé hérité,
+                # réinitialiser la suggestion erronée et remettre le visage dans Sans nom (]unknownface).
+                # EN: If an unconfirmed suggestion (alb_idx == 0) comes from a legacy saturated template,
+                # clear the bogus suggestion and return the face to Unnamed (]unknownface).
+                if not alb_idx and sug_idx and self._has_saturated_legacy_templates:
+                    is_bogus_sug = all_sampled_saturated or self._is_saturated_legacy_cue_blob(
+                        self.db.get_thumbnail(db_idx, size="facetemplatesV2")
+                    )
+                    if is_bogus_sug:
+                        old_sug_alb = sug_idx
+                        sug_idx = 0
+                        cleaned_legacy_sugs += 1
+                        if pmp_suggestion and db_idx < len(pmp_suggestion.records):
+                            pmp_suggestion.records[db_idx] = 0
+                            pmp_suggestion.dirty = True
+                        if pmp_parecs and db_idx < len(pmp_parecs.records):
+                            pmp_parecs.records[db_idx] = 0
+                            pmp_parecs.dirty = True
+                        if pmp_parecvals and db_idx < len(pmp_parecvals.records):
+                            pmp_parecvals.records[db_idx] = 0
+                            pmp_parecvals.dirty = True
+                        if getattr(self.db, "wordhash", None) is not None:
+                            if hasattr(self.db.wordhash, "remove_word"):
+                                self.db.wordhash.remove_word(f"]facealbum:{old_sug_alb}", db_idx)
+                            if is_face_rec:
+                                self.db.wordhash.add_word("]unknownface", db_idx)
 
                 photo_path = _get_photo_path(db_idx)
 
@@ -1131,6 +1183,109 @@ class PicasaFaceManager:
         for cluster in self.people.values():
             cluster._manager = self
 
+    @staticmethod
+    def _is_saturated_legacy_cue_blob(raw_blob: Optional[bytes]) -> bool:
+        """
+        FR : Détecte si un blob `vqc_Cue` de 1 044 octets provient de l'ancien extracteur saturé
+        (où > 80 % des quartets 4 bits valent 0 ou 15, contre ~12,5 % pour Red.dll).
+        EN: Detect whether a 1,044-byte `vqc_Cue` blob comes from the legacy saturated extractor
+        (where > 80% of 4-bit nibbles are 0 or 15, compared to ~12.5% for Red.dll).
+        Ref: Red.dll @ 0x10055BE8, 0x100FCA88
+        """
+        if not raw_blob or len(raw_blob) < 108:
+            return False
+        b = np.frombuffer(raw_blob, dtype=np.uint8, count=64, offset=44)
+        lo = b & 0x0F
+        hi = b >> 4
+        ext = int(np.count_nonzero((lo == 0) | (lo == 15)) + np.count_nonzero((hi == 0) | (hi == 15)))
+        return ext >= 80
+
+    @staticmethod
+    def _is_saturated_legacy_vector(vec: Optional[np.ndarray]) -> bool:
+        """
+        FR : Détecte si un vecteur `vqc_Cue` 2000-D déquantifié est saturé aux bornes
+        (dans les vecteurs saturés hérités, > 80 % des 32 premières coordonnées valent 0,044..0,056
+        et max(|vec[:32]|) < 0,058 en raison de la saturation uniforme des 2 000 dimensions).
+        EN: Detect whether a dequantized 2000-D `vqc_Cue` vector is saturated at its bounds.
+        """
+        if vec is None or not isinstance(vec, np.ndarray) or vec.size != 2000:
+            return False
+        head = np.abs(vec[:32])
+        return bool(float(np.max(head)) < 0.058 and int(np.count_nonzero(head >= 0.043)) >= 26)
+
+    def _extract_fresh_cue_blob_for_record(
+        self,
+        rec_idx: int,
+        face_rect: Optional[FaceRect] = None,
+        photo_path: str = "",
+    ) -> Optional[bytes]:
+        """
+        FR : Extrait un gabarit `vqc_Cue` 1 044 octets authentique via `Red.dll` (`red_bridge_x86.exe`)
+        ou `PurePythonRedEngine` corrigé pour un enregistrement `1001` (en privilégiant sa miniature
+        `240x288` dans `bigthumbs_0.db` pour éviter tout accès disque inutile, avec repli sur la photo).
+        EN: Extract an authentic 1,044-byte `vqc_Cue` template via `Red.dll` (`red_bridge_x86.exe`)
+        or fixed `PurePythonRedEngine` for a `1001` face record (preferring its `240x288` thumbnail
+        in `bigthumbs_0.db` to avoid disk I/O, falling back to the original photo).
+        Ref: picasa3.exe @ 0x0047A0C0, Red.dll @ 0x100FC859
+        """
+        if not self.db or rec_idx is None or rec_idx < 0:
+            return None
+        detector = getattr(self, "detector", None) or PicasaFaceDetector.get()
+        # 1. Essayer depuis la miniature portrait 240x288 (bigthumbs_0.db) ou 120x144 (thumbs_0.db)
+        if getattr(self.db, "is_face_record", lambda i: False)(rec_idx):
+            raw_thumb = (
+                self.db.get_thumbnail(rec_idx, size="large")
+                or self.db.get_thumbnail(rec_idx, size="small")
+            )
+            if raw_thumb:
+                try:
+                    with Image.open(io.BytesIO(raw_thumb)) as t_img:
+                        dets = detector.detect_faces_in_image(t_img)
+                        for d in dets:
+                            blob = getattr(d, "template_blob", None)
+                            if isinstance(blob, (bytes, bytearray)) and len(blob) == 1044 and not self._is_saturated_legacy_cue_blob(blob):
+                                self.db.add_face_template(rec_idx, bytes(blob))
+                                return bytes(blob)
+                        blob_crop = detector.extract_cue_blob_from_crop(t_img)
+                        if isinstance(blob_crop, (bytes, bytearray)) and len(blob_crop) == 1044 and not self._is_saturated_legacy_cue_blob(blob_crop):
+                            self.db.add_face_template(rec_idx, bytes(blob_crop))
+                            return bytes(blob_crop)
+                except Exception:
+                    pass
+
+        # 2. Repli sur le fichier photo parent sur disque
+        if not photo_path:
+            parent_idx = (
+                self.db.get_face_parent_photo_idx(rec_idx)
+                if getattr(self.db, "is_face_record", lambda i: False)(rec_idx)
+                else rec_idx
+            )
+            if parent_idx is not None and parent_idx >= 0:
+                photo_path = self.db.get_media_full_path(parent_idx) or ""
+        if photo_path and os.path.exists(photo_path):
+            try:
+                dets = detector.detect_faces_in_image(photo_path)
+                if dets:
+                    best_blob: Optional[bytes] = None
+                    best_ov = 0.25 if face_rect is not None else -1.0
+                    for d in dets:
+                        blob = getattr(d, "template_blob", None)
+                        if not (isinstance(blob, (bytes, bytearray)) and len(blob) == 1044):
+                            continue
+                        if face_rect is None:
+                            best_blob = bytes(blob)
+                            break
+                        ov = _face_overlap(d, face_rect)
+                        if ov >= best_ov:
+                            best_ov = ov
+                            best_blob = bytes(blob)
+                    if best_blob is not None and not self._is_saturated_legacy_cue_blob(best_blob):
+                        self.db.add_face_template(rec_idx, best_blob)
+                        return best_blob
+            except Exception:
+                pass
+        return None
+
     def _rebuild_suggestions_from_templates(self) -> None:
         """
         FR : Reconstruit paresseusement les vecteurs et suggestions à partir de `facetemplatesV2_0.db`
@@ -1150,9 +1305,11 @@ class PicasaFaceManager:
         """
         FR : Charge à la demande les gabarits `vqc_Cue` depuis `facetemplatesV2_0.db` pour les
         clusters de personnes connus lorsque l'identification automatique (`detect_faces_for_photo`)
-        en a besoin.
+        en a besoin. Si un visage confirmé possède un gabarit saturé hérité, le régénère
+        immédiatement via `Red.dll`.
         EN: Lazily loads `vqc_Cue` templates from `facetemplatesV2_0.db` for known person clusters
-        when automatic recognition (`detect_faces_for_photo`) needs them.
+        when automatic recognition (`detect_faces_for_photo`) needs them. If a confirmed face has
+        a legacy saturated template, regenerates it immediately via `Red.dll`.
         Ref: picasa3.exe @ 0x0048AA80, 0x008AAD76
         """
         if getattr(self, "_person_vectors_loaded", False):
@@ -1162,13 +1319,24 @@ class PicasaFaceManager:
         if not has_templates_db:
             return
         for cid, cluster in list(self.people.items()):
+            if cluster.feature_vectors:
+                cluster.feature_vectors = [
+                    v for v in cluster.feature_vectors if not self._is_saturated_legacy_vector(v)
+                ]
+                if not cluster.feature_vectors:
+                    cluster.feature_vector = None
             if not cluster.photo_indices or cluster.feature_vectors:
                 continue
             for p_idx in cluster.photo_indices[:32]:
+                raw_tpl = self.db.get_thumbnail(p_idx, size="facetemplatesV2")
+                if raw_tpl is None or self._is_saturated_legacy_cue_blob(raw_tpl):
+                    fr_list = cluster.face_rects_by_photo.get(p_idx, [])
+                    fr_hint = fr_list[0] if fr_list else cluster.primary_face_rect
+                    self._extract_fresh_cue_blob_for_record(p_idx, face_rect=fr_hint)
                 tpl_vec = self.db.get_face_template(p_idx)
-                if tpl_vec is not None:
+                if tpl_vec is not None and not self._is_saturated_legacy_vector(tpl_vec):
                     cluster.feature_vectors.append(tpl_vec)
-            if cluster.feature_vectors and cluster.feature_vector is None:
+            if cluster.feature_vectors and (cluster.feature_vector is None or self._is_saturated_legacy_vector(cluster.feature_vector)):
                 cluster.feature_vector = cluster.feature_vectors[0]
 
     def get_person_avatar(
@@ -2218,11 +2386,112 @@ class PicasaFaceManager:
 
         if db_idx is not None:
             self._scanned_photo_indices.add(db_idx)
-
-        if not photo_path or not os.path.exists(photo_path):
-            return self.get_faces_for_photo(db_idx) if db_idx is not None else []
+        self._last_detect_refreshed_count = 0
 
         existing: List[FaceRect] = list(self.get_faces_for_photo(db_idx)) if db_idx is not None else []
+
+        # FR : Si la photo possède déjà des sous-enregistrements 1001 dont les gabarits facetemplatesV2
+        # sont saturés (issus de l'ancien extracteur), les régénérer directement via Red.dll à partir de
+        # leurs miniatures 240x288 (bigthumbs_0.db) sans rouvrir le fichier original sur Google Drive,
+        # puis recalculer les suggestions authentiques.
+        # EN: If the photo already has 1001 child records with legacy saturated facetemplatesV2 templates,
+        # regenerate them directly via Red.dll from their 240x288 bigthumbs_0.db thumbnails without
+        # reopening the full photo on disk, then recompute genuine suggestions.
+        if db_idx is not None and db_idx >= 0 and self.db:
+            children_1001 = getattr(self, "_parent_to_1001", {}).get(db_idx, [])
+            if children_1001:
+                sat_children = [
+                    c_idx for c_idx in children_1001
+                    if self._is_saturated_legacy_cue_blob(self.db.get_thumbnail(c_idx, size="facetemplatesV2"))
+                ]
+                if sat_children:
+                    refreshed_cnt = 0
+                    pmp_pa = self.db.pmps.get("imagedata_personalbumid")
+                    pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+                    ignored_set = getattr(self, "_ignored_rec_ids", set())
+                    for c_idx in sat_children:
+                        c_rects = self.photo_to_faces.get(c_idx, [])
+                        c_fr = c_rects[0] if c_rects else None
+                        fresh_blob = self._extract_fresh_cue_blob_for_record(
+                            c_idx, face_rect=c_fr, photo_path=photo_path
+                        )
+                        if not fresh_blob:
+                            continue
+                        refreshed_cnt += 1
+                        self._cached_unnamed_clusters = None
+                        feat = PicasaFaceDetector.cue_blob_to_feature_vector(fresh_blob)
+                        if feat is None:
+                            continue
+                        if c_fr is not None:
+                            c_fr.feature_vector = feat
+                            self._face_feature_cache[(db_idx, round(c_fr.left, 4), round(c_fr.top, 4))] = feat
+                            self._face_feature_cache[(c_idx, round(c_fr.left, 4), round(c_fr.top, 4))] = feat
+                        pa_val = pmp_pa.records[c_idx] if (pmp_pa and c_idx < len(pmp_pa.records)) else 0
+                        sug_val = pmp_sug.records[c_idx] if (pmp_sug and c_idx < len(pmp_sug.records)) else 0
+                        if pa_val == 0 and sug_val == 0 and c_idx not in ignored_set and auto_suggest and self.people and c_fr is not None:
+                            self._ensure_person_feature_vectors()
+                            det_inst = PicasaFaceDetector.get()
+                            rejected_set = getattr(self, "_rejected_suggestions", set())
+                            matched_cluster: Optional[PersonCluster] = None
+                            best_sim: float = -1.0
+                            for cluster in self.people.values():
+                                if (c_idx, cluster.contact_id.lower()) in rejected_set:
+                                    continue
+                                ref_vecs = [
+                                    rv for rv in (cluster.feature_vectors or ([cluster.feature_vector] if cluster.feature_vector is not None else []))
+                                    if rv is not None and not self._is_saturated_legacy_vector(rv)
+                                ]
+                                if not ref_vecs:
+                                    continue
+                                c_best = max(det_inst.compare_face_features(feat, rv) for rv in ref_vecs)
+                                req_t = FR_SUGGESTION_SINGLE_THRESHOLD if cluster.photo_count <= 1 else FR_SUGGESTION_THRESHOLD
+                                if c_best >= req_t and c_best > best_sim:
+                                    best_sim = c_best
+                                    matched_cluster = cluster
+                            if matched_cluster is not None:
+                                c_fr.contact_id = ""
+                                c_fr.contact_name = f"? {matched_cluster.name}"
+                                self.unnamed_faces = [
+                                    (u_i, u_p, u_f) for (u_i, u_p, u_f) in self.unnamed_faces
+                                    if u_i != c_idx
+                                ]
+                                sug_obj = FaceSuggestion(
+                                    contact_id=matched_cluster.contact_id,
+                                    contact_name=matched_cluster.name,
+                                    photo_path=photo_path,
+                                    face_rect=c_fr,
+                                    similarity=best_sim,
+                                    db_idx=c_idx,
+                                )
+                                self.suggestions.setdefault(matched_cluster.contact_id, []).append(sug_obj)
+                                with self.db._lock:
+                                    sug_alb_idx = self._get_or_create_person_album_id(matched_cluster.contact_id, matched_cluster.name)
+                                    if sug_alb_idx is not None and sug_alb_idx > 0:
+                                        if pmp_sug is not None:
+                                            while len(pmp_sug.records) <= c_idx:
+                                                pmp_sug.records.append(0)
+                                            pmp_sug.records[c_idx] = sug_alb_idx
+                                            pmp_sug.dirty = True
+                                        pmp_parecs = self.db.pmps.get("imagedata_personalbumrecs")
+                                        if pmp_parecs is not None:
+                                            while len(pmp_parecs.records) <= c_idx:
+                                                pmp_parecs.records.append(0)
+                                            pmp_parecs.records[c_idx] = sug_alb_idx
+                                            pmp_parecs.dirty = True
+                                        pmp_parecvals = self.db.pmps.get("imagedata_personalbumrecvalues")
+                                        if pmp_parecvals is not None:
+                                            while len(pmp_parecvals.records) <= c_idx:
+                                                pmp_parecvals.records.append(0)
+                                            pmp_parecvals.records[c_idx] = int(round(max(0.0, min(1.0, best_sim)) * 10000.0)) & 0xFFFF
+                                            pmp_parecvals.dirty = True
+                                        if getattr(self.db, "wordhash", None) is not None:
+                                            self.db.wordhash.add_word("]unknownface", c_idx)
+                                            self.db.wordhash.add_word(f"]facealbum:{sug_alb_idx}", c_idx)
+                    self._last_detect_refreshed_count = refreshed_cnt
+                    return existing
+
+        if not photo_path or not os.path.exists(photo_path):
+            return existing
 
         # Ref: picasa3.exe @ 0x00881690 (frexclude=1 dans [Picasa] de .picasa.ini)
         parent_dir = os.path.dirname(photo_path)
@@ -2766,16 +3035,29 @@ class PicasaFaceManager:
             if not replaced_p:
                 pflist.append(face_rect)
 
-        # FR : Ajouter le gabarit vqc_Cue 2000-D au cluster s'il est disponible
-        # EN: Append the 2000-D vqc_Cue template to the cluster if available
+        # FR : Ajouter le gabarit vqc_Cue 2000-D au cluster s'il est disponible (et régénérer s'il est saturé)
+        # EN: Append the 2000-D vqc_Cue template to the cluster if available (regenerating if saturated)
         fv = getattr(face_rect, "feature_vector", None)
+        if fv is not None and self._is_saturated_legacy_vector(fv):
+            fv = None
         if fv is None:
-            fv = self._face_feature_cache.get((eff_idx, round(face_rect.left, 4), round(face_rect.top, 4)))
-        if fv is None and eff_idx is not None and self.db and hasattr(self.db, "get_face_template"):
-            fv = self.db.get_face_template(eff_idx)
+            cached_fv = self._face_feature_cache.get((eff_idx, round(face_rect.left, 4), round(face_rect.top, 4)))
+            if cached_fv is not None and not self._is_saturated_legacy_vector(cached_fv):
+                fv = cached_fv
+        if fv is None and eff_idx is not None and self.db:
+            raw_tpl = self.db.get_thumbnail(eff_idx, size="facetemplatesV2")
+            if raw_tpl is None or self._is_saturated_legacy_cue_blob(raw_tpl):
+                self._extract_fresh_cue_blob_for_record(eff_idx, face_rect=face_rect, photo_path=photo_path)
+            if hasattr(self.db, "get_face_template"):
+                tpl_fv = self.db.get_face_template(eff_idx)
+                if tpl_fv is not None and not self._is_saturated_legacy_vector(tpl_fv):
+                    fv = tpl_fv
         if fv is not None:
+            cluster.feature_vectors = [
+                v for v in cluster.feature_vectors if not self._is_saturated_legacy_vector(v)
+            ]
             cluster.feature_vectors.append(fv)
-            if cluster.feature_vector is None:
+            if cluster.feature_vector is None or self._is_saturated_legacy_vector(cluster.feature_vector):
                 cluster.feature_vector = fv
 
         # FR : Générer l'avatar si manquant ou mis à jour
@@ -3822,13 +4104,23 @@ class PicasaFaceManager:
             return res
 
         candidates: List[Tuple[int, str]] = []
+        has_sat_legacy = bool(getattr(self, "_has_saturated_legacy_templates", False))
+        parent_to_1001 = getattr(self, "_parent_to_1001", {})
         for idx, rec in enumerate(self.db.index):
             if is_cancelled and is_cancelled():
                 break
             if rec.type in (1, 0x20, 1001):
                 continue
+            needs_tpl_refresh = False
             if idx in self._scanned_photo_indices or idx in self.photo_to_faces:
-                continue
+                if has_sat_legacy and idx in parent_to_1001:
+                    ch_list = parent_to_1001[idx]
+                    if ch_list and self._is_saturated_legacy_cue_blob(
+                        self.db.get_thumbnail(ch_list[0], size="facetemplatesV2")
+                    ):
+                        needs_tpl_refresh = True
+                if not needs_tpl_refresh:
+                    continue
 
             fdir = folders_map.get(rec.parent_idx, "")
             if not fdir:
@@ -3844,8 +4136,16 @@ class PicasaFaceManager:
                 continue
 
             full_path = os.path.join(fdir, rec.path)
-            if os.path.exists(full_path):
+            if needs_tpl_refresh or os.path.exists(full_path):
                 candidates.append((idx, full_path))
+
+        if not any(
+            idx in parent_to_1001
+            and parent_to_1001[idx]
+            and self._is_saturated_legacy_cue_blob(self.db.get_thumbnail(parent_to_1001[idx][0], size="facetemplatesV2"))
+            for idx, _ in candidates[:16]
+        ) and has_sat_legacy and not folder_paths and not candidates:
+            self._has_saturated_legacy_templates = False
 
         return candidates
 
@@ -3961,8 +4261,6 @@ class BackgroundFaceDetectionWorker(QThread):
     def __del__(self) -> None:
         try:
             self._is_cancelled = True
-            if self.isRunning():
-                self.wait(2000)
         except Exception:
             pass
 
@@ -4026,7 +4324,8 @@ class BackgroundFaceDetectionWorker(QThread):
                     auto_suggest=True,
                     persist_ini=self.persist_ini,
                 )
-                added = max(0, len(after_faces) - before_count)
+                refreshed = int(getattr(fm, "_last_detect_refreshed_count", 0))
+                added = max(0, len(after_faces) - before_count) + refreshed
                 if added > 0:
                     total_detected += added
                     pending_ui_notify += added

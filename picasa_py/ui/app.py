@@ -7,9 +7,17 @@ Ref: picasa3.exe @ 0x0087FC90 (SplashThread, runtime\\splashbk.jpg, /nosplash)
 """
 
 import argparse
+import gc
 import os
 import sys
 from typing import Optional
+
+# FR: Désactiver le GC cyclique incrémental automatique de CPython 3.14 (`_PyGC_VisitFrameStacks`
+#     @ `python314.dll + 0x0b2928` -> `0x0b2a37`) pour éviter les crashs `0xC0000005` lors du parcours
+#     concurrent des piles d'appels des `QThread` / `threading.Thread`.
+# EN: Disable CPython 3.14 automatic incremental cyclic GC (`_PyGC_VisitFrameStacks`) to prevent
+#     `0xC0000005` crashes when walking concurrent `QThread` / `threading.Thread` frame stacks.
+gc.disable()
 
 os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.ffmpeg*=false")
 os.environ.setdefault("OPENCV_FFMPEG_LOGLEVEL", "-8")
@@ -55,6 +63,8 @@ def run_picasa(
     EN : Launches the PyCasa GUI application with its authentic splash screen.
     Ref: picasa3.exe @ 0x0070494B, 0x0087FC90 (SplashThread)
     """
+    # Désactiver le GC cyclique automatique de CPython 3.14 pendant l'exécution multi-thread Qt
+    gc.disable()
     # Désactiver la limite d'allocation de 256 Mo de Qt pour autoriser les images volumineuses
     QImageReader.setAllocationLimit(0)
     QLoggingCategory.setFilterRules("qt.multimedia.ffmpeg*=false")

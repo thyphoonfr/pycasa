@@ -299,14 +299,17 @@ class PicasaIniDocument:
     def set_faces(self, filename: str, faces: List[FaceItem]) -> None:
         """
         FR: Définit ou supprime l'entrée faces= pour un fichier image.
+        Ref: picasa3.exe @ 0x009BD640 / 0x009BD7B8 (ne crée pas de section vide si faces est vide).
         EN: Sets or removes the faces= entry for an image file.
         """
-        sec = self.get_or_create_section(filename)
         if not faces:
-            sec.remove("faces")
-        else:
-            val = ";".join(f.to_ini_str() for f in faces)
-            sec.set("faces", val)
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("faces")
+            return
+        sec = self.get_or_create_section(filename)
+        val = ";".join(f.to_ini_str() for f in faces)
+        sec.set("faces", val)
 
     # Ref: picasa3.exe @ 0x0068B63D ("crop=rect64(%s)\r\n"), 0x006ADB2E ("crop64=1,%s")
     def get_crop_rect64(self, filename: str) -> Optional[Rect64]:
@@ -337,10 +340,12 @@ class PicasaIniDocument:
         """
         FR: Définit ou supprime le rectangle de recadrage `crop=rect64(<hex>)` et synchronise `crop64=1,<hex>;` dans `filters=`.
         EN: Sets or removes the `crop=rect64(<hex>)` crop rectangle and synchronizes `crop64=1,<hex>;` in `filters=`.
-        Ref: picasa3.exe @ 0x0068B63D, 0x00456A15 (FUN_00456a15)
+        Ref: picasa3.exe @ 0x0068B63D, 0x00456A15 (FUN_00456a15), 0x009BD7B8
         """
-        sec = self.get_or_create_section(filename)
         if rect is None or (isinstance(rect, str) and not rect.strip()):
+            sec = self.get_section(filename)
+            if sec is None:
+                return
             sec.remove("crop")
             filters_val = sec.get("filters")
             if filters_val is not None:
@@ -351,6 +356,7 @@ class PicasaIniDocument:
                     sec.remove("filters")
             return
 
+        sec = self.get_or_create_section(filename)
         if isinstance(rect, Rect64):
             hex_str = f"{rect.to_uint64():x}"
         else:
@@ -461,13 +467,17 @@ class PicasaIniDocument:
         """
         FR: Définit ou supprime le filtre `tilt=1,<angle>,0.000000;` dans la clé `filters=` d'une image.
         EN: Sets or removes the `tilt=1,<angle>,0.000000;` filter in an image's `filters=` key.
-        Ref: picasa3.exe @ 0x008814AC, 0x00456A15 (FUN_00456a15)
+        Ref: picasa3.exe @ 0x008814AC, 0x00456A15 (FUN_00456a15), 0x009BD7B8
         """
+        has_tilt = angle_deg is not None and abs(angle_deg) >= 0.01
+        sec = self.get_section(filename)
+        if sec is None and not has_tilt:
+            return
         sec = self.get_or_create_section(filename)
         val = sec.get("filters", "")
         # FR: Supprimer tout tilt existant / EN: Remove any existing tilt entry
         val = re.sub(r"tilt=[^;]*;?", "", val).strip(";")
-        if angle_deg is not None and abs(angle_deg) >= 0.01:
+        if has_tilt and angle_deg is not None:
             tilt_part = f"tilt=1,{angle_deg:.6f},0.000000;"
             val = (val + ";" + tilt_part if val else tilt_part).strip(";") + ";"
         if val:
@@ -492,14 +502,17 @@ class PicasaIniDocument:
     def set_filters(self, filename: str, filters: List[str]) -> None:
         """
         FR: Définit la chaîne filters= d'une photo.
+        Ref: picasa3.exe @ 0x009BD7B8 (ne crée pas de section vide si filters est vide).
         EN: Sets the filters= string of a photo.
         """
-        sec = self.get_or_create_section(filename)
         clean = [f.strip().rstrip(";") for f in filters if f.strip().rstrip(";")]
         if not clean:
-            sec.remove("filters")
-        else:
-            sec.set("filters", ";".join(clean) + ";")
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("filters")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("filters", ";".join(clean) + ";")
 
     def append_filter(self, filename: str, filter_expr: str) -> None:
         """
@@ -535,11 +548,13 @@ class PicasaIniDocument:
     def get_text(self, filename: str) -> Optional[str]:
         """
         FR: Retourne l'annotation textuelle (outil Texte) d'une photo, ou None.
-        Supporte le format natif `CTextItemList` de `picasa3.exe` (`<num_items>;<utf8_len>;<texte>;<police>;...`,
-        Ref: `0x00A4DB30` / `0x00A4DD50`), le format à 12 champs (`Police;taille;...;texte`) et le texte brut.
+        Supporte le format natif `CTextItemList` de `picasa3.exe` (`<num_items>;<item_len>;<utf8_len>;<texte>;<police>;...`
+        ou `<num_items>;<utf8_len>;<texte>;<police>;...`, Ref: `0x00A4DB30` / `0x00A4E3B0` / `0x00A4DD50`),
+        le format à 12 champs (`Police;taille;...;texte`) et le texte brut.
         EN: Returns the text overlay annotation (Text tool) of a photo, or None.
-        Supports the native `picasa3.exe` `CTextItemList` format (`<num_items>;<utf8_len>;<text>;<font>;...`,
-        Ref: `0x00A4DB30` / `0x00A4DD50`), the 12-field format (`Font;size;...;text`), and plain text.
+        Supports the native `picasa3.exe` `CTextItemList` format (`<num_items>;<item_len>;<utf8_len>;<text>;<font>;...`
+        or `<num_items>;<utf8_len>;<text>;<font>;...`, Ref: `0x00A4DB30` / `0x00A4E3B0` / `0x00A4DD50`),
+        the 12-field format (`Font;size;...;text`), and plain text.
         """
         sec = self.get_section(filename)
         if not sec:
@@ -547,11 +562,22 @@ class PicasaIniDocument:
         val = sec.get("text")
         if not val:
             return val
-        # Format natif CTextItemList (0x00A4DB30 / 0x00A4DD50) : <num_items>;<utf8_len>;<utf8_text>;<font>;...
+        # Format natif CTextItemList (0x00A4DB30 -> 0x00A4E3B0 / 0x00A4DD50) :
+        # Outer: <num_items>;<item_len>;<utf8_len>;<utf8_text>;<font>;...
+        # Inner: <num_items>;<utf8_len>;<utf8_text>;<font>;...
         first_semi = val.find(";")
         if first_semi > 0 and val[:first_semi].strip().isdigit():
             second_semi = val.find(";", first_semi + 1)
             if second_semi > first_semi + 1 and val[first_semi + 1 : second_semi].strip().isdigit():
+                third_semi = val.find(";", second_semi + 1)
+                if third_semi > second_semi + 1 and val[second_semi + 1 : third_semi].strip().isdigit():
+                    try:
+                        utf8_len = int(val[second_semi + 1 : third_semi].strip())
+                        rest_bytes = val[third_semi + 1 :].encode("utf-8")
+                        if len(rest_bytes) > utf8_len and rest_bytes[utf8_len : utf8_len + 1] == b";":
+                            return rest_bytes[:utf8_len].decode("utf-8", errors="replace")
+                    except Exception:
+                        pass
                 try:
                     utf8_len = int(val[first_semi + 1 : second_semi].strip())
                     rest_bytes = val[second_semi + 1 :].encode("utf-8")
@@ -568,15 +594,17 @@ class PicasaIniDocument:
         """
         FR: Définit ou supprime l'annotation textuelle (text= et textactive=) d'une photo.
         EN: Sets or removes the text overlay annotation (text= and textactive=) of a photo.
-        Ref: picasa3.exe @ 0x00456A15, func_00456a15.c:3189
+        Ref: picasa3.exe @ 0x00456A15, func_00456a15.c:3189, 0x009BD7B8
         """
-        sec = self.get_or_create_section(filename)
         if not text:
-            sec.remove("text")
-            sec.remove("textactive")
-        else:
-            sec.set("text", text)
-            sec.set("textactive", "1")
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("text")
+                sec.remove("textactive")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("text", text)
+        sec.set("textactive", "1")
 
     # Ref: picasa3.exe @ 0x0068B800 ("star=yes\r\n")
     def is_starred(self, filename: str) -> bool:
@@ -592,13 +620,16 @@ class PicasaIniDocument:
     def set_starred(self, filename: str, starred: bool) -> None:
         """
         FR: Active ou désactive l'étoile (star=yes) sur une photo.
+        Ref: picasa3.exe @ 0x009BD7B8 (ne crée pas de section vide si starred est False).
         EN: Enables or disables the star flag (star=yes) on a photo.
         """
+        if not starred:
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("star")
+            return
         sec = self.get_or_create_section(filename)
-        if starred:
-            sec.set("star", "yes")
-        else:
-            sec.remove("star")
+        sec.set("star", "yes")
 
     set_star = set_starred
 
@@ -625,14 +656,17 @@ class PicasaIniDocument:
     def set_rotate(self, filename: str, rotation: int) -> None:
         """
         FR: Définit ou supprime le pas de rotation rotate=rotate(N) d'une photo.
+        Ref: picasa3.exe @ 0x009BD7B8 (ne crée pas de section vide si rotation == 0).
         EN: Sets or removes the rotation step rotate=rotate(N) of a photo.
         """
-        sec = self.get_or_create_section(filename)
         rot = rotation % 4
         if rot == 0:
-            sec.remove("rotate")
-        else:
-            sec.set("rotate", f"rotate({rot})")
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("rotate")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("rotate", f"rotate({rot})")
 
     get_rotation = get_rotate
     set_rotation = set_rotate
@@ -654,17 +688,20 @@ class PicasaIniDocument:
     def set_keywords(self, filename: str, keywords: Union[List[str], str]) -> None:
         """
         FR: Définit ou supprime la liste des mots-clés (keywords=) d'une photo.
+        Ref: picasa3.exe @ 0x009BD7B8 (ne crée pas de section vide si keywords est vide).
         EN: Sets or removes the keywords list (keywords=) of a photo.
         """
-        sec = self.get_or_create_section(filename)
         if isinstance(keywords, str):
             clean = [k.strip() for k in keywords.split(",") if k.strip()]
         else:
             clean = [str(k).strip() for k in keywords if str(k).strip()]
         if not clean:
-            sec.remove("keywords")
-        else:
-            sec.set("keywords", ",".join(clean))
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("keywords")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("keywords", ",".join(clean))
 
     # Ref: picasa3.exe @ 0x0068B870 ("caption=%s\r\n")
     def get_caption(self, filename: str) -> str:
@@ -680,13 +717,16 @@ class PicasaIniDocument:
     def set_caption(self, filename: str, caption: Optional[str]) -> None:
         """
         FR: Définit ou supprime la légende (`caption=`) d'une photo.
+        Ref: picasa3.exe @ 0x009BD7B8 (ne crée pas de section vide si caption est vide).
         EN: Sets or removes the caption (`caption=`) of a photo.
         """
-        sec = self.get_or_create_section(filename)
         if not caption:
-            sec.remove("caption")
-        else:
-            sec.set("caption", caption)
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("caption")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("caption", caption)
 
     # Ref: picasa3.exe @ 0x00CA7810 - Contacts2
     def get_contacts(self) -> Dict[str, ContactInfo]:

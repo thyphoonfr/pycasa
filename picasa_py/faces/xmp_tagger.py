@@ -56,17 +56,20 @@ class PicasaXMPFaceTagger:
         width: int,
         height: int,
         faces: List[Tuple[str, float, float, float, float]],  # (name, left, top, right, bottom)
+        existing_xmp: Optional[bytes] = None,
     ) -> bytes:
         """
-        FR : Construit le paquet RDF/XMP complet au format standard MWG Regions et IPTC `PersonInImage`.
-        EN: Build the complete RDF/XMP packet following the MWG Regions and IPTC `PersonInImage` standards.
-        Ref: picasa3.exe @ 0x008EF3AC (mwg-rs:Regions, RegionList, stArea, PersonInImage)
+        FR : Construit le paquet RDF/XMP complet au format `mwg-rs:Regions` exact de `Picasa3.exe`
+        (`%g` pour `stArea:x/y/w/h`, `mwg-rs:AppliedToDimensions`, sans `Iptc4xmpExt:PersonInImage`,
+        et préservation des balises XMP existantes hors `mwg-rs:Regions`).
+        EN: Builds the complete RDF/XMP packet in the exact `Picasa3.exe` `mwg-rs:Regions` format
+        (`%g` for `stArea:x/y/w/h`, `mwg-rs:AppliedToDimensions`, no `Iptc4xmpExt:PersonInImage`,
+        preserving existing non-`mwg-rs:Regions` XMP nodes).
+        Ref: picasa3.exe @ 0x00BA73C0 ("%g"), 0x00BA7430, 0x00BB15F0, 0x00BB17E0..0x00BB2010
         """
-        # FR : stArea utilise le centre (x, y) et les dimensions (w, h) normalisés
-        # EN: stArea uses normalized center (x, y) and dimensions (w, h)
-        regions_xml = []
-        persons_xml = []
+        import re
 
+        regions_xml = []
         for name, left, top, right, bottom in faces:
             cx = (left + right) / 2.0
             cy = (top + bottom) / 2.0
@@ -74,45 +77,101 @@ class PicasaXMPFaceTagger:
             h = bottom - top
 
             safe_name = name.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-            if safe_name:
-                persons_xml.append(f"            <rdf:li>{safe_name}</rdf:li>")
-
-            regions_xml.append(f"""          <rdf:li rdf:parseType="Resource">
-            <mwg-rs:Area stArea:x="{cx:.6f}" stArea:y="{cy:.6f}" stArea:w="{w:.6f}" stArea:h="{h:.6f}" stArea:unit="normalized"/>
-            <mwg-rs:Type>Face</mwg-rs:Type>
-            <mwg-rs:Name>{safe_name}</mwg-rs:Name>
-          </rdf:li>""")
+            regions_xml.append(
+                f'          <rdf:li rdf:parseType="Resource">\n'
+                f'            <mwg-rs:Area stArea:x="{cx:g}" stArea:y="{cy:g}" stArea:w="{w:g}" stArea:h="{h:g}" stArea:unit="normalized"/>\n'
+                f'            <mwg-rs:Type>Face</mwg-rs:Type>\n'
+                f'            <mwg-rs:Name>{safe_name}</mwg-rs:Name>\n'
+                f'          </rdf:li>'
+            )
 
         region_list_str = "\n".join(regions_xml)
-        person_list_str = "\n".join(persons_xml)
+        mwg_block = (
+            f'      <mwg-rs:Regions rdf:parseType="Resource">\n'
+            f'        <mwg-rs:AppliedToDimensions stDim:w="{width}" stDim:h="{height}" stDim:unit="pixel"/>\n'
+            f'        <mwg-rs:RegionList>\n'
+            f'          <rdf:Bag>\n'
+            f'{region_list_str}\n'
+            f'          </rdf:Bag>\n'
+            f'        </mwg-rs:RegionList>\n'
+            f'      </mwg-rs:Regions>'
+        )
 
-        xmp_str = f"""<?xpacket begin="\ufeff" id="W5M0MpCehiHzreSzNTczkc9d"?>
-<x:xmpmeta xmlns:x="adobe:ns:meta/">
-  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <rdf:Description rdf:about=""
-        xmlns:mwg-rs="http://www.metadataworkinggroup.com/schemas/regions/"
-        xmlns:stDim="http://ns.adobe.com/xmp/sType/Dimensions#"
-        xmlns:stArea="http://ns.adobe.com/xmp/sType/Area#"
-        xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/">
-      <mwg-rs:Regions rdf:parseType="Resource">
-        <mwg-rs:AppliedToDimensions stDim:w="{width}" stDim:h="{height}" stDim:unit="pixel"/>
-        <mwg-rs:RegionList>
-          <rdf:Bag>
-{region_list_str}
-          </rdf:Bag>
-        </mwg-rs:RegionList>
-      </mwg-rs:Regions>
-      <Iptc4xmpExt:PersonInImage>
-        <rdf:Bag>
-{person_list_str}
-        </rdf:Bag>
-      </Iptc4xmpExt:PersonInImage>
-    </rdf:Description>
-  </rdf:RDF>
-</x:xmpmeta>
-<?xpacket end="w"?>"""
+        # Ref: picasa3.exe @ 0x00BB2010 — fusionner dans le DOM XMP existant s'il est présent
+        if existing_xmp:
+            try:
+                old_str = existing_xmp.decode("utf-8", errors="replace")
+                if "</rdf:Description>" in old_str:
+                    cleaned = re.sub(
+                        r"\s*<mwg-rs:Regions\b[^>]*>.*?</mwg-rs:Regions>",
+                        "",
+                        old_str,
+                        flags=re.DOTALL,
+                    )
+                    for ns_prefix, ns_uri in (
+                        ("xmlns:mwg-rs", "http://www.metadataworkinggroup.com/schemas/regions/"),
+                        ("xmlns:stDim", "http://ns.adobe.com/xmp/sType/Dimensions#"),
+                        ("xmlns:stArea", "http://ns.adobe.com/xmp/sType/Area#"),
+                    ):
+                        if ns_prefix not in cleaned:
+                            cleaned = cleaned.replace(
+                                "<rdf:Description",
+                                f'<rdf:Description {ns_prefix}="{ns_uri}"',
+                                1,
+                            )
+                    idx_close = cleaned.rfind("</rdf:Description>")
+                    if idx_close != -1:
+                        merged = cleaned[:idx_close] + mwg_block + "\n    " + cleaned[idx_close:]
+                        return merged.encode("utf-8")
+            except Exception:
+                pass
 
+        xmp_str = (
+            f'<?xpacket begin="\ufeff" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
+            f'<x:xmpmeta xmlns:x="adobe:ns:meta/">\n'
+            f'  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
+            f'    <rdf:Description rdf:about=""\n'
+            f'        xmlns:mwg-rs="http://www.metadataworkinggroup.com/schemas/regions/"\n'
+            f'        xmlns:stDim="http://ns.adobe.com/xmp/sType/Dimensions#"\n'
+            f'        xmlns:stArea="http://ns.adobe.com/xmp/sType/Area#">\n'
+            f'{mwg_block}\n'
+            f'    </rdf:Description>\n'
+            f'  </rdf:RDF>\n'
+            f'</x:xmpmeta>\n'
+            f'<?xpacket end="w"?>'
+        )
         return xmp_str.encode("utf-8")
+
+    @staticmethod
+    def extract_xmp_from_jpeg(jpeg_path: str) -> Optional[bytes]:
+        """
+        FR : Extrait le paquet XMP existant (`APP1` `http://ns.adobe.com/xap/1.0/\\x00`) d'un JPEG, ou `None`.
+        EN: Extracts the existing XMP packet (`APP1` `http://ns.adobe.com/xap/1.0/\\x00`) from a JPEG, or `None`.
+        Ref: picasa3.exe @ 0x00BB2010
+        """
+        try:
+            with open(jpeg_path, "rb") as f:
+                data = f.read()
+            if len(data) < 4 or data[:2] != b"\xff\xd8":
+                return None
+            idx = 2
+            while idx + 4 <= len(data):
+                if data[idx] != 0xFF:
+                    break
+                marker = data[idx : idx + 2]
+                if marker in (b"\xff\xd9", b"\xff\xda"):
+                    break
+                if marker == b"\xff\x00":
+                    idx += 1
+                    continue
+                length = struct.unpack(">H", data[idx + 2 : idx + 4])[0]
+                chunk = data[idx : idx + 2 + length]
+                if marker == b"\xff\xe1" and chunk[4 : 4 + len(XMP_HEADER)] == XMP_HEADER:
+                    return chunk[4 + len(XMP_HEADER) :]
+                idx += 2 + length
+        except Exception:
+            pass
+        return None
 
     @staticmethod
     def inject_xmp_into_jpeg(jpeg_path: str, xmp_bytes: bytes) -> bool:
@@ -189,12 +248,9 @@ class PicasaXMPFaceTagger:
 
             final_data = b"".join(new_data_parts)
 
-            # FR : Écriture atomique via fichier temporaire
-            # EN: Atomic write via temporary file
-            tmp_path = jpeg_path + ".tmp_xmp"
-            with open(tmp_path, "wb") as f:
+            # Ref: picasa3.exe @ 0x009ED330 — écriture directe sans fichier .tmp_xmp
+            with open(jpeg_path, "wb") as f:
                 f.write(final_data)
-            os.replace(tmp_path, jpeg_path)
             return True
 
         except Exception:
@@ -283,7 +339,8 @@ class PicasaWriteFaceTagsWorker(QThread):
                 if faces_to_write:
                     with Image.open(p) as img:
                         w, h = img.size
-                    xmp_bytes = PicasaXMPFaceTagger.build_xmp_packet(w, h, faces_to_write)
+                    existing_xmp = PicasaXMPFaceTagger.extract_xmp_from_jpeg(str(p))
+                    xmp_bytes = PicasaXMPFaceTagger.build_xmp_packet(w, h, faces_to_write, existing_xmp=existing_xmp)
                     if PicasaXMPFaceTagger.inject_xmp_into_jpeg(str(p), xmp_bytes):
                         succ += 1
                     else:

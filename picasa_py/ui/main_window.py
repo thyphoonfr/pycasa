@@ -2290,11 +2290,16 @@ class PicasaMainWindow(QMainWindow):
             if sys.platform == "win32":
                 try:
                     import ctypes
-                    ctypes.windll.kernel32.SetFileAttributesW(str(originals_dir), 0x02)
+                    # Ref: picasa3.exe @ 0x0054366D..0x00543681
+                    attrs = ctypes.windll.kernel32.GetFileAttributesW(str(originals_dir))
+                    if attrs != -1 and (attrs & 0x02) == 0:
+                        ctypes.windll.kernel32.SetFileAttributesW(str(originals_dir), attrs | 0x02)
                 except Exception:
                     pass
             backup_file = originals_dir / target_p.name
-            if not backup_file.exists():
+            legacy_backup = folder / "Originals" / target_p.name
+            had_existing_backup = backup_file.exists() or legacy_backup.exists()
+            if not had_existing_backup:
                 import shutil
                 shutil.copy2(target_path, str(backup_file))
 
@@ -2318,15 +2323,27 @@ class PicasaMainWindow(QMainWindow):
                 save_kwargs["icc_profile"] = icc_profile
             ext = target_p.suffix.lower()
             if ext in (".jpg", ".jpeg"):
-                full_rendered.convert("RGB").save(target_path, format="JPEG", quality=95, **save_kwargs)
+                # Ref: picasa3.exe @ 0x00A3D67B (quality=90 = 0x5A), 0x009D5432 (subsampling="keep")
+                rgb_img = full_rendered.convert("RGB")
+                try:
+                    rgb_img.save(target_path, format="JPEG", quality=90, subsampling="keep", **save_kwargs)
+                except Exception:
+                    rgb_img.save(target_path, format="JPEG", quality=90, **save_kwargs)
             elif ext == ".png":
                 full_rendered.save(target_path, format="PNG", **save_kwargs)
             else:
                 full_rendered.save(target_path, **save_kwargs)
 
-            import zlib
+            # Ref: picasa3.exe @ 0x00429CA0, 0x004548DC, 0x004851CF (XOR 16-bit de VariantTime double)
+            import struct
+            from datetime import datetime
+            from picasa_py.scanner.scanner import datetime_to_ole
             try:
-                b_hash = (zlib.crc32(backup_file.read_bytes()) & 0xFFFF) or 1
+                ole_now = datetime_to_ole(datetime.now())
+                w0, w1, w2, w3 = struct.unpack("<4H", struct.pack("<d", ole_now))
+                b_hash = (w0 ^ w1 ^ w2 ^ w3) & 0xFFFF
+                if had_existing_backup:
+                    b_hash = (b_hash + 1) & 0xFFFF
             except Exception:
                 b_hash = 1
 
@@ -2341,8 +2358,19 @@ class PicasaMainWindow(QMainWindow):
                 sec.set("backuphash", str(b_hash))
 
             self._update_photo_ini(target_path, _clear_baked)
-            if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
-                self.db.update_photo_thumbnails_from_disk(target_path, persist_to_disk=False)
+            if self.db is not None:
+                rec_idx = self.db.find_photo_index(target_path) if hasattr(self.db, "find_photo_index") else None
+                if rec_idx is not None and rec_idx >= 0:
+                    for col_n, col_v in (
+                        ("imagedata_backuphash", int(b_hash) & 0xFFFF),
+                        ("imagedata_revertable", 1),
+                    ):
+                        pmp_c = self.db.pmps.get(col_n)
+                        if pmp_c is not None and rec_idx < len(pmp_c.records):
+                            pmp_c.records[rec_idx] = col_v
+                            pmp_c.dirty = True
+                if hasattr(self.db, "update_photo_thumbnails_from_disk"):
+                    self.db.update_photo_thumbnails_from_disk(target_path, persist_to_disk=False)
             self.thumb_view.invalidate_item(target_path)
             return True
         except Exception:
@@ -4325,11 +4353,24 @@ class PicasaMainWindow(QMainWindow):
 
     def action_sort_album_by(self, criterion: str, target_album: Optional[str] = None) -> None:
         """
-        FR: Trie l'album courant par nom, date ou taille (Album::SortAlbumBy).
-        EN: Sorts the current album by name, date, or size (Album::SortAlbumBy).
+        FR: Trie l'album courant par nom, date ou taille (Album::SortAlbumBy) et persiste l'ordre trié.
+        EN: Sorts the current album by name, date, or size (Album::SortAlbumBy) and persists the sorted order.
         Ref: picasa3.exe @ Album::SortAlbumBy (0x00CAE43C)
         """
         self.action_sort_folder_by(criterion, target_folder=target_album)
+        if self.db is not None and hasattr(self.db, "get_albums"):
+            try:
+                norm_t = (target_album or "").strip().lower()
+                for alb in self.db.get_albums():
+                    if not norm_t or alb.name.strip().lower() == norm_t or alb.uid.strip().lower() == norm_t or alb.token.strip().lower() == norm_t:
+                        if criterion == "name":
+                            alb.photo_paths.sort(key=lambda p: os.path.basename(p).lower())
+                        elif criterion == "size":
+                            alb.photo_paths.sort(key=lambda p: os.path.getsize(p) if os.path.exists(p) else 0)
+                        elif criterion == "date":
+                            alb.photo_paths.sort(key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0.0)
+            except Exception:
+                pass
 
     def action_keyboard_shortcuts(self) -> None:
         """
@@ -4891,6 +4932,24 @@ class PicasaMainWindow(QMainWindow):
                 self._pending_scan_notify = True
             return
 
+        if self.scan_worker is not None:
+            old_sw = self.scan_worker
+            self.scan_worker = None
+            for sig, slot in (
+                (old_sw.progress, self._on_scan_progress),
+                (old_sw.batch_indexed, self._on_scan_batch_indexed),
+                (old_sw.finished, self._on_scan_finished),
+            ):
+                try:
+                    sig.disconnect(slot)
+                except Exception:
+                    pass
+            try:
+                old_sw.wait(200)
+                old_sw.deleteLater()
+            except Exception:
+                pass
+
         self._active_scan_notify = notify_popup
         self._last_incremental_ui_sync = time.monotonic()
         self.scan_worker = BackgroundScanWorker(self.db, folder_paths, self)
@@ -5012,9 +5071,9 @@ class PicasaMainWindow(QMainWindow):
             self._start_background_scan(queued, notify_popup=notify_next)
             return
 
-        # Enchaîner avec la détection des visages en arrière-plan (Ref: BgFaceDetectThread @ 0x0087ECD6)
+        # Enchaîner avec la détection des visages en arrière-plan sur toute la base (Ref: BgFaceDetectThread @ 0x0087ECD6)
         if self.auto_scan and self.db and not getattr(self, "_is_closing", False):
-            self._start_background_face_detection(scanned_folders)
+            self._start_background_face_detection(None)
 
     def _start_background_face_detection(self, folder_paths: Optional[List[str]] = None) -> None:
         """
@@ -5027,6 +5086,24 @@ class PicasaMainWindow(QMainWindow):
         if self.face_worker and self.face_worker.isRunning():
             return
 
+
+        if self.face_worker is not None:
+            old_fw = self.face_worker
+            self.face_worker = None
+            for sig, slot in (
+                (old_fw.progress, self._on_face_detect_progress),
+                (old_fw.people_updated, self._on_people_changed),
+                (old_fw.finished, self._on_face_detect_finished),
+            ):
+                try:
+                    sig.disconnect(slot)
+                except Exception:
+                    pass
+            try:
+                old_fw.wait(200)
+                old_fw.deleteLater()
+            except Exception:
+                pass
 
         self.face_worker = BackgroundFaceDetectionWorker(
             self.db,
@@ -5081,6 +5158,10 @@ class PicasaMainWindow(QMainWindow):
                     pass
             if sw.isRunning():
                 sw.wait(5000)
+            try:
+                sw.deleteLater()
+            except Exception:
+                pass
         if self.face_worker:
             fw = self.face_worker
             self.face_worker = None
@@ -5096,11 +5177,20 @@ class PicasaMainWindow(QMainWindow):
                     pass
             if fw.isRunning():
                 fw.wait(5000)
+            try:
+                fw.deleteLater()
+            except Exception:
+                pass
         if hasattr(self, "thumb_view") and getattr(self.thumb_view, "_cluster_worker", None):
             cw = self.thumb_view._cluster_worker
             self.thumb_view._cluster_worker = None
             if cw and cw.isRunning():
                 cw.wait(5000)
+            try:
+                if cw is not None:
+                    cw.deleteLater()
+            except Exception:
+                pass
 
 
 

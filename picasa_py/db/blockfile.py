@@ -903,16 +903,10 @@ class BlockContainerFile:
         total_size = self.byte_size()
 
         def _full_atomic_write() -> None:
+            # Ref: picasa3.exe @ 0x006B6AF0 / 0x00991EAE — écriture directe sans fichier .tmp
             raw = self.to_bytes()
-            tmp = target.with_suffix(target.suffix + ".tmp")
-            tmp.write_bytes(raw)
-            try:
-                os.replace(str(tmp), str(target))
-            except PermissionError:
-                try:
-                    target.write_bytes(raw)
-                finally:
-                    tmp.unlink(missing_ok=True)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(raw)
             self._backing_path = target
             self._disk_payload_len = len(raw) - 4
             self._dirty_ranges.clear()

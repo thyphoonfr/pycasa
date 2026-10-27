@@ -410,17 +410,59 @@ class PicasaAdjustTimeDialog(QDialog):
 
                 new_ts = final_dt.timestamp()
 
-                # FR: 2. Mise à jour EXIF si JPEG (avant os.utime pour ne pas écraser st_mtime)
-                # EN: 2. Update EXIF if JPEG (before os.utime so st_mtime is not overwritten)
+                # FR: 2. Mise à jour EXIF sans perte si JPEG (avant os.utime pour ne pas écraser st_mtime)
+                # EN: 2. Lossless EXIF APP1 update if JPEG (before os.utime so st_mtime is not overwritten)
+                # Ref: picasa3.exe @ 0x00490580, 0x00490C10, 0x009ED330, 0x00992780
                 if p.suffix.lower() in (".jpg", ".jpeg"):
                     try:
+                        import struct
                         exif_str = final_dt.strftime("%Y:%m:%d %H:%M:%S")
                         with Image.open(p) as img:
                             exif = img.getexif()
-                            exif[306] = exif_str    # DateTime
-                            exif[36867] = exif_str  # DateTimeOriginal
-                            exif[36868] = exif_str  # DateTimeDigitized
-                            img.save(p, format="JPEG", exif=exif, quality="keep")
+                            exif[306] = exif_str    # DateTime (0x0132)
+                            exif[36867] = exif_str  # DateTimeOriginal (0x9003)
+                            exif[36868] = exif_str  # DateTimeDigitized (0x9004)
+                            try:
+                                exif_ifd = exif.get_ifd(0x8769)
+                                exif_ifd[36867] = exif_str
+                                exif_ifd[36868] = exif_str
+                            except Exception:
+                                pass
+                            exif_payload = exif.tobytes()
+                        raw_jpg = p.read_bytes()
+                        if len(raw_jpg) >= 4 and raw_jpg[:2] == b"\xff\xd8" and len(exif_payload) + 2 <= 65535:
+                            new_app1 = b"\xff\xe1" + struct.pack(">H", len(exif_payload) + 2) + exif_payload
+                            pos = 2
+                            n_jpg = len(raw_jpg)
+                            out_chunks = [b"\xff\xd8"]
+                            replaced = False
+                            while pos + 4 <= n_jpg:
+                                if raw_jpg[pos] != 0xFF:
+                                    break
+                                marker = raw_jpg[pos : pos + 2]
+                                if marker in (b"\xff\xda", b"\xff\xd9"):
+                                    break
+                                if marker == b"\xff\x00":
+                                    pos += 1
+                                    continue
+                                seg_len = struct.unpack_from(">H", raw_jpg, pos + 2)[0]
+                                if seg_len < 2 or pos + 2 + seg_len > n_jpg:
+                                    break
+                                seg_bytes = raw_jpg[pos : pos + 2 + seg_len]
+                                if marker == b"\xff\xe1" and seg_bytes[4:10] == b"Exif\x00\x00":
+                                    if not replaced:
+                                        out_chunks.append(new_app1)
+                                        replaced = True
+                                else:
+                                    out_chunks.append(seg_bytes)
+                                pos += 2 + seg_len
+                            if not replaced:
+                                if len(out_chunks) > 1 and out_chunks[1].startswith(b"\xff\xe0"):
+                                    out_chunks.insert(2, new_app1)
+                                else:
+                                    out_chunks.insert(1, new_app1)
+                            out_chunks.append(raw_jpg[pos:])
+                            p.write_bytes(b"".join(out_chunks))
                     except Exception:
                         pass
 

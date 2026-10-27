@@ -15,11 +15,43 @@ Ref: picasa3.exe @ 0x008B7F90 (foldermgr/watched_folders)
 from __future__ import annotations
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 from PySide6.QtCore import QObject, QFileSystemWatcher, QTimer, Signal
 
 from picasa_py.db.database import PicasaDatabase
 from picasa_py.ini.writer import PicasaIniWriter
+
+# Ref: picasa3.exe @ 0x00705007 (500 ms), 0x007050C2 (filter 0x57), 0x007050C7 (bWatchSubtree=1), 0x007050CE (buffer 0x10000)
+DEBOUNCE_DELAY_MS: int = 500
+READ_DIR_CHANGES_BUFFER_SIZE: int = 0x10000
+READ_DIR_CHANGES_WATCH_SUBTREE: bool = True
+READ_DIR_CHANGES_NOTIFY_FILTER: int = 0x57  # FILE_NOTIFY_CHANGE_FILE_NAME|DIR_NAME|ATTRIBUTES|LAST_WRITE|CREATION
+
+
+def parse_file_notify_information(buf: bytes, root_dir: str = "") -> List[Tuple[int, str]]:
+    """
+    FR: Décode un buffer binaire `FILE_NOTIFY_INFORMATION` produit par `ReadDirectoryChangesW`
+    (`0x00705150..0x00705210`) en une liste de tuples `(action, chemin_complet_ou_relatif)`.
+    EN: Decodes a binary `FILE_NOTIFY_INFORMATION` buffer produced by `ReadDirectoryChangesW`
+    (`0x00705150..0x00705210`) into a list of `(action, full_or_relative_path)` tuples.
+    Ref: picasa3.exe @ 0x00704F20..0x0070525A
+    """
+    import struct
+
+    results: List[Tuple[int, str]] = []
+    offset = 0
+    total = len(buf)
+    while offset + 12 <= total:
+        next_entry_offset, action, name_byte_len = struct.unpack_from("<III", buf, offset)
+        name_start = offset + 12
+        name_end = min(name_start + name_byte_len, total)
+        rel_name = buf[name_start:name_end].decode("utf-16le", errors="replace")
+        full_p = os.path.join(root_dir, rel_name) if root_dir else rel_name
+        results.append((action, full_p))
+        if next_entry_offset == 0:
+            break
+        offset += next_entry_offset
+    return results
 
 
 class PicasaFolderWatcher(QObject):

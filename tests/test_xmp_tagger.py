@@ -45,11 +45,10 @@ def test_build_xmp_packet():
 
     assert "xmlns:mwg-rs=" in xmp_str
     assert "xmlns:stArea=" in xmp_str
-    assert "xmlns:Iptc4xmpExt=" in xmp_str
+    assert "Iptc4xmpExt" not in xmp_str
     assert '<mwg-rs:Name>Alice Dupont</mwg-rs:Name>' in xmp_str
     assert '<mwg-rs:Name>Bob Martin</mwg-rs:Name>' in xmp_str
-    assert '<rdf:li>Alice Dupont</rdf:li>' in xmp_str
-    assert '<rdf:li>Bob Martin</rdf:li>' in xmp_str
+    assert 'stArea:x="0.2"' in xmp_str
     assert 'stArea:unit="normalized"' in xmp_str
     assert 'stDim:w="1000"' in xmp_str
     assert 'stDim:h="800"' in xmp_str

@@ -89,6 +89,9 @@ class PmpHeader:
             raise ValueError(f"Version de schéma PMP non supportée : {subversion} (attendu {PMP_SUBVERSION})")
         if type_id != type_id_repeat:
             raise ValueError(f"Incohérence des identifiants de type dans l'en-tête PMP : 0x{type_id:08X} != 0x{type_id_repeat:08X}")
+        # Ref: picasa3.exe @ 0x0099C95A (cmp eax, 0x0FFFFFFF; jbe ...)
+        if record_count > 0x0FFFFFFF:
+            raise ValueError(f"Nombre d'enregistrements PMP invalide (> 0x0FFFFFFF) : 0x{record_count:08X}")
         return cls(
             magic=magic,
             type_id=type_id,
@@ -277,25 +280,16 @@ class PmpFile:
 
     def write_file(self, path: str) -> None:
         """
-        FR: Écrit atomiquement le fichier .pmp sur disque (multi-OS, avec gestion des attributs Windows).
-        EN: Atomically writes the .pmp file to disk (cross-platform, handling Windows file attributes).
+        FR: Écrit directement le fichier .pmp sur disque (`CREATE_ALWAYS` / `"wb"`), conformément à `picasa3.exe`.
+        Ref: picasa3.exe @ 0x006A2CD0, 0x00998620
+        EN: Writes the .pmp file directly to disk (`CREATE_ALWAYS` / `"wb"`), matching `picasa3.exe`.
         """
         data = self.to_bytes()
         abs_path = os.path.abspath(path)
         dir_name = os.path.dirname(abs_path)
         if dir_name:
             os.makedirs(dir_name, exist_ok=True)
-        if sys.platform == "win32" and os.path.exists(abs_path):
-            try:
-                import ctypes
-                attrs = ctypes.windll.kernel32.GetFileAttributesW(abs_path)
-                if attrs != -1 and (attrs & 0x01):
-                    ctypes.windll.kernel32.SetFileAttributesW(abs_path, attrs & ~0x01)
-            except Exception:
-                pass
-        tmp_path = abs_path + ".tmp"
-        with open(tmp_path, "wb") as f:
+        with open(abs_path, "wb") as f:
             f.write(data)
-        os.replace(tmp_path, abs_path)
         self.dirty = False
 

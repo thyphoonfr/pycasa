@@ -150,17 +150,19 @@ class PicasaIniWriter:
         return data
 
     @classmethod
-    def write_atomic(cls, path: str, doc: PicasaIniDocument) -> None:
+    def write_atomic(cls, path: str, doc: PicasaIniDocument) -> bool:
         """
-        FR: Écrit le fichier INI de manière atomique (fichier temporaire puis renommage).
-        Gère les attributs Windows (FILE_ATTRIBUTE_HIDDEN, FILE_ATTRIBUTE_READONLY) uniquement
-        sous sys.platform == 'win32' pour éviter PermissionError [Errno 13] / [WinError 5],
-        et fonctionne nativement sur Linux et macOS (où le préfixe '.' rend déjà .picasa.ini caché).
-        EN: Atomically writes the INI file (temporary file followed by rename).
-        Handles Windows file attributes (FILE_ATTRIBUTE_HIDDEN, FILE_ATTRIBUTE_READONLY) only
-        under sys.platform == 'win32' to prevent PermissionError [Errno 13] / [WinError 5],
-        and works natively on Linux and macOS (where a leading '.' already hides .picasa.ini).
-        Ref: FUN_0068ac80 (sauvegarde sécurisée évitant la corruption en cas d'interruption).
+        FR: Écrit le fichier `.picasa.ini` directement sur place (`OPEN_ALWAYS`, `SetFilePointer(0)`,
+        `WriteFile`, `SetEndOfFile`) sans fichier temporaire `.tmp`, puis applique `attrs | 0x02`
+        (`FILE_ATTRIBUTE_HIDDEN`) si le bit 0x02 n'est pas déjà positionné.
+        Si le fichier existant possède `FILE_ATTRIBUTE_READONLY` (0x01), l'écriture est abandonnée
+        sans modifier le fichier (retourne False), exactement comme `picasa3.exe`.
+        EN: Writes the `.picasa.ini` file directly in-place (`OPEN_ALWAYS`, `SetFilePointer(0)`,
+        `WriteFile`, `SetEndOfFile`) without a `.tmp` file, then sets `attrs | 0x02`
+        (`FILE_ATTRIBUTE_HIDDEN`) if bit 0x02 is not already set.
+        If the existing file has `FILE_ATTRIBUTE_READONLY` (0x01), writing is aborted without
+        modifying the file (returns False), matching `picasa3.exe`.
+        Ref: picasa3.exe @ 0x0099B440..0x0099B58C, 0x0099DB60, 0x009BD390, 0x009BD640, 0x009BED3F..0x009BEDB3
         """
         data = cls.to_bytes(doc)
         abs_path = os.path.abspath(path)
@@ -174,68 +176,50 @@ class PicasaIniWriter:
                 kernel32 = ctypes.windll.kernel32
                 if os.path.exists(abs_path):
                     attrs = kernel32.GetFileAttributesW(abs_path)
-                    # FR: Si le fichier a les bits READONLY (0x01), HIDDEN (0x02) ou SYSTEM (0x04),
-                    # les retirer temporairement car MoveFileExW (os.replace) et open("r+b") échouent
-                    # avec PermissionError [WinError 5] sur un fichier caché sous Windows.
-                    # EN: If the file has READONLY (0x01), HIDDEN (0x02), or SYSTEM (0x04) bits,
-                    # clear them temporarily because MoveFileExW (os.replace) and open("r+b") fail
-                    # with PermissionError [WinError 5] on hidden files on Windows.
-                    if attrs != -1 and (attrs & 0x07):
-                        kernel32.SetFileAttributesW(abs_path, attrs & ~0x07)
+                    # Ref: picasa3.exe @ 0x0099DB60 / 0x009BD706 — ne jamais supprimer FILE_ATTRIBUTE_READONLY (0x01).
+                    if attrs != -1 and (attrs & 0x01):
+                        return False
             except Exception:
                 kernel32 = None
+        else:
+            if os.path.exists(abs_path) and not os.access(abs_path, os.W_OK):
+                return False
 
         cls.mark_internal_write(dir_name)
-        fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".picasa_", suffix=".tmp")
+        flags = os.O_RDWR | os.O_CREAT | getattr(os, "O_BINARY", 0)
         try:
-            with os.fdopen(fd, "wb") as f:
+            fd = os.open(abs_path, flags, 0o666)
+        except PermissionError:
+            return False
+
+        try:
+            with os.fdopen(fd, "r+b") as f:
+                # Ref: picasa3.exe @ 0x009BED3F (SetFilePointer(0)), 0x009BED63 (WriteFile), 0x009BEDB3 (SetEndOfFile)
+                f.seek(0)
                 f.write(data)
+                f.truncate()
                 f.flush()
-                os.fsync(f.fileno())
-
-            # FR: Remplacement atomique / EN: Atomic replacement
-            os.replace(tmp_path, abs_path)
-
-            # FR: Rétablir ou appliquer l'attribut HIDDEN (0x02) sous Windows si le fichier commence par '.'
-            # EN: Restore or apply the HIDDEN attribute (0x02) on Windows if the filename starts with '.'
-            is_dot_ini = os.path.basename(abs_path).startswith(".")
-            if kernel32 is not None and sys.platform == "win32" and is_dot_ini:
-                attrs = kernel32.GetFileAttributesW(abs_path)
-                if attrs != -1:
-                    kernel32.SetFileAttributesW(abs_path, attrs | 0x02)
+        finally:
             cls.mark_internal_write(dir_name)
-        except Exception:
-            if os.path.exists(tmp_path):
-                try:
-                    os.remove(tmp_path)
-                except Exception:
-                    pass
 
-            # FR: Repli direct via r+b si os.replace échoue pour cause de verrouillage / attributs
-            # EN: Direct r+b fallback if os.replace fails due to locking or file attributes
+        # Ref: picasa3.exe @ 0x0099B578..0x0099B58C :
+        # GetFileAttributesW -> test bl, 2 -> jnz -> or eax, 2 -> SetFileAttributesW
+        is_dot_ini = os.path.basename(abs_path).startswith(".")
+        if kernel32 is not None and sys.platform == "win32" and is_dot_ini:
             try:
-                if os.path.exists(abs_path):
-                    with open(abs_path, "r+b") as f:
-                        f.seek(0)
-                        f.write(data)
-                        f.truncate()
-                    is_dot_ini = os.path.basename(abs_path).startswith(".")
-                    if kernel32 is not None and sys.platform == "win32" and is_dot_ini:
-                        attrs = kernel32.GetFileAttributesW(abs_path)
-                        if attrs != -1:
-                            kernel32.SetFileAttributesW(abs_path, attrs | 0x02)
-                    cls.mark_internal_write(dir_name)
-                    return
+                attrs = kernel32.GetFileAttributesW(abs_path)
+                if attrs != -1 and (attrs & 0x02) == 0:
+                    kernel32.SetFileAttributesW(abs_path, attrs | 0x02)
             except Exception:
                 pass
-            raise
+        return True
 
     @classmethod
-    def write_file(cls, path: str, doc: PicasaIniDocument) -> None:
+    def write_file(cls, path: str, doc: PicasaIniDocument) -> bool:
         """
-        FR: Alias de `write_atomic` pour l'écriture atomique d'un document `.picasa.ini`.
-        EN: Alias for `write_atomic` to atomically write a `.picasa.ini` document.
-        Ref: picasa3.exe @ 0x0068AC80
+        FR: Écrit un document `.picasa.ini` sur place conformément à `picasa3.exe`.
+        EN: Writes a `.picasa.ini` document in-place matching `picasa3.exe`.
+        Ref: picasa3.exe @ 0x0099B440, 0x009BD390
         """
-        cls.write_atomic(path, doc)
+        return cls.write_atomic(path, doc)
 

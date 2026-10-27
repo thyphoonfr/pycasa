@@ -148,13 +148,11 @@ class ContactsFile:
 
     def save(self, path: str) -> None:
         """
-        FR: Sauvegarde atomique de contacts.xml sur disque.
-        EN: Atomically saves contacts.xml to disk.
+        FR: Sauvegarde directe de contacts.xml sur disque (`0x00586BD0` / `0x005868D0`).
+        EN: Directly saves contacts.xml to disk (`0x00586BD0` / `0x005868D0`).
         """
         abs_path = os.path.abspath(path)
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
-        tmp_path = abs_path + ".tmp"
-        with open(tmp_path, "w", encoding="utf-8", newline="\n") as f:
+        with open(abs_path, "w", encoding="utf-8", newline="\n") as f:
             f.write(self.to_xml())
-        os.replace(tmp_path, abs_path)
 

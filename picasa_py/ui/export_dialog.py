@@ -34,13 +34,13 @@ from picasa_py.faces.facerect import decode_rect64_string
 # Ref: export.fen <bind source="size" attr="title" list="320|480|640|800|1024|1200|1600"/>
 EXPORT_SIZE_STEPS = [320, 480, 640, 800, 1024, 1200, 1600]
 
-# Ref: export.fen <popup name="quality"> & EXPORT_FR.XML
+# Ref: picasa3.exe @ 0x00739642 (default 85 = 0x55), 0x00739C45..0x00739CBA (0->85, 1->85, 2->95, 3->65, 4->custom)
 QUALITY_PRESETS = {
-    0: ("Automatique", 90, "Préserve la qualité d'origine de l'image."),
-    1: ("Normal", 82, "Équilibre satisfaisant entre la qualité et la taille"),
+    0: ("Automatique", 85, "Préserve la qualité d'origine de l'image."),
+    1: ("Normal", 85, "Équilibre satisfaisant entre la qualité et la taille"),
     2: ("Maximum", 95, "Fichiers très volumineux, conservant la précision des détails"),
     3: ("Minimum", 65, "Fichier de taille minimale, perte de qualité"),
-    4: ("Personnalisé", 80, "Qualité personnalisée")
+    4: ("Personnalisé", 85, "Qualité personnalisée")
 }
 
 

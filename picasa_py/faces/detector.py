@@ -194,11 +194,13 @@ def _ensure_bridge_executable() -> Path | None:
     return None
 
 
-# Ref: picasa3.exe @ 0x0048AA80..0x0048AE80 (FRSuggestionThreshold, FRSuggestionSingleThreshold)
+# Ref: picasa3.exe @ 0x0048AABC..0x0048AE60 (FRSuggestionThreshold = 0x55/100 = 0.85, FRSuggestionSingleThreshold = 0x5A/100 = 0.90)
 # Ref: picasa3.exe @ 0x0078A220, 0x00881CC2 (FRSortThreshold default = 0x55 = 85 -> 0.85)
-FR_SUGGESTION_THRESHOLD: float = 0.65
+FR_SUGGESTION_THRESHOLD: float = 0.85
 FR_SUGGESTION_SINGLE_THRESHOLD: float = 0.90
 FR_SORT_THRESHOLD: float = 0.85
+FR_RECOMMEND_INCLUDE_LIMIT: float = 0.50
+FR_RECOMMEND_SHOW_LIMIT: float = 0.70
 
 
 class PicasaFaceDetector:
@@ -337,7 +339,8 @@ class PicasaFaceDetector:
             )
             assert self._proc.stdout is not None
             magic = self._proc.stdout.read(4)
-            if magic != b"RED2":
+            # Ref: red_bridge_x86.exe @ RedBridge.Main il_offset 610..626 (écrit int32(1) = b"\x01\x00\x00\x00" au démarrage)
+            if magic not in (b"\x01\x00\x00\x00", b"RED2"):
                 self.close()
                 return False
             return True
@@ -353,7 +356,8 @@ class PicasaFaceDetector:
         if self._proc is not None:
             try:
                 if self._proc.stdin:
-                    self._proc.stdin.write(b"Q")
+                    # Ref: red_bridge_x86.exe @ RedBridge.Main il_offset 707..728 (width <= 0 -> arrêt propre vt[1])
+                    self._proc.stdin.write(struct.pack("<iif", 0, 0, 0.0))
                     self._proc.stdin.flush()
                     self._proc.stdin.close()
             except Exception:
@@ -485,20 +489,21 @@ class PicasaFaceDetector:
 
             try:
                 assert self._proc is not None and self._proc.stdin is not None and self._proc.stdout is not None
-                min_face_size = 24
-                header = struct.pack("<cIII", b"D", det_w, det_h, min_face_size)
+                # Ref: red_bridge_x86.exe @ RedBridge.Main il_offset 668..706 (12 octets : int32 w, int32 h, float32 min_conf)
+                header = struct.pack("<iif", int(det_w), int(det_h), float(self.confidence_threshold))
                 self._proc.stdin.write(header)
                 self._proc.stdin.write(gray.tobytes())
                 self._proc.stdin.flush()
 
                 count_bytes = self._read_exact(self._proc.stdout, 4)
-                (num_faces,) = struct.unpack("<I", count_bytes)
+                (num_faces,) = struct.unpack("<i", count_bytes)
 
                 results: list[FaceRect] = []
-                for _ in range(num_faces):
-                    # 6 floats (left_norm, top_norm, right_norm, bottom_norm, conf, pan) + uint32 blob_len
-                    meta = self._read_exact(self._proc.stdout, 28)
-                    l_f, t_f, r_f, b_f, conf, _pan, blob_len = struct.unpack("<6fI", meta)
+                for _ in range(max(0, num_faces)):
+                    # Ref: red_bridge_x86.exe @ RedBridge.Main il_offset 2082..2224
+                    # 7 floats (left_norm, top_norm, right_norm, bottom_norm, conf, pan, roll) + int32 blob_len = 32 octets
+                    meta = self._read_exact(self._proc.stdout, 32)
+                    l_f, t_f, r_f, b_f, conf, _pan, _roll, blob_len = struct.unpack("<7fi", meta)
                     blob = self._read_exact(self._proc.stdout, blob_len) if blob_len > 0 else b""
 
                     if conf < self.confidence_threshold:
@@ -523,6 +528,7 @@ class PicasaFaceDetector:
                     bh_n = max(0.0, float(b_f) - float(t_f))
                     fr.confidence = float(conf)  # type: ignore[attr-defined]
                     fr.pan = float(_pan)  # type: ignore[attr-defined]
+                    fr.roll = float(_roll)  # type: ignore[attr-defined]
                     fr.leye = (float(l_f) + 0.3625 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
                     fr.reye = (float(l_f) + 0.6375 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
                     fr.mouth = (float(l_f) + 0.5000 * bw_n, float(t_f) + 0.7500 * bh_n)  # type: ignore[attr-defined]
@@ -637,32 +643,11 @@ class PicasaFaceDetector:
         ry = ly
 
         with self._lock:
-            use_python_engine = (self._engine == "python") or (sys.platform != "win32") or (not self._ensure_process_locked())
-            if use_python_engine:
-                py_eng = self._ensure_py_engine_locked()
-                if py_eng is None:
-                    return None
-                blob, _vec = py_eng.extract_vqc_cue_from_eyes(gray, lx, ly, rx, ry)
-                return blob
-
-            try:
-                assert self._proc is not None and self._proc.stdin is not None and self._proc.stdout is not None
-                header = struct.pack("<cII4f", b"E", w, h, lx, ly, rx, ry)
-                self._proc.stdin.write(header)
-                self._proc.stdin.write(gray.tobytes())
-                self._proc.stdin.flush()
-
-                (blob_len,) = struct.unpack("<I", self._read_exact(self._proc.stdout, 4))
-                if blob_len == 0:
-                    return None
-                return self._read_exact(self._proc.stdout, blob_len)
-            except Exception:
-                self.close()
-                py_eng = self._ensure_py_engine_locked()
-                if py_eng is not None:
-                    blob, _vec = py_eng.extract_vqc_cue_from_eyes(gray, lx, ly, rx, ry)
-                    return blob
+            py_eng = self._ensure_py_engine_locked()
+            if py_eng is None:
                 return None
+            blob, _vec = py_eng.extract_vqc_cue_from_eyes(gray, lx, ly, rx, ry)
+            return blob
 
     def compute_face_feature(self, face_crop: Image.Image) -> list[float] | None:
         """
@@ -685,33 +670,17 @@ class PicasaFaceDetector:
     def compare_cue_blobs(self, blob_a: bytes, blob_b: bytes) -> float:
         """
         FR : Compare deux blobs `vqc_Cue` de 1 044 octets via `vqc_Relator::relate` de `Red.dll`
-        (ou via `PurePythonRedEngine.relate_cues` en mode `'python'` / multi-OS).
+        (`PurePythonRedEngine.relate_cues`, équivalent bit-à-bit à `Red.dll @ 0x10100A10`).
         EN: Compare two 1,044-byte `vqc_Cue` blobs via `Red.dll`'s `vqc_Relator::relate`
-        (or via `PurePythonRedEngine.relate_cues` in `'python'` / multi-OS mode).
+        (`PurePythonRedEngine.relate_cues`, bit-exact equivalent of `Red.dll @ 0x10100A10`).
         """
         if len(blob_a) != 1044 or len(blob_b) != 1044:
             return 0.0
         with self._lock:
-            use_python_engine = (self._engine == "python") or (sys.platform != "win32") or (not self._ensure_process_locked())
-            if use_python_engine:
-                py_eng = self._ensure_py_engine_locked()
-                if py_eng is not None:
-                    return py_eng.relate_cues(blob_a, blob_b)
-                return 0.0
-            try:
-                assert self._proc is not None and self._proc.stdin is not None and self._proc.stdout is not None
-                self._proc.stdin.write(b"R")
-                self._proc.stdin.write(blob_a)
-                self._proc.stdin.write(blob_b)
-                self._proc.stdin.flush()
-                (score,) = struct.unpack("<f", self._read_exact(self._proc.stdout, 4))
-                return float(score)
-            except Exception:
-                self.close()
-                py_eng = self._ensure_py_engine_locked()
-                if py_eng is not None:
-                    return py_eng.relate_cues(blob_a, blob_b)
-                return 0.0
+            py_eng = self._ensure_py_engine_locked()
+            if py_eng is not None:
+                return py_eng.relate_cues(blob_a, blob_b)
+            return 0.0
 
     @staticmethod
     def compare_face_features(feat_a: list[float] | np.ndarray | None, feat_b: list[float] | np.ndarray | None) -> float:

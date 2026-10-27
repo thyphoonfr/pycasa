@@ -162,6 +162,7 @@ STANDARD_PMP_SCHEMA: Dict[str, PmpType] = {
     "albumdata_uid": PmpType.STRING,
     "albumdata_unread": PmpType.UINT8,
     "catdata_catpri": PmpType.UINT8,
+    "catdata_info": PmpType.STRING,
     "catdata_name": PmpType.STRING,
     "catdata_state": PmpType.UINT8,
     "imagedata_aliasparents": PmpType.UINT32,
@@ -219,6 +220,7 @@ DEFAULT_CATDATA_RECORDS: Dict[str, List[Any]] = {
         "People",
     ],
     "catdata_catpri": [100, 90, 20, 9, 8, 7, 6, 1, 95],
+    "catdata_info": ["", "", "", "", "", "", "", "", ""],
     "catdata_state": [1, 1, 1, 1, 1, 1, 0, 1, 1],
 }
 
@@ -465,6 +467,10 @@ class PicasaDatabase:
         # 4. Tables PMP (FR: Colonnes de propriétés / EN: Property columns)
         for pmp_path in self.db3_dir.glob("*.pmp"):
             self.pmps[pmp_path.stem] = PmpFile.from_bytes(pmp_path.read_bytes())
+        # Ref: picasa3.exe @ 0x00420268 (CThumbDB::Open -> m_categoryData.AddColumn("info", 0, 1))
+        if "catdata_name" in self.pmps and "catdata_info" not in self.pmps:
+            cat_count = len(self.pmps["catdata_name"].records)
+            self.pmps["catdata_info"] = PmpFile(pmp_type=PmpType.STRING, records=[""] * cat_count, dirty=True)
 
         # 5. CBlockFile indices & conteneurs multi-blocs (*_0.db, *_1.db, ...)
         # Ref: picasa3.exe @ 0x006B6AF0 (CBlockFile::OpenBlock "%s_%d.%s"), 0x006B8AC0 (ValidateIndex)
@@ -1561,13 +1567,212 @@ class PicasaDatabase:
             return str(pmp_cap.records[eff_idx])
         return ""
 
+    def _update_jpeg_iptc_metadata(
+        self,
+        full_path: str,
+        eff_idx: int,
+        caption: Optional[str] = None,
+        keywords: Optional[List[str]] = None,
+    ) -> bool:
+        """
+        FR: Met à jour sans perte le segment `APP13` (`0xFFED`, `"Photoshop 3.0\\x008BIM\\x04\\x04"`)
+        d'un fichier JPEG accessible en écriture pour `caption` (IPTC `2:120 Caption-Abstract`) et/ou
+        `keywords` (IPTC `2:25 Keywords`, avec `1:90 Coded Character Set = "\\x1b%G"` en UTF-8).
+        Ref: picasa3.exe @ 0x00438450..0x004385CE, 0x00456150..0x004561F3, 0x00C77B10, 0x00AB06D0, 0x009ED330
+        EN: Losslessly updates the `APP13` (`0xFFED`, `"Photoshop 3.0\\x008BIM\\x04\\x04"`) segment
+        of a writable JPEG file for `caption` (IPTC `2:120 Caption-Abstract`) and/or
+        `keywords` (IPTC `2:25 Keywords`, with `1:90 Coded Character Set = "\\x1b%G"` in UTF-8).
+        """
+        if not full_path or not os.path.isfile(full_path):
+            return False
+        ext = os.path.splitext(full_path)[1].lower()
+        if ext not in (".jpg", ".jpeg"):
+            return False
+        if sys.platform == "win32":
+            try:
+                import ctypes
+                attrs = ctypes.windll.kernel32.GetFileAttributesW(full_path)
+                if attrs != -1 and (attrs & 0x01):
+                    return False
+            except Exception:
+                pass
+        elif not os.access(full_path, os.W_OK):
+            return False
+
+        try:
+            with open(full_path, "rb") as fh:
+                raw_jpeg = fh.read()
+        except OSError:
+            return False
+
+        if len(raw_jpeg) < 4 or raw_jpeg[:2] != b"\xff\xd8":
+            return False
+
+        # Parcourir les marqueurs JPEG avant SOS (0xFFDA)
+        pos = 2
+        n = len(raw_jpeg)
+        segments: List[Tuple[int, int, int, bytes]] = []  # (start, end, marker, payload)
+        sos_pos = n
+        while pos + 1 < n:
+            if raw_jpeg[pos] != 0xFF:
+                sos_pos = pos
+                break
+            while pos < n and raw_jpeg[pos] == 0xFF:
+                pos += 1
+            if pos >= n:
+                break
+            marker = raw_jpeg[pos]
+            pos += 1
+            if marker == 0xD9 or marker == 0xDA:
+                sos_pos = pos - 2
+                break
+            if marker in (0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8):
+                continue
+            if pos + 2 > n:
+                sos_pos = pos - 2
+                break
+            seg_len = struct.unpack_from(">H", raw_jpeg, pos)[0]
+            if seg_len < 2 or pos + seg_len > n:
+                sos_pos = pos - 2
+                break
+            seg_start = pos - 2
+            seg_end = pos + seg_len
+            segments.append((seg_start, seg_end, marker, raw_jpeg[pos + 2 : seg_end]))
+            pos = seg_end
+
+        photoshop_hdr = b"Photoshop 3.0\x00"
+        app13_seg_idx: Optional[int] = None
+        other_8bim_blocks: List[bytes] = []
+        iptc_datasets: List[Tuple[int, int, bytes]] = []
+
+        for idx_s, (_s_start, _s_end, marker, payload) in enumerate(segments):
+            if marker == 0xED and payload.startswith(photoshop_hdr):
+                app13_seg_idx = idx_s
+                bpos = len(photoshop_hdr)
+                blen = len(payload)
+                while bpos + 8 <= blen:
+                    if payload[bpos : bpos + 4] != b"8BIM":
+                        break
+                    res_id = struct.unpack_from(">H", payload, bpos + 4)[0]
+                    name_len = payload[bpos + 6]
+                    # Chaîne Pascal alignée sur un nombre pair d'octets (incluant l'octet de longueur)
+                    padded_name_len = name_len + 1 + ((name_len + 1) & 1)
+                    size_off = bpos + 6 + padded_name_len
+                    if size_off + 4 > blen:
+                        break
+                    res_size = struct.unpack_from(">I", payload, size_off)[0]
+                    data_start = size_off + 4
+                    data_end = data_start + res_size
+                    if data_end > blen:
+                        break
+                    padded_data_end = data_end + (res_size & 1)
+                    if res_id == 0x0404:
+                        iptc_raw = payload[data_start:data_end]
+                        ipos = 0
+                        ilen = len(iptc_raw)
+                        while ipos + 5 <= ilen:
+                            if iptc_raw[ipos] != 0x1C:
+                                break
+                            rec_no = iptc_raw[ipos + 1]
+                            ds_no = iptc_raw[ipos + 2]
+                            ds_len = struct.unpack_from(">H", iptc_raw, ipos + 3)[0]
+                            if ipos + 5 + ds_len > ilen:
+                                break
+                            iptc_datasets.append((rec_no, ds_no, iptc_raw[ipos + 5 : ipos + 5 + ds_len]))
+                            ipos += 5 + ds_len
+                    else:
+                        other_8bim_blocks.append(payload[bpos : min(padded_data_end, blen)])
+                    bpos = padded_data_end
+                break
+
+        if caption is not None:
+            iptc_datasets = [(r, d, v) for (r, d, v) in iptc_datasets if not (r == 2 and d == 120)]
+            if caption:
+                iptc_datasets.append((2, 120, caption.encode("utf-8")[:2000]))
+
+        if keywords is not None:
+            iptc_datasets = [(r, d, v) for (r, d, v) in iptc_datasets if not (r == 2 and d == 25)]
+            for kw in keywords:
+                if kw:
+                    iptc_datasets.append((2, 25, kw.encode("utf-8")[:64]))
+
+        # Ref: picasa3.exe @ 0x00AB06D0 — 1:90 Coded Character Set = "\x1b%G" (UTF-8)
+        iptc_datasets = [(r, d, v) for (r, d, v) in iptc_datasets if not (r == 1 and d == 90)]
+        has_record2 = any(r == 2 for (r, _d, _v) in iptc_datasets)
+        if has_record2:
+            iptc_datasets.insert(0, (1, 90, b"\x1b%G"))
+
+        iptc_bytes_parts: List[bytes] = []
+        for rec_no, ds_no, val_b in iptc_datasets:
+            iptc_bytes_parts.append(struct.pack(">BBBH", 0x1C, rec_no & 0xFF, ds_no & 0xFF, len(val_b)) + val_b)
+        iptc_blob = b"".join(iptc_bytes_parts)
+
+        new_8bim_blocks: List[bytes] = list(other_8bim_blocks)
+        if iptc_blob:
+            pad_b = b"\x00" if (len(iptc_blob) & 1) else b""
+            block_0404 = b"8BIM" + struct.pack(">HBB", 0x0404, 0, 0) + struct.pack(">I", len(iptc_blob)) + iptc_blob + pad_b
+            new_8bim_blocks.append(block_0404)
+
+        if new_8bim_blocks:
+            app13_payload = photoshop_hdr + b"".join(new_8bim_blocks)
+            app13_seg_bytes = b"\xff\xed" + struct.pack(">H", len(app13_payload) + 2) + app13_payload
+        else:
+            app13_seg_bytes = b""
+
+        out_parts: List[bytes] = [b"\xff\xd8"]
+        inserted = False
+        if app13_seg_idx is not None:
+            for idx_s, (s_start, s_end, _m, _p) in enumerate(segments):
+                if idx_s == app13_seg_idx:
+                    if app13_seg_bytes:
+                        out_parts.append(app13_seg_bytes)
+                    inserted = True
+                else:
+                    out_parts.append(raw_jpeg[s_start:s_end])
+        else:
+            insert_after = -1
+            for idx_s, (_s_start, _s_end, marker, _p) in enumerate(segments):
+                if marker in (0xE0, 0xE1):
+                    insert_after = idx_s
+            if insert_after == -1 and app13_seg_bytes:
+                out_parts.append(app13_seg_bytes)
+                inserted = True
+            for idx_s, (s_start, s_end, _m, _p) in enumerate(segments):
+                out_parts.append(raw_jpeg[s_start:s_end])
+                if idx_s == insert_after and app13_seg_bytes and not inserted:
+                    out_parts.append(app13_seg_bytes)
+                    inserted = True
+
+        out_parts.append(raw_jpeg[sos_pos:])
+        new_jpeg = b"".join(out_parts)
+        if new_jpeg == raw_jpeg:
+            return True
+
+        try:
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(os.path.dirname(full_path))
+            with open(full_path, "wb") as fh:
+                fh.write(new_jpeg)
+            st = os.stat(full_path)
+            if self.thumbindex is not None and 0 <= eff_idx < len(self.thumbindex.records):
+                rec = self.thumbindex.records[eff_idx]
+                rec.size = int(st.st_size) & 0xFFFFFFFF
+                rec.ft2 = int(st.st_mtime * 10_000_000) + 116_444_736_000_000_000
+                rec.dirty = True
+                self.thumbindex.dirty = True
+            return True
+        except OSError:
+            return False
+
     def set_caption(self, idx: int, caption: str) -> bool:
         """
         FR: Définit ou supprime la légende (caption) de la photo (ou de la photo parente d'un visage 1001).
-        Met à jour `imagedata_caption.pmp` et indexe les termes dans `wordhash.dat`.
+        Met à jour `imagedata_caption.pmp`, indexe les termes dans `wordhash.dat`, écrit `caption=` dans `.picasa.ini`
+        et met à jour sans perte le champ IPTC `2:120` dans `APP13` pour les fichiers JPEG (`0x00438450`).
         EN: Sets or removes the caption of the photo (or of the parent photo of a 1001 face record).
-        Updates `imagedata_caption.pmp` and indexes the terms in `wordhash.dat`.
-        Ref: picasa3.exe @ 0x00456A15, 0x004D9AA0
+        Updates `imagedata_caption.pmp`, indexes terms in `wordhash.dat`, writes `caption=` in `.picasa.ini`,
+        and losslessly updates IPTC `2:120` in `APP13` for JPEG files (`0x00438450`).
+        Ref: picasa3.exe @ 0x00438450..0x004385CE, 0x00456A15, 0x004D9AA0
         """
         eff_idx = self._resolve_photo_record_index(idx)
         if eff_idx is None:
@@ -1579,13 +1784,8 @@ class PicasaDatabase:
                 self.wordhash.add_word(tok, eff_idx)
         full_path = self.get_media_full_path(eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
-            def _mut_cap(doc: Any, fn: str) -> None:
-                sec = doc.get_or_create_section(fn)
-                if caption:
-                    sec.set("caption", caption)
-                else:
-                    sec.remove("caption")
-            return self.update_photo_ini(full_path, _mut_cap)
+            self._update_jpeg_iptc_metadata(full_path, eff_idx, caption=caption or "")
+            return self.update_photo_ini(full_path, lambda doc, fn: doc.set_caption(fn, caption))
         pmp_cap = self.pmps.get("imagedata_caption")
         if pmp_cap is not None:
             default_v = pmp_cap.default_value()
@@ -1641,6 +1841,7 @@ class PicasaDatabase:
                     self.wordhash.add_word(tok, eff_idx)
         full_path = self.get_media_full_path(eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
+            self._update_jpeg_iptc_metadata(full_path, eff_idx, keywords=tag_list)
             return self.update_photo_ini(full_path, lambda doc, fn: doc.set_keywords(fn, tag_list))
         pmp_tags = self.pmps.get("imagedata_tags")
         if pmp_tags is not None:
@@ -2569,15 +2770,7 @@ class PicasaDatabase:
             repo_bytes = self.repository.to_bytes()
             scanlist_bytes = self._serialize_scanlist_bytes()
         target = self.db3_dir / "repository.dat"
-        tmp = target.with_suffix(target.suffix + ".tmp")
-        tmp.write_bytes(repo_bytes)
-        try:
-            os.replace(str(tmp), str(target))
-        except PermissionError:
-            try:
-                target.write_bytes(repo_bytes)
-            finally:
-                tmp.unlink(missing_ok=True)
+        target.write_bytes(repo_bytes)
         try:
             (self.db3_dir / "scanlist.txt").write_bytes(scanlist_bytes)
         except Exception:
@@ -3753,15 +3946,8 @@ class PicasaDatabase:
             return
 
         def _atomic_write(target: Path, data: bytes) -> None:
-            tmp = target.with_suffix(target.suffix + ".tmp")
-            tmp.write_bytes(data)
-            try:
-                os.replace(str(tmp), str(target))
-            except PermissionError:
-                try:
-                    target.write_bytes(data)
-                finally:
-                    tmp.unlink(missing_ok=True)
+            # Ref: picasa3.exe @ 0x0041BA40, 0x004F54B0, 0x006B7FC0, 0x006A2CD0 — écriture directe sans fichier .tmp
+            target.write_bytes(data)
 
         with self._lock:
             if self._thumb_save_timer is not None:
@@ -3873,17 +4059,10 @@ class PicasaDatabase:
             self.db3_dir.mkdir(parents=True, exist_ok=True)
 
         def _atomic_write(target: Path, data: bytes) -> None:
-            tmp = target.with_suffix(target.suffix + ".tmp")
-            tmp.write_bytes(data)
-            try:
-                os.replace(str(tmp), str(target))
-            except PermissionError:
-                try:
-                    target.write_bytes(data)
-                finally:
-                    tmp.unlink(missing_ok=True)
+            # Ref: picasa3.exe @ 0x0041BA40, 0x004F54B0, 0x006B7FC0, 0x006A2CD0 — écriture directe sans fichier .tmp
+            target.write_bytes(data)
 
-        # 1. thumbindex.db
+        # 1. thumbindex.db (Ref: 0x0041BADD)
         ti_path = self.db3_dir / "thumbindex.db"
         with self._lock:
             if self._thumb_save_timer is not None:
@@ -3905,32 +4084,19 @@ class PicasaDatabase:
             if self.thumbindex is not None:
                 self.thumbindex.dirty = False
 
-        # 2. BlockFiles (thumbs_0.db, thumbs_1.db, thumbs_index.db, etc.)
-        saved_containers: Set[Tuple[str, int]] = set()
-        for (prefix, block_num), container in list(self.block_containers_by_block.items()):
-            with self._get_block_lock(prefix):
-                container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
-            saved_containers.add((prefix, block_num))
+        # 2. scanlist.txt (Ref: 0x0041BAEB -> 0x004F61C0)
+        try:
+            if self.repository is not None or self._scanlist:
+                scanlist_bytes = self._serialize_scanlist_bytes()
+                if scanlist_bytes or not (self.db3_dir / "scanlist.txt").exists():
+                    (self.db3_dir / "scanlist.txt").write_bytes(scanlist_bytes)
+        except Exception:
+            pass
 
-        for prefix, container in list(self.block_containers.items()):
-            if (prefix, 0) not in saved_containers:
-                with self._get_block_lock(prefix):
-                    container.flush_to_file(self.db3_dir / f"{prefix}_0.db")
-
-        for prefix, idx_file in list(self.block_indices.items()):
-            idx_path = self.db3_dir / f"{prefix}_index.db"
-            idx_bytes: Optional[bytes] = None
-            with self._get_block_lock(prefix):
-                if getattr(idx_file, "dirty", True) or not idx_path.exists() or (
-                    force_all and not getattr(idx_file, "_compacted_on_disk", False)
-                ):
-                    idx_bytes = idx_file.to_bytes()
-            if idx_bytes is not None:
-                _atomic_write(idx_path, idx_bytes)
-                idx_file.dirty = False
-                idx_file._compacted_on_disk = False
-
-        # 3. Tables PMP (*.pmp) : alignement strict des tables imagedata_*, albumdata_*, catdata_*
+        # 3-5. Tables PMP : alignement et sauvegarde dans l'ordre exact de CThumbDB::Save :
+        # 3. catdata_*.pmp + catdata_0 (0x0041BAFC)
+        # 4. imagedata_*.pmp + imagedata_0 (0x0041BB25)
+        # 5. albumdata_*.pmp + albumdata_0 (0x0041BB4E)
         with self._lock:
             if self.thumbindex is not None:
                 target_img_len = len(self.thumbindex.records)
@@ -3958,6 +4124,12 @@ class PicasaDatabase:
 
             if "catdata_name" in self.pmps:
                 target_cat_len = len(self.pmps["catdata_name"].records)
+                if "catdata_info" not in self.pmps:
+                    self.pmps["catdata_info"] = PmpFile(
+                        pmp_type=PmpType.STRING,
+                        records=[""] * target_cat_len,
+                        dirty=True,
+                    )
                 for stem, pmp_file in self.pmps.items():
                     if stem.startswith("catdata_"):
                         def_val = pmp_file.default_value()
@@ -3969,7 +4141,30 @@ class PicasaDatabase:
                             pmp_file.dirty = True
 
         is_bg_thread = threading.current_thread() is not threading.main_thread()
-        for stem, pmp_file in list(self.pmps.items()):
+
+        def _pmp_order_key(item: Tuple[str, PmpFile]) -> Tuple[int, str]:
+            st = item[0]
+            if st.startswith("catdata_"):
+                return (0, st)
+            if st.startswith("imagedata_"):
+                return (1, st)
+            if st.startswith("albumdata_"):
+                return (2, st)
+            return (3, st)
+
+        sentinel_magic = b"\xcd\xcc\xcc?"  # 0x3FCCCCCD (1.6f @ 0x00991EAE)
+        written_sentinels: Set[str] = set()
+        for stem, pmp_file in sorted(self.pmps.items(), key=_pmp_order_key):
+            for grp_prefix, sentinel_name in (
+                ("catdata_", "catdata_0"),
+                ("imagedata_", "imagedata_0"),
+                ("albumdata_", "albumdata_0"),
+            ):
+                if stem.startswith(grp_prefix) and sentinel_name not in written_sentinels:
+                    written_sentinels.add(sentinel_name)
+                    sent_path = self.db3_dir / sentinel_name
+                    if force_all or not sent_path.exists():
+                        _atomic_write(sent_path, sentinel_magic)
             pmp_path = self.db3_dir / f"{stem}.pmp"
             pmp_bytes: Optional[bytes] = None
             with self._lock:
@@ -3980,18 +4175,59 @@ class PicasaDatabase:
                 pmp_file.dirty = False
                 if is_bg_thread:
                     time.sleep(0.0005)
+        for sentinel_name in ("catdata_0", "imagedata_0", "albumdata_0"):
+            if sentinel_name not in written_sentinels:
+                sent_path = self.db3_dir / sentinel_name
+                if force_all or not sent_path.exists():
+                    _atomic_write(sent_path, sentinel_magic)
 
-        # 4. repository.dat & usernames.dat
-        if self.repository:
-            with self._lock:
-                repo_bytes = self.repository.to_bytes()
-            _atomic_write(self.db3_dir / "repository.dat", repo_bytes)
-        if self.usernames:
-            with self._lock:
-                un_bytes = self.usernames.to_bytes()
-            _atomic_write(self.db3_dir / "usernames.dat", un_bytes)
+        # 6-12. BlockFiles dans l'ordre exact de CThumbDB::Save (0x0041BB8B..0x0041BC9C) :
+        # 6: albums, 7: profilephotos_0.db, 8: thumbs, 9: bigthumbs, 10: previews, 11: facetemplatesV2, 12: thumbs2
+        ordered_bf_prefixes = [
+            "albums",
+            "thumbs",
+            "bigthumbs",
+            "previews",
+            "facetemplatesV2",
+            "thumbs2",
+        ]
+        for extra_p in list(self.block_indices.keys()) + list(self.block_containers.keys()):
+            if extra_p not in ordered_bf_prefixes:
+                ordered_bf_prefixes.append(extra_p)
 
-        # 5. wordhash.dat
+        prof_path = self.db3_dir / "profilephotos_0.db"
+        saved_containers: Set[Tuple[str, int]] = set()
+        for prefix in ordered_bf_prefixes:
+            for (p_key, block_num), container in sorted(self.block_containers_by_block.items(), key=lambda x: x[0][1]):
+                if p_key == prefix:
+                    with self._get_block_lock(prefix):
+                        container.flush_to_file(self.db3_dir / f"{prefix}_{block_num}.db")
+                    saved_containers.add((prefix, block_num))
+            container_0 = self.block_containers.get(prefix)
+            if container_0 is not None and (prefix, 0) not in saved_containers:
+                with self._get_block_lock(prefix):
+                    container_0.flush_to_file(self.db3_dir / f"{prefix}_0.db")
+                saved_containers.add((prefix, 0))
+            idx_file = self.block_indices.get(prefix)
+            if idx_file is not None:
+                idx_path = self.db3_dir / f"{prefix}_index.db"
+                idx_bytes: Optional[bytes] = None
+                with self._get_block_lock(prefix):
+                    if getattr(idx_file, "dirty", True) or not idx_path.exists() or (
+                        force_all and not getattr(idx_file, "_compacted_on_disk", False)
+                    ):
+                        idx_bytes = idx_file.to_bytes()
+                if idx_bytes is not None:
+                    _atomic_write(idx_path, idx_bytes)
+                    idx_file.dirty = False
+                    idx_file._compacted_on_disk = False
+            if prefix == "albums" and (force_all or not prof_path.exists()):
+                # 7. profilephotos_0.db (Ref: 0x00415AFB, 0x0041BBB4)
+                _atomic_write(prof_path, sentinel_magic)
+        if force_all or not prof_path.exists():
+            _atomic_write(prof_path, sentinel_magic)
+
+        # 13. wordhash.dat, facetags.txt, tags.txt (Ref: 0x0041BCCE)
         if self.wordhash:
             wh_path = self.db3_dir / "wordhash.dat"
             wh_bytes: Optional[bytes] = None
@@ -4002,12 +4238,18 @@ class PicasaDatabase:
                 _atomic_write(wh_path, wh_bytes)
                 self.wordhash.dirty = False
 
-        # 6. contacts.xml
+        # 14. repository.dat, usernames.dat, contacts.xml, starlist.txt, saverlist.txt, watchedfolders.txt, frexcludefolders.txt
+        # Ref: picasa3.exe @ 0x0041BCE2..0x0041BD54, 0x006BA000, 0x006C0E00, 0x00586BD0, 0x004755F0, 0x004F5960, 0x004F5D90
+        if self.repository:
+            with self._lock:
+                repo_bytes = self.repository.to_bytes()
+            _atomic_write(self.db3_dir / "repository.dat", repo_bytes)
+        if self.usernames:
+            with self._lock:
+                un_bytes = self.usernames.to_bytes()
+            _atomic_write(self.db3_dir / "usernames.dat", un_bytes)
         if self.contacts and self.contacts_dir:
             self.save_contacts()
-
-        # 7. Fichiers listes .txt auxiliaires (scanlist.txt, starlist.txt, saverlist.txt, facetags.txt, tags.txt)
-        # Ref: picasa3.exe @ 0x0041BA40, 0x004F61C0, 0x004755F0, 0x006BA000, 0x006C0E00
         try:
             self._write_auxiliary_txt_lists()
         except Exception:
@@ -4081,6 +4323,32 @@ class PicasaDatabase:
             tags_path = self.db3_dir / "tags.txt"
             if unique_tags or not tags_path.exists():
                 tags_path.write_bytes("".join(unique_tags).encode("utf-8", errors="surrogateescape"))
+
+        # 5. Picasa2Albums\watchedfolders.txt (0x004F5960) & frexcludefolders.txt (0x004F5D90)
+        # Ref: picasa3.exe @ 0x0041BD3E, 0x0041BD54
+        p2a_dir = (
+            self.db3_dir.parent.parent / "Picasa2Albums"
+            if self.db3_dir.parent.name.lower() == "picasa2"
+            else self.db3_dir.parent / "Picasa2Albums"
+        )
+        try:
+            p2a_dir.mkdir(parents=True, exist_ok=True)
+            watched_lines: List[str] = []
+            frexcl_lines: List[str] = []
+            folders_status = self.get_watched_folders()
+            for fpath_k, status_v in folders_status.items():
+                norm_k = fpath_k if fpath_k.endswith("\\") else fpath_k + "\\"
+                if status_v == "1":
+                    watched_lines.append(f"{norm_k}\r\n")
+            if self.repository is not None:
+                for p in self.repository.pairs:
+                    if p.section == "FileManagerFRStatus" and p.value == "0" and p.key:
+                        norm_fr = p.key if p.key.endswith("\\") else p.key + "\\"
+                        frexcl_lines.append(f"{norm_fr}\r\n")
+            (p2a_dir / "watchedfolders.txt").write_bytes("".join(watched_lines).encode("utf-8", errors="surrogateescape"))
+            (p2a_dir / "frexcludefolders.txt").write_bytes("".join(frexcl_lines).encode("utf-8", errors="surrogateescape"))
+        except Exception:
+            pass
 
     save_all = save_database
 

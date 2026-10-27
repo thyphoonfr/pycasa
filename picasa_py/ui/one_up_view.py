@@ -1499,7 +1499,12 @@ class PicasaOneUpView(QWidget):
                                 )
                         return src_img.copy()
 
+                    # Ref: picasa3.exe @ 0x00462CD9 : cherche d'abord .picasaoriginals/, puis Originals/
                     orig_backup = Path(full_path).parent / ".picasaoriginals" / os.path.basename(full_path)
+                    if not orig_backup.exists():
+                        legacy_orig = Path(full_path).parent / "Originals" / os.path.basename(full_path)
+                        if legacy_orig.exists():
+                            orig_backup = legacy_orig
                     self._orig_backup_path = str(orig_backup) if orig_backup.exists() else None
                     self._orig_backup_loaded = False
                     if self._orig_backup_path and self.canvas.view_mode in ("A_A", "A_B"):
@@ -2797,16 +2802,18 @@ class PicasaOneUpView(QWidget):
             )
             self._push_history(new_img)
 
-        # Ref: picasa3.exe @ 0x00A4DB30, 0x00A4E3A0 (CTextItemList exact format)
+        # Ref: picasa3.exe @ 0x00A4DB30 -> 0x00A4E3B0, 0x00A4DD50 (CTextItemList::SaveToString exact format)
         utf8_len = len(txt.encode("utf-8"))
         scale = max(0.02, min(0.5, float(size) / 360.0))
         fill_argb = 0xFF000000 | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF)
         outline_w = 2.0 if shadow else 0.0
         outline_argb = 0xFF000000
-        text_token = (
-            f"1;{utf8_len};{txt};Arial;{px:.6f},{py:.6f},{scale:.6f},0.000000;"
+        item_body = (
+            f"{utf8_len};{txt};Arial;{px:.6f},{py:.6f},{scale:.6f},0.000000;"
             f"v1,400,400,128.000000,{outline_w:.6f},1.000000,1.000000,{outline_argb},{fill_argb},32768;"
         )
+        item_byte_len = len(item_body.encode("utf-8"))
+        text_token = f"1;{item_byte_len};{item_body}"
         self._update_ini(target_path, lambda doc, fname: doc.set_text(fname, text_token))
         self._sync_current_thumbnails_to_db()
         self.photo_edited.emit(target_path)
@@ -3077,13 +3084,17 @@ class PicasaOneUpView(QWidget):
             if sys.platform == "win32":
                 try:
                     import ctypes
-                    FILE_ATTRIBUTE_HIDDEN = 0x02
-                    ctypes.windll.kernel32.SetFileAttributesW(str(originals_dir), FILE_ATTRIBUTE_HIDDEN)
+                    # Ref: picasa3.exe @ 0x0054366D..0x00543681 (GetFileAttributesW | FILE_ATTRIBUTE_HIDDEN)
+                    attrs = ctypes.windll.kernel32.GetFileAttributesW(str(originals_dir))
+                    if attrs != -1 and (attrs & 0x02) == 0:
+                        ctypes.windll.kernel32.SetFileAttributesW(str(originals_dir), attrs | 0x02)
                 except Exception:
                     pass
 
             backup_file = originals_dir / target_p.name
-            if not backup_file.exists():
+            legacy_backup = folder / "Originals" / target_p.name
+            had_existing_backup = backup_file.exists() or legacy_backup.exists()
+            if not had_existing_backup:
                 import shutil
                 shutil.copy2(target_path, str(backup_file))
 
@@ -3133,21 +3144,28 @@ class PicasaOneUpView(QWidget):
 
             ext = target_p.suffix.lower()
             if ext in (".jpg", ".jpeg"):
-                img_to_save.convert("RGB").save(target_path, format="JPEG", quality=95, **save_kwargs)
+                # Ref: picasa3.exe @ 0x00A3D67B (quality=90 = 0x5A), 0x009D5432 (preserve source chroma subsampling)
+                rgb_to_save = img_to_save.convert("RGB")
+                try:
+                    rgb_to_save.save(target_path, format="JPEG", quality=90, subsampling="keep", **save_kwargs)
+                except Exception:
+                    rgb_to_save.save(target_path, format="JPEG", quality=90, **save_kwargs)
             elif ext == ".png":
                 img_to_save.save(target_path, format="PNG", **save_kwargs)
             else:
                 img_to_save.save(target_path, **save_kwargs)
 
-            # Ref: picasa3.exe @ 0x00429CA0, 0x004548B1, 0x004851C3, 0x0098B6E0 :
-            # backuphash est le XOR des quatre mots 16 bits du double IEEE-754 de la date OLE Automation courante
+            # Ref: picasa3.exe @ 0x00429CA0, 0x004548B1, 0x004548DC, 0x004851C3..0x004851CF :
+            # backuphash = (w0 ^ w1 ^ w2 ^ w3) & 0xFFFF (incrémenté de +1 si une sauvegarde existait déjà)
             import struct
             from datetime import datetime
             from picasa_py.scanner.scanner import datetime_to_ole
             try:
                 ole_now = datetime_to_ole(datetime.now())
                 w0, w1, w2, w3 = struct.unpack("<4H", struct.pack("<d", ole_now))
-                b_hash = ((w0 ^ w1 ^ w2 ^ w3) & 0xFFFF) or 1
+                b_hash = (w0 ^ w1 ^ w2 ^ w3) & 0xFFFF
+                if had_existing_backup:
+                    b_hash = (b_hash + 1) & 0xFFFF
             except Exception:
                 b_hash = 1
 
@@ -3200,6 +3218,7 @@ class PicasaOneUpView(QWidget):
                             ("imagedata_height", int(current_img.height)),
                             ("imagedata_originfast", compute_originfast_hash(Path(target_path))),
                             ("imagedata_revertable", 1),
+                            ("imagedata_backuphash", int(b_hash) & 0xFFFF),
                         ):
                             pmp_c = self.db.pmps.get(col_n)
                             if pmp_c is not None and rec_idx < len(pmp_c.records):

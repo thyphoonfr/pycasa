@@ -271,14 +271,25 @@ class PicasaImageProcessor:
         if ";" not in raw:
             return raw, (0.15, 0.85), 28, (255, 255, 255), True
 
-        # 1. Format natif CTextItemList (0x00A4DB30 / 0x00A4DD50) : <num_items>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,...
+        # 1. Format natif CTextItemList (0x00A4DB30 -> 0x00A4E3B0 / 0x00A4DD50) :
+        # Outer: <num_items>;<item_len>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,...
+        # Inner: <num_items>;<utf8_len>;<utf8_text>;<font>;<nx>,<ny>,<scale>,<angle>;v1,...
         first_semi = raw.find(";")
         if first_semi > 0 and raw[:first_semi].strip().isdigit():
             second_semi = raw.find(";", first_semi + 1)
             if second_semi > first_semi + 1 and raw[first_semi + 1 : second_semi].strip().isdigit():
                 try:
-                    utf8_len = int(raw[first_semi + 1 : second_semi].strip())
-                    rest_bytes = raw[second_semi + 1 :].encode("utf-8")
+                    len_semi_start = first_semi + 1
+                    len_semi_end = second_semi
+                    third_semi = raw.find(";", second_semi + 1)
+                    if third_semi > second_semi + 1 and raw[second_semi + 1 : third_semi].strip().isdigit():
+                        cand_len = int(raw[second_semi + 1 : third_semi].strip())
+                        cand_bytes = raw[third_semi + 1 :].encode("utf-8")
+                        if len(cand_bytes) > cand_len and cand_bytes[cand_len : cand_len + 1] == b";":
+                            len_semi_start = second_semi + 1
+                            len_semi_end = third_semi
+                    utf8_len = int(raw[len_semi_start:len_semi_end].strip())
+                    rest_bytes = raw[len_semi_end + 1 :].encode("utf-8")
                     if len(rest_bytes) >= utf8_len:
                         text_str = rest_bytes[:utf8_len].decode("utf-8", errors="replace")
                         tail_str = rest_bytes[utf8_len:].decode("utf-8", errors="replace").lstrip(";")
@@ -292,13 +303,24 @@ class PicasaImageProcessor:
                             if len(coords) >= 2:
                                 pos_norm = (coords[0], coords[1])
                             if len(coords) >= 3 and coords[2] > 0:
-                                size = max(8, int(round(coords[2] * 360.0)))
+                                size = max(8, int(round(coords[2] * 360.0 if coords[2] <= 2.0 else coords[2])))
                         if len(tail_parts) >= 3 and tail_parts[2].startswith("v1,"):
                             v_fields = [x.strip() for x in tail_parts[2].split(",")]
-                            if len(v_fields) >= 5:
+                            if len(v_fields) >= 10 and v_fields[9].lstrip("-").isdigit():
+                                shadow = int(v_fields[9]) != 0
+                            elif len(v_fields) >= 5:
                                 shadow = float(v_fields[4]) > 0.0
-                            if len(v_fields) >= 9:
+                            # Ref: 0x00A4DD50 : v1,<weight>,<flags2>,<rel_size>,<outline_w>,<aspect>,<fill_alpha>,<outline_argb>,<fill_argb>,<style_flags>
+                            raw_c = ""
+                            if len(v_fields) >= 2 and (
+                                any(ch in v_fields[1].lower() for ch in "abcdef") or len(v_fields[1].strip()) == 8
+                            ):
+                                raw_c = v_fields[1].strip().lower()
+                            elif len(v_fields) >= 9 and v_fields[8].strip():
                                 raw_c = v_fields[8].strip().lower()
+                            elif len(v_fields) >= 2 and v_fields[1].strip():
+                                raw_c = v_fields[1].strip().lower()
+                            if raw_c:
                                 try:
                                     if any(ch in raw_c for ch in "abcdef") or len(raw_c) == 8:
                                         fill_u32 = int(raw_c, 16) & 0xFFFFFFFF
@@ -573,11 +595,12 @@ class PicasaImageProcessor:
                         out = PicasaImageProcessor.remove_red_eye(out, box)
                     else:
                         out = PicasaImageProcessor.remove_red_eye(out)
-                elif fname_l == "retouch":
+                elif fname_l in ("retouch", "spotblend"):
                     cx = float(parts[1]) if len(parts) > 1 else 0.5
                     cy = float(parts[2]) if len(parts) > 2 else 0.5
                     rad = float(parts[3]) if len(parts) > 3 else 0.03
-                    out = PicasaImageProcessor.retouch_heal(out, (cx, cy), rad)
+                    src_pt = (float(parts[4]), float(parts[5])) if len(parts) >= 6 else None
+                    out = PicasaImageProcessor.retouch_heal(out, (cx, cy), rad, src_pt)
                 elif fname_l in ("hdr", "hdrish"):
                     args = [float(p) for p in parts[1:4]]
                     out = PicasaImageProcessor.hdr_simulator(out, *args)
@@ -1291,20 +1314,51 @@ class PicasaImageProcessor:
         return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def film_grain(img: Image.Image, intensity: float = 18.0, fade: float = 0.0) -> Image.Image:
+    def film_grain(img: Image.Image, intensity: float = 0.5, fade: float = 0.0) -> Image.Image:
         """
-        FR : Grain argentique additif.
-        EN : Additive film grain effect.
+        FR : Grain argentique 5 passes reproduisant exactement `FUN_0090a2e0` (`0x008F88E0` -> `0x0090A2E0..0x0090A739`) :
+             1. Bruit RGB MT19937 (`0x00AA28F0`) atténué vers 127 par `inv_strength = int(256.0 - param * 256.0)` (`0x0090A36C`).
+             2. 3 passes de flou séparable 3x3 `[1, 2, 1] >> 2` (`0x009DBB40`).
+             3. Second bruit RGB MT19937 mélangé avec la passe 2 au poids `210/256` (`0xD2` @ `0x0090A4B0`).
+             4. Désaturation à `200/256` (`0xC8` @ `0x009A9550`) vers la luminance `Y = (77*R + 151*G + 28*B) >> 8`.
+             5. Enveloppe des tons moyens `w = 160 - |128 - S_c|`, `delta = ((G_c - 128) * w) >> 8`, `S_out = clamp(S_c + delta, 0, 255)`.
+        EN : 5-pass film grain reproducing `FUN_0090a2e0` (`0x008F88E0` -> `0x0090A2E0..0x0090A739`).
 
-        Ref: picasa3.exe @ ID_PICTURE_FILM_GRAIN, filterdesc.xml @ grain, grain2, picnikgrain
+        Ref: picasa3.exe @ 0x008F88E0, 0x0090A2E0..0x0090A739, 0x009DBB40, 0x009A9550, 0x00AA28F0
         """
         if img.mode != "RGB":
             img = img.convert("RGB")
-        arr = np.array(img, dtype=np.float32)
-        rng = np.random.default_rng(42)
-        noise = rng.normal(0, max(0.5, float(intensity)), arr.shape).astype(np.float32)
-        out = np.clip(arr + noise, 0, 255)
-        res = Image.fromarray(out.astype(np.uint8))
+        arr_src = np.array(img, dtype=np.int32)
+        h, w, _ = arr_src.shape
+        val = float(intensity)
+        param = min(1.0, max(0.0, val / 36.0 if val > 1.0 else val))
+        inv_strength = max(0, min(256, int(256.0 - param * 256.0)))
+
+        rng = np.random.Generator(np.random.MT19937(5489))
+        # Passe 1 (0x0090A3C0) : bruit RGB MT19937 ramené vers 127 par inv_strength / 256
+        r0 = rng.integers(0, 256, size=(h, w, 3), dtype=np.int32)
+        g = r0 + (((127 - r0) * inv_strength) >> 8)
+
+        # Passe 2 (0x0090A470 -> 0x009DBB40) : 3 itérations de flou séparable 3x3 [1, 2, 1] >> 2
+        for _ in range(3):
+            gp_h = np.pad(g, ((0, 0), (1, 1), (0, 0)), mode="edge")
+            g = (gp_h[:, :-2, :] + (gp_h[:, 1:-1, :] << 1) + gp_h[:, 2:, :]) >> 2
+            gp_v = np.pad(g, ((1, 1), (0, 0), (0, 0)), mode="edge")
+            g = (gp_v[:-2, :, :] + (gp_v[1:-1, :, :] << 1) + gp_v[2:, :, :]) >> 2
+
+        # Passe 3 (0x0090A4B0) : second bruit RGB MT19937 mélangé au poids 210/256 (0xD2)
+        r1 = rng.integers(0, 256, size=(h, w, 3), dtype=np.int32)
+        g = r1 + (((g - r1) * 210) >> 8)
+
+        # Passe 4 (0x0090A590 -> 0x009A9550) : désaturation 200/256 (0xC8) vers Y = (77*R + 151*G + 28*B) >> 8
+        y_lum = ((77 * g[:, :, 0] + 151 * g[:, :, 1] + 28 * g[:, :, 2]) >> 8)[:, :, np.newaxis]
+        g = g + (((y_lum - g) * 200) >> 8)
+
+        # Passe 5 (0x0090A5E0..0x0090A710) : enveloppe des tons moyens w = 160 - |128 - S_c|
+        env_w = 160 - np.abs(128 - arr_src)
+        delta = ((g - 128) * env_w) >> 8
+        out = np.clip(arr_src + delta, 0, 255).astype(np.uint8)
+        res = Image.fromarray(out)
         alpha = max(0.0, min(1.0, 1.0 - float(fade) / 100.0))
         return Image.blend(img, res, alpha) if alpha < 1.0 else res
 
@@ -1377,11 +1431,20 @@ class PicasaImageProcessor:
         eye_box_norm: Optional[tuple[float, float, float, float]] = None
     ) -> Image.Image:
         """
-        FR : Supprime les yeux rouges dans la zone spécifiée (ou détection automatique).
-        EN : Removes red-eye in the specified bounding box (or automatic detection).
+        FR : Supprime les yeux rouges selon l'algorithme HSV + flood-fill de `picasa3.exe`
+             (`0x008727C0` + `0x008720C0..0x00872660`) :
+             1. Recherche de la graine maximisant `2*R - G - B` avec `R > G`, `R > B` et `S_seed >= 96` (`0x60` @ `0x0087224E`).
+             2. Croissance de région 4-connexe où `|int8(H - H_seed)| <= 6` (`0x00872505`) et
+                `w = min((S * 255) // S_seed, 255) >= 196` (`0xC4` @ `0x0087250E`).
+             3. Atténuation du canal Rouge vers `R_target = (G + B) >> 1` :
+                `R_out = R + (((R_target - R) * w) >> 8)` (`0x00872560`).
+        EN : Removes red-eye using the exact HSV seed + 4-connected flood-fill algorithm from `picasa3.exe`
+             (`0x008727C0` + `0x008720C0..0x00872660`).
 
-        Ref: filterdesc.xml @ redeye, picasa3.exe @ eMenuPicture::ID_PICTURE_AUTO_REDEYE
+        Ref: picasa3.exe @ 0x008727C0, 0x008720C0..0x00872660, filterdesc.xml @ redeye
         """
+        from collections import deque
+
         if img.mode != "RGB":
             out = img.convert("RGB")
         else:
@@ -1395,34 +1458,75 @@ class PicasaImageProcessor:
             y0 = max(0, min(h - 1, int(round(eye_box_norm[1] * h))))
             x1 = max(x0 + 1, min(w, int(round(eye_box_norm[2] * w))))
             y1 = max(y0 + 1, min(h, int(round(eye_box_norm[3] * h))))
-            sub = arr[y0:y1, x0:x1]
         else:
-            sub = arr
+            x0, y0, x1, y1 = 0, 0, w, h
 
-        r = sub[:, :, 0].astype(np.float32)
-        g = sub[:, :, 1].astype(np.float32)
-        b = sub[:, :, 2].astype(np.float32)
+        sub_rgb = arr[y0:y1, x0:x1]
+        sh, sw = sub_rgb.shape[:2]
+        if sh == 0 or sw == 0:
+            return out
 
-        # FR : Condition de rouge prédominant caractéristique de l'œil rouge
-        # EN : Dominant red condition characteristic of red-eye reflection
-        red_mask = (r > 60) & (r > 1.35 * g) & (r > 1.35 * b)
-        # FR : Atténuation vers la teinte de luminance neutre
-        # EN : Attenuation toward neutral luminance tone
-        sub[red_mask, 0] = ((g[red_mask] + b[red_mask]) * 0.5).astype(np.uint8)
+        sub_hsv = np.array(Image.fromarray(sub_rgb, mode="RGB").convert("HSV"), dtype=np.int32)
+        r = sub_rgb[:, :, 0].astype(np.int32)
+        g = sub_rgb[:, :, 1].astype(np.int32)
+        b = sub_rgb[:, :, 2].astype(np.int32)
+        hue = sub_hsv[:, :, 0]
+        sat = sub_hsv[:, :, 1]
 
+        # 1. Graine maximisant 2*R - G - B avec R > G, R > B et S >= 96 (0x60 @ 0x0087224E)
+        valid_seed = (r > g) & (r > b) & (sat >= 96)
+        if not np.any(valid_seed):
+            return out
+        scores = np.where(valid_seed, (r << 1) - g - b, -1000)
+        seed_flat = int(np.argmax(scores))
+        sy, sx = divmod(seed_flat, sw)
+        if scores[sy, sx] <= 0:
+            return out
+
+        h_seed = int(hue[sy, sx])
+        s_seed = max(1, int(sat[sy, sx]))
+
+        # 2. Croissance 4-connexe (0x00872505, 0x0087250E) : |int8(H - H_seed)| <= 6 et w >= 196 (0xC4)
+        dh = np.abs(((hue - h_seed + 128) & 0xFF) - 128)
+        weight_map = np.minimum((sat * 255) // s_seed, 255)
+        eligible = (dh <= 6) & (weight_map >= 196) & (r > ((g + b) >> 1))
+
+        visited = np.zeros((sh, sw), dtype=bool)
+        if eye_box_norm is not None:
+            q: deque[Tuple[int, int]] = deque([(sy, sx)])
+            visited[sy, sx] = True
+            while q:
+                cy_i, cx_i = q.popleft()
+                for ny_i, nx_i in ((cy_i - 1, cx_i), (cy_i + 1, cx_i), (cy_i, cx_i - 1), (cy_i, cx_i + 1)):
+                    if 0 <= ny_i < sh and 0 <= nx_i < sw and not visited[ny_i, nx_i] and eligible[ny_i, nx_i]:
+                        visited[ny_i, nx_i] = True
+                        q.append((ny_i, nx_i))
+        else:
+            visited = eligible
+
+        # 3. Atténuation du canal Rouge vers R_target = (G + B) >> 1 (0x00872560)
+        r_target = (g + b) >> 1
+        r_new = r + (((r_target - r) * weight_map) >> 8)
+        sub_rgb[:, :, 0] = np.where(visited, np.clip(r_new, 0, 255), r).astype(np.uint8)
         return Image.fromarray(arr)
 
     @staticmethod
     def retouch_heal(
         img: Image.Image,
         center_norm: tuple[float, float] = (0.5, 0.5),
-        radius_norm: float = 0.03
+        radius_norm: float = 0.03,
+        source_norm: Optional[tuple[float, float]] = None,
     ) -> Image.Image:
         """
-        FR : Corrige une imperfection par interpolation/lissage local des pixels environnants.
-        EN : Heals a blemish via local interpolation/smoothing from surrounding pixels.
+        FR : Corrige une imperfection (`spotblend` / `retouch`) selon l'algorithme de `picasa3.exe`
+             (`0x00901110`, `0x00910C20`, `0x009148D0`) :
+             1. Rayon interne `r_inner = min(0.9 * R, max(0.0, R - 1.0))` (`0x00910F66`).
+             2. Transition cubique d'Hermite `w = t^2 * (3.0 - 2.0 * t)` sur `[r_inner, R]` (`0x00910FDD`).
+             3. Fusion laplacienne de Poisson à 5 points sur le disque interne (`0x009148D0`).
+        EN : Heals a blemish (`spotblend` / `retouch`) using the exact `picasa3.exe` algorithm
+             (`0x00901110`, `0x00910C20`, `0x009148D0`).
 
-        Ref: filterdesc.xml @ retouch, picasa3.exe @ 0x0088C3EC
+        Ref: picasa3.exe @ 0x00901110, 0x00910C20, 0x00910F66, 0x00910FDD, 0x009148D0, filterdesc.xml @ spotblend
         """
         if img.mode != "RGB":
             out = img.convert("RGB")
@@ -1433,27 +1537,58 @@ class PicasaImageProcessor:
         h, w = arr.shape[:2]
         cx = int(round(center_norm[0] * w))
         cy = int(round(center_norm[1] * h))
-        rad = max(3, int(round(radius_norm * min(w, h))))
+        rad = max(2, int(round(radius_norm * max(w, h) if radius_norm <= 0.5 else radius_norm)))
 
         x0 = max(0, cx - rad)
         x1 = min(w, cx + rad + 1)
         y0 = max(0, cy - rad)
         y1 = min(h, cy + rad + 1)
+        ph, pw = y1 - y0, x1 - x0
+        if ph <= 0 or pw <= 0:
+            return out
 
         y_grid, x_grid = np.ogrid[y0:y1, x0:x1]
-        dist = np.sqrt((x_grid - cx) ** 2 + (y_grid - cy) ** 2)
-        mask = dist <= rad
+        dist = np.sqrt((x_grid - cx) ** 2 + (y_grid - cy) ** 2).astype(np.float32)
+        r_f = float(rad)
+        # 1. r_inner = min(0.9 * R, R - 1.0) (0x00910F66)
+        r_inner = min(0.9 * r_f, max(0.0, r_f - 1.0))
+        denom = max(1e-5, r_f - r_inner)
+        # 2. Hermite smoothstep w = t^2 * (3 - 2*t) (0x00910FDD)
+        t = np.clip((r_f - dist) / denom, 0.0, 1.0)
+        weight = (t * t * (3.0 - 2.0 * t))[:, :, np.newaxis]
 
-        if np.any(mask):
-            ring_mask = (dist > rad * 0.6) & (dist <= rad * 1.3)
+        dst_patch = arr[y0:y1, x0:x1].copy()
+        if source_norm is not None:
+            sx = int(round(source_norm[0] * w))
+            sy = int(round(source_norm[1] * h))
+            sx0 = max(0, min(w - pw, sx - (cx - x0)))
+            sy0 = max(0, min(h - ph, sy - (cy - y0)))
+            src_patch = arr[sy0 : sy0 + ph, sx0 : sx0 + pw].copy()
+        else:
+            ring_mask = (dist >= r_inner) & (dist <= r_f + 1.5)
             if np.any(ring_mask):
-                med_color = np.median(arr[y0:y1, x0:x1][ring_mask], axis=0)
+                med_color = np.median(dst_patch[ring_mask], axis=0)
             else:
-                med_color = np.median(arr[y0:y1, x0:x1], axis=(0, 1))
+                med_color = np.median(dst_patch, axis=(0, 1))
+            src_patch = np.broadcast_to(med_color, dst_patch.shape).copy()
 
-            weight = np.clip(1.0 - (dist / rad), 0.0, 1.0)[:, :, np.newaxis]
-            arr[y0:y1, x0:x1] = arr[y0:y1, x0:x1] * (1.0 - weight) + med_color * weight
+        # 3. Résolution de Poisson discrète à 5 points (0x009148D0) sur l'intérieur du masque
+        interior = dist < r_f
+        if np.any(interior) and ph >= 3 and pw >= 3:
+            u = dst_patch.copy()
+            u[interior] = src_patch[interior]
+            # Laplacien de la source (4*S - S_N - S_S - S_W - S_E)
+            sp = np.pad(src_patch, ((1, 1), (1, 1), (0, 0)), mode="edge")
+            lap_src = 4.0 * src_patch - (sp[:-2, 1:-1] + sp[2:, 1:-1] + sp[1:-1, :-2] + sp[1:-1, 2:])
+            for _ in range(24):
+                up = np.pad(u, ((1, 1), (1, 1), (0, 0)), mode="edge")
+                u_next = 0.25 * (up[:-2, 1:-1] + up[2:, 1:-1] + up[1:-1, :-2] + up[1:-1, 2:] + lap_src)
+                u[interior] = u_next[interior]
+            blended = dst_patch * (1.0 - weight) + u * weight
+        else:
+            blended = dst_patch * (1.0 - weight) + src_patch * weight
 
+        arr[y0:y1, x0:x1] = blended
         return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
     # =========================================================================
@@ -3420,6 +3555,8 @@ class PicasaImageProcessor:
     ir = infrared
     comicize = comic
     quantize = quantize_palette
+    spotblend = retouch_heal
+    redeye = remove_red_eye
 
     @staticmethod
     def save_history(img: Image.Image) -> Image.Image:

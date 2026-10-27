@@ -411,16 +411,38 @@ class PicasaImportDialog(QDialog):
         self.list_widget.clear()
 
         existing_names: Set[str] = set()
+        existing_originfast: Set[int] = set()
         if self.db and self.chk_exclude_dupes.isChecked():
             try:
+                # Ref: picasa3.exe @ 0x00513680, 0x00513730 (iCAcquireDupeChecker -> imagedata_originfast.pmp)
+                pmp_of = getattr(self.db, "pmps", {}).get("imagedata_originfast")
+                if pmp_of is not None:
+                    for idx_r, h_val in enumerate(pmp_of.records):
+                        if h_val and (
+                            not getattr(self.db, "thumbindex", None)
+                            or (idx_r < len(self.db.thumbindex.records) and self.db.thumbindex.records[idx_r].type != 0)
+                        ):
+                            existing_originfast.add(int(h_val))
                 for entry in self.db.get_all_photos():
                     existing_names.add(os.path.basename(entry.filepath).lower())
             except Exception:
                 pass
 
+        from picasa_py.scanner.scanner import compute_originfast_hash
+
         for p in self.discovered_files:
             fname = os.path.basename(p)
-            is_dupe = fname.lower() in existing_names
+            is_dupe = False
+            if self.chk_exclude_dupes.isChecked():
+                if existing_originfast:
+                    try:
+                        cand_hash = compute_originfast_hash(Path(p))
+                        if cand_hash and cand_hash in existing_originfast:
+                            is_dupe = True
+                    except Exception:
+                        pass
+                if not is_dupe and fname.lower() in existing_names:
+                    is_dupe = True
 
             item = QListWidgetItem(fname)
             item.setData(Qt.ItemDataRole.UserRole, p)

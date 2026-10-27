@@ -1712,6 +1712,14 @@ class PicasaThumbnailView(QWidget):
             """
             if getattr(self, "_cluster_worker", None) is worker:
                 self._cluster_worker = None
+            try:
+                worker.progress.disconnect(_on_prog)
+            except Exception:
+                pass
+            try:
+                worker.finished.disconnect(_on_done)
+            except Exception:
+                pass
             self.unsetCursor()
             self._apply_unnamed_clusters(clusters)
             multi_cnt = sum(1 for c in clusters if len(c) > 1)
@@ -1719,7 +1727,8 @@ class PicasaThumbnailView(QWidget):
                 main_win.status_bar.showMessage(
                     f"Regroupement terminé : {multi_cnt} groupe(s) de visages identifié(s).", 4000
                 )
-            worker.wait()
+            worker.wait(500)
+            worker.deleteLater()
 
         worker.progress.connect(_on_prog)
         worker.finished.connect(_on_done)

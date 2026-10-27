@@ -897,12 +897,16 @@ def unpack_compact_vec_6bit(cvec: Tuple[int, int, int, float, bytes | List[int]]
         b1 = b[:, 1]
         b2 = b[:, 2]
 
-        # FR : Reproduit exactement les décalages et masques `0xFC` de 0x10055BE8..0x10055C9E
-        # EN: Exact bit shifts and `0xFC` masks from 0x10055BE8..0x10055C9E
-        u0 = (b0 & 0xFC).astype(np.uint8)
-        u1 = (((b0 & 0x03) << 6) | ((b1 >> 2) & 0x3C)).astype(np.uint8)
-        u2 = (((b1 & 0x0F) << 4) | ((b2 >> 4) & 0x0C)).astype(np.uint8)
-        u3 = ((b2 & 0x3F) << 2).astype(np.uint8)
+        # FR : Reproduit exactement les décalages et masques `0xFC` de Red.dll @ 0x10055BE8..0x10055C45 :
+        # - x[0] : (b0 << 2) & 0xFC (0x10055C01..0x10055C0B)
+        # - x[1] : ((b0 | (b1 << 8)) >> 4) & 0xFC (0x10055BF2..0x10055BFA)
+        # - x[2] : (((b1 >> 2) & 0x3C) | ((b2 & 0x03) << 6)) & 0xFC (0x10055C15..0x10055C2C)
+        # - x[3] : b2 & 0xFC (0x10055C35..0x10055C3A)
+        # EN: Exact bit shifts and `0xFC` masks from Red.dll @ 0x10055BE8..0x10055C45
+        u0 = ((b0 << 2) & 0xFC).astype(np.uint8)
+        u1 = (((b0 >> 4) & 0x0C) | ((b1 << 4) & 0xF0)).astype(np.uint8)
+        u2 = (((b1 >> 2) & 0x3C) | ((b2 << 6) & 0xC0)).astype(np.uint8)
+        u3 = (b2 & 0xFC).astype(np.uint8)
 
         s0 = u0.view(np.int8).astype(np.float32)
         s1 = u1.view(np.int8).astype(np.float32)
@@ -1379,7 +1383,7 @@ class PurePythonRedEngine:
             pad_mode=cv2.BORDER_DEFAULT,
         )  # (180, 32)
         norms0 = np.linalg.norm(grid0, axis=1, keepdims=True).astype(np.float32)
-        grid0 = (grid0 / np.maximum(norms0, np.float32(1e-5))).astype(np.float32)
+        grid0 = (grid0 * (np.float32(0.21) / np.maximum(norms0, np.float32(1e-5)))).astype(np.float32)
 
         grid1 = _compute_layer(
             p1,
@@ -1389,23 +1393,27 @@ class PurePythonRedEngine:
             pad_mode=cv2.BORDER_DEFAULT,
         )  # (60, 32)
         norms1 = np.linalg.norm(grid1, axis=1, keepdims=True).astype(np.float32)
-        grid1 = (grid1 / np.maximum(norms1, np.float32(1e-5))).astype(np.float32)
+        grid1 = (grid1 * (np.float32(0.21) / np.maximum(norms1, np.float32(1e-5)))).astype(np.float32)
 
         # FR : 3. Projection locale par blocs ets_CompactAlt (180 × 16 = 2880 et 60 × 16 = 960 -> 3840 floats)
-        # EN: 3. Local block projection ets_CompactAlt (180 × 16 = 2880 and 60 × 16 = 960 -> 3840 floats)
-        # Ref: Red.dll @ 0x10056FD0 (ets_CompactAlt::map)
-        out0 = (np.einsum("bij,bj->bi", self.model.fvc0_alt_mats, grid0, dtype=np.float32) + self.model.fvc0_alt_biases).astype(np.float32)
-        out1 = (np.einsum("bij,bj->bi", self.model.fvc1_alt_mats, grid1, dtype=np.float32) + self.model.fvc1_alt_biases).astype(np.float32)
+        #         Les filtres de Gabor étant de moyenne nulle, la projection centrée M @ (x - x_mean)
+        #         s'évalue directement par M @ grid (fvc_alt_biases = -M @ x_mean correspondant aux magnitudes non centrées).
+        # EN: 3. Local block projection ets_CompactAlt (180 × 16 = 2880 and 60 × 16 = 960 -> 3840 floats).
+        #        Since Gabor filters are zero-mean, the centered projection M @ (x - x_mean) evaluates
+        #        directly as M @ grid (fvc_alt_biases = -M @ x_mean corresponds to uncentered magnitudes).
+        # Ref: Red.dll @ 0x10056FD0 & 0x10057A40 (ets_CompactAlt::map)
+        out0 = np.einsum("bij,bj->bi", self.model.fvc0_alt_mats, grid0, dtype=np.float32)
+        out1 = np.einsum("bij,bj->bi", self.model.fvc1_alt_mats, grid1, dtype=np.float32)
         raw_3840 = np.concatenate((out0.ravel(), out1.ravel())).astype(np.float32)
 
-        # FR : 4. Sous-projecteur orthogonal vqc_SubProjector (Red.dll @ 0x100FC7C0, b14 == 0) :
-        #         centered = raw_3840 - a2c
-        #         proj_90 = U @ centered
-        #         regulated_3840 = centered - U^T @ proj_90
-        # EN: 4. Orthogonal subspace projector vqc_SubProjector (Red.dll @ 0x100FC7C0, b14 == 0)
-        centered = (raw_3840 - self.model.sub_mean_3840).astype(np.float32)
-        proj_90 = np.dot(self.model.sub_basis_90x3840, centered).astype(np.float32)
-        regulated_3840 = (centered - np.dot(proj_90, self.model.sub_basis_90x3840)).astype(np.float32)
+        # FR : 4. Sous-projecteur orthogonal vqc_SubProjector (Red.dll @ 0x100FC859..0x100FCA88, b14 == 0) :
+        #         proj_90 = U @ raw_3840
+        #         regulated_3840 = (raw_3840 - U^T @ proj_90) + a2c
+        # EN: 4. Orthogonal subspace projector vqc_SubProjector (Red.dll @ 0x100FC859..0x100FCA88, b14 == 0)
+        proj_90 = np.dot(self.model.sub_basis_90x3840, raw_3840).astype(np.float32)
+        regulated_3840 = (
+            raw_3840 - np.dot(proj_90, self.model.sub_basis_90x3840) + self.model.sub_mean_3840
+        ).astype(np.float32)
 
         # FR : 5. Sélection des 2000 composantes `m18` et quantification 4 bits sur les 15 seuils `v50`
         # EN: 5. Selection of the 2,000 `m18` components and 4-bit quantization across 15 `v50` thresholds

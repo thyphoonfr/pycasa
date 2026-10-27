@@ -1718,6 +1718,23 @@ class PicasaDirScanner:
                 norm_fdir == af or norm_fdir.startswith(af + "\\") for af in allowed_folders_norm
             ):
                 continue
+            # Ref: picasa3.exe @ 0x004F4FB1..0x004F5253 — ne jamais supprimer en base les médias d'un volume ou
+            # d'une racine surveillée déconnectée / démontée (ex: disque externe ou partage réseau hors ligne).
+            drv, _ = os.path.splitdrive(host_fdir)
+            if drv and not os.path.exists(drv + os.sep):
+                continue
+            if not os.path.exists(host_fdir):
+                parent_watch_root = os.path.dirname(host_fdir.rstrip("\\/"))
+                drv_root = (drv + os.sep) if drv else ""
+                if (
+                    not parent_watch_root
+                    or parent_watch_root.rstrip("\\/").lower() == drv_root.rstrip("\\/").lower()
+                    or not os.path.exists(parent_watch_root)
+                ):
+                    if allowed_folders_norm is None or not any(
+                        os.path.exists(af) and norm_fdir.startswith(af + "\\") for af in allowed_folders_norm
+                    ):
+                        continue
             full_path = os.path.join(host_fdir, rpath)
             if not os.path.exists(full_path):
                 newly_deleted_indices.append(idx)
@@ -2257,8 +2274,6 @@ class BackgroundScanWorker(QThread):
     def __del__(self) -> None:
         try:
             self._is_cancelled = True
-            if self.isRunning():
-                self.wait(2000)
         except Exception:
             pass
 
