@@ -1515,6 +1515,16 @@ class PicasaDatabase:
         _set_pmp("imagedata_crop64", crop_u64)
 
         # 4. Filters, Text, Keywords, Caption, BackupHash, DeferredFace, Geotag
+        def _get_old_pmp_str(col_name: str) -> str:
+            pmp = self.pmps.get(col_name)
+            if pmp is not None and 0 <= idx < len(pmp.records):
+                return str(pmp.records[idx] or "")
+            return ""
+
+        old_tags_val = _get_old_pmp_str("imagedata_tags")
+        old_cap_val = _get_old_pmp_str("imagedata_caption")
+        old_text_val = _get_old_pmp_str("imagedata_text")
+
         edited_val = 0
         lat_val: Optional[float] = None
         lon_val: Optional[float] = None
@@ -1544,6 +1554,13 @@ class PicasaDatabase:
             elif photo_path_str and os.path.exists(photo_path_str):
                 _set_pmp("imagedata_revertable", 0)
             if self.wordhash is not None and hasattr(self.wordhash, "remove_word"):
+                from picasa_py.scanner.scanner import tokenize_indexer_text
+                path_keep: Set[str] = set(tokenize_indexer_text(photo_path_str or ""))
+                for old_src in (old_tags_val, old_cap_val, old_text_val):
+                    if old_src:
+                        for old_tok in tokenize_indexer_text(old_src):
+                            if old_tok not in path_keep:
+                                self.wordhash.remove_word(old_tok, idx)
                 for st_tok in ("]star", "]hidden", "]screensaver", "]rating"):
                     self.wordhash.remove_word(st_tok, idx)
                 ad_uids_col = self.pmps.get("albumdata_uid")
@@ -1669,7 +1686,18 @@ class PicasaDatabase:
                     if kw.strip():
                         words.extend(tokenize_indexer_text(kw.strip()))
                 words.extend(tokenize_indexer_text(cap_val))
-                words.extend(tokenize_indexer_text(text_str))
+                decoded_text = ""
+                if text_str and (text_active or raw_ta is None):
+                    decoded_text = (doc.get_text(fname) if hasattr(doc, "get_text") else text_str) or ""
+                if decoded_text:
+                    words.extend(tokenize_indexer_text(decoded_text))
+                if hasattr(self.wordhash, "remove_word"):
+                    keep_tokens: Set[str] = set(words) | set(tokenize_indexer_text(photo_path_str or ""))
+                    for old_src in (old_tags_val, old_cap_val, old_text_val):
+                        if old_src:
+                            for old_tok in tokenize_indexer_text(old_src):
+                                if old_tok not in keep_tokens:
+                                    self.wordhash.remove_word(old_tok, idx)
                 for tok in words:
                     self.wordhash.add_word(tok, idx)
 
@@ -2175,15 +2203,36 @@ class PicasaDatabase:
         if eff_idx is None:
             return False
         self._align_imagedata_tables(eff_idx)
-        if self.wordhash is not None and caption:
-            from picasa_py.scanner.scanner import tokenize_indexer_text
-            for tok in tokenize_indexer_text(caption):
-                self.wordhash.add_word(tok, eff_idx)
         full_path = self.get_media_full_path(eff_idx)
+        pmp_cap = self.pmps.get("imagedata_caption")
+        old_cap = (
+            str(pmp_cap.records[eff_idx] or "")
+            if (pmp_cap is not None and 0 <= eff_idx < len(pmp_cap.records))
+            else ""
+        )
+        if self.wordhash is not None:
+            from picasa_py.scanner.scanner import tokenize_indexer_text
+            new_cap_tokens = tokenize_indexer_text(caption or "")
+            if old_cap and hasattr(self.wordhash, "remove_word"):
+                pmp_tags = self.pmps.get("imagedata_tags")
+                tags_s = (
+                    str(pmp_tags.records[eff_idx] or "")
+                    if (pmp_tags is not None and 0 <= eff_idx < len(pmp_tags.records))
+                    else ""
+                )
+                keep_toks = (
+                    set(new_cap_tokens)
+                    | set(tokenize_indexer_text(tags_s))
+                    | set(tokenize_indexer_text(full_path or ""))
+                )
+                for old_tok in tokenize_indexer_text(old_cap):
+                    if old_tok not in keep_toks:
+                        self.wordhash.remove_word(old_tok, eff_idx)
+            for tok in new_cap_tokens:
+                self.wordhash.add_word(tok, eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
             self._update_jpeg_iptc_metadata(full_path, eff_idx, caption=caption or "")
             return self.update_photo_ini(full_path, lambda doc, fn: doc.set_caption(fn, caption))
-        pmp_cap = self.pmps.get("imagedata_caption")
         if pmp_cap is not None:
             default_v = pmp_cap.default_value()
             while len(pmp_cap.records) <= eff_idx:
@@ -2231,16 +2280,38 @@ class PicasaDatabase:
             return False
         self._align_imagedata_tables(eff_idx)
         tag_list = [k.strip() for k in tags.split(",") if k.strip()] if isinstance(tags, str) else [str(k).strip() for k in tags if str(k).strip()]
+        full_path = self.get_media_full_path(eff_idx)
+        pmp_tags = self.pmps.get("imagedata_tags")
+        old_tags_s = (
+            str(pmp_tags.records[eff_idx] or "")
+            if (pmp_tags is not None and 0 <= eff_idx < len(pmp_tags.records))
+            else ""
+        )
         if self.wordhash is not None:
             from picasa_py.scanner.scanner import tokenize_indexer_text
+            new_tag_tokens: List[str] = []
             for kw in tag_list:
-                for tok in tokenize_indexer_text(kw):
-                    self.wordhash.add_word(tok, eff_idx)
-        full_path = self.get_media_full_path(eff_idx)
+                new_tag_tokens.extend(tokenize_indexer_text(kw))
+            if old_tags_s and hasattr(self.wordhash, "remove_word"):
+                pmp_cap = self.pmps.get("imagedata_caption")
+                cap_s = (
+                    str(pmp_cap.records[eff_idx] or "")
+                    if (pmp_cap is not None and 0 <= eff_idx < len(pmp_cap.records))
+                    else ""
+                )
+                keep_toks = (
+                    set(new_tag_tokens)
+                    | set(tokenize_indexer_text(cap_s))
+                    | set(tokenize_indexer_text(full_path or ""))
+                )
+                for old_tok in tokenize_indexer_text(old_tags_s):
+                    if old_tok not in keep_toks:
+                        self.wordhash.remove_word(old_tok, eff_idx)
+            for tok in new_tag_tokens:
+                self.wordhash.add_word(tok, eff_idx)
         if full_path and os.path.exists(os.path.dirname(full_path)):
             self._update_jpeg_iptc_metadata(full_path, eff_idx, keywords=tag_list)
             return self.update_photo_ini(full_path, lambda doc, fn: doc.set_keywords(fn, tag_list))
-        pmp_tags = self.pmps.get("imagedata_tags")
         if pmp_tags is not None:
             default_v = pmp_tags.default_value()
             while len(pmp_tags.records) <= eff_idx:
@@ -3466,17 +3537,66 @@ class PicasaDatabase:
             f".album:{clean_target}",
         }
         ad_names = self.pmps.get("albumdata_name")
+        matched_rows: Set[int] = set()
         if ad_names is not None:
             for col_name in ("albumdata_token", "albumdata_uid", "albumdata_name"):
                 pmp_col = self.pmps.get(col_name)
                 if pmp_col is not None:
                     for i, val in enumerate(pmp_col.records):
                         if str(val or "").strip() in candidates:
+                            matched_rows.add(i)
                             while len(ad_names.records) <= i:
                                 ad_names.records.append("")
                             ad_names.records[i] = new_name
                             ad_names.dirty = True
                             renamed = True
+
+        # Mettre à jour le fichier .pal éventuel dans Picasa2Albums/<db_guid>/*.pal et db3/albums/*.pal
+        # Ref: picasa3.exe @ 0x0044F390..0x0044F500, 0x008AAD76
+        if self.db3_dir:
+            import re
+            import xml.sax.saxutils as saxutils
+            pal_candidates = {f"{clean_target}.pal", f"{album_token.strip()}.pal"}
+            for matched_i in matched_rows:
+                for col_n in ("albumdata_uid", "albumdata_token"):
+                    col_p = self.pmps.get(col_n)
+                    if col_p is not None and matched_i < len(col_p.records):
+                        v_s = str(col_p.records[matched_i] or "").strip()
+                        if v_s.startswith("]album:") or v_s.startswith(".album:"):
+                            v_s = v_s[7:].strip()
+                        if v_s:
+                            pal_candidates.add(f"{v_s}.pal")
+            pal_dirs: List[Path] = []
+            p2a = self.picasa2albums_dir
+            if p2a.is_dir():
+                for sub in list(p2a.iterdir()):
+                    if sub.is_dir():
+                        pal_dirs.append(sub)
+            albums_dir = self.db3_dir / "albums"
+            if albums_dir.is_dir():
+                pal_dirs.append(albums_dir)
+            esc_name = saxutils.escape(new_name, {'"': "&quot;"})
+            for p_dir in pal_dirs:
+                for pal_cand in pal_candidates:
+                    pal_path = p_dir / pal_cand
+                    if pal_path.is_file():
+                        try:
+                            raw_xml = pal_path.read_text(encoding="utf-8", errors="replace")
+                            new_xml = re.sub(
+                                r'(<property\s+name="name"[^>]*\bvalue=")[^"]*(")',
+                                lambda m: f"{m.group(1)}{esc_name}{m.group(2)}",
+                                raw_xml,
+                            )
+                            new_xml = re.sub(
+                                r"(<name>)[^<]*(</name>)",
+                                lambda m: f"{m.group(1)}{saxutils.escape(new_name)}{m.group(2)}",
+                                new_xml,
+                            )
+                            if new_xml != raw_xml:
+                                pal_path.write_text(new_xml, encoding="utf-8")
+                                renamed = True
+                        except Exception:
+                            pass
 
         self._albums_cache = None
         return renamed
@@ -5264,6 +5384,7 @@ class PicasaDatabase:
             always_save_stems = {
                 "imagedata_edited",
                 "imagedata_filters",
+                "imagedata_redo",
                 "imagedata_rotate",
                 "imagedata_crop64",
                 "imagedata_edit_width",

@@ -1709,6 +1709,132 @@ def test_pass12_redo_stack_revert_move_and_originals_parity(tmp_path: Path):
     assert not (folder_c / "Originals" / "vacances.jpg").exists()
 
 
+def test_pass13_wordhash_token_removal_filters_and_album_pal_parity(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les corrections de la 13e passe d'audit picasa3.exe vs PyCasa :
+    1. Suppression effective des anciens jetons dans `wordhash.db` lorsque des mots-clés (`remove_keyword`),
+       une légende (`set_caption("")`) ou un texte actif (`textactive=0`) sont modifiés ou retirés (`0x004D9AA0`).
+    2. Indexation du texte décodé de `CTextItemList` sans polluer `wordhash.db` avec la police (`Arial`) ou `v1`.
+    3. Rendu des clés historiques `fix=1` et `bw=1` dans `PicasaImageProcessor.load_transformed_image` (`0x00456A15`)
+       et désactivation du rendu de `text=` lorsque `textactive=0`.
+    4. Prise en compte des coordonnées `(cx, cy)` dans `focal_pixelate` et `focal_zoom` (`0x008FADDE`)
+       et mise à l'échelle exacte de `border` pour `inner_pct=1.0` et `0.0`.
+    5. Mise à jour du fichier `.pal` dans `Picasa2Albums/<db_guid>/<uid>.pal` lors de `db.rename_album` (`0x008AAD76`).
+    """
+    from PIL import Image
+    import numpy as np
+    from picasa_py.ui.image_processor import PicasaImageProcessor
+    from picasa_py.ini.parser import PicasaIniParser
+
+    db3_dir = tmp_path / "db3_pass13"
+    contacts_dir = tmp_path / "contacts_pass13"
+    folder = tmp_path / "PhotosPass13"
+    folder.mkdir(parents=True, exist_ok=True)
+
+    photo_p = folder / "color_test.jpg"
+    img = Image.new("RGB", (60, 60), (220, 40, 90))
+    img.save(photo_p, format="JPEG", quality=95)
+
+    db = PicasaDatabase.create_new(db3_dir, contacts_dir)
+    db.set_watched_folder(str(folder), "1")
+    PicasaDirScanner(db).scan_directory(folder)
+    idx = db.find_photo_index(str(photo_p))
+    assert idx is not None
+
+    # 1. Ajout puis suppression de mots-clés et de légende : les anciens jetons doivent disparaître de wordhash.db
+    assert db.add_keyword(idx, "montagneunique") is True
+    assert db.add_keyword(idx, " glacierunique ") is True
+    assert idx in db.search("montagneunique")
+    assert idx in db.search("glacierunique")
+
+    assert db.remove_keyword(idx, "montagneunique") is True
+    assert idx not in db.search("montagneunique")
+    assert idx in db.search("glacierunique")
+
+    assert db.set_caption(idx, "legendeephemere") is True
+    assert idx in db.search("legendeephemere")
+    assert db.set_caption(idx, "") is True
+    assert idx not in db.search("legendeephemere")
+
+    # 2. Texte CTextItemList : seul le texte décodé actif est indexé dans wordhash.db
+    ini_path = folder / ".picasa.ini"
+    doc = PicasaIniParser.parse_file(str(ini_path))
+    sec = doc.get_or_create_section("color_test.jpg")
+    sec.set("text", "1;11;Bonjourtous;Arial;0.150000,0.850000,0.080000,0.000000;v1,400,0,128.000000,0.100000,1.000000,1.000000,ff000000,ffffffff,1;")
+    sec.set("textactive", "1")
+    doc.write_file(str(ini_path))
+    db.invalidate_ini_cache(str(ini_path))
+    db.sync_photo_ini_to_db(str(photo_p))
+
+    assert idx in db.search("bonjourtous")
+    assert idx not in db.search("arial")
+
+    # Désactivation via textactive=0 : le jeton de texte est retiré de wordhash.db
+    doc = PicasaIniParser.parse_file(str(ini_path))
+    doc.get_or_create_section("color_test.jpg").set("textactive", "0")
+    doc.write_file(str(ini_path))
+    db.invalidate_ini_cache(str(ini_path))
+    db.sync_photo_ini_to_db(str(photo_p))
+    assert idx not in db.search("bonjourtous")
+
+    # 3. Legacy bw=1 dans .picasa.ini sans filters= -> rendu en niveaux de gris par load_transformed_image
+    doc = PicasaIniParser.parse_file(str(ini_path))
+    sec = doc.get_or_create_section("color_test.jpg")
+    sec.set("bw", "1")
+    doc.write_file(str(ini_path))
+    rendered_bw = PicasaImageProcessor.load_transformed_image(str(photo_p))
+    assert rendered_bw is not None
+    arr_bw = np.array(rendered_bw)
+    assert np.allclose(arr_bw[:, :, 0], arr_bw[:, :, 1], atol=2)
+    assert np.allclose(arr_bw[:, :, 1], arr_bw[:, :, 2], atol=2)
+
+    # 4. Vérifier focal_zoom avec cx/cy décentrés et border avec inner_pct=1.0 / 0.0
+    grad_arr = np.zeros((80, 80, 3), dtype=np.uint8)
+    grad_arr[:40, :40] = (255, 0, 0)
+    grad_arr[:40, 40:] = (0, 255, 0)
+    grad_arr[40:, :40] = (0, 0, 255)
+    grad_arr[40:, 40:] = (255, 255, 0)
+    grad_img = Image.fromarray(grad_arr)
+
+    fz_tl = PicasaImageProcessor.apply_filter_chain(grad_img, "FocalZoom=1,0.1,0.1,50.0,0.2,50.0;")
+    fz_br = PicasaImageProcessor.apply_filter_chain(grad_img, "FocalZoom=1,0.9,0.9,50.0,0.2,50.0;")
+    assert not np.array_equal(np.array(fz_tl), np.array(fz_br))
+
+    fp_tl = PicasaImageProcessor.execute_effect(grad_img, "focal_pixelate", {"block_size": 16, "size": 0.25, "hardness": 80, "cx": 0.15, "cy": 0.15})
+    fp_br = PicasaImageProcessor.execute_effect(grad_img, "focal_pixelate", {"block_size": 16, "size": 0.25, "hardness": 80, "cx": 0.85, "cy": 0.85})
+    assert not np.array_equal(np.array(fp_tl), np.array(fp_br))
+
+    b_img = PicasaImageProcessor.apply_filter_chain(grad_img, "Border=1,10.0,1.0,0.0,001a1a1a,00ffffff;")
+    # 10.0 / 200.0 * 80 = 4 px outer, 1.0 / 200.0 * 80 = 1 px inner -> 80 + 2*(4+1) = 90
+    assert b_img.size == (90, 90)
+    b_zero_in = PicasaImageProcessor.apply_filter_chain(grad_img, "Border=1,10.0,0.0,0.0,001a1a1a,00ffffff;")
+    assert b_zero_in.size == (88, 88)
+
+    # 5. Renommage d'album met aussi à jour le fichier .pal dans Picasa2Albums/<db_guid>/<uid>.pal
+    alb_tok = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
+    doc = PicasaIniParser.parse_file(str(ini_path))
+    alb_sec = doc.get_or_create_section(f".album:{alb_tok}")
+    alb_sec.set("name", "Ancien Nom")
+    alb_sec.set("token", alb_tok)
+    doc.write_file(str(ini_path))
+    db.invalidate_ini_cache(str(ini_path))
+    db.sync_photo_ini_to_db(str(photo_p))
+
+    guid_dir = db.picasa2albums_dir / "test_guid"
+    guid_dir.mkdir(parents=True, exist_ok=True)
+    pal_file = guid_dir / f"{alb_tok}.pal"
+    pal_file.write_text(
+        '<picasa2album>\n  <property name="name" type="string" value="Ancien Nom"/>\n  <name>Ancien Nom</name>\n</picasa2album>\n',
+        encoding="utf-8",
+    )
+
+    assert db.rename_album(alb_tok, "Nouveau Nom Pass13") is True
+    updated_pal = pal_file.read_text(encoding="utf-8")
+    assert 'value="Nouveau Nom Pass13"' in updated_pal
+    assert "<name>Nouveau Nom Pass13</name>" in updated_pal
+
+
+
 
 
 

@@ -224,14 +224,25 @@ class PicasaImageProcessor:
 
                         sec = doc.get_section(base_name)
                         if sec:
-                            filters_str = sec.get("filters", "")
+                            filters_str = sec.get("filters", "") or ""
+                            # Ref: func_00456a15.c:3352-3460 — legacy fix=1 / bw=1 synthesis when filters= is absent
+                            if not filters_str:
+                                synth_parts = []
+                                if (sec.get("fix") or "").strip().lower() in ("1", "yes", "true"):
+                                    synth_parts.append("autolight=1;")
+                                if (sec.get("bw") or "").strip().lower() in ("1", "yes", "true"):
+                                    synth_parts.append("bw=1;")
+                                if synth_parts:
+                                    filters_str = "".join(synth_parts)
                             if filters_str:
                                 pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str, skip_geom=True)
 
-                        # Ref: editpanel/edittextpanel (0x00658900)
-                        txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
-                        if txt_val:
-                            pil_img = PicasaImageProcessor.apply_text_token(pil_img, txt_val)
+                        # Ref: editpanel/edittextpanel (0x00658900), func_00456a15.c:3189 (textactive)
+                        raw_ta = sec.get("textactive") if sec is not None else None
+                        if raw_ta is None or raw_ta.strip().lower() not in ("0", "no", "false"):
+                            txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
+                            if txt_val:
+                                pil_img = PicasaImageProcessor.apply_text_token(pil_img, txt_val)
                     except Exception:
                         pass
 
@@ -699,8 +710,9 @@ class PicasaImageProcessor:
                 elif fname_l == "focalzoom":
                     # Ref: 0x008FADDE : FocalZoom=1,<cx>,<cy>,<zoom>,<size>,<hardness>[,<fade>]
                     if len(parts) >= 6 and 0.0 <= float(parts[1]) <= 1.0 and 0.0 <= float(parts[2]) <= 1.0 and float(parts[3]) > 1.0:
+                        cx_f, cy_f = float(parts[1]), float(parts[2])
                         zm, sz, hd = float(parts[3]), float(parts[4]), float(parts[5])
-                        out = PicasaImageProcessor.focal_zoom(out, zm, sz, hd)
+                        out = PicasaImageProcessor.focal_zoom(out, zm, sz, hd, center_x=cx_f, center_y=cy_f)
                     else:
                         args = [float(p) for p in parts[1:6]]
                         out = PicasaImageProcessor.focal_zoom(out, *args)
@@ -2442,12 +2454,14 @@ class PicasaImageProcessor:
         z_amt = float(zoom_amount) * 100.0 if 0.0 < float(zoom_amount) <= 1.0 else float(zoom_amount)
         max_step = max(0.01, z_amt / 350.0)
         layers = [img]
+        cx_clamped = max(0.0, min(1.0, float(center_x)))
+        cy_clamped = max(0.0, min(1.0, float(center_y)))
         for i in range(1, 5):
             scale = 1.0 + max_step * i
             sw, sh = max(1, int(w * scale)), max(1, int(h * scale))
             scaled = img.resize((sw, sh), resample=Image.Resampling.BILINEAR)
-            x0 = (sw - w) // 2
-            y0 = (sh - h) // 2
+            x0 = max(0, min(sw - w, int(round((sw - w) * cx_clamped))))
+            y0 = max(0, min(sh - h, int(round((sh - h) * cy_clamped))))
             cropped = scaled.crop((x0, y0, x0 + w, y0 + h))
             layers.append(cropped)
         zoomed = layers[0]
@@ -2626,14 +2640,17 @@ class PicasaImageProcessor:
             img = img.convert("RGB")
         w, h = img.size
         min_d = min(w, h)
-        b_pct = float(border_pct) / 200.0 if float(border_pct) > 1.0 else float(border_pct)
-        i_pct = float(inner_pct) / 200.0 if float(inner_pct) > 1.0 else float(inner_pct)
-        c_pct = float(corner_radius_pct) / 200.0 if float(corner_radius_pct) > 1.0 else float(corner_radius_pct)
-        in_w = max(1, int(round(min_d * i_pct)))
-        out_w = max(2, int(round(min_d * b_pct)))
-        step1 = ImageOps.expand(img, border=in_w, fill=inner_color)
-        framed = ImageOps.expand(step1, border=out_w, fill=outer_color)
-        if c_pct > 0.005:
+        b_raw = float(border_pct)
+        i_raw = float(inner_pct)
+        c_raw = float(corner_radius_pct)
+        b_pct = b_raw / 200.0 if b_raw >= 0.5 else b_raw
+        i_pct = i_raw / 200.0 if i_raw >= 0.5 else i_raw
+        c_pct = c_raw / 200.0 if c_raw >= 0.5 else c_raw
+        in_w = 0 if i_pct <= 0.0 else max(1, int(round(min_d * i_pct)))
+        out_w = 0 if b_pct <= 0.0 else max(2, int(round(min_d * b_pct)))
+        step1 = ImageOps.expand(img, border=in_w, fill=inner_color) if in_w > 0 else img.copy()
+        framed = ImageOps.expand(step1, border=out_w, fill=outer_color) if out_w > 0 else step1
+        if c_pct > 0.002:
             framed = PicasaImageProcessor.rounded_edges(framed, radius_ratio=c_pct, outer_color=inner_color)
         return framed
 
@@ -3023,6 +3040,8 @@ class PicasaImageProcessor:
                 block_size=float(p.get("block_size", 15.0)),
                 radius_norm=float(p.get("size", 0.35)),
                 hardness=float(p.get("hardness", 50.0)),
+                center_x=float(p.get("cx", 0.5)),
+                center_y=float(p.get("cy", 0.5)),
             )
         if effect_name == "invert":
             return PicasaImageProcessor.invert(img)
@@ -3032,6 +3051,8 @@ class PicasaImageProcessor:
                 zoom_amount=float(p.get("zoom_amount", 30.0)),
                 radius_norm=float(p.get("size", 0.25)),
                 hardness=float(p.get("hardness", 50.0)),
+                center_x=float(p.get("cx", 0.5)),
+                center_y=float(p.get("cy", 0.5)),
             )
         if effect_name == "soften":
             return PicasaImageProcessor.soften(

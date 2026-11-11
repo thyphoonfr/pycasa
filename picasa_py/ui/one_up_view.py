@@ -1596,14 +1596,25 @@ class PicasaOneUpView(QWidget):
                             # Ref: filterdesc.xml, 0x008814AC, 0x00760F40
                             sec = doc.get_section(base_name)
                             if sec:
-                                filters_str = sec.get("filters", "")
+                                filters_str = sec.get("filters", "") or ""
+                                # Ref: func_00456a15.c:3352-3460 — legacy fix=1 / bw=1 synthesis when filters= is absent
+                                if not filters_str:
+                                    synth_parts: List[str] = []
+                                    if (sec.get("fix") or "").strip().lower() in ("1", "yes", "true"):
+                                        synth_parts.append("autolight=1;")
+                                    if (sec.get("bw") or "").strip().lower() in ("1", "yes", "true"):
+                                        synth_parts.append("bw=1;")
+                                    if synth_parts:
+                                        filters_str = "".join(synth_parts)
                                 if filters_str:
                                     pil_img = PicasaImageProcessor.apply_filter_chain(pil_img, filters_str, skip_geom=True)
 
-                            # Ref: editpanel/edittextpanel (0x00658900)
-                            txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
-                            if txt_val:
-                                pil_img = PicasaImageProcessor.apply_text_token(pil_img, txt_val)
+                            # Ref: editpanel/edittextpanel (0x00658900), func_00456a15.c:3189 (textactive)
+                            raw_ta = sec.get("textactive") if sec is not None else None
+                            if raw_ta is None or raw_ta.strip().lower() not in ("0", "no", "false"):
+                                txt_val = doc.get_raw_text(base_name) if hasattr(doc, "get_raw_text") else doc.get_text(base_name)
+                                if txt_val:
+                                    pil_img = PicasaImageProcessor.apply_text_token(pil_img, txt_val)
                         except Exception:
                             pass
 

@@ -814,12 +814,21 @@ class PicasaThumbnailView(QWidget):
                     sec_low = sec.name.lower()
                     if sec.get("star", "").lower() == "yes":
                         starred_set.add(sec_low)
+                    rot_s = (sec.get("rotate") or "").strip().lower()
+                    has_active_rot = bool(rot_s and rot_s not in ("rotate(0)", "rotate(-1)", "0", "-1"))
+                    raw_ta = sec.get("textactive")
+                    has_active_text = bool(
+                        sec.get("text", "")
+                        and (raw_ta is None or raw_ta.strip().lower() not in ("0", "no", "false"))
+                    )
                     if (
-                        sec.get("rotate", "")
+                        has_active_rot
                         or sec.get("tilt", "")
                         or sec.get("crop", "")
                         or sec.get("filters", "")
-                        or sec.get("text", "")
+                        or (sec.get("fix") or "").strip().lower() in ("1", "yes", "true")
+                        or (sec.get("bw") or "").strip().lower() in ("1", "yes", "true")
+                        or has_active_text
                     ):
                         edited_set.add(sec_low)
                     if sec.get("backuphash", ""):
