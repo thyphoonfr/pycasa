@@ -738,16 +738,16 @@ class PicasaIniDocument:
         sec.set("text", text)
         sec.set("textactive", "1")
 
-    # Ref: picasa3.exe @ 0x0068B800 ("star=yes\r\n")
+    # Ref: picasa3.exe @ 0x0068B800 ("star=yes\r\n"), 0x00456A15 ("yes", "1", "true")
     def is_starred(self, filename: str) -> bool:
         """
-        FR: Indique si la photo possède le statut favori (star=yes).
-        EN: Indicates whether the photo is marked as starred (star=yes).
+        FR: Indique si la photo possède le statut favori (star=yes/1/true).
+        EN: Indicates whether the photo is marked as starred (star=yes/1/true).
         """
         sec = self.get_section(filename)
         if not sec:
             return False
-        return sec.get("star", "").lower() == "yes"
+        return sec.get("star", "").strip().lower() in ("yes", "1", "true")
 
     def set_starred(self, filename: str, starred: bool) -> None:
         """

@@ -144,7 +144,12 @@ class PicasaImageProcessor:
         return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
     @staticmethod
-    def load_transformed_image(file_path: str, max_size: int = 0, parsed_ini: Any = None) -> Optional[Image.Image]:
+    def load_transformed_image(
+        file_path: str,
+        max_size: int = 0,
+        parsed_ini: Any = None,
+        db: Any = None,
+    ) -> Optional[Image.Image]:
         """
         FR : Charge une image depuis le disque en appliquant fidèlement l'orientation EXIF
              et les retouches non-destructives Picasa (.picasa.ini : crop, rotate, tilt, filters).
@@ -183,7 +188,11 @@ class PicasaImageProcessor:
                     try:
                         from picasa_py.ini.parser import PicasaIniParser
                         from picasa_py.faces.facerect import decode_rect64_string
-                        doc = parsed_ini if parsed_ini is not None else PicasaIniParser.parse_file(ini_path)
+                        doc = parsed_ini
+                        if doc is None and db is not None and hasattr(db, "get_parsed_ini"):
+                            doc = db.get_parsed_ini(ini_path)
+                        if doc is None:
+                            doc = PicasaIniParser.parse_file(ini_path)
                         base_name = os.path.basename(file_path)
 
                         crop_hex = doc.get_crop(base_name)

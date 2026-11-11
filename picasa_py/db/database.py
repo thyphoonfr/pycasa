@@ -1444,7 +1444,14 @@ class PicasaDatabase:
             photo_path_str = str(photo_path)
             if os.path.isdir(photo_path_str) or photo_path_str.lower().endswith(".ini"):
                 from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-                ini_p = photo_path_str if photo_path_str.lower().endswith(".ini") else os.path.join(photo_path_str, ".picasa.ini")
+                if photo_path_str.lower().endswith(".ini"):
+                    ini_p = photo_path_str
+                else:
+                    ini_p = os.path.join(photo_path_str, ".picasa.ini")
+                    if not os.path.exists(ini_p):
+                        alt_p = os.path.join(photo_path_str, "Picasa.ini")
+                        if os.path.exists(alt_p):
+                            ini_p = alt_p
                 if doc is None:
                     doc = self.get_parsed_ini(ini_p)
                     if doc is None:
@@ -1459,8 +1466,14 @@ class PicasaDatabase:
         fname = os.path.basename(photo_path_str)
         if doc is None:
             from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-            ini_path = os.path.join(os.path.dirname(photo_path_str), ".picasa.ini")
+            dir_p = os.path.dirname(photo_path_str)
+            ini_path = os.path.join(dir_p, ".picasa.ini")
             doc = self.get_parsed_ini(ini_path)
+            if doc is None:
+                alt_ini = os.path.join(dir_p, "Picasa.ini")
+                doc = self.get_parsed_ini(alt_ini)
+                if doc is not None:
+                    ini_path = alt_ini
             if doc is None:
                 doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
 
@@ -1817,8 +1830,10 @@ class PicasaDatabase:
             return 0
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            ini_path = os.path.join(os.path.dirname(full_path), ".picasa.ini")
-            doc = self.get_parsed_ini(ini_path)
+            dir_p = os.path.dirname(full_path)
+            doc = self.get_parsed_ini(os.path.join(dir_p, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(dir_p, "Picasa.ini"))
             if doc is not None:
                 rot = doc.get_rotate(os.path.basename(full_path))
                 if rot:
@@ -1875,8 +1890,10 @@ class PicasaDatabase:
             return False
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            ini_path = os.path.join(os.path.dirname(full_path), ".picasa.ini")
-            doc = self.get_parsed_ini(ini_path)
+            dir_p = os.path.dirname(full_path)
+            doc = self.get_parsed_ini(os.path.join(dir_p, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(dir_p, "Picasa.ini"))
             if doc is not None:
                 return doc.is_starred(os.path.basename(full_path))
         pmp_star = self.pmps.get("imagedata_star")
@@ -1912,8 +1929,10 @@ class PicasaDatabase:
             return ""
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            ini_path = os.path.join(os.path.dirname(full_path), ".picasa.ini")
-            doc = self.get_parsed_ini(ini_path)
+            dir_p = os.path.dirname(full_path)
+            doc = self.get_parsed_ini(os.path.join(dir_p, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(dir_p, "Picasa.ini"))
             if doc is not None:
                 sec = doc.get_section(os.path.basename(full_path))
                 if sec is not None:
@@ -2256,8 +2275,10 @@ class PicasaDatabase:
             return []
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            ini_path = os.path.join(os.path.dirname(full_path), ".picasa.ini")
-            doc = self.get_parsed_ini(ini_path)
+            dir_p = os.path.dirname(full_path)
+            doc = self.get_parsed_ini(os.path.join(dir_p, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(dir_p, "Picasa.ini"))
             if doc is not None:
                 kws = doc.get_keywords(os.path.basename(full_path))
                 if kws:
@@ -3001,11 +3022,22 @@ class PicasaDatabase:
         # collections dynamiques système ]updated, ]screensaver, ]history:email, ]history:upload ayant > 0 photo)
         ad_musics = self.pmps.get("albumdata_music")
         ad_dates = self.pmps.get("albumdata_date")
+        ad_descs = self.pmps.get("albumdata_description")
+        ad_locs = self.pmps.get("albumdata_location")
+        pmp_hidden = self.pmps.get("imagedata_hidden")
+        hidden_recs = pmp_hidden.records if pmp_hidden is not None else []
+        hidden_wordhash_set: Set[int] = set()
+        if self.wordhash is not None and hasattr(self.wordhash, "search"):
+            try:
+                hidden_wordhash_set = set(self.wordhash.search("]hidden"))
+            except Exception:
+                pass
         dynamic_system_tokens: List[str] = []
         if ad_names and ad_cats:
             names = ad_names.records
             cats = ad_cats.records
             tokens = ad_tokens.records if ad_tokens else []
+            uids = ad_uids.records if ad_uids else []
             for i in range(len(names)):
                 if i < len(cats) and cats[i] == 0:
                     aname = str(names[i] or "")
@@ -3025,13 +3057,19 @@ class PicasaDatabase:
                         aname = aname.replace("Album ]album:", "Album ")
                     pmp_music = str(ad_musics.records[i] or "") if (ad_musics is not None and i < len(ad_musics.records) and ad_musics.records[i]) else None
                     pmp_date = ad_dates.records[i] if (ad_dates is not None and i < len(ad_dates.records) and ad_dates.records[i]) else None
+                    pmp_desc = str(ad_descs.records[i] or "") if (ad_descs is not None and i < len(ad_descs.records) and ad_descs.records[i]) else ""
+                    pmp_loc = str(ad_locs.records[i] or "") if (ad_locs is not None and i < len(ad_locs.records) and ad_locs.records[i]) else ""
+                    pmp_uid = str(uids[i] or "").strip() if (i < len(uids) and uids[i]) else token
                     albums[token] = {
                         "token": token,
+                        "uid": pmp_uid,
                         "name": aname,
                         "photo_paths": [],
                         "photo_indices": [],
                         "music": pmp_music,
                         "date": pmp_date,
+                        "description": pmp_desc,
+                        "location": pmp_loc,
                         "source": "pmp_dynamic" if is_dynamic_sys else "pmp",
                         "is_dynamic": is_dynamic_sys,
                     }
@@ -3063,6 +3101,11 @@ class PicasaDatabase:
             ini_p = os.path.join(w, ".picasa.ini")
             doc = self.get_parsed_ini(ini_p)
             if not doc:
+                alt_ini = os.path.join(w, "Picasa.ini")
+                doc = self.get_parsed_ini(alt_ini)
+                if doc:
+                    ini_p = alt_ini
+            if not doc:
                 continue
             norm_w = os.path.abspath(w).replace("/", "\\").rstrip("\\").lower()
             try:
@@ -3075,29 +3118,48 @@ class PicasaDatabase:
                             token = token[7:].strip()
                         if not token or token in non_album_tokens:
                             continue
-                        aname = sec.get("name") or token
+                        raw_aname = (sec.get("name") or "").strip()
+                        aname = raw_aname or token
                         music = sec.get("music")
                         date = sec.get("date")
-                        folder_albums[token] = aname
+                        desc = sec.get("description") or ""
+                        loc = sec.get("location") or ""
+                        uid_val = (sec.get("uid") or token).strip()
+                        if raw_aname or token not in folder_albums:
+                            folder_albums[token] = aname
                         if token not in albums:
                             albums[token] = {
                                 "token": token,
+                                "uid": uid_val,
                                 "name": aname,
                                 "photo_paths": [],
                                 "photo_indices": [],
                                 "music": music,
                                 "date": date,
+                                "description": desc,
+                                "location": loc,
                                 "ini_path": ini_p,
                                 "source": "ini",
                             }
                         else:
-                            if aname and (not albums[token]["name"] or albums[token]["name"].startswith("Album ")):
-                                albums[token]["name"] = aname
+                            if raw_aname and (
+                                not albums[token]["name"]
+                                or albums[token]["name"] in (token, f"Album {token}")
+                            ):
+                                albums[token]["name"] = raw_aname
                             if music and not albums[token]["music"]:
                                 albums[token]["music"] = music
+                            if desc and not albums[token].get("description"):
+                                albums[token]["description"] = desc
+                            if loc and not albums[token].get("location"):
+                                albums[token]["location"] = loc
+                            if uid_val and uid_val != token and (not albums[token].get("uid") or albums[token].get("uid") == token):
+                                albums[token]["uid"] = uid_val
 
                 for sec in doc.sections:
                     if sec.name.startswith(".") or sec.name.startswith("]") or sec.name.startswith("["):
+                        continue
+                    if sec.get("hidden", "").strip().lower() in ("yes", "1", "true"):
                         continue
                     alb_str = sec.get("albums")
                     if not alb_str:
@@ -3105,6 +3167,11 @@ class PicasaDatabase:
                     alb_tokens = [x.strip() for x in alb_str.split(",") if x.strip()]
                     photo_full_path = os.path.join(w, sec.name)
                     rec_idx = self._path_index_cache.get(f"{norm_w}\\{sec.name.lower()}")
+                    if rec_idx is not None and (
+                        rec_idx in hidden_wordhash_set
+                        or bool(hidden_recs and rec_idx < len(hidden_recs) and hidden_recs[rec_idx])
+                    ):
+                        continue
                     if has_authoritative_db:
                         if (
                             rec_idx is None
@@ -3123,11 +3190,14 @@ class PicasaDatabase:
                             aname = folder_albums.get(tok, f"Album {tok}")
                             albums[tok] = {
                                 "token": tok,
+                                "uid": tok,
                                 "name": aname,
                                 "photo_paths": [],
                                 "photo_indices": [],
                                 "music": None,
                                 "date": None,
+                                "description": "",
+                                "location": "",
                                 "ini_path": ini_p,
                                 "source": "ini",
                             }
@@ -3150,6 +3220,8 @@ class PicasaDatabase:
                             and self.index[r_idx].is_active
                             and self.index[r_idx].type in MEDIA_RECORD_TYPES
                             and not self.is_face_record(r_idx)
+                            and r_idx not in hidden_wordhash_set
+                            and not bool(hidden_recs and r_idx < len(hidden_recs) and hidden_recs[r_idx])
                         ):
                             p_full = self.get_media_full_path(r_idx)
                             if p_full:
@@ -3313,7 +3385,10 @@ class PicasaDatabase:
                 continue
             try:
                 for sec in doc.sections:
-                    if sec.get("star", "").lower() == "yes" and sec.get("hidden", "").lower() != "yes":
+                    if (
+                        sec.get("star", "").strip().lower() in ("yes", "1", "true")
+                        and sec.get("hidden", "").strip().lower() not in ("yes", "1", "true")
+                    ):
                         photo_full_path = os.path.join(w, sec.name)
                         norm_p = f"{norm_w}\\{sec.name.lower()}"
                         if norm_p not in starred_seen:
@@ -5996,6 +6071,32 @@ class PicasaDatabase:
                 failed.append((ini_path, str(exc)))
 
         if deleted:
+            cleaned_folder_norms = {
+                os.path.normcase(os.path.abspath(str(p.parent)))
+                for p in deleted
+            }
+            if self.thumbindex:
+                from picasa_py.ini.parser import PicasaIniDocument
+                empty_doc = PicasaIniDocument()
+                folder_indices_to_clean: Set[int] = set()
+                for f_idx, r in enumerate(self.thumbindex.records):
+                    if r.type == 1 and r.is_active and r.path:
+                        hp = _to_host_path(r.path.rstrip("\\/"))
+                        nk = os.path.normcase(os.path.abspath(hp))
+                        if nk in cleaned_folder_norms:
+                            folder_indices_to_clean.add(f_idx)
+                if folder_indices_to_clean:
+                    for r_idx, r in enumerate(self.thumbindex.records):
+                        if (
+                            r.is_active
+                            and r.type in MEDIA_RECORD_TYPES
+                            and not self.is_face_record(r_idx)
+                            and r.parent_idx in folder_indices_to_clean
+                        ):
+                            try:
+                                self.sync_photo_ini_to_db(r_idx, doc=empty_doc)
+                            except Exception:
+                                pass
             self._albums_cache = None
             self._starred_cache = None
             self.invalidate_search_cache()

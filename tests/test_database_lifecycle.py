@@ -1834,6 +1834,136 @@ def test_pass13_wordhash_token_removal_filters_and_album_pal_parity(tmp_path: Pa
     assert "<name>Nouveau Nom Pass13</name>" in updated_pal
 
 
+def test_pass14_edited_scan_thumbnails_legacy_ini_and_clean_traces_parity(tmp_path):
+    """
+    FR: Vérifie les corrections de la 14e passe d'audit picasa3.exe vs PyCasa :
+    1. Une photo indexée par `PicasaDirScanner` dans un dossier dont `.picasa.ini` ou `Picasa.ini`
+       contient déjà des retouches (`imagedata_edited != 0`, ex. `filters= Invert=1;`) génère ses
+       miniatures (`thumbs_0.db`, `thumbs2_0.db`), `imagedata_avgcolor` et ses jetons `color:*`
+       dans `wordhash.db` à partir de l'image transformée (`0x00456A15` -> `0x00425210`).
+    2. Les méthodes `sync_photo_ini_to_db`, `get_rotate`, `is_starred`, `get_caption`, `get_tags`,
+       `get_starred_photo_paths` et `get_all_albums` basculent sur `Picasa.ini` lorsque `.picasa.ini`
+       est absent (`0x0068AC80`), incluent `description`/`location`/`uid` dans `get_all_albums`,
+       fusionnent les métadonnées `[.album:<tok>]` multi-dossiers sans écraser les champs non vides,
+       et excluent les photos masquées (`hidden=yes|1|true`) des albums.
+    3. `clean_picasa_ini_traces` resynchronise toutes les colonnes `imagedata_*` et les jetons
+       `wordhash.db` (`]star`, `]edited`, mots-clés, légendes) après suppression des `.picasa.ini` / `Picasa.ini`.
+    """
+    import io
+    import numpy as np
+    from PIL import Image
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.scanner.scanner import PicasaDirScanner
+
+    db_dir = tmp_path / "db3_pass14"
+    contacts_dir = tmp_path / "contacts_pass14"
+    db = PicasaDatabase.create_new(db_dir, contacts_dir)
+
+    folder1 = tmp_path / "PhotosPass14_A"
+    folder1.mkdir(parents=True, exist_ok=True)
+    folder2 = tmp_path / "PhotosPass14_B"
+    folder2.mkdir(parents=True, exist_ok=True)
+
+    # 1. Créer une photo rouge pur (255, 0, 0) mais pré-configurée avec Invert=1; dans Picasa.ini (sans .picasa.ini)
+    # L'image inversée est cyan (0, 255, 255).
+    red_photo = folder1 / "edited_red.jpg"
+    Image.new("RGB", (64, 64), (255, 0, 0)).save(str(red_photo), format="JPEG", quality=95)
+
+    hidden_photo = folder1 / "hidden_pic.jpg"
+    Image.new("RGB", (64, 64), (0, 255, 0)).save(str(hidden_photo), format="JPEG", quality=95)
+
+    alb_tok = "f1e2d3c4b5a69788796a5b4c3d2e1f00"
+    legacy_ini = folder1 / "Picasa.ini"
+    legacy_ini.write_text(
+        f"[.album:{alb_tok}]\r\n"
+        f"name=Album Multi Dossier\r\n"
+        f"token={alb_tok}\r\n"
+        f"description=Description dossier A\r\n"
+        f"location=Paris\r\n"
+        f"[edited_red.jpg]\r\n"
+        f"rotate=rotate(1)\r\n"
+        f"star=1\r\n"
+        f"caption=LegendeLegacyIni\r\n"
+        f"keywords=TagLegacyUn,TagLegacyDeux\r\n"
+        f"filters=Invert=1;\r\n"
+        f"albums={alb_tok}\r\n"
+        f"[hidden_pic.jpg]\r\n"
+        f"hidden=true\r\n"
+        f"star=yes\r\n"
+        f"albums={alb_tok}\r\n",
+        encoding="utf-8",
+    )
+
+    # Second dossier référençant le même album mais avec une section [.album:<tok>] minimaliste sans description/location
+    photo_b = folder2 / "second.jpg"
+    Image.new("RGB", (64, 64), (0, 0, 255)).save(str(photo_b), format="JPEG", quality=95)
+    (folder2 / ".picasa.ini").write_text(
+        f"[.album:{alb_tok}]\r\n"
+        f"token={alb_tok}\r\n"
+        f"[second.jpg]\r\n"
+        f"albums={alb_tok}\r\n",
+        encoding="utf-8",
+    )
+
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(folder1)
+    scanner.scan_directory(folder2)
+
+    idx_red = db.find_photo_index(str(red_photo))
+    idx_hid = db.find_photo_index(str(hidden_photo))
+    assert idx_red is not None
+    assert idx_hid is not None
+
+    # Vérifier la lecture depuis Picasa.ini (sans .picasa.ini)
+    assert db.get_rotate(idx_red) == 1
+    assert db.is_starred(idx_red) is True
+    assert db.get_caption(idx_red) == "LegendeLegacyIni"
+    assert db.get_tags(idx_red) == ["TagLegacyUn", "TagLegacyDeux"]
+    assert idx_red in db.search("legendelegacyini")
+    assert idx_red in db.search("taglegacyun")
+    assert idx_red in db.search("]star")
+    assert idx_red in db.search("]edited")
+
+    # Vérifier que la miniature stockée dans thumbs_0.db reflète bien l'image inversée (cyan : R < 30, G > 200, B > 200)
+    thumb_bytes = db.get_thumbnail(idx_red, size="small")
+    assert thumb_bytes is not None
+    with Image.open(io.BytesIO(thumb_bytes)) as t_img:
+        arr = np.array(t_img.convert("RGB"))
+        assert float(arr[:, :, 0].mean()) < 30.0
+        assert float(arr[:, :, 1].mean()) > 200.0
+        assert float(arr[:, :, 2].mean()) > 200.0
+
+    # Vérifier que get_all_albums préserve le nom, la description et le lieu de l'album multi-dossiers
+    # et exclut la photo masquée (hidden=true)
+    all_albs = {a["token"]: a for a in db.get_all_albums()}
+    assert alb_tok in all_albs
+    alb_entry = all_albs[alb_tok]
+    assert alb_entry["name"] == "Album Multi Dossier"
+    assert alb_entry["description"] == "Description dossier A"
+    assert alb_entry["location"] == "Paris"
+    assert idx_red in alb_entry["photo_indices"]
+    assert idx_hid not in alb_entry["photo_indices"]
+
+    # Vérifier que get_starred_photo_paths inclut edited_red.jpg (star=1) et exclut hidden_pic.jpg (hidden=true)
+    starred_norms = {p.lower() for p in db.get_starred_photo_paths()}
+    assert str(red_photo).lower() in starred_norms
+    assert str(hidden_photo).lower() not in starred_norms
+
+    # 3. Nettoyage des traces INI : doit purger imagedata_* et wordhash.db pour les dossiers nettoyés
+    deleted, failed = db.clean_picasa_ini_traces(folder1, include_legacy_picasa_ini=True)
+    assert len(deleted) == 1
+    assert not failed
+    assert db.is_starred(idx_red) is False
+    assert db.get_rotate(idx_red) == 0
+    assert db.get_caption(idx_red) == ""
+    assert db.get_tags(idx_red) == []
+    assert idx_red not in db.search("]star")
+    assert idx_red not in db.search("]edited")
+    assert idx_red not in db.search("legendelegacyini")
+    assert idx_red not in db.search("taglegacyun")
+
+
+
 
 
 

@@ -1491,7 +1491,15 @@ class PicasaDirScanner:
                         tok = tok[7:].strip()
                     if not tok:
                         continue
-                    aname = (sec.get("name") or tok).strip()
+                    existing_alb = self._discovered_albums.get(tok, {})
+                    raw_name = (sec.get("name") or "").strip()
+                    prev_name = existing_alb.get("name", "")
+                    if raw_name:
+                        aname = raw_name
+                    elif prev_name and prev_name not in (tok, f"Album {tok}"):
+                        aname = prev_name
+                    else:
+                        aname = prev_name or tok
                     date_val = 0.0
                     raw_date = sec.get("date")
                     if raw_date:
@@ -1505,14 +1513,19 @@ class PicasaDirScanner:
                                     break
                                 except Exception:
                                     pass
+                    if date_val <= 0.0 and existing_alb.get("date", 0.0) > 0.0:
+                        date_val = float(existing_alb["date"])
+                    raw_uid = (sec.get("uid") or "").strip()
+                    prev_uid = existing_alb.get("uid", "")
+                    uid_val = raw_uid or (prev_uid if prev_uid and prev_uid != tok else "") or tok
                     self._discovered_albums[tok] = {
                         "name": aname,
                         "token": tok,
-                        "uid": (sec.get("uid") or tok).strip(),
+                        "uid": uid_val,
                         "date": date_val,
-                        "description": sec.get("description") or "",
-                        "location": sec.get("location") or "",
-                        "music": sec.get("music") or "",
+                        "description": (sec.get("description") or "").strip() or existing_alb.get("description", ""),
+                        "location": (sec.get("location") or "").strip() or existing_alb.get("location", ""),
+                        "music": (sec.get("music") or "").strip() or existing_alb.get("music", ""),
                     }
                 elif not sec.name.startswith("[") and sec.name.lower() not in ("picasa", "contacts2", "encoding"):
                     alb_str = sec.get("albums")
@@ -2049,12 +2062,47 @@ class PicasaDirScanner:
                 self.db.sync_photo_ini_to_db(record_idx)
             except Exception:
                 pass
+        self._refresh_edited_photo_thumbnails(record_idx, file_path, is_video_rec)
         mod_set = getattr(self.db, "_modified_media_indices", None)
         if isinstance(mod_set, set):
             mod_set.add(record_idx)
         if hasattr(self.db, "invalidate_search_cache"):
             self.db.invalidate_search_cache()
         return True
+
+    # Ref: picasa3.exe @ 0x00456A15 -> 0x00425210 / 0x00424CA0 (recalcul des miniatures si imagedata_edited != 0)
+    def _refresh_edited_photo_thumbnails(self, record_idx: int, file_path: str, is_video_rec: bool) -> None:
+        """
+        FR: Si la photo indexée possède des retouches non destructives dans `.picasa.ini` / `Picasa.ini`
+        (`imagedata_edited != 0`), régénère ses miniatures (`thumbs_0.db`, `thumbs2_0.db`),
+        sa couleur moyenne (`imagedata_avgcolor`) et ses jetons `color:*` dans `wordhash.db`
+        à partir de l'image transformée.
+        EN: If the indexed photo has non-destructive edits in `.picasa.ini` / `Picasa.ini`
+        (`imagedata_edited != 0`), regenerates its thumbnails (`thumbs_0.db`, `thumbs2_0.db`),
+        average color (`imagedata_avgcolor`), and `color:*` tokens in `wordhash.db`
+        from the transformed image.
+        """
+        if is_video_rec or not hasattr(self.db, "update_thumbnails_from_pil"):
+            return
+        try:
+            pmp_ed = self.db.pmps.get("imagedata_edited")
+            edited_val = (
+                int(pmp_ed.records[record_idx])
+                if (pmp_ed is not None and 0 <= record_idx < len(pmp_ed.records))
+                else 0
+            )
+            if not edited_val:
+                return
+            from picasa_py.ui.image_processor import PicasaImageProcessor
+            edited_img = PicasaImageProcessor.load_transformed_image(
+                file_path, max_size=288, db=self.db
+            )
+            if edited_img is not None:
+                self.db.update_thumbnails_from_pil(
+                    record_idx, edited_img, persist_to_disk=False
+                )
+        except Exception:
+            pass
 
     def index_file(self, file_path: str) -> Optional[int]:
         """
@@ -2185,6 +2233,7 @@ class PicasaDirScanner:
                 self.db.sync_photo_ini_to_db(record_idx)
             except Exception:
                 pass
+        self._refresh_edited_photo_thumbnails(record_idx, file_path, is_video_rec)
 
         return record_idx
 
