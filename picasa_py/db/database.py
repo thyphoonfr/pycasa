@@ -1578,10 +1578,13 @@ class PicasaDatabase:
                     self.wordhash.remove_word(st_tok, idx)
                 ad_uids_col = self.pmps.get("albumdata_uid")
                 ad_toks_col = self.pmps.get("albumdata_token")
+                ad_cats_col = self.pmps.get("albumdata_category")
                 known_albs: Set[str] = set()
                 for col in (ad_uids_col, ad_toks_col):
                     if col is not None:
-                        for v in col.records:
+                        for r_i, v in enumerate(col.records):
+                            if ad_cats_col is not None and r_i < len(ad_cats_col.records) and ad_cats_col.records[r_i] != 0:
+                                continue
                             s = str(v or "").strip()
                             if s.startswith("]album:") or s.startswith(".album:"):
                                 s = s[7:].strip()
@@ -1748,10 +1751,13 @@ class PicasaDatabase:
                 if hasattr(self.wordhash, "remove_word"):
                     ad_uids_col = self.pmps.get("albumdata_uid")
                     ad_toks_col = self.pmps.get("albumdata_token")
+                    ad_cats_col = self.pmps.get("albumdata_category")
                     known_albs_rm: Set[str] = set()
                     for col in (ad_uids_col, ad_toks_col):
                         if col is not None:
-                            for v in col.records:
+                            for r_i, v in enumerate(col.records):
+                                if ad_cats_col is not None and r_i < len(ad_cats_col.records) and ad_cats_col.records[r_i] != 0:
+                                    continue
                                 s = str(v or "").strip()
                                 if s.startswith("]album:") or s.startswith(".album:"):
                                     s = s[7:].strip()
@@ -2510,16 +2516,19 @@ class PicasaDatabase:
                     except Exception:
                         pass
         if full_path:
-            ini_p = os.path.join(os.path.dirname(full_path), ".picasa.ini")
-            if os.path.exists(ini_p):
-                try:
-                    from picasa_py.ini.parser import PicasaIniParser
-                    doc = PicasaIniParser.parse_file(ini_p)
-                    if doc.remove_section(os.path.basename(full_path)):
-                        doc.write_file(ini_p)
-                        self.invalidate_ini_cache(ini_p)
-                except Exception:
-                    pass
+            folder_dir = os.path.dirname(full_path)
+            for ini_name in (".picasa.ini", "Picasa.ini"):
+                ini_p = os.path.join(folder_dir, ini_name)
+                if os.path.exists(ini_p):
+                    try:
+                        from picasa_py.ini.parser import PicasaIniParser
+                        doc = PicasaIniParser.parse_file(ini_p)
+                        if doc.remove_section(os.path.basename(full_path)):
+                            doc.write_file(ini_p)
+                            self.invalidate_ini_cache(ini_p)
+                    except Exception:
+                        pass
+                    break
             # Retirer également les références à la photo supprimée des fichiers .pal (Ref: 0x0044EA30..0x0044F000)
             if self.db3_dir and self.db3_dir != Path("."):
                 pal_files: List[Path] = []
@@ -2695,19 +2704,45 @@ class PicasaDatabase:
                     pass
                 break
 
-        # Transférer la section [fname] du .picasa.ini source vers le .picasa.ini destination
+        # Transférer la section [fname] (ainsi que [Contacts2] et [.album:<tok>]) du .picasa.ini / Picasa.ini source vers la destination
         src_ini = os.path.join(src_dir, ".picasa.ini")
+        if not os.path.exists(src_ini):
+            alt_src_ini = os.path.join(src_dir, "Picasa.ini")
+            if os.path.exists(alt_src_ini):
+                src_ini = alt_src_ini
         dest_ini = os.path.join(dest_dir_str, ".picasa.ini")
+        dest_legacy_ini = os.path.join(dest_dir_str, "Picasa.ini")
         if os.path.exists(src_ini):
             try:
                 src_doc = PicasaIniParser.parse_file(src_ini)
                 src_sec = src_doc.get_section(fname)
                 if src_sec is not None:
-                    dest_doc = PicasaIniParser.parse_file(dest_ini) if os.path.exists(dest_ini) else PicasaIniDocument()
+                    if os.path.exists(dest_ini):
+                        dest_doc = PicasaIniParser.parse_file(dest_ini)
+                    elif os.path.exists(dest_legacy_ini):
+                        dest_doc = PicasaIniParser.parse_file(dest_legacy_ini)
+                    else:
+                        dest_doc = PicasaIniDocument()
                     dest_doc.remove_section(fname)
                     dest_sec = dest_doc.get_or_create_section(fname)
                     for k, v in src_sec.items():
                         dest_sec.set(k, v)
+                    # Transférer les sections [.album:<tok>] référencées par albums= (Ref: picasa3.exe @ 0x0068AC80)
+                    alb_str = src_sec.get("albums") or ""
+                    for raw_tok in alb_str.split(","):
+                        clean_tok = raw_tok.strip()
+                        if clean_tok.startswith("]album:") or clean_tok.startswith(".album:"):
+                            clean_tok = clean_tok[7:].strip()
+                        if not clean_tok:
+                            continue
+                        for cand_sec_name in (f".album:{clean_tok}", f"]album:{clean_tok}"):
+                            src_alb_sec = src_doc.get_section(cand_sec_name)
+                            if src_alb_sec is not None:
+                                if dest_doc.get_section(f".album:{clean_tok}") is None and dest_doc.get_section(f"]album:{clean_tok}") is None:
+                                    dest_alb_sec = dest_doc.get_or_create_section(f".album:{clean_tok}")
+                                    for ak, av in src_alb_sec.items():
+                                        dest_alb_sec.set(ak, av)
+                                break
                     # Transférer également les entrées [Contacts2] référencées par faces=
                     src_contacts_sec = src_doc.get_section("Contacts2")
                     faces_items = src_doc.get_faces(fname)
@@ -2719,6 +2754,8 @@ class PicasaDatabase:
                                 dest_contacts_sec.set(f_item.contact_id, c_val)
                     dest_doc.write_file(dest_ini)
                     self.invalidate_ini_cache(dest_ini)
+                    if os.path.exists(dest_legacy_ini):
+                        self.invalidate_ini_cache(dest_legacy_ini)
                     src_doc.remove_section(fname)
                     src_doc.write_file(src_ini)
                     self.invalidate_ini_cache(src_ini)
@@ -2745,15 +2782,43 @@ class PicasaDatabase:
                         if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
                             idx_f.checksums[c_idx] = new_cs
                             idx_f.dirty = True
+            dest_folder_tok = self.ensure_folder_album_row(dest_dir_str)
             if self.wordhash is not None:
+                import hashlib
                 from picasa_py.scanner.scanner import tokenize_indexer_text
-                keep_tokens = set(tokenize_indexer_text(fname))
+                pmp_cap = self.pmps.get("imagedata_caption")
+                cap_s = str(pmp_cap.records[rec_idx] or "") if (pmp_cap is not None and 0 <= rec_idx < len(pmp_cap.records)) else ""
+                pmp_tags = self.pmps.get("imagedata_tags")
+                tags_s = str(pmp_tags.records[rec_idx] or "") if (pmp_tags is not None and 0 <= rec_idx < len(pmp_tags.records)) else ""
+                keep_tokens = (
+                    set(tokenize_indexer_text(fname))
+                    | set(tokenize_indexer_text(dest_dir_str))
+                    | set(tokenize_indexer_text(cap_s))
+                    | set(tokenize_indexer_text(tags_s))
+                )
                 if hasattr(self.wordhash, "remove_word"):
                     for old_tok in tokenize_indexer_text(src_dir):
                         if old_tok not in keep_tokens:
                             self.wordhash.remove_word(old_tok, rec_idx)
+                    # Retirer le jeton ]album:<old_folder_uid> de l'ancien dossier
+                    src_norm_low = (src_dir.replace("/", "\\").rstrip("\\") + "\\").lower()
+                    old_f_toks = {f"]album:{hashlib.md5(src_norm_low.encode('utf-8', errors='surrogateescape')).hexdigest()}"}
+                    ad_fnames = self.pmps.get("albumdata_filename")
+                    ad_tokens = self.pmps.get("albumdata_token")
+                    ad_cats = self.pmps.get("albumdata_category")
+                    if ad_fnames is not None and ad_tokens is not None:
+                        for r_i, fn_v in enumerate(ad_fnames.records):
+                            if ad_cats is None or (r_i < len(ad_cats.records) and ad_cats.records[r_i] in (2, 7)):
+                                if (str(fn_v or "").replace("/", "\\").rstrip("\\") + "\\").lower() == src_norm_low:
+                                    if r_i < len(ad_tokens.records) and ad_tokens.records[r_i]:
+                                        old_f_toks.add(str(ad_tokens.records[r_i]))
+                    for old_ft in old_f_toks:
+                        if old_ft and old_ft != dest_folder_tok:
+                            self.wordhash.remove_word(old_ft, rec_idx)
                 for new_tok in tokenize_indexer_text(dest_dir_str):
                     self.wordhash.add_word(new_tok, rec_idx)
+                if dest_folder_tok and rec_obj.type not in (8, 0x20):
+                    self.wordhash.add_word(dest_folder_tok, rec_idx)
 
         self._remap_photo_path_in_faces_and_pals(src_full_path, dest_full_path)
         self._invalidate_path_index_cache()
@@ -2859,9 +2924,20 @@ class PicasaDatabase:
                             idx_f.dirty = True
             if self.wordhash is not None:
                 from picasa_py.scanner.scanner import tokenize_indexer_text
+                pmp_cap = self.pmps.get("imagedata_caption")
+                cap_s = str(pmp_cap.records[rec_idx] or "") if (pmp_cap is not None and 0 <= rec_idx < len(pmp_cap.records)) else ""
+                pmp_tags = self.pmps.get("imagedata_tags")
+                tags_s = str(pmp_tags.records[rec_idx] or "") if (pmp_tags is not None and 0 <= rec_idx < len(pmp_tags.records)) else ""
+                keep_tokens = (
+                    set(tokenize_indexer_text(new_fname))
+                    | set(tokenize_indexer_text(parent_dir))
+                    | set(tokenize_indexer_text(cap_s))
+                    | set(tokenize_indexer_text(tags_s))
+                )
                 if hasattr(self.wordhash, "remove_word"):
                     for old_tok in tokenize_indexer_text(old_fname):
-                        self.wordhash.remove_word(old_tok, rec_idx)
+                        if old_tok not in keep_tokens:
+                            self.wordhash.remove_word(old_tok, rec_idx)
                 for tok in tokenize_indexer_text(new_fname):
                     self.wordhash.add_word(tok, rec_idx)
 
@@ -2879,9 +2955,11 @@ class PicasaDatabase:
         invalidate_albums_starred: bool = True,
     ) -> bool:
         """
-        FR: Modifie de façon atomique l'entrée d'une photo dans le fichier .picasa.ini de son dossier,
+        FR: Modifie de façon atomique l'entrée d'une photo dans le fichier .picasa.ini de son dossier
+        (en préservant les sections d'un fichier historique `Picasa.ini` s'il existe sans `.picasa.ini`),
         invalide le cache INI et synchronise les colonnes PMP / wordhash correspondantes.
-        EN: Atomically updates a photo's entry in its folder's .picasa.ini file,
+        EN: Atomically updates a photo's entry in its folder's .picasa.ini file
+        (preserving sections from a legacy `Picasa.ini` file if present without `.picasa.ini`),
         invalidates the INI cache, and synchronizes the corresponding PMP / wordhash columns.
         Ref: AGENTS.md §4 bis.3 & picasa3.exe @ 0x00456A15, 0x0068AC80
         """
@@ -2891,11 +2969,19 @@ class PicasaDatabase:
         folder = os.path.dirname(photo_path)
         fname = os.path.basename(photo_path)
         ini_path = os.path.join(folder, ".picasa.ini")
+        legacy_ini_path = os.path.join(folder, "Picasa.ini")
         try:
-            doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+            if os.path.exists(ini_path):
+                doc = PicasaIniParser.parse_file(ini_path)
+            elif os.path.exists(legacy_ini_path):
+                doc = PicasaIniParser.parse_file(legacy_ini_path)
+            else:
+                doc = PicasaIniDocument()
             mutator(doc, fname)
             doc.write_file(ini_path)
             self.invalidate_ini_cache(ini_path, invalidate_albums_starred=invalidate_albums_starred)
+            if os.path.exists(legacy_ini_path):
+                self.invalidate_ini_cache(legacy_ini_path, invalidate_albums_starred=invalidate_albums_starred)
             self.sync_photo_ini_to_db(photo_path, doc)
             self.invalidate_search_cache()
             return True
@@ -3437,45 +3523,46 @@ class PicasaDatabase:
                         watched.append(p)
 
         for w in watched:
-            ini_p = os.path.join(w, ".picasa.ini")
-            if not os.path.exists(ini_p):
-                continue
-            try:
-                doc = PicasaIniParser.parse_file(ini_p)
-                modified = False
-                for sec in list(doc.sections):
-                    if (
-                        sec.name in (f".album:{clean_target}", f"]album:{clean_target}", f".album:{album_token}")
-                        or (sec.name.startswith(".album:") and sec.get("token") in (album_token, clean_target))
-                        or (sec.name.startswith(".album:") and sec.get("name") in (album_token, clean_target))
-                    ):
-                        doc.sections.remove(sec)
-                        doc._modified = True
-                        doc._untagged_utf8_preserved = False
-                        modified = True
-                        deleted = True
-
-                for sec in doc.sections:
-                    alb_str = sec.get("albums")
-                    if alb_str:
-                        tokens = [t.strip() for t in alb_str.split(",") if t.strip()]
-                        kept = [
-                            t for t in tokens
-                            if t not in (album_token, clean_target, f"]album:{clean_target}", f".album:{clean_target}")
-                        ]
-                        if len(kept) != len(tokens):
-                            if kept:
-                                sec.set("albums", ",".join(kept))
-                            else:
-                                sec.remove("albums")
+            for ini_name in (".picasa.ini", "Picasa.ini"):
+                ini_p = os.path.join(w, ini_name)
+                if not os.path.exists(ini_p):
+                    continue
+                try:
+                    doc = PicasaIniParser.parse_file(ini_p)
+                    modified = False
+                    for sec in list(doc.sections):
+                        if (
+                            sec.name in (f".album:{clean_target}", f"]album:{clean_target}", f".album:{album_token}")
+                            or (sec.name.startswith(".album:") and sec.get("token") in (album_token, clean_target))
+                            or (sec.name.startswith(".album:") and sec.get("name") in (album_token, clean_target))
+                        ):
+                            doc.sections.remove(sec)
+                            doc._modified = True
+                            doc._untagged_utf8_preserved = False
                             modified = True
                             deleted = True
 
-                if modified:
-                    doc.write_file(ini_p)
-                    self.invalidate_ini_cache(ini_p)
-            except Exception:
-                pass
+                    for sec in doc.sections:
+                        alb_str = sec.get("albums")
+                        if alb_str:
+                            tokens = [t.strip() for t in alb_str.split(",") if t.strip()]
+                            kept = [
+                                t for t in tokens
+                                if t not in (album_token, clean_target, f"]album:{clean_target}", f".album:{clean_target}")
+                            ]
+                            if len(kept) != len(tokens):
+                                if kept:
+                                    sec.set("albums", ",".join(kept))
+                                else:
+                                    sec.remove("albums")
+                                modified = True
+                                deleted = True
+
+                    if modified:
+                        doc.write_file(ini_p)
+                        self.invalidate_ini_cache(ini_p)
+                except Exception:
+                    pass
 
         # Nettoyer également les entrées correspondantes dans albumdata_*.pmp
         candidates = {
@@ -3584,26 +3671,27 @@ class PicasaDatabase:
                         watched.append(p)
 
         for w in watched:
-            ini_p = os.path.join(w, ".picasa.ini")
-            if not os.path.exists(ini_p):
-                continue
-            try:
-                doc = PicasaIniParser.parse_file(ini_p)
-                modified = False
-                for sec in doc.sections:
-                    if (
-                        sec.name in (f".album:{clean_target}", f"]album:{clean_target}", f".album:{album_token}")
-                        or (sec.name.startswith(".album:") and sec.get("token") in (album_token, clean_target))
-                        or (sec.name.startswith(".album:") and sec.get("name") in (album_token, clean_target))
-                    ):
-                        sec.set("name", new_name)
-                        modified = True
-                        renamed = True
-                if modified:
-                    doc.write_file(ini_p)
-                    self.invalidate_ini_cache(ini_p)
-            except Exception:
-                pass
+            for ini_name in (".picasa.ini", "Picasa.ini"):
+                ini_p = os.path.join(w, ini_name)
+                if not os.path.exists(ini_p):
+                    continue
+                try:
+                    doc = PicasaIniParser.parse_file(ini_p)
+                    modified = False
+                    for sec in doc.sections:
+                        if (
+                            sec.name in (f".album:{clean_target}", f"]album:{clean_target}", f".album:{album_token}")
+                            or (sec.name.startswith(".album:") and sec.get("token") in (album_token, clean_target))
+                            or (sec.name.startswith(".album:") and sec.get("name") in (album_token, clean_target))
+                        ):
+                            sec.set("name", new_name)
+                            modified = True
+                            renamed = True
+                    if modified:
+                        doc.write_file(ini_p)
+                        self.invalidate_ini_cache(ini_p)
+                except Exception:
+                    pass
 
         candidates = {
             album_token.strip(),
@@ -3974,6 +4062,8 @@ class PicasaDatabase:
 
             if moved_folder_indices:
                 from picasa_py.scanner.scanner import tokenize_indexer_text
+                pmp_cap = self.pmps.get("imagedata_caption")
+                pmp_tags = self.pmps.get("imagedata_tags")
                 for idx, rec in enumerate(self.thumbindex.records):
                     if rec.type in MEDIA_RECORD_TYPES and rec.is_active and rec.parent_idx in moved_folder_indices:
                         old_dir_h, new_dir_h = moved_folder_indices[rec.parent_idx]
@@ -3990,7 +4080,14 @@ class PicasaDatabase:
                                         idx_f.checksums[c_idx] = new_cs
                                         idx_f.dirty = True
                         if self.wordhash is not None:
-                            keep_tokens = set(tokenize_indexer_text(rec.path))
+                            cap_s = str(pmp_cap.records[idx] or "") if (pmp_cap is not None and 0 <= idx < len(pmp_cap.records)) else ""
+                            tags_s = str(pmp_tags.records[idx] or "") if (pmp_tags is not None and 0 <= idx < len(pmp_tags.records)) else ""
+                            keep_tokens = (
+                                set(tokenize_indexer_text(rec.path))
+                                | set(tokenize_indexer_text(new_dir_h))
+                                | set(tokenize_indexer_text(cap_s))
+                                | set(tokenize_indexer_text(tags_s))
+                            )
                             if hasattr(self.wordhash, "remove_word"):
                                 for old_tok in tokenize_indexer_text(old_dir_h):
                                     if old_tok not in keep_tokens:
@@ -4003,6 +4100,7 @@ class PicasaDatabase:
                         )
 
         ad_files = self.pmps.get("albumdata_filename")
+        ad_names = self.pmps.get("albumdata_name")
         if ad_files is not None:
             for r_idx, fp_val in enumerate(ad_files.records):
                 if not fp_val:
@@ -4010,8 +4108,16 @@ class PicasaDatabase:
                 fp_win = str(fp_val).replace("/", "\\").rstrip("\\") + "\\"
                 if fp_win.lower() == old_prefix_low or fp_win.lower().startswith(old_prefix_low):
                     suffix = fp_win[len(old_norm):]
-                    ad_files.records[r_idx] = new_norm + suffix
+                    updated_fp = new_norm + suffix
+                    ad_files.records[r_idx] = updated_fp
                     ad_files.dirty = True
+                    if ad_names is not None and r_idx < len(ad_names.records):
+                        old_base = os.path.basename(fp_win.rstrip("\\"))
+                        new_base = os.path.basename(updated_fp.rstrip("\\"))
+                        cur_name = str(ad_names.records[r_idx] or "")
+                        if new_base and (not cur_name or cur_name.lower() == old_base.lower()):
+                            ad_names.records[r_idx] = new_base
+                            ad_names.dirty = True
 
         if self.repository is not None and hasattr(self.repository, "pairs"):
             new_pairs: List[Tuple[str, str]] = []
@@ -5502,6 +5608,16 @@ class PicasaDatabase:
                 _atomic_write(pmp_path, pmp_bytes)
                 if is_bg_thread:
                     time.sleep(0.0005)
+
+        if self.wordhash is not None:
+            wh_path = self.db3_dir / "wordhash.dat"
+            wh_bytes: Optional[bytes] = None
+            with self._lock:
+                if getattr(self.wordhash, "dirty", False) or not wh_path.exists():
+                    wh_bytes = self.wordhash.to_bytes()
+                    self.wordhash.dirty = False
+            if wh_bytes is not None:
+                _atomic_write(wh_path, wh_bytes)
 
     def save_database(self, force_all: bool = False) -> None:
         """

@@ -2531,8 +2531,14 @@ class PicasaOneUpView(QWidget):
         else:
             p = Path(target_path)
             ini_path = p.parent / ".picasa.ini"
+            legacy_ini = p.parent / "Picasa.ini"
             from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-            doc = PicasaIniParser.parse_file(str(ini_path)) if ini_path.exists() else PicasaIniDocument()
+            if ini_path.exists():
+                doc = PicasaIniParser.parse_file(str(ini_path))
+            elif legacy_ini.exists():
+                doc = PicasaIniParser.parse_file(str(legacy_ini))
+            else:
+                doc = PicasaIniDocument()
             modify_fn(doc, p.name)
             doc.write_file(str(ini_path))
         if 0 <= self._history_idx < len(self._history_ini_snapshots):

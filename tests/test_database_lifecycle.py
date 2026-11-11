@@ -1963,6 +1963,116 @@ def test_pass14_edited_scan_thumbnails_legacy_ini_and_clean_traces_parity(tmp_pa
     assert idx_red not in db.search("taglegacyun")
 
 
+def test_pass15_move_rename_photo_folder_legacy_ini_and_thumb_save_parity(tmp_path):
+    """
+    FR: Vérifie les corrections de la 15e passe d'audit picasa3.exe vs PyCasa :
+    1. `update_photo_ini` préserve les sections existantes d'un fichier historique `Picasa.ini`
+       lorsqu'il écrit `.picasa.ini` (`0x0068AC80`).
+    2. `move_photo` transfère également les définitions `[.album:<tok>]` référencées par `albums=`,
+       bascule le jeton d'album de dossier `]album:<folder_uid>` dans `wordhash.db`, préserve les
+       termes partagés (légende/tags/nom) et maintient `compute_preview_checksum` (`0x006B9B26`)
+       sur `bigthumbs` / `previews`.
+    3. `rename_photo` et `move_folder` préservent les jetons de légende/tags dans `wordhash.db`,
+       maintiennent `compute_preview_checksum` sur `bigthumbs` / `previews`, et `move_folder`
+       met à jour `albumdata_name` lorsque le titre du dossier correspondait à l'ancien basename.
+    4. `save_thumbnails_only` persiste `wordhash.dat` sur disque après mise à jour des jetons
+       `color:*` par `update_thumbnails_from_pil`.
+    """
+    from PIL import Image
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.scanner.scanner import PicasaDirScanner
+    from picasa_py.db.wordhash import WordHashFile
+
+    db_dir = tmp_path / "db3_pass15"
+    contacts_dir = tmp_path / "contacts_pass15"
+    db = PicasaDatabase.create_new(db_dir, contacts_dir)
+
+    src_folder = tmp_path / "DossierSource"
+    src_folder.mkdir(parents=True, exist_ok=True)
+    dest_folder = tmp_path / "DossierDest"
+    dest_folder.mkdir(parents=True, exist_ok=True)
+
+    p1 = src_folder / "vacances_soleil.jpg"
+    p2 = src_folder / "autre_photo.jpg"
+    Image.new("RGB", (64, 64), (255, 0, 0)).save(str(p1), format="JPEG", quality=95)
+    Image.new("RGB", (64, 64), (0, 255, 0)).save(str(p2), format="JPEG", quality=95)
+
+    alb_tok = "11223344556677889900aabbccddeeff"
+    legacy_ini = src_folder / "Picasa.ini"
+    legacy_ini.write_text(
+        f"[.album:{alb_tok}]\r\n"
+        f"name=Album Soleil\r\n"
+        f"token={alb_tok}\r\n"
+        f"[vacances_soleil.jpg]\r\n"
+        f"albums={alb_tok}\r\n"
+        f"caption= dossiersource vacances\r\n"
+        f"[autre_photo.jpg]\r\n"
+        f"star=yes\r\n",
+        encoding="utf-8",
+    )
+
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(src_folder)
+
+    idx1 = db.find_photo_index(str(p1))
+    idx2 = db.find_photo_index(str(p2))
+    assert idx1 is not None
+    assert idx2 is not None
+
+    # 1. update_photo_ini sur un dossier ayant uniquement Picasa.ini doit préserver [autre_photo.jpg] et [.album:...]
+    assert db.set_tags(idx1, ["Plage", "Soleil"]) is True
+    dot_ini = src_folder / ".picasa.ini"
+    assert dot_ini.exists()
+    parsed_dot = PicasaIniParser.parse_file(str(dot_ini))
+    assert parsed_dot.is_starred("autre_photo.jpg") is True
+    assert parsed_dot.get_section(f".album:{alb_tok}") is not None
+
+    # 2. move_photo vers dest_folder transfère [.album:<tok>], met à jour ]album:<folder_uid> et conserve le mot 'dossiersource' de la légende
+    src_folder_tok = db.ensure_folder_album_row(str(src_folder))
+    assert idx1 in db.search(src_folder_tok)
+    assert db.move_photo(idx1, dest_folder) is True
+
+    dest_dot_ini = dest_folder / ".picasa.ini"
+    assert dest_dot_ini.exists()
+    dest_doc = PicasaIniParser.parse_file(str(dest_dot_ini))
+    dest_alb_sec = dest_doc.get_section(f".album:{alb_tok}")
+    assert dest_alb_sec is not None
+    assert dest_alb_sec.get("name") == "Album Soleil"
+
+    dest_folder_tok = db.ensure_folder_album_row(str(dest_folder))
+    assert idx1 not in db.search(src_folder_tok)
+    assert idx1 in db.search(dest_folder_tok)
+    # Le mot 'dossiersource' est dans la légende de idx1 : il ne doit pas avoir été supprimé de wordhash !
+    assert idx1 in db.search("dossiersource")
+
+    # Simuler un checksum non nul dans previews_index.db et vérifier que rename_photo maintient compute_entry_checksum("previews")
+    prev_idx_f = db.block_indices.get("previews")
+    if prev_idx_f is not None and idx1 < len(prev_idx_f.checksums):
+        prev_idx_f.checksums[idx1] = 123456
+
+    # 3. rename_photo préserve le mot 'soleil' (présent dans les tags) et met à jour le checksum CBlockFile
+    assert db.rename_photo(idx1, "plage_ete.jpg") is True
+    assert idx1 in db.search("soleil")
+    assert idx1 in db.search("plage")
+    if prev_idx_f is not None and idx1 < len(prev_idx_f.checksums):
+        assert prev_idx_f.checksums[idx1] == db.compute_entry_checksum(idx1, "thumbs")
+
+    # Déplacer physiquement dest_folder -> renamed_folder et appeler move_folder
+    renamed_folder = tmp_path / "DossierRenomme"
+    dest_folder.rename(renamed_folder)
+    assert db.move_folder(str(dest_folder), str(renamed_folder)) is True
+    ad_names = db.pmps.get("albumdata_name")
+    assert ad_names is not None
+    assert "DossierRenomme" in ad_names.records
+
+    # 4. update_thumbnails_from_pil(..., persist_to_disk=True) sauvegarde aussi wordhash.dat sur disque via save_thumbnails_only
+    blue_img = Image.new("RGB", (64, 64), (0, 0, 255))
+    assert db.update_thumbnails_from_pil(idx1, blue_img, persist_to_disk=True) is True
+    wh_on_disk = WordHashFile.from_bytes((db_dir / "wordhash.dat").read_bytes())
+    assert idx1 in wh_on_disk.words.get("color:blue", set())
+
+
 
 
 
