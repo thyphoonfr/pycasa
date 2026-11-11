@@ -2034,6 +2034,7 @@ class PicasaMainWindow(QMainWindow):
             if sec is not None:
                 for k in (
                     "filters",
+                    "redo",
                     "crop",
                     "rotate",
                     "tilt",
@@ -2044,6 +2045,8 @@ class PicasaMainWindow(QMainWindow):
                     "colorfix",
                     "redeye",
                     "retouch",
+                    "fix",
+                    "bw",
                     "backuphash",
                 ):
                     sec.remove(k)
@@ -2052,7 +2055,7 @@ class PicasaMainWindow(QMainWindow):
         for p in paths:
             try:
                 p_obj = Path(p)
-                # Ref: picasa3.exe @ 0x0054368A, 0x0085A0B0 (.picasaoriginals et dossier legacy Originals)
+                # Ref: picasa3.exe @ 0x00462BA0, 0x0054368A, 0x0085A0B0 (.picasaoriginals et dossier legacy Originals)
                 orig_backup = p_obj.parent / ".picasaoriginals" / p_obj.name
                 if not orig_backup.exists():
                     legacy_backup = p_obj.parent / "Originals" / p_obj.name
@@ -2060,6 +2063,8 @@ class PicasaMainWindow(QMainWindow):
                         orig_backup = legacy_backup
                 if orig_backup.exists():
                     import shutil
+                    from picasa_py.ini.parser import PicasaIniWriter
+                    PicasaIniWriter.mark_internal_write(str(p_obj.parent))
                     shutil.copy2(str(orig_backup), str(p_obj))
                     try:
                         orig_backup.unlink()
@@ -2089,8 +2094,8 @@ class PicasaMainWindow(QMainWindow):
                                 for col_n, col_v in (
                                     ("imagedata_width", int(rw)),
                                     ("imagedata_height", int(rh)),
-                                    ("imagedata_edit_width", int(rw)),
-                                    ("imagedata_edit_height", int(rh)),
+                                    ("imagedata_edit_width", 0),
+                                    ("imagedata_edit_height", 0),
                                     ("imagedata_originfast", compute_originfast_hash(p_obj)),
                                     ("imagedata_revertable", 0),
                                     ("imagedata_backuphash", 0),
@@ -2100,25 +2105,28 @@ class PicasaMainWindow(QMainWindow):
                                     if pmp_c is not None and rec_idx < len(pmp_c.records):
                                         pmp_c.records[rec_idx] = col_v
                                         pmp_c.dirty = True
-                                # Mettre à jour les checksums CBlockFile (thumbs / thumbs2) après restauration de l'original
-                                p_idx = rec.parent_idx
-                                folder_p = (
-                                    self.db.thumbindex.records[p_idx].path
-                                    if 0 <= p_idx < len(self.db.thumbindex.records)
-                                    else ""
-                                )
-                                new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
-                                for pref in ("thumbs", "thumbs2"):
-                                    idx_f = self.db.block_indices.get(pref)
-                                    if idx_f is not None:
-                                        if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
-                                            idx_f.checksums[rec_idx] = new_cs
-                                            idx_f.dirty = True
-                                        if hasattr(self.db, "_get_face_children"):
-                                            for c_idx in self.db._get_face_children(rec_idx):
-                                                if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
-                                                    idx_f.checksums[c_idx] = new_cs
-                                                    idx_f.dirty = True
+                                # Mettre à jour les checksums CBlockFile (thumbs / thumbs2 / bigthumbs / previews) après restauration de l'original
+                                if hasattr(self.db, "sync_file_stat_and_checksums"):
+                                    self.db.sync_file_stat_and_checksums(rec_idx)
+                                else:
+                                    p_idx = rec.parent_idx
+                                    folder_p = (
+                                        self.db.thumbindex.records[p_idx].path
+                                        if 0 <= p_idx < len(self.db.thumbindex.records)
+                                        else ""
+                                    )
+                                    new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
+                                    for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
+                                        idx_f = self.db.block_indices.get(pref)
+                                        if idx_f is not None:
+                                            if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
+                                                idx_f.checksums[rec_idx] = new_cs
+                                                idx_f.dirty = True
+                                            if hasattr(self.db, "_get_face_children"):
+                                                for c_idx in self.db._get_face_children(rec_idx):
+                                                    if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
+                                                        idx_f.checksums[c_idx] = new_cs
+                                                        idx_f.dirty = True
                         except Exception:
                             pass
             except Exception:
@@ -2422,7 +2430,7 @@ class PicasaMainWindow(QMainWindow):
                 doc.set_tilt(fname, None)
                 doc.set_text(fname, None)
                 sec = doc.get_or_create_section(fname)
-                for k in ("filters", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch"):
+                for k in ("filters", "redo", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch", "fix", "bw"):
                     sec.remove(k)
                 sec.set("backuphash", str(b_hash))
 
@@ -4911,17 +4919,18 @@ class PicasaMainWindow(QMainWindow):
                     if self.db is not None and hasattr(self.db, "rename_photo"):
                         self.db.rename_photo(old_p, new_p)
                     else:
-                        # Migrer [old_fname] -> [new_fname] dans .picasa.ini et .picasaoriginals/
+                        # Migrer [old_fname] -> [new_fname] dans .picasa.ini et .picasaoriginals/ ou Originals/ (Ref: 0x00462BA0)
                         parent_dir = os.path.dirname(old_p)
                         old_fn = os.path.basename(old_p)
                         new_fn = os.path.basename(new_p)
-                        orig_old = os.path.join(parent_dir, ".picasaoriginals", old_fn)
-                        orig_new = os.path.join(parent_dir, ".picasaoriginals", new_fn)
-                        if os.path.exists(orig_old) and not os.path.exists(orig_new):
-                            try:
-                                os.rename(orig_old, orig_new)
-                            except Exception:
-                                pass
+                        for b_dir in (".picasaoriginals", "Originals"):
+                            orig_old = os.path.join(parent_dir, b_dir, old_fn)
+                            orig_new = os.path.join(parent_dir, b_dir, new_fn)
+                            if os.path.exists(orig_old) and not os.path.exists(orig_new):
+                                try:
+                                    os.rename(orig_old, orig_new)
+                                except Exception:
+                                    pass
                         ini_p = os.path.join(parent_dir, ".picasa.ini")
                         if os.path.exists(ini_p):
                             try:

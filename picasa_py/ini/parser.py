@@ -398,6 +398,8 @@ class PicasaIniDocument:
                 hex_str = clean
 
         sec.set("crop", f"rect64({hex_str})")
+        # Ref: picasa3.exe @ 0x0045FF60 (CFilterStack::AppendFilter vide la pile redo=)
+        sec.remove("redo")
         filters_val = sec.get("filters")
         # Protection contre le bug de picasa3.exe @ 0x00459DE3 -> LAB_00459e21 :
         # si backuphash= est présent sans filters=, picasa3.exe écrase imagedata_crop64 = 0.
@@ -451,6 +453,8 @@ class PicasaIniDocument:
         if clean.lower().startswith("rect64(") and clean.endswith(")"):
             clean = clean[7:-1]
         sec.set("crop", f"rect64({clean})")
+        # Ref: picasa3.exe @ 0x0045FF60 (CFilterStack::AppendFilter vide la pile redo=)
+        sec.remove("redo")
         filters_val = sec.get("filters")
         if filters_val is not None or sec.get("backuphash") is not None:
             f_str = filters_val or ""
@@ -508,6 +512,8 @@ class PicasaIniDocument:
         if has_tilt and angle_deg is not None:
             tilt_part = f"tilt=1,{angle_deg:.6f},0.000000;"
             val = (val + ";" + tilt_part if val else tilt_part).strip(";") + ";"
+            # Ref: picasa3.exe @ 0x0045FF60 (CFilterStack::AppendFilter vide la pile redo=)
+            sec.remove("redo")
         if val:
             sec.set("filters", val)
         else:
@@ -544,8 +550,9 @@ class PicasaIniDocument:
 
     def append_filter(self, filename: str, filter_expr: str) -> None:
         """
-        FR: Ajoute ou remplace un filtre dans la clé filters= d'une photo.
-        EN: Appends or replaces a filter in a photo's filters= key.
+        FR: Ajoute ou remplace un filtre dans la clé filters= d'une photo et vide la pile redo=.
+        EN: Appends or replaces a filter in a photo's filters= key and clears the redo= stack.
+        Ref: picasa3.exe @ 0x0045FF60 (CFilterStack::AppendFilter)
         """
         clean_expr = filter_expr.strip().rstrip(";")
         if not clean_expr:
@@ -561,6 +568,103 @@ class PicasaIniDocument:
             ]
         current.append(clean_expr)
         self.set_filters(filename, current)
+        sec = self.get_section(filename)
+        if sec is not None:
+            sec.remove("redo")
+
+    # Ref: picasa3.exe @ 0x00C814B4 ("redo"), 0x00460DF7, 0x006AD860, 0x006AE280
+    def get_redo(self, filename: str) -> List[str]:
+        """
+        FR: Renvoie la liste ordonnée des expressions de filtres dans la pile `redo=` d'une photo.
+        EN: Returns the ordered list of filter expressions in a photo's `redo=` stack.
+        Ref: picasa3.exe @ 0x00C814B4 ("redo"), 0x00460DF7
+        """
+        sec = self.get_section(filename)
+        if not sec:
+            return []
+        val = sec.get("redo", "")
+        if not val:
+            return []
+        return [part.strip() for part in val.split(";") if part.strip()]
+
+    def set_redo(self, filename: str, redo_filters: List[str]) -> None:
+        """
+        FR: Définit ou supprime la clé `redo=` d'une photo (`<tok1>;<tok2>;`).
+        EN: Sets or removes the `redo=` key of a photo (`<tok1>;<tok2>;`).
+        Ref: picasa3.exe @ 0x00460DF7, 0x006AD860, 0x006AE280
+        """
+        clean = [f.strip().rstrip(";") for f in redo_filters if f.strip().rstrip(";")]
+        if not clean:
+            sec = self.get_section(filename)
+            if sec is not None:
+                sec.remove("redo")
+            return
+        sec = self.get_or_create_section(filename)
+        sec.set("redo", ";".join(clean) + ";")
+
+    def undo_last_filter(self, filename: str) -> Optional[str]:
+        """
+        FR: Dépile le dernier filtre de `filters=` et l'empile dans `redo=` (sauf `redeye`, `retouch`, `picnik`,
+        conformément à `FUN_00846900` @ `0x00846900` appelé par `0x006AD860`). Synchronise également `crop=`
+        si le filtre annulé est `crop64=`.
+        EN: Pops the last filter from `filters=` and pushes it onto `redo=` (except `redeye`, `retouch`, `picnik`,
+        per `FUN_00846900` @ `0x00846900` called by `0x006AD860`). Also synchronizes `crop=` if `crop64=` is undone.
+        Ref: picasa3.exe @ 0x006AD860, 0x00846900
+        """
+        current = self.get_filters(filename)
+        if not current:
+            return None
+        undone = current.pop()
+        self.set_filters(filename, current)
+        prefix = undone.split("=")[0].split("(")[0].strip().lower()
+        if prefix == "crop64":
+            sec = self.get_section(filename)
+            if sec is not None:
+                rem_crop = None
+                for f_tok in reversed(current):
+                    m = re.match(r"crop64=1,([0-9a-fA-F]+)", f_tok.strip(), re.IGNORECASE)
+                    if m:
+                        rem_crop = m.group(1)
+                        break
+                if rem_crop:
+                    sec.set("crop", f"rect64({rem_crop})")
+                else:
+                    sec.remove("crop")
+        if prefix not in ("redeye", "retouch", "picnik"):
+            redo_list = self.get_redo(filename)
+            redo_list.append(undone)
+            self.set_redo(filename, redo_list)
+        return undone
+
+    def redo_next_filter(self, filename: str) -> Optional[str]:
+        """
+        FR: Dépile le dernier filtre de `redo=` et le ré-applique à la fin de `filters=` (synchronisant `crop=`
+        si le filtre rétabli est `crop64=`).
+        EN: Pops the last filter from `redo=` and re-applies it to the end of `filters=` (synchronizing `crop=`
+        if the redone filter is `crop64=`).
+        Ref: picasa3.exe @ 0x006AE280
+        """
+        redo_list = self.get_redo(filename)
+        if not redo_list:
+            return None
+        redone = redo_list.pop()
+        self.set_redo(filename, redo_list)
+        current = self.get_filters(filename)
+        prefix = redone.split("=")[0].split("(")[0].strip().lower()
+        singleton_prefixes = {"finetune2", "finetune", "autolight", "colorfix", "tilt", "crop64"}
+        if prefix in singleton_prefixes:
+            current = [
+                f for f in current
+                if f.split("=")[0].split("(")[0].strip().lower() != prefix
+            ]
+        current.append(redone)
+        self.set_filters(filename, current)
+        if prefix == "crop64":
+            m = re.match(r"crop64=1,([0-9a-fA-F]+)", redone.strip(), re.IGNORECASE)
+            if m:
+                sec = self.get_or_create_section(filename)
+                sec.set("crop", f"rect64({m.group(1)})")
+        return redone
 
     # Ref: picasa3.exe @ 0x00658900 (ytImageMetadata::Text, editpanel/edittextpanel)
     def get_raw_text(self, filename: str) -> Optional[str]:

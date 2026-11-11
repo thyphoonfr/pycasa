@@ -827,16 +827,17 @@ class PicasaThumbnailView(QWidget):
             if norm_k in self._folder_backups_cache:
                 backup_set.update(self._folder_backups_cache[norm_k])
             else:
-                orig_dir = os.path.join(fp, ".picasaoriginals")
-                if os.path.isdir(orig_dir):
-                    try:
-                        orig_files = {fn.lower() for fn in os.listdir(orig_dir)}
-                        backup_set.update(orig_files)
-                        self._folder_backups_cache[norm_k] = orig_files
-                    except Exception:
-                        self._folder_backups_cache[norm_k] = set()
-                else:
-                    self._folder_backups_cache[norm_k] = set()
+                # Ref: picasa3.exe @ 0x00462BA0 (.picasaoriginals et dossier legacy Originals)
+                orig_files: Set[str] = set()
+                for b_dir in (".picasaoriginals", "Originals"):
+                    orig_dir = os.path.join(fp, b_dir)
+                    if os.path.isdir(orig_dir):
+                        try:
+                            orig_files.update(fn.lower() for fn in os.listdir(orig_dir))
+                        except Exception:
+                            pass
+                backup_set.update(orig_files)
+                self._folder_backups_cache[norm_k] = orig_files
             folder_ini_meta_cache[norm_k] = (starred_set, edited_set, backup_set)
         return folder_ini_meta_cache[norm_k]
 
@@ -5067,7 +5068,7 @@ class PicasaThumbnailView(QWidget):
                 it.face_pixmap = None
                 if it.path:
                     p = Path(it.path)
-                    it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists()
+                    it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists() or (p.parent / "Originals" / p.name).exists()
                     it.has_edits = True
         else:
             norm_target = os.path.normcase(os.path.normpath(item_idx_or_path))
@@ -5081,7 +5082,7 @@ class PicasaThumbnailView(QWidget):
                     it.pixmap = None
                     it.face_pixmap = None
                     p = Path(it.path)
-                    it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists()
+                    it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists() or (p.parent / "Originals" / p.name).exists()
                     it.has_edits = True
         self.update()
 
@@ -5181,11 +5182,13 @@ class PicasaThumbnailView(QWidget):
 
         pix: Optional[QPixmap] = None
 
-        # 1. Si la photo a été enregistrée sur le disque, .picasaoriginals/ existe et le fichier sur le disque a priorité
+        # 1. Si la photo a été enregistrée sur le disque, .picasaoriginals/ ou Originals/ existe et le fichier sur le disque a priorité (Ref: 0x00462BA0)
         has_backup = item.has_backup
         if not has_backup and not self._in_paint_event and item.path:
             p = Path(item.path)
             orig_backup = p.parent / ".picasaoriginals" / p.name
+            if not orig_backup.exists():
+                orig_backup = p.parent / "Originals" / p.name
             if orig_backup.exists():
                 has_backup = True
                 item.has_backup = True

@@ -1530,10 +1530,14 @@ class PicasaDatabase:
             _set_pmp("imagedata_caption", "")
             _set_pmp("imagedata_deferredface", "")
             _set_pmp("imagedata_backuphash", 0)
+            # Ref: picasa3.exe @ 0x00462BA0 (.picasaoriginals et dossier legacy Originals)
             has_orig_backup = bool(
                 photo_path_str
                 and fname
-                and os.path.exists(os.path.join(os.path.dirname(photo_path_str), ".picasaoriginals", fname))
+                and any(
+                    os.path.exists(os.path.join(os.path.dirname(photo_path_str), b_dir, fname))
+                    for b_dir in (".picasaoriginals", "Originals")
+                )
             )
             if has_orig_backup:
                 _set_pmp("imagedata_revertable", 1)
@@ -2389,11 +2393,30 @@ class PicasaDatabase:
                     if di != rec_idx and (not old_norm or not pp or os.path.normcase(os.path.normpath(pp)) != old_norm)
                 ]
 
-        if delete_from_disk and full_path and os.path.exists(full_path):
+        if delete_from_disk and full_path:
+            parent_dir = os.path.dirname(full_path)
+            fname_del = os.path.basename(full_path)
             try:
-                os.remove(full_path)
+                from picasa_py.ini.parser import PicasaIniWriter
+                PicasaIniWriter.mark_internal_write(parent_dir)
             except Exception:
                 pass
+            if os.path.exists(full_path):
+                try:
+                    os.remove(full_path)
+                except Exception:
+                    pass
+            # Supprimer également la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> (Ref: 0x00462BA0)
+            for b_dir in (".picasaoriginals", "Originals"):
+                b_file = os.path.join(parent_dir, b_dir, fname_del)
+                if os.path.exists(b_file):
+                    try:
+                        os.remove(b_file)
+                        b_parent = os.path.dirname(b_file)
+                        if os.path.isdir(b_parent) and not os.listdir(b_parent):
+                            os.rmdir(b_parent)
+                    except Exception:
+                        pass
         if full_path:
             ini_p = os.path.join(os.path.dirname(full_path), ".picasa.ini")
             if os.path.exists(ini_p):
@@ -2552,21 +2575,33 @@ class PicasaDatabase:
         fname = os.path.basename(src_full_path)
         dest_full_path = os.path.join(dest_dir_str, fname)
 
+        try:
+            from picasa_py.ini.parser import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(src_dir)
+            PicasaIniWriter.mark_internal_write(dest_dir_str)
+        except Exception:
+            pass
+
         if os.path.exists(src_full_path) and os.path.abspath(src_full_path) != os.path.abspath(dest_full_path):
             try:
                 shutil.move(src_full_path, dest_full_path)
             except Exception:
                 pass
 
-        # Transférer la sauvegarde .picasaoriginals/<fname> si présente (Ref: picasa3.exe @ 0x0068AC80)
-        src_orig_backup = os.path.join(src_dir, ".picasaoriginals", fname)
-        if os.path.exists(src_orig_backup):
-            try:
-                dest_orig_dir = os.path.join(dest_dir_str, ".picasaoriginals")
-                os.makedirs(dest_orig_dir, exist_ok=True)
-                shutil.move(src_orig_backup, os.path.join(dest_orig_dir, fname))
-            except Exception:
-                pass
+        # Transférer la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> si présente (Ref: picasa3.exe @ 0x00462BA0, 0x0068AC80)
+        for b_dir in (".picasaoriginals", "Originals"):
+            src_orig_backup = os.path.join(src_dir, b_dir, fname)
+            if os.path.exists(src_orig_backup):
+                try:
+                    dest_orig_dir = os.path.join(dest_dir_str, b_dir)
+                    os.makedirs(dest_orig_dir, exist_ok=True)
+                    shutil.move(src_orig_backup, os.path.join(dest_orig_dir, fname))
+                    src_b_parent = os.path.dirname(src_orig_backup)
+                    if os.path.isdir(src_b_parent) and not os.listdir(src_b_parent):
+                        os.rmdir(src_b_parent)
+                except Exception:
+                    pass
+                break
 
         # Transférer la section [fname] du .picasa.ini source vers le .picasa.ini destination
         src_ini = os.path.join(src_dir, ".picasa.ini")
@@ -2604,11 +2639,11 @@ class PicasaDatabase:
             self.thumbindex.records[rec_idx].path = fname
             self.thumbindex.dirty = True
             self._modified_media_indices.add(rec_idx)
-            # Mettre à jour le checksum CBlockFile (0x006B99F0) pour le nouveau dossier parent
+            # Mettre à jour le checksum CBlockFile (0x006B99F0) pour le nouveau dossier parent dans les 4 index
             rec_obj = self.thumbindex.records[rec_idx]
             folder_p = self.thumbindex.records[new_parent_idx].path if 0 <= new_parent_idx < len(self.thumbindex.records) else ""
             new_cs = compute_thumb_checksum(folder_p, rec_obj.path, rec_obj.ft2, rec_obj.size)
-            for pref in ("thumbs", "thumbs2"):
+            for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
                 idx_f = self.block_indices.get(pref)
                 if idx_f is not None:
                     if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
@@ -2618,6 +2653,15 @@ class PicasaDatabase:
                         if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
                             idx_f.checksums[c_idx] = new_cs
                             idx_f.dirty = True
+            if self.wordhash is not None:
+                from picasa_py.scanner.scanner import tokenize_indexer_text
+                keep_tokens = set(tokenize_indexer_text(fname))
+                if hasattr(self.wordhash, "remove_word"):
+                    for old_tok in tokenize_indexer_text(src_dir):
+                        if old_tok not in keep_tokens:
+                            self.wordhash.remove_word(old_tok, rec_idx)
+                for new_tok in tokenize_indexer_text(dest_dir_str):
+                    self.wordhash.add_word(new_tok, rec_idx)
 
         self._remap_photo_path_in_faces_and_pals(src_full_path, dest_full_path)
         self._invalidate_path_index_cache()
@@ -2659,20 +2703,27 @@ class PicasaDatabase:
             return False
         new_full_path = os.path.join(parent_dir, new_fname)
 
+        try:
+            from picasa_py.ini.parser import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(parent_dir)
+        except Exception:
+            pass
+
         if os.path.exists(src_full_path) and not os.path.exists(new_full_path):
             try:
                 os.rename(src_full_path, new_full_path)
             except Exception:
                 return False
 
-        # Migrer .picasaoriginals/<old_fname> -> .picasaoriginals/<new_fname>
-        orig_old = os.path.join(parent_dir, ".picasaoriginals", old_fname)
-        orig_new = os.path.join(parent_dir, ".picasaoriginals", new_fname)
-        if os.path.exists(orig_old) and not os.path.exists(orig_new):
-            try:
-                os.rename(orig_old, orig_new)
-            except Exception:
-                pass
+        # Migrer .picasaoriginals/<old_fname> ou Originals/<old_fname> (Ref: 0x00462BA0)
+        for b_dir in (".picasaoriginals", "Originals"):
+            orig_old = os.path.join(parent_dir, b_dir, old_fname)
+            orig_new = os.path.join(parent_dir, b_dir, new_fname)
+            if os.path.exists(orig_old) and not os.path.exists(orig_new):
+                try:
+                    os.rename(orig_old, orig_new)
+                except Exception:
+                    pass
 
         # Migrer [old_fname] -> [new_fname] dans .picasa.ini
         for ini_name in (".picasa.ini", "Picasa.ini"):
@@ -2704,7 +2755,7 @@ class PicasaDatabase:
             p_idx = rec_obj.parent_idx
             folder_p = self.thumbindex.records[p_idx].path if 0 <= p_idx < len(self.thumbindex.records) else ""
             new_cs = compute_thumb_checksum(folder_p, rec_obj.path, rec_obj.ft2, rec_obj.size)
-            for pref in ("thumbs", "thumbs2"):
+            for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
                 idx_f = self.block_indices.get(pref)
                 if idx_f is not None:
                     if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
@@ -3727,12 +3778,13 @@ class PicasaDatabase:
                         self.thumbindex.dirty = True
 
             if moved_folder_indices:
+                from picasa_py.scanner.scanner import tokenize_indexer_text
                 for idx, rec in enumerate(self.thumbindex.records):
                     if rec.type in MEDIA_RECORD_TYPES and rec.is_active and rec.parent_idx in moved_folder_indices:
                         old_dir_h, new_dir_h = moved_folder_indices[rec.parent_idx]
                         folder_p = self.thumbindex.records[rec.parent_idx].path
                         new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
-                        for pref in ("thumbs", "thumbs2"):
+                        for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
                             idx_f = self.block_indices.get(pref)
                             if idx_f is not None:
                                 if 0 <= idx < len(idx_f.checksums) and idx_f.checksums[idx] != 0:
@@ -3742,6 +3794,14 @@ class PicasaDatabase:
                                     if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
                                         idx_f.checksums[c_idx] = new_cs
                                         idx_f.dirty = True
+                        if self.wordhash is not None:
+                            keep_tokens = set(tokenize_indexer_text(rec.path))
+                            if hasattr(self.wordhash, "remove_word"):
+                                for old_tok in tokenize_indexer_text(old_dir_h):
+                                    if old_tok not in keep_tokens:
+                                        self.wordhash.remove_word(old_tok, idx)
+                            for new_tok in tokenize_indexer_text(new_dir_h):
+                                self.wordhash.add_word(new_tok, idx)
                         self._remap_photo_path_in_faces_and_pals(
                             os.path.join(old_dir_h, rec.path),
                             os.path.join(new_dir_h, rec.path),

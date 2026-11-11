@@ -1580,6 +1580,136 @@ def test_pass11_file_stat_checksums_and_contacts_backup_sync(tmp_path: Path) -> 
     assert "Clara Renommée" not in backup_xmls[0].read_text(encoding="utf-8")
 
 
+def test_pass12_redo_stack_revert_move_and_originals_parity(tmp_path: Path):
+    """
+    FR: Vérifie les corrections de la passe 12 :
+    1. Pile `redo=` dans `PicasaIniDocument` (`get_redo`, `set_redo`, `undo_last_filter` @ `0x006AD860`,
+       `redo_next_filter` @ `0x006AE280`, exclusion `redeye`/`retouch`/`picnik` @ `0x00846900`, et
+       vidage automatique de `redo=` lors d'un nouveau filtre / recadrage / redressement @ `0x0045FF60`),
+       et synchronisation avec `imagedata_redo.pmp`.
+    2. Fallback legacy `Originals/` aux côtés de `.picasaoriginals/` (`0x00462BA0`) pour `imagedata_revertable`,
+       `move_photo`, `rename_photo` et `delete_photo(delete_from_disk=True)` (suppression du backup orphelin).
+    3. `move_photo` et `move_folder` : mise à jour des checksums `CBlockFile` sur les 4 index (`thumbs`,
+       `thumbs2`, `bigthumbs`, `previews`) et mise à jour des jetons de dossier dans `wordhash.db`.
+    """
+    from PIL import Image
+    from picasa_py.ini.parser import PicasaIniDocument
+    from picasa_py.scanner.scanner import PicasaDirScanner
+    from picasa_py.db.blockfile import compute_thumb_checksum
+
+    # 1. Test unitaire de la pile filters= <-> redo= dans PicasaIniDocument
+    doc = PicasaIniDocument()
+    doc.append_filter("photo.jpg", "autolight=1")
+    doc.append_filter("photo.jpg", "sepia=1")
+    doc.append_filter("photo.jpg", "crop64=1,20002000e000e000")
+    doc.set_crop("photo.jpg", "20002000e000e000")
+    doc.append_filter("photo.jpg", "redeye=1,1234")
+    assert doc.get_filters("photo.jpg") == [
+        "autolight=1",
+        "sepia=1",
+        "crop64=1,20002000e000e000",
+        "redeye=1,1234",
+    ]
+    # Annuler redeye : retiré de filters=, mais PAS ajouté à redo= (0x00846900)
+    assert doc.undo_last_filter("photo.jpg") == "redeye=1,1234"
+    assert doc.get_redo("photo.jpg") == []
+    # Annuler crop64 : retiré de filters=, crop= supprimé, et ajouté à redo= (0x006AD860)
+    assert doc.undo_last_filter("photo.jpg") == "crop64=1,20002000e000e000"
+    assert doc.get_crop("photo.jpg") is None
+    assert doc.get_redo("photo.jpg") == ["crop64=1,20002000e000e000"]
+    # Annuler sepia=1 : empilé à la fin de redo=
+    assert doc.undo_last_filter("photo.jpg") == "sepia=1"
+    assert doc.get_redo("photo.jpg") == ["crop64=1,20002000e000e000", "sepia=1"]
+    # Rétablir : dépile sepia=1 puis crop64 (et restaure crop=rect64(...)) (0x006AE280)
+    assert doc.redo_next_filter("photo.jpg") == "sepia=1"
+    assert doc.get_filters("photo.jpg") == ["autolight=1", "sepia=1"]
+    assert doc.redo_next_filter("photo.jpg") == "crop64=1,20002000e000e000"
+    assert doc.get_crop("photo.jpg") == "20002000e000e000"
+    assert doc.get_redo("photo.jpg") == []
+    # Un nouveau filtre vide redo= (0x0045FF60)
+    doc.undo_last_filter("photo.jpg")
+    assert len(doc.get_redo("photo.jpg")) == 1
+    doc.append_filter("photo.jpg", "bw=1")
+    assert doc.get_redo("photo.jpg") == []
+
+    # 2 & 3. Test base de données : imagedata_redo, legacy Originals/, move_photo, move_folder et delete_photo
+    db_dir = tmp_path / "db3_pass12"
+    contacts_dir = tmp_path / "contacts_pass12"
+    folder_a = tmp_path / "DossierAlphaUnique"
+    folder_b = tmp_path / "DossierBetaUnique"
+    folder_c = tmp_path / "DossierGammaUnique"
+    folder_a.mkdir(parents=True, exist_ok=True)
+    folder_b.mkdir(parents=True, exist_ok=True)
+
+    img_p = folder_a / "vacances.jpg"
+    Image.new("RGB", (320, 240), (60, 120, 200)).save(img_p, "JPEG")
+    # Créer une sauvegarde dans le dossier legacy Originals/ (0x00462BA0)
+    legacy_orig_dir = folder_a / "Originals"
+    legacy_orig_dir.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (320, 240), (50, 100, 180)).save(legacy_orig_dir / "vacances.jpg", "JPEG")
+
+    db = PicasaDatabase.create_new(db_dir, contacts_dir)
+    db.set_watched_folder(str(folder_a), "1")
+    db.set_watched_folder(str(folder_b), "1")
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(folder_a)
+
+    idx = db.find_photo_index(str(img_p))
+    assert idx is not None and idx >= 0
+    # Sans section INI mais avec Originals/vacances.jpg, imagedata_revertable doit valoir 1
+    db.sync_photo_ini_to_db(str(img_p))
+    assert db.pmps["imagedata_revertable"].records[idx] == 1
+
+    # Appliquer deux filtres puis annuler le dernier via update_photo_ini -> imagedata_redo synchronisé
+    db.update_photo_ini(str(img_p), lambda d, fn: (d.append_filter(fn, "autolight=1"), d.append_filter(fn, "sepia=1")))
+    assert db.pmps["imagedata_filters"].records[idx] == "autolight=1;sepia=1;"
+    assert db.pmps["imagedata_redo"].records[idx] == ""
+    db.update_photo_ini(str(img_p), lambda d, fn: d.undo_last_filter(fn))
+    assert db.pmps["imagedata_filters"].records[idx] == "autolight=1;"
+    assert db.pmps["imagedata_redo"].records[idx] == "sepia=1;"
+
+    # Simuler des checksums non nuls dans bigthumbs et previews en plus de thumbs/thumbs2
+    for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
+        if pref in db.block_indices and idx < len(db.block_indices[pref].checksums):
+            db.block_indices[pref].checksums[idx] = 0x12345678
+
+    # Déplacer la photo de folder_a vers folder_b : Originals/vacances.jpg est déplacé,
+    # les 4 checksums CBlockFile et wordhash sont mis à jour
+    assert idx in db.search("dossieralphaunique")
+    assert db.move_photo(idx, folder_b) is True
+    moved_p = folder_b / "vacances.jpg"
+    assert moved_p.exists()
+    assert (folder_b / "Originals" / "vacances.jpg").exists()
+    assert not (folder_a / "Originals" / "vacances.jpg").exists()
+    assert idx not in db.search("dossieralphaunique")
+    assert idx in db.search("dossierbetaunique")
+
+    rec = db.thumbindex.records[idx]
+    folder_b_win = db.thumbindex.records[rec.parent_idx].path
+    expected_cs_b = compute_thumb_checksum(folder_b_win, rec.path, rec.ft2, rec.size)
+    for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
+        if pref in db.block_indices and idx < len(db.block_indices[pref].checksums):
+            assert db.block_indices[pref].checksums[idx] == expected_cs_b
+
+    # Déplacer le dossier folder_b -> folder_c : wordhash et les 4 checksums sont mis à jour
+    folder_b.rename(folder_c)
+    assert db.move_folder(str(folder_b), str(folder_c)) is True
+    assert idx not in db.search("dossierbetaunique")
+    assert idx in db.search("dossiergammaunique")
+    rec = db.thumbindex.records[idx]
+    folder_c_win = db.thumbindex.records[rec.parent_idx].path
+    expected_cs_c = compute_thumb_checksum(folder_c_win, rec.path, rec.ft2, rec.size)
+    for pref in ("thumbs", "thumbs2", "bigthumbs", "previews"):
+        if pref in db.block_indices and idx < len(db.block_indices[pref].checksums):
+            assert db.block_indices[pref].checksums[idx] == expected_cs_c
+
+    # Supprimer la photo du disque : supprime aussi la sauvegarde Originals/vacances.jpg
+    assert db.delete_photo(idx, delete_from_disk=True) is True
+    assert not (folder_c / "vacances.jpg").exists()
+    assert not (folder_c / "Originals" / "vacances.jpg").exists()
+
+
+
 
 
 

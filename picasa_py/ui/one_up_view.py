@@ -1313,9 +1313,33 @@ class PicasaOneUpView(QWidget):
         if not target or not os.path.exists(target):
             return
         parent_dir = Path(target).parent
+        fname = os.path.basename(target)
         ini_path = parent_dir / ".picasa.ini"
         try:
-            if snapshot is None:
+            from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
+            doc: Optional[PicasaIniDocument] = None
+            if snapshot is not None:
+                doc = PicasaIniParser.parse_bytes(snapshot.encode("utf-8"))
+            # Calculer les filtres annulés entre le sommet de l'historique et _history_idx (Ref: picasa3.exe @ 0x006AD860, 0x00846900)
+            undone_for_redo: List[str] = []
+            if 0 <= self._history_idx < len(self._history_ini_snapshots) - 1:
+                tip_snap = self._history_ini_snapshots[-1]
+                if tip_snap:
+                    try:
+                        tip_doc = PicasaIniParser.parse_bytes(tip_snap.encode("utf-8"))
+                        tip_filters = tip_doc.get_filters(fname)
+                        curr_filters = doc.get_filters(fname) if doc is not None else []
+                        curr_set = set(curr_filters)
+                        diff_filters = [f for f in tip_filters if f not in curr_set]
+                        for f_tok in reversed(diff_filters):
+                            pref = f_tok.split("=")[0].split("(")[0].strip().lower()
+                            if pref not in ("redeye", "retouch", "picnik"):
+                                undone_for_redo.append(f_tok)
+                    except Exception:
+                        pass
+            if doc is None and undone_for_redo:
+                doc = PicasaIniDocument()
+            if doc is None:
                 if ini_path.exists():
                     if os.name == "nt":
                         try:
@@ -1325,8 +1349,12 @@ class PicasaOneUpView(QWidget):
                             pass
                     ini_path.unlink()
             else:
-                from picasa_py.ini.parser import PicasaIniParser
-                doc = PicasaIniParser.parse_bytes(snapshot.encode("utf-8"))
+                if undone_for_redo:
+                    base_redo = doc.get_redo(fname)
+                    for r_tok in undone_for_redo:
+                        if r_tok not in base_redo:
+                            base_redo.append(r_tok)
+                    doc.set_redo(fname, base_redo)
                 doc.write_file(str(ini_path))
             if self.db is not None:
                 if hasattr(self.db, "_ini_cache") and isinstance(self.db._ini_cache, dict):
@@ -2545,8 +2573,10 @@ class PicasaOneUpView(QWidget):
 
     def _on_undo(self) -> None:
         """
-        FR: Annule la dernière opération dans l'historique d'édition et restaure l'état précédent.
-        EN: Undoes the last operation in the edit history and restores the previous state.
+        FR: Annule la dernière opération dans l'historique d'édition (ou dépile le dernier filtre de `.picasa.ini`
+        vers `redo=` si l'historique de session est à l'indice 0, Ref: `0x006AD860`) et restaure l'état précédent.
+        EN: Undoes the last operation in the edit history (or pops the last filter from `.picasa.ini`
+        onto `redo=` if session history is at index 0, Ref: `0x006AD860`) and restores the previous state.
         """
         if self._history_idx > 0:
             self._history_idx -= 1
@@ -2557,11 +2587,45 @@ class PicasaOneUpView(QWidget):
             self._display_current_history()
             if 0 <= self._history_idx < len(self._history_ini_snapshots):
                 self._restore_ini_snapshot(self._history_ini_snapshots[self._history_idx])
+            return
+
+        target = self.current_photo_path
+        if not target or not os.path.exists(target):
+            return
+        undone_box: List[Optional[str]] = [None]
+        self._update_ini(target, lambda doc, fname: undone_box.__setitem__(0, doc.undo_last_filter(fname)))
+        if undone_box[0] is not None:
+            if self.db is not None and hasattr(self.db, "_ini_cache") and isinstance(self.db._ini_cache, dict):
+                self.db._ini_cache.clear()
+            pil_img = self._load_pil_image_at_index(self.current_index, direct_path=target)
+            if pil_img is not None:
+                self._tuning_base_img = pil_img.copy()
+                self._tuning_history_slot = -1
+                self._effect_preview_base_img = None
+                self.edit_panel.reset_tuning_controls_silently()
+                if self._history:
+                    self._history[0] = pil_img.copy()
+                    self._history_idx = 0
+                else:
+                    self._history = [pil_img.copy()]
+                    self._history_idx = 0
+                snap = self._read_current_ini_snapshot(target)
+                if self._history_ini_snapshots:
+                    self._history_ini_snapshots[0] = snap
+                else:
+                    self._history_ini_snapshots = [snap]
+                self._display_current_history()
+                self._sync_active_transform_from_ini(target)
+                self.right_drawer.set_current_photo(self.db, self.current_index, target, source_img=pil_img)
+                self._sync_current_thumbnails_to_db(pil_img)
+                self.photo_edited.emit(target)
 
     def _on_redo(self) -> None:
         """
-        FR: Rétablit l'opération suivante dans l'historique d'édition.
-        EN: Redoes the next operation in the edit history.
+        FR: Rétablit l'opération suivante dans l'historique d'édition (ou dépile le prochain filtre de `redo=`
+        dans `.picasa.ini` vers `filters=`, Ref: `0x006AE280`).
+        EN: Redoes the next operation in the edit history (or pops the next filter from `redo=`
+        in `.picasa.ini` into `filters=`, Ref: `0x006AE280`).
         """
         if self._history_idx < len(self._history) - 1:
             self._history_idx += 1
@@ -2572,6 +2636,35 @@ class PicasaOneUpView(QWidget):
             self._display_current_history()
             if 0 <= self._history_idx < len(self._history_ini_snapshots):
                 self._restore_ini_snapshot(self._history_ini_snapshots[self._history_idx])
+            return
+
+        target = self.current_photo_path
+        if not target or not os.path.exists(target):
+            return
+        prev_idx = self._history_idx
+        prev_snap = (
+            self._history_ini_snapshots[prev_idx]
+            if 0 <= prev_idx < len(self._history_ini_snapshots)
+            else self._read_current_ini_snapshot(target)
+        )
+        redone_box: List[Optional[str]] = [None]
+        self._update_ini(target, lambda doc, fname: redone_box.__setitem__(0, doc.redo_next_filter(fname)))
+        if redone_box[0] is not None:
+            if 0 <= prev_idx < len(self._history_ini_snapshots):
+                self._history_ini_snapshots[prev_idx] = prev_snap
+            if self.db is not None and hasattr(self.db, "_ini_cache") and isinstance(self.db._ini_cache, dict):
+                self.db._ini_cache.clear()
+            pil_img = self._load_pil_image_at_index(self.current_index, direct_path=target)
+            if pil_img is not None:
+                self._tuning_base_img = pil_img.copy()
+                self._tuning_history_slot = -1
+                self._effect_preview_base_img = None
+                self.edit_panel.reset_tuning_controls_silently()
+                self._push_history(pil_img)
+                self._sync_active_transform_from_ini(target)
+                self.right_drawer.set_current_photo(self.db, self.current_index, target, source_img=pil_img)
+                self._sync_current_thumbnails_to_db(pil_img)
+                self.photo_edited.emit(target)
 
     # FR: --- Gestion du recadrage interactif (Ref: editpanel/crop*, CSmartCrop) ---
     # EN: --- Interactive crop management (Ref: editpanel/crop*, CSmartCrop) ---
@@ -3194,7 +3287,7 @@ class PicasaOneUpView(QWidget):
                 doc.set_tilt(fname, None)
                 doc.set_text(fname, None)
                 sec = doc.get_or_create_section(fname)
-                for k in ("filters", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch"):
+                for k in ("filters", "redo", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch", "fix", "bw"):
                     sec.remove(k)
                 sec.set("backuphash", str(b_hash))
 
