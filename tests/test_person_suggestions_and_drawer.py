@@ -442,3 +442,210 @@ def test_suggestion_selected_header_confirm_and_remove(temp_face_test_env, qapp)
     # Vérifier que la suggestion a été rejetée
     assert len(db.face_manager.get_suggestions("cid_emma")) == 0
 
+
+def test_two_line_header_and_suggestion_grouped_style_controls(temp_face_test_env, qapp):
+    """
+    FR: Vérifie :
+    1. L'en-tête d'album sur 2 lignes (hauteur 64 px, texte sur la ligne 1 y <= 30, boutons sur la ligne 2 y >= 34)
+       garantissant qu'aucun bouton ne masque le titre ou le sous-titre.
+    2. La visibilité permanente du bouton '💡 Suggestions' dans les albums des personnes connues (même à 0 suggestion).
+    3. Les contrôles façon 'visages groupés' sur les suggestions :
+       - Saisie directe du nom sous la photo (avec QCompleter) permettant de confirmer ou d'attribuer à une autre personne.
+       - Bouton '✕' en haut à droite sur la vignette pour ignorer individuellement.
+       - Saisie directe '✎ Nommer... ▾' et '✖ Tout ignorer' dans l'en-tête des suggestions.
+    """
+    from PySide6.QtCore import QPointF
+    from PySide6.QtGui import QPixmap
+
+    db = temp_face_test_env["db"]
+    photo1 = temp_face_test_env["photo1"]
+    photo2 = temp_face_test_env["photo2"]
+    photo3 = temp_face_test_env["photo3"]
+
+    db.face_manager.add_face(photo1, FaceRect(0.2, 0.2, 0.8, 0.8), "Frank", contact_id="cid_frank", db_idx=1)
+
+    view = PicasaThumbnailView()
+    view.resize(1000, 600)
+    view.set_database(db)
+
+    # 1. Même avec 0 suggestion, l'en-tête est sur 2 lignes et le bouton Suggestions est présent et cliquable
+    view.filter_by_person("cid_frank", "Frank", [1])
+    sec = view.visible_sections[0]
+    hdr_y = sec.y_start - view.scroll_y
+    hdr_rect = view._get_header_rect(hdr_y)
+    assert hdr_rect.height() == 64
+
+    # Tous les boutons d'action sont sur la 2e ligne (top == hdr_y + 35 >= hdr_y + 34), sous la ligne de texte (hdr_y + 4..30)
+    for btn_r in (
+        view._get_slideshow_btn_rect(hdr_y),
+        view._get_picture_zoom_btn_rect(hdr_y),
+        view._get_face_zoom_btn_rect(hdr_y),
+        view._get_sug_filter_btn_rect(hdr_y),
+        view._get_confirm_sug_btn_rect(hdr_y),
+        view._get_sug_rename_btn_rect(hdr_y),
+        view._get_remove_sel_btn_rect(hdr_y),
+    ):
+        assert btn_r.top() == hdr_y + 35
+        assert btn_r.bottom() <= hdr_rect.bottom()
+
+    # Clic sur le bouton Suggestions (même à 0 suggestion) bascule en mode suggestions
+    sug_btn = view._get_sug_filter_btn_rect(hdr_y)
+    click_sug = QMouseEvent(
+        QMouseEvent.Type.MouseButtonPress,
+        QPointF(sug_btn.center()),
+        QPointF(sug_btn.center()),
+        Qt.MouseButton.LeftButton,
+        Qt.MouseButton.LeftButton,
+        Qt.KeyboardModifier.NoModifier,
+    )
+    view.mousePressEvent(click_sug)
+    assert view.visible_sections[0].only_suggestions is True
+
+    # Rendu complet sans erreur
+    pix = QPixmap(1000, 600)
+    view.render(pix)
+    assert not pix.isNull()
+
+    # 2. Ajouter 2 suggestions pour Frank et tester le nommage individuel vers une autre personne + l'ignorance par '✕'
+    sug1 = FaceSuggestion(
+        contact_id="cid_frank",
+        contact_name="Frank",
+        photo_path=photo2,
+        face_rect=FaceRect(0.2, 0.2, 0.8, 0.8),
+        similarity=0.91,
+        db_idx=2,
+    )
+    sug2 = FaceSuggestion(
+        contact_id="cid_frank",
+        contact_name="Frank",
+        photo_path=photo3,
+        face_rect=FaceRect(0.2, 0.2, 0.8, 0.8),
+        similarity=0.87,
+        db_idx=3,
+    )
+    db.face_manager.suggestions["cid_frank"] = [sug1, sug2]
+    view.filter_by_person("cid_frank", "Frank", [1], only_suggestions=True)
+    sec_s = view.visible_sections[0]
+    assert len(sec_s.item_indices) == 2
+
+    # Clic sur la légende sous la 1re suggestion -> ouvre le champ QLineEdit inline avec QCompleter
+    r0 = view._get_item_rect(sec_s, 0)
+    cap_pos = QPointF(r0.center().x(), r0.bottom() + 8)
+    click_cap = QMouseEvent(
+        QMouseEvent.Type.MouseButtonPress,
+        cap_pos,
+        cap_pos,
+        Qt.MouseButton.LeftButton,
+        Qt.MouseButton.LeftButton,
+        Qt.KeyboardModifier.NoModifier,
+    )
+    view.mousePressEvent(click_cap)
+    assert view._inline_name_edit.isHidden() is False
+    assert view._inline_name_edit.text() == "Frank"
+
+    # Saisir un autre nom ("Grace") et valider -> attribue la photo2 à Grace et la retire des suggestions de Frank
+    view._inline_name_edit.setText("Grace")
+    view._commit_inline_face_name_edit()
+    assert len(db.face_manager.get_suggestions("cid_frank")) == 1
+    grace_people = [p for p in db.face_manager.get_people() if p.name == "Grace"]
+    assert len(grace_people) == 1
+    assert 2 in grace_people[0].photo_indices
+
+    # Clic sur le bouton '✕' en haut à droite de la suggestion restante -> ignore la suggestion
+    sec_rem = view.visible_sections[0]
+    assert len(sec_rem.item_indices) == 1
+    r_rem = view._get_item_rect(sec_rem, 0)
+    top_x_btn = view._get_unnamed_ignore_btn_rect(r_rem)
+    click_top_x = QMouseEvent(
+        QMouseEvent.Type.MouseButtonPress,
+        QPointF(top_x_btn.center()),
+        QPointF(top_x_btn.center()),
+        Qt.MouseButton.LeftButton,
+        Qt.MouseButton.LeftButton,
+        Qt.KeyboardModifier.NoModifier,
+    )
+    view.mousePressEvent(click_top_x)
+    assert len(db.face_manager.get_suggestions("cid_frank")) == 0
+
+
+def test_people_sorting_modes_and_scanning_progress_sticky_row(temp_face_test_env, qapp, monkeypatch):
+    """
+    FR: Vérifie la parité binaire avec picasa3.exe pour la section Personnes :
+    1. Tri par défaut par ordre alphabétique (`peoplesort == 0`, `AlbumList::ID_PEOPLEBYNAME` @ 0x004A198C, 0x004A7A18),
+       tri par nombre décroissant (`peoplesort == 1`, `AlbumList::ID_PEOPLEBYAMOUNT` @ 0x004A7CA4),
+       et tri selon les 10 premières personnes puis ordre alphabétique (`peoplesort == 2`, `AlbumList::ID_PEOPLEBYAMOUNTTOP10` @ 0x004B8D00).
+    2. Affichage de la première ligne épinglée `]unknownface` (`0x00764454..0x00764685`) :
+       - `"Analyse des visages..."` (`CAlbumList::Finding0`) lorsque la progression est `< 1.0%` (même si 0 visage sans nom) ;
+       - `"Analyse, x % terminés"` (`CAlbumList::Finding` + `CAlbumList::Findingprogress`) de `1%` à `99%` ;
+       - `"Sans nom (N)"` (`CThumbDB::unknownfacealbum`) lorsque l'analyse est terminée, permettant d'ouvrir `unnamed_faces`.
+    EN: Verifies binary parity with picasa3.exe for the People section (sorting modes 0/1/2 and sticky scan progress row).
+    Ref: picasa3.exe @ 0x004A198C, 0x004A37E8, 0x004A7A18 - 0x004A7D80, 0x004B8D00, 0x00764454 - 0x00764685
+    """
+    from picasa_py.db.preferences import PicasaPreferences
+    from picasa_py.ui.library_tree import PicasaLibraryTree
+    from picasa_py.ui.resources import PicasaResourceManager
+
+    monkeypatch.setattr(PicasaPreferences, "REGISTRY_APP", r"Picasa\Picasa2\Preferences_PeopleSortTest")
+    monkeypatch.setattr(PicasaResourceManager.get(), "_current_lang", "fr")
+    PicasaPreferences.set_people_sort_mode(0)
+
+    db = temp_face_test_env["db"]
+    photo1 = temp_face_test_env["photo1"]
+    photo2 = temp_face_test_env["photo2"]
+    photo3 = temp_face_test_env["photo3"]
+
+    # Zoe a 3 photos, Bernard a 2 photos, Alice a 1 photo
+    db.face_manager.add_face(photo1, FaceRect(0.1, 0.1, 0.3, 0.3), "Zoe", contact_id="cid_zoe", db_idx=1)
+    db.face_manager.add_face(photo2, FaceRect(0.1, 0.1, 0.3, 0.3), "Zoe", contact_id="cid_zoe", db_idx=2)
+    db.face_manager.add_face(photo3, FaceRect(0.1, 0.1, 0.3, 0.3), "Zoe", contact_id="cid_zoe", db_idx=3)
+
+    db.face_manager.add_face(photo1, FaceRect(0.4, 0.1, 0.6, 0.3), "Bernard", contact_id="cid_bernard", db_idx=1)
+    db.face_manager.add_face(photo2, FaceRect(0.4, 0.1, 0.6, 0.3), "Bernard", contact_id="cid_bernard", db_idx=2)
+
+    db.face_manager.add_face(photo1, FaceRect(0.7, 0.1, 0.9, 0.3), "Alice", contact_id="cid_alice", db_idx=1)
+
+    tree = PicasaLibraryTree()
+    tree.populate_from_database(db)
+
+    # 1. Mode par défaut (peoplesort == 0) : ordre alphabétique (Alice, Bernard, Zoe)
+    assert tree.people_sort_mode == 0
+    labels_mode0 = [tree.cat_people.child(i).text(0) for i in range(tree.cat_people.childCount())]
+    assert labels_mode0 == ["Alice (1)", "Bernard (2)", "Zoe (3)"]
+
+    # 2. Démarrage de l'analyse des visages (0 / 200 -> 0.0% < 1.0%) même avec 0 visage sans nom :
+    # la ligne épinglée apparaît en premier avec "Analyse des visages..."
+    tree.set_face_scan_progress(True, 0, 200)
+    assert tree.cat_people.childCount() == 4
+    sticky_item = tree.cat_people.child(0)
+    assert sticky_item.text(0) == "Analyse des visages..."
+    assert sticky_item.data(0, Qt.ItemDataRole.UserRole)["type"] == "unnamed_faces"
+
+    # 3. Progression à 42% (84 / 200) -> "Analyse, 42 % terminés"
+    tree.set_face_scan_progress(True, 84, 200)
+    assert tree.cat_people.child(0).text(0).replace("\xa0", " ") == "Analyse, 42 % terminés"
+
+    # Un clic sur la ligne "Analyse, 42 % terminés" émet folder_selected("unnamed", "unnamed_faces", ...)
+    emitted = []
+    tree.folder_selected.connect(lambda k, t, n: emitted.append((k, t, n)))
+    tree._on_item_clicked(tree.cat_people.child(0), 0)
+    assert emitted == [("unnamed", "unnamed_faces", "Sans nom")]
+
+    # 4. Ajout d'un visage non reconnu et fin de l'analyse -> "Sans nom (1)"
+    db.face_manager.unnamed_faces.append((3, photo3, FaceRect(0.5, 0.5, 0.8, 0.8)))
+    tree.set_face_scan_progress(False, 0, 0)
+    tree.refresh_people()
+    assert tree.cat_people.child(0).text(0) == "Sans nom (1)"
+
+    # 5. Tri par nombre (peoplesort == 1) -> Zoe (3), Bernard (2), Alice (1) après la ligne épinglée
+    tree.set_people_sort_mode(1)
+    assert PicasaPreferences.get_people_sort_mode() == 1
+    labels_mode1 = [tree.cat_people.child(i).text(0) for i in range(tree.cat_people.childCount())]
+    assert labels_mode1 == ["Sans nom (1)", "Zoe (3)", "Bernard (2)", "Alice (1)"]
+
+    # 6. Retour au tri alphabétique par nom (peoplesort == 0)
+    tree.set_people_sort_mode(0)
+    labels_back0 = [tree.cat_people.child(i).text(0) for i in range(tree.cat_people.childCount())]
+    assert labels_back0 == ["Sans nom (1)", "Alice (1)", "Bernard (2)", "Zoe (3)"]
+
+
+

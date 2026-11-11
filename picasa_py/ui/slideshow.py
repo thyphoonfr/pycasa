@@ -574,11 +574,16 @@ class PicasaSlideshowWindow(QWidget):
         # EN: Synchronize with the database and thumbnail view when available
         parent_win = self.parentWidget()
         db = getattr(parent_win, "db", None) if parent_win else None
-        if db is not None and hasattr(db, "find_media_index_by_path") and hasattr(db, "set_rotate"):
+        if db is not None:
             try:
-                db_idx = db.find_media_index_by_path(path_str)
-                if db_idx is not None and db_idx >= 0:
-                    db.set_rotate(db_idx, new_rot)
+                if hasattr(db, "invalidate_ini_cache"):
+                    db.invalidate_ini_cache(str(ini_p))
+                if hasattr(db, "find_media_index_by_path") and hasattr(db, "set_rotate"):
+                    db_idx = db.find_media_index_by_path(path_str)
+                    if db_idx is not None and db_idx >= 0:
+                        db.set_rotate(db_idx, new_rot)
+                if hasattr(db, "sync_photo_ini_to_db"):
+                    db.sync_photo_ini_to_db(path_str, doc)
             except Exception:
                 pass
 
@@ -587,8 +592,8 @@ class PicasaSlideshowWindow(QWidget):
 
     def toggle_star_current(self) -> None:
         """
-        FR: Bascule l'étoile/favori de la photo courante et persiste dans .picasa.ini.
-        EN: Toggles the star/favorite status of the current photo and persists it to .picasa.ini.
+        FR: Bascule l'étoile/favori de la photo courante et persiste dans .picasa.ini (et la base si présente).
+        EN: Toggles the star/favorite status of the current photo and persists it to .picasa.ini (and database if present).
         """
         if not self.photo_paths:
             return
@@ -605,6 +610,21 @@ class PicasaSlideshowWindow(QWidget):
         is_star = doc.is_starred(src.name)
         doc.set_starred(src.name, not is_star)
         doc.write_file(str(ini_p))
+
+        parent_win = self.parentWidget()
+        db = getattr(parent_win, "db", None) if parent_win else None
+        if db is not None:
+            try:
+                if hasattr(db, "invalidate_ini_cache"):
+                    db.invalidate_ini_cache(str(ini_p), invalidate_albums_starred=True)
+                if hasattr(db, "find_media_index_by_path") and hasattr(db, "set_starred"):
+                    db_idx = db.find_media_index_by_path(path_str)
+                    if db_idx is not None and db_idx >= 0:
+                        db.set_starred(db_idx, not is_star)
+                if hasattr(db, "sync_photo_ini_to_db"):
+                    db.sync_photo_ini_to_db(path_str, doc)
+            except Exception:
+                pass
 
         self.hud.set_starred(not is_star)
 

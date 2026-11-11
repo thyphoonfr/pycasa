@@ -1020,11 +1020,16 @@ class PicasaMovieMakerDialog(QDialog):
         contact_id: Optional[str]
     ) -> List[MovieSlide]:
         """
-        FR: Construit la liste initiale de `MovieSlide` en lisant les métadonnées `.picasa.ini` (visages, dates, légendes).
-        EN: Builds the initial list of `MovieSlide` by reading `.picasa.ini` metadata (faces, dates, captions).
+        FR: Construit la liste initiale de `MovieSlide` en lisant les métadonnées `.picasa.ini`
+        et la base `db3` (visages 15/16-hex, dates EXIF/INI, légendes).
+        EN: Builds the initial list of `MovieSlide` by reading `.picasa.ini` and `db3` metadata
+        (15/16-hex faces, EXIF/INI dates, captions).
+        Ref: picasa3.exe @ CMakeMoviePanel, CMakeFaceMoviePanel
         """
         slides: List[MovieSlide] = []
         ini_cache: Dict[str, Any] = {}
+        norm_target_cid = (contact_id or "").strip().lower().lstrip("0") if contact_id else ""
+        parent_db = getattr(self.parent(), "db", None) if self.parent() is not None else None
 
         for p in paths:
             if not p or not os.path.exists(p):
@@ -1051,17 +1056,20 @@ class PicasaMovieMakerDialog(QDialog):
             if doc:
                 sec = doc.get_section(Path(p).name)
                 if sec:
-                    # FR: Visages / EN: Faces
+                    # FR: Visages (format Picasa faces=rect64(...),<cid>;... avec comparaison 15/16-hex)
+                    # EN: Faces (Picasa format faces=rect64(...),<cid>;... with 15/16-hex comparison)
                     faces_val = sec.get("faces")
                     if faces_val:
                         parts = faces_val.split(";")
                         for part in parts:
-                            if "=" in part:
-                                r_str, cid = part.split("=", 1)
-                                if not contact_id or cid == contact_id:
+                            sep = "," if "," in part else ("=" if "=" in part else None)
+                            if sep is not None:
+                                r_str, cid = part.split(sep, 1)
+                                norm_cid = cid.strip().lower().lstrip("0")
+                                if not norm_target_cid or norm_cid == norm_target_cid:
                                     try:
-                                        l, t, r, b = decode_rect64_string(r_str)
-                                        f_rect = FaceRect(l, t, r, b, contact_id=cid)
+                                        l, t, r, b = decode_rect64_string(r_str.strip())
+                                        f_rect = FaceRect(l, t, r, b, contact_id=cid.strip())
                                         break
                                     except Exception:
                                         pass
@@ -1069,8 +1077,40 @@ class PicasaMovieMakerDialog(QDialog):
                     date_str = sec.get("date", "")
                     caption_str = sec.get("caption", "")
 
-            # FR: Si date absente dans l'INI, tenter mtime
-            # EN: If date is missing from INI, fall back to mtime
+            # FR: Si le visage n'est pas encore écrit dans .picasa.ini, interroger face_manager (db3 / 1001)
+            # EN: If face is not yet written to .picasa.ini, query face_manager (db3 / 1001)
+            if f_rect is None and parent_db is not None and getattr(parent_db, "face_manager", None) is not None:
+                try:
+                    db_idx = parent_db.find_photo_index(p) if hasattr(parent_db, "find_photo_index") else -1
+                    db_faces = parent_db.face_manager.get_faces_for_photo(db_idx if db_idx is not None else -1, p)
+                    for df in db_faces:
+                        df_cid = (getattr(df, "contact_id", "") or "").strip()
+                        if not norm_target_cid or df_cid.lower().lstrip("0") == norm_target_cid:
+                            f_rect = df
+                            break
+                except Exception:
+                    pass
+
+            # FR: Si date absente dans l'INI, tenter EXIF DateTimeOriginal puis mtime
+            # EN: If date is missing from INI, try EXIF DateTimeOriginal then mtime
+            if not date_str:
+                try:
+                    with Image.open(p) as img_dt:
+                        exif_dt = img_dt.getexif()
+                        if exif_dt:
+                            raw_dt = exif_dt.get(0x9003) or exif_dt.get(0x0132)
+                            if not raw_dt:
+                                try:
+                                    from PIL import ExifTags
+                                    exif_ifd = exif_dt.get_ifd(ExifTags.IFD.Exif)
+                                    raw_dt = exif_ifd.get(0x9003) or exif_ifd.get(0x9004)
+                                except Exception:
+                                    pass
+                            if raw_dt and isinstance(raw_dt, str):
+                                dt_obj = time.strptime(raw_dt.strip()[:19], "%Y:%m:%d %H:%M:%S")
+                                date_str = time.strftime("%d/%m/%Y", dt_obj)
+                except Exception:
+                    pass
             if not date_str:
                 try:
                     mtime = os.path.getmtime(p)
@@ -1717,16 +1757,34 @@ class PicasaMovieMakerDialog(QDialog):
         # FR: Filtrer les photos prises trop rapprochées à partir de la liste complète non filtrée
         # EN: Filter out photos taken too close together in time from the full unfiltered list
         filtered: List[MovieSlide] = []
-        last_t = 0.0
+        last_t: Optional[float] = None
         for s in self._all_unfiltered_slides:
             if s.is_text or not s.path:
                 filtered.append(s)
                 continue
             try:
-                mt = os.path.getmtime(s.path)
-                if abs(mt - last_t) >= interval_s:
+                ts: Optional[float] = None
+                try:
+                    with Image.open(s.path) as img_b:
+                        exif_b = img_b.getexif()
+                        if exif_b:
+                            raw_b = exif_b.get(0x9003) or exif_b.get(0x0132)
+                            if not raw_b:
+                                try:
+                                    from PIL import ExifTags
+                                    exif_ifd = exif_b.get_ifd(ExifTags.IFD.Exif)
+                                    raw_b = exif_ifd.get(0x9003) or exif_ifd.get(0x9004)
+                                except Exception:
+                                    pass
+                            if raw_b and isinstance(raw_b, str):
+                                ts = time.mktime(time.strptime(raw_b.strip()[:19], "%Y:%m:%d %H:%M:%S"))
+                except Exception:
+                    ts = None
+                if ts is None:
+                    ts = os.path.getmtime(s.path)
+                if last_t is None or abs(ts - last_t) >= interval_s:
                     filtered.append(s)
-                    last_t = mt
+                    last_t = ts
             except Exception:
                 filtered.append(s)
         self.slides = filtered

@@ -124,16 +124,23 @@ def test_drawer_toggle_and_no_font_or_pil_warnings(qapp):
     """FR: Vérifie la bascule du tiroir droit et l'absence d'avertissements QFont ou PIL sur images palette.
     EN: Verifies right drawer toggling and the absence of QFont or PIL warnings on palette images.
     """
+    import gc
     import warnings
     from PIL import Image
     from PySide6.QtCore import qInstallMessageHandler
     from picasa_py.ui.main_window import PicasaMainWindow
     from picasa_py.faces.facerect import FaceRect
 
+    qapp.processEvents()
+    gc.collect()
+
     qt_font_warnings = []
-    prev_handler = qInstallMessageHandler(
-        lambda t, c, m: qt_font_warnings.append(m) if "QFont::setPointSize:" in m else None
-    )
+
+    def _msg_handler(t, c, m):
+        if m and "QFont::setPointSize:" in m:
+            qt_font_warnings.append(m)
+
+    prev_handler = qInstallMessageHandler(_msg_handler)
     try:
         win = PicasaMainWindow(db_path="__non_existent__", auto_scan=False)
         # Bascule du tiroir droit via menu Affichage -> Tags (vérifie _is_expanded)

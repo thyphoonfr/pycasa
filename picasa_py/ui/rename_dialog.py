@@ -237,29 +237,91 @@ class PicasaRenameDialog(QDialog):
         self.btn_rename.setText(self.res_mgr.get_xml_string("rename/rename.title", "Renommer"))
         self.btn_cancel.setText(self.res_mgr.get_xml_string("rename/button14.title", "Annuler"))
 
+    def _extract_photo_date_and_size(self, p: Path, doc=None) -> Tuple[str, str]:
+        """
+        FR: Extrait la date de prise de vue EXIF (`DateTimeOriginal` / `0x9003`, repli sur `mtime`)
+        et la résolution effective (tenant compte de l'orientation EXIF et du recadrage/rotation `.picasa.ini`).
+        EN: Extracts the EXIF capture date (`DateTimeOriginal` / `0x9003`, fallback to `mtime`)
+        and effective resolution (accounting for EXIF orientation and `.picasa.ini` crop/rotate).
+        Ref: picasa3.exe @ 0x0074F590 (ExampleTransformer@RenameDialog)
+        """
+        date_str = "2024-06-15"
+        size_str = "1920x1080"
+        if not p.exists():
+            return date_str, size_str
+
+        exif_date_found = False
+        try:
+            with Image.open(p) as img:
+                w, h = img.size
+                orient = 1
+                try:
+                    raw_exif = img.getexif()
+                    if raw_exif:
+                        orient = int(raw_exif.get(0x0112, 1) or 1)
+                        dt_raw = raw_exif.get(0x9003) or raw_exif.get(0x9004)
+                        if not dt_raw:
+                            try:
+                                exif_ifd = raw_exif.get_ifd(0x8769)
+                                if exif_ifd:
+                                    dt_raw = exif_ifd.get(0x9003) or exif_ifd.get(0x9004)
+                            except Exception:
+                                pass
+                        if not dt_raw:
+                            dt_raw = raw_exif.get(0x0132)
+                        if dt_raw and isinstance(dt_raw, str):
+                            clean_dt = dt_raw.strip().rstrip("\x00")[:10].replace(":", "-")
+                            dt_parsed = datetime.datetime.strptime(clean_dt, "%Y-%m-%d")
+                            date_str = dt_parsed.strftime("%Y-%m-%d")
+                            exif_date_found = True
+                except Exception:
+                    pass
+                if orient in (5, 6, 7, 8):
+                    w, h = h, w
+
+                if doc is None:
+                    ini_p = p.parent / ".picasa.ini"
+                    if not ini_p.exists():
+                        alt_p = p.parent / "Picasa.ini"
+                        if alt_p.exists():
+                            ini_p = alt_p
+                    if ini_p.exists():
+                        try:
+                            doc = PicasaIniParser.parse_file(str(ini_p))
+                        except Exception:
+                            doc = None
+                if doc is not None:
+                    try:
+                        c_rect = doc.get_crop_rect64(p.name) if hasattr(doc, "get_crop_rect64") else None
+                        if c_rect is not None:
+                            l_f, t_f, r_f, b_f = c_rect.to_normalized()
+                            w = max(1, int(round(w * max(0.0, r_f - l_f))))
+                            h = max(1, int(round(h * max(0.0, b_f - t_f))))
+                        rot = doc.get_rotate(p.name) if hasattr(doc, "get_rotate") else 0
+                        if rot in (1, 3):
+                            w, h = h, w
+                    except Exception:
+                        pass
+                size_str = f"{w}x{h}"
+        except Exception:
+            pass
+
+        if not exif_date_found:
+            try:
+                mtime = os.path.getmtime(p)
+                dt = datetime.datetime.fromtimestamp(mtime)
+                date_str = dt.strftime("%Y-%m-%d")
+            except Exception:
+                date_str = "2024-06-15"
+
+        return date_str, size_str
+
     def _extract_sample_info(self, p: Path) -> None:
         """
         FR: Extrait la date et la résolution d'image pour l'aperçu d'exemple interactif.
         EN: Extracts the date and image resolution for the interactive sample preview.
         """
-        if not p.exists():
-            self.first_date_str = "2024-06-15"
-            self.first_size_str = "1920x1080"
-            return
-
-        try:
-            mtime = os.path.getmtime(p)
-            dt = datetime.datetime.fromtimestamp(mtime)
-            self.first_date_str = dt.strftime("%Y-%m-%d")
-        except Exception:
-            self.first_date_str = "2024-06-15"
-
-        try:
-            with Image.open(p) as img:
-                w, h = img.size
-                self.first_size_str = f"{w}x{h}"
-        except Exception:
-            self.first_size_str = "1920x1080"
+        self.first_date_str, self.first_size_str = self._extract_photo_date_and_size(p)
 
     def _format_filename(self, base: str, date_str: str, size_str: str, ext: str, index: int, total: int) -> str:
         """
@@ -324,22 +386,23 @@ class PicasaRenameDialog(QDialog):
             if not src_p.exists():
                 continue
 
+            parent_dir = str(src_p.parent)
+            if parent_dir not in ini_docs:
+                ini_p = Path(parent_dir) / ".picasa.ini"
+                if ini_p.exists():
+                    ini_docs[parent_dir] = PicasaIniParser.parse_file(str(ini_p))
+                else:
+                    ini_docs[parent_dir] = None
+            doc = ini_docs.get(parent_dir)
+
             date_str = ""
             size_str = ""
-
-            if self.chk_date.isChecked():
-                try:
-                    mtime = os.path.getmtime(src_p)
-                    date_str = datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
-                except Exception:
-                    pass
-
-            if self.chk_size.isChecked():
-                try:
-                    with Image.open(src_p) as img:
-                        size_str = f"{img.width}x{img.height}"
-                except Exception:
-                    pass
+            if self.chk_date.isChecked() or self.chk_size.isChecked():
+                d_str, s_str = self._extract_photo_date_and_size(src_p, doc=doc)
+                if self.chk_date.isChecked():
+                    date_str = d_str
+                if self.chk_size.isChecked():
+                    size_str = s_str
 
             new_name = self._format_filename(
                 base=base,
@@ -377,20 +440,16 @@ class PicasaRenameDialog(QDialog):
 
                     # FR: Mise à jour de la section .picasa.ini correspondante
                     # EN: Update the corresponding .picasa.ini section
-                    parent_dir = str(src_p.parent)
-                    if parent_dir not in ini_docs:
-                        ini_p = Path(parent_dir) / ".picasa.ini"
-                        if ini_p.exists():
-                            ini_docs[parent_dir] = PicasaIniParser.parse_file(str(ini_p))
-                        else:
-                            ini_docs[parent_dir] = None
-
-                    doc = ini_docs.get(parent_dir)
                     if doc:
                         sec = doc.get_section(src_p.name)
                         if sec:
+                            existing_dst_sec = doc.get_section(dst_p.name)
+                            if existing_dst_sec is not None and existing_dst_sec is not sec:
+                                doc.remove_section(dst_p.name)
                             sec.name = dst_p.name
                             sec.raw_header = f"[{dst_p.name}]\r\n"
+                            doc._modified = True
+                            doc._untagged_utf8_preserved = False
 
                 except Exception:
                     pass

@@ -701,7 +701,57 @@ class PicasaContextMenuBuilder:
         if main_win and hasattr(main_win, "action_delete_person"):
             act_del.triggered.connect(lambda: main_win.action_delete_person(contact_id, person_name))
 
+        # 6. Options de tri des personnes (Ref: 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C)
+        menu.addSeparator()
+        PicasaContextMenuBuilder._append_people_sort_actions(menu, main_win)
+
         return menu
+
+    @staticmethod
+    def _append_people_sort_actions(menu: QMenu, main_win: Optional[Any] = None) -> None:
+        """
+        FR: Ajoute les 3 options de tri de la collection Personnes (`AlbumList::ID_PEOPLEBYNAME`,
+        `AlbumList::ID_PEOPLEBYAMOUNT`, `AlbumList::ID_PEOPLEBYAMOUNTTOP10`).
+        EN: Appends the 3 People collection sort actions (`AlbumList::ID_PEOPLEBYNAME`,
+        `AlbumList::ID_PEOPLEBYAMOUNT`, `AlbumList::ID_PEOPLEBYAMOUNTTOP10`).
+        Ref: picasa3.exe @ 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C, 0x005D31B9 - 0x005D3205
+        """
+        from picasa_py.db.preferences import PicasaPreferences
+
+        lib_tree = getattr(main_win, "library_tree", None) if main_win is not None else None
+        cur_psort = (
+            int(getattr(lib_tree, "people_sort_mode", 0))
+            if lib_tree is not None
+            else PicasaPreferences.get_people_sort_mode()
+        )
+
+        act_p_name = menu.addAction(
+            _tr("Sort &People by Name", "Trier les &personnes par nom", "AlbumList::ID_PEOPLEBYNAME")
+        )
+        act_p_name.setCheckable(True)
+        act_p_name.setChecked(cur_psort == 0)
+        if main_win and hasattr(main_win, "action_sort_people_by"):
+            act_p_name.triggered.connect(lambda: main_win.action_sort_people_by(0))
+
+        act_p_amount = menu.addAction(
+            _tr("Sort People by &Amount", "Trier les personnes par &nombre", "AlbumList::ID_PEOPLEBYAMOUNT")
+        )
+        act_p_amount.setCheckable(True)
+        act_p_amount.setChecked(cur_psort == 1)
+        if main_win and hasattr(main_win, "action_sort_people_by"):
+            act_p_amount.triggered.connect(lambda: main_win.action_sort_people_by(1))
+
+        act_p_top10 = menu.addAction(
+            _tr(
+                "Sort People by Top &10",
+                "Trier en fonction des &10premières personnes",
+                "AlbumList::ID_PEOPLEBYAMOUNTTOP10",
+            )
+        )
+        act_p_top10.setCheckable(True)
+        act_p_top10.setChecked(cur_psort == 2)
+        if main_win and hasattr(main_win, "action_sort_people_by"):
+            act_p_top10.triggered.connect(lambda: main_win.action_sort_people_by(2))
 
     @staticmethod
     def show_person_context_menu(
@@ -732,8 +782,12 @@ class PicasaContextMenuBuilder:
         FR: Construit le menu contextuel d'une collection racine (Menu 0x88, Collection::*).
         EN: Builds the context menu for a root collection (Menu 0x88, Collection::*).
         Ref: picasa3.exe @ 0x00732680 - 0x0073279F (Collection::ID_COL_PASSWORD 0x9D56 -> FUN_005EB910)
+        Ref: picasa3.exe @ 0x007336F5 - 0x00733772 (AlbumList::ID_PEOPLEBY* sort options)
         """
         menu = QMenu(parent)
+        if str(collection_name).lower() == "people":
+            PicasaContextMenuBuilder._append_people_sort_actions(menu, main_win)
+            menu.addSeparator()
         act_pwd = menu.addAction(
             _tr("&Add/Change a password...", "&Ajouter/modifier un mot de passe...", "Collection::ID_COL_PASSWORD")
         )
@@ -804,12 +858,14 @@ class PicasaContextMenuBuilder:
         """
         if not db or not getattr(db, "face_manager", None):
             return
-        people = db.face_manager.get_people()
+        fm = db.face_manager
+        cur_vars = fm._cid_variants(current_contact_id) if hasattr(fm, "_cid_variants") else {current_contact_id.lower()}
+        people = fm.get_people()
         added = 0
         for p in sorted(people, key=lambda x: str(getattr(x, "name", "") or "").lower()):
             cid = str(getattr(p, "contact_id", "") or "")
             pname = str(getattr(p, "name", "") or "")
-            if cid.lower() == current_contact_id.lower():
+            if cid.lower() in cur_vars:
                 continue
             act = menu.addAction(pname)
             if main_win and hasattr(main_win, "action_move_face_to_person"):

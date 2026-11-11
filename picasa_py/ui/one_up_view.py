@@ -1216,7 +1216,7 @@ class PicasaOneUpView(QWidget):
                 if p_idx >= 0:
                     return p_idx
         if hasattr(db, "index") and 0 <= idx < len(db.index) and getattr(db.index[idx], "type", 0) == 1001:
-            p_idx = getattr(db.index[idx], "parent", -1)
+            p_idx = getattr(db.index[idx], "parent_idx", getattr(db.index[idx], "parent", -1))
             if 0 <= p_idx < len(db.index):
                 return p_idx
         return idx
@@ -1648,7 +1648,7 @@ class PicasaOneUpView(QWidget):
                 elif hasattr(db, "index"):
                     norm_target = os.path.normcase(os.path.abspath(direct_path))
                     for k in range(len(db.index)):
-                        if getattr(db.index[k], "type", 0) in (2, 0x20):
+                        if getattr(db.index[k], "is_active", True) and getattr(db.index[k], "type", 0) in (2, 4, 8, 18, 0x20):
                             mp = db.get_media_full_path(k)
                             if mp and os.path.normcase(os.path.abspath(mp)) == norm_target:
                                 index = k
@@ -1697,7 +1697,7 @@ class PicasaOneUpView(QWidget):
             if ext in VIDEO_EXTENSIONS:
                 is_video = True
         elif db and 0 <= index < len(db.index):
-            if db.index[index].type == 0x20 or Path(db.index[index].path).suffix.lower() in VIDEO_EXTENSIONS:
+            if db.index[index].type in (8, 0x20) or Path(db.index[index].path).suffix.lower() in VIDEO_EXTENSIONS:
                 is_video = True
 
         if is_video and full_path:
@@ -1814,9 +1814,12 @@ class PicasaOneUpView(QWidget):
                         pass
         if not caption_text and db is not None and 0 <= index < len(db.index):
             try:
-                cap_tbl = db.tables.get("imagedata_caption")
-                if cap_tbl and index < len(cap_tbl.values) and cap_tbl.values[index]:
-                    caption_text = str(cap_tbl.values[index])
+                pmps_map = getattr(db, "pmps", None) or getattr(db, "tables", None) or {}
+                cap_tbl = pmps_map.get("imagedata_caption")
+                if cap_tbl is not None:
+                    cap_vals = getattr(cap_tbl, "records", getattr(cap_tbl, "values", []))
+                    if index < len(cap_vals) and cap_vals[index]:
+                        caption_text = str(cap_vals[index])
             except Exception:
                 pass
         self.update_star_button(is_starred)
@@ -2919,10 +2922,17 @@ class PicasaOneUpView(QWidget):
 
     def _on_video_snapshot_captured(self, snapshot_path: str) -> None:
         """
-        FR: Notifie l'application lorsqu'une capture d'écran vidéo a été enregistrée.
-        EN: Notifies the application when a video frame snapshot has been saved.
+        FR: Indexe immédiatement la capture d'écran vidéo dans la base de données et notifie l'application.
+        EN: Immediately indexes the captured video frame snapshot into the database and notifies the application.
+        Ref: picasa3.exe @ 0x008A28F0 (editpanel/take_snapshot_btn)
         """
         if snapshot_path:
+            if self.db is not None and os.path.exists(snapshot_path):
+                try:
+                    from picasa_py.scanner.scanner import PicasaDirScanner
+                    PicasaDirScanner(self.db).index_file(snapshot_path)
+                except Exception:
+                    pass
             self.photo_edited.emit(snapshot_path)
 
     def navigate_previous(self) -> None:
@@ -3206,6 +3216,8 @@ class PicasaOneUpView(QWidget):
                 try:
                     from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
                     rec_idx = self.db.find_photo_index(target_path) if hasattr(self.db, "find_photo_index") else None
+                    if (rec_idx is None or rec_idx < 0) and self.current_index >= 0:
+                        rec_idx = self._resolve_db_photo_index(self.db, self.current_index)
                     if rec_idx is not None and self.db.thumbindex is not None and 0 <= rec_idx < len(self.db.thumbindex.records):
                         _, ft2_new, fsize_new = file_filetimes(Path(target_path))
                         rec = self.db.thumbindex.records[rec_idx]
@@ -3213,9 +3225,13 @@ class PicasaOneUpView(QWidget):
                         rec.size = fsize_new
                         rec.file_size = fsize_new
                         self.db.thumbindex.dirty = True
+                        saved_w = int(img_to_save.width)
+                        saved_h = int(img_to_save.height)
                         for col_n, col_v in (
-                            ("imagedata_width", int(current_img.width)),
-                            ("imagedata_height", int(current_img.height)),
+                            ("imagedata_width", saved_w),
+                            ("imagedata_height", saved_h),
+                            ("imagedata_edit_width", saved_w),
+                            ("imagedata_edit_height", saved_h),
                             ("imagedata_originfast", compute_originfast_hash(Path(target_path))),
                             ("imagedata_revertable", 1),
                             ("imagedata_backuphash", int(b_hash) & 0xFFFF),
@@ -3274,6 +3290,12 @@ class PicasaOneUpView(QWidget):
                 img_to_save.save(output_path, format="PNG", **save_kwargs)
             else:
                 img_to_save.save(output_path, **save_kwargs)
+            if self.db is not None and os.path.exists(output_path):
+                try:
+                    from picasa_py.scanner.scanner import PicasaDirScanner
+                    PicasaDirScanner(self.db).index_file(output_path)
+                except Exception:
+                    pass
             return True
         except Exception:
             return False

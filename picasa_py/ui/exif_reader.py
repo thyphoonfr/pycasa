@@ -178,8 +178,46 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
 
     try:
         with Image.open(file_path) as img:
-            data["dimensions"] = img.size
             w, h = img.size
+            exif = img.getexif()
+            # Ref: picasa3.exe @ 0x00889210 (CImagePropertiesDialog) — applique l'orientation EXIF
+            # ainsi que le recadrage (crop=rect64) et la rotation (rotate=rotate(n)) de .picasa.ini
+            if exif:
+                try:
+                    orient = int(exif.get(0x0112, 1) or 1)
+                    if orient in (5, 6, 7, 8):
+                        w, h = h, w
+                except Exception:
+                    pass
+
+            ini_geotag: Optional[Tuple[float, float, Optional[float]]] = None
+            try:
+                ini_path = os.path.join(os.path.dirname(file_path), ".picasa.ini")
+                if not os.path.exists(ini_path):
+                    ini_path = os.path.join(os.path.dirname(file_path), "Picasa.ini")
+                if os.path.exists(ini_path):
+                    from picasa_py.ini.parser import PicasaIniParser
+                    doc = PicasaIniParser.parse_file(ini_path)
+                    fname = os.path.basename(file_path)
+                    crop_rect = doc.get_crop_rect64(fname) if hasattr(doc, "get_crop_rect64") else None
+                    if crop_rect is not None:
+                        l_f, t_f, r_f, b_f = crop_rect.to_normalized()
+                        cw = max(1, int(round(max(0.0, r_f - l_f) * w)))
+                        ch = max(1, int(round(max(0.0, b_f - t_f) * h)))
+                        w, h = cw, ch
+                    rot_step = doc.get_rotate(fname)
+                    if (rot_step % 2) == 1:
+                        w, h = h, w
+                    sec = doc.get_section(fname)
+                    if sec is not None:
+                        gt = (sec.get("geotag") or "").strip()
+                        if gt and "," in gt:
+                            lat_s, lon_s = gt.split(",", 1)
+                            ini_geotag = (float(lat_s.strip()), float(lon_s.strip()), None)
+            except Exception:
+                pass
+
+            data["dimensions"] = (w, h)
             mp = (w * h) / 1_000_000.0
             data["resolution"] = f"{w} × {h} ({mp:.1f} MP)"
 
@@ -190,7 +228,6 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
             props.append(("Dimensions", f"{w} × {h} pixels"))
             props.append(("Mégapixels", f"{mp:.1f} MP"))
 
-            exif = img.getexif()
             if exif:
                 # FR: Récupérer les tags EXIF de base / EN: Retrieve basic EXIF tags
                 make = str(exif.get(0x010F, "")).strip()  # Make
@@ -199,7 +236,13 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                     data["camera"] = f"{make} {model}".strip() if make and make not in model else model
                     props.append(("Appareil photo", data["camera"]))
 
-                date_taken = exif.get(0x9003) or exif.get(0x0132)
+                # FR: IFD EXIF étendu / EN: Extended EXIF IFD
+                try:
+                    exif_ifd = exif.get_ifd(ExifTags.IFD.Exif)
+                except Exception:
+                    exif_ifd = {}
+
+                date_taken = exif.get(0x9003) or (exif_ifd.get(0x9003) if exif_ifd else None) or exif.get(0x0132)
                 if date_taken and isinstance(date_taken, str):
                     try:
                         clean_dt = datetime.strptime(date_taken.strip()[:19], "%Y:%m:%d %H:%M:%S")
@@ -207,12 +250,6 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                     except Exception:
                         pass
                 props.append(("Date de prise de vue", data["date"]))
-
-                # FR: IFD EXIF étendu / EN: Extended EXIF IFD
-                try:
-                    exif_ifd = exif.get_ifd(ExifTags.IFD.Exif)
-                except Exception:
-                    exif_ifd = {}
 
                 if exif_ifd:
                     # FR: Temps de pose / Vitesse d'obturation / EN: Exposure time / Shutter speed
@@ -256,7 +293,7 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                         props.append(("Balance des blancs", "Automatique" if wb == 0 else "Manuelle"))
 
                 # FR: Coordonnées GPS / EN: GPS Coordinates
-                gps_coords = parse_gps_coordinates(exif)
+                gps_coords = parse_gps_coordinates(exif) or ini_geotag
                 if gps_coords:
                     data["gps"] = gps_coords
                     data["gps_formatted"] = format_gps_dms(gps_coords[0], gps_coords[1], gps_coords[2])
@@ -266,6 +303,11 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                 software = exif.get(0x0131)
                 if software:
                     props.append(("Logiciel", str(software).strip()))
+            elif ini_geotag:
+                props.append(("Date de prise de vue", data["date"]))
+                data["gps"] = ini_geotag
+                data["gps_formatted"] = format_gps_dms(ini_geotag[0], ini_geotag[1], ini_geotag[2])
+                props.append(("Coordonnées GPS", data["gps_formatted"]))
 
             data["properties"] = props
 

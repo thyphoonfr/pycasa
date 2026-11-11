@@ -138,8 +138,23 @@ class PicasaIniWriter:
         preserve_untagged = getattr(doc, "_untagged_utf8_preserved", False) and not doc.is_modified()
         explicit_utf8 = getattr(doc, "_encoding_explicit", False) and getattr(doc, "encoding", "utf-8").lower() in ("utf-8", "utf8")
 
-        # Ref: picasa3.exe @ 0x0068AD5A ("[encoding]\r\nutf8=1\r\n")
-        if not has_encoding_sec and not doc.has_bom and not preserve_untagged and (has_non_ascii or explicit_utf8):
+        # Ref: picasa3.exe @ 0x0068AE31, 0x00CA77F0 ("[encoding]\r\nutf8=1\r\n[Picasa]\r\n") :
+        # picasa3.exe n'émet l'en-tête `[encoding]\r\nutf8=1\r\n` automatiquement que lors de l'écriture
+        # de la section dossier `[Picasa]` contenant de l'UTF-8 (ou lorsque l'encodage UTF-8 a été
+        # explicitement demandé sur le document). Les sections `[Contacts2]` et `[<filename>]` sont
+        # encodées en UTF-8 direct sans ajouter de section `[encoding]`.
+        picasa_sec = doc.get_section("Picasa")
+        picasa_has_non_ascii = False
+        if picasa_sec is not None:
+            for entry in picasa_sec.entries:
+                if (
+                    (entry.raw_line and any(ord(c) > 127 for c in entry.raw_line))
+                    or (entry.value and any(ord(c) > 127 for c in entry.value))
+                    or (entry.key and any(ord(c) > 127 for c in entry.key))
+                ):
+                    picasa_has_non_ascii = True
+                    break
+        if not has_encoding_sec and not doc.has_bom and not preserve_untagged and (explicit_utf8 or (picasa_has_non_ascii and has_non_ascii)):
             full_str = "[encoding]\r\nutf8=1\r\n" + full_str
 
         data = full_str.encode("utf-8")

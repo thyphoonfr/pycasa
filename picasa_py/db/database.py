@@ -51,8 +51,9 @@ from picasa_py.db.kvtable import KeyValueTableFile
 from picasa_py.db.wordhash import WordHashFile
 from picasa_py.db.contacts import ContactsFile, Contact
 
-# Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows) — type 19 (.pal palette) is NOT a media record
-MEDIA_RECORD_TYPES = (2, 3, 4, 6, 7, 8, 13, 18, 31, 32)
+# Ref: picasa3.exe @ 0x004A59E9..0x004A5A29 (CAlbumState::RebuildFromThumbDB) & 0x00415790 (AVytDirScannerWindows)
+# Types média actifs reconnus dans thumbindex.db (incluant 2=JPG, 3=BMP/GIF, 6..18 dont 14=PNG, 21..24, 26..29, 31, 32=vidéo ; exclut 1=dossier, 19=.pal, 1001=visage)
+MEDIA_RECORD_TYPES = (2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32)
 
 
 def _to_host_path(picasa_path: str) -> str:
@@ -67,15 +68,29 @@ def _to_host_path(picasa_path: str) -> str:
 
 def _find_default_db3_dir() -> Tuple[Path, Path]:
     """
-    FR: Recherche les répertoires par défaut (db3_dir, contacts_dir) selon l'OS hôte :
+    FR: Recherche les répertoires par défaut (db3_dir, contacts_dir) selon la préférence
+    `AppLocalDataPath` (`0x004073A5`, `0x0097E366`) ou l'emplacement standard de l'OS hôte :
     - Windows : %LOCALAPPDATA%/Google/Picasa2/db3
     - macOS (darwin) : ~/Library/Application Support/Google/Picasa3/db3 (et Picasa2/db3)
     - Linux : ~/.local/share/Google/Picasa3/db3 (et Picasa2/db3, ou préfixe Wine ~/.google/picasa)
-    EN: Finds the default (db3_dir, contacts_dir) directories according to the host OS:
+    EN: Finds the default (db3_dir, contacts_dir) directories according to the `AppLocalDataPath`
+    preference (`0x004073A5`, `0x0097E366`) or the host OS default location:
     - Windows: %LOCALAPPDATA%/Google/Picasa2/db3
     - macOS (darwin): ~/Library/Application Support/Google/Picasa3/db3 (and Picasa2/db3)
     - Linux: ~/.local/share/Google/Picasa3/db3 (and Picasa2/db3, or Wine prefix ~/.google/picasa)
+    Ref: picasa3.exe @ 0x004073A5, 0x0097E366 (AppLocalDataPath), 0x00980EC0 (CFilePath::Resolve)
     """
+    try:
+        from picasa_py.db.preferences import PicasaPreferences
+        custom_root = PicasaPreferences.get_repository_path()
+        if custom_root:
+            cp = Path(custom_root)
+            if cp.name.lower() == "db3" and cp.exists():
+                return cp, cp.parent / "contacts"
+            if (cp / "db3").exists():
+                return cp / "db3", cp / "contacts"
+    except Exception:
+        pass
     if sys.platform == "win32":
         localappdata = os.environ.get("LOCALAPPDATA")
         if localappdata:
@@ -331,6 +346,44 @@ class PicasaDatabase:
         self._min_aligned_idx: int = -1
         self._aligned_pmp_count: int = 0
         self._scanlist: Dict[str, str] = {}
+        self._frexclude_folders: List[str] = []
+        self._session_scanned_folders: Set[str] = set()
+
+    @property
+    def thumbs(self) -> Dict[str, BlockIndexFile]:
+        """
+        FR: Alias de compatibilité vers `block_indices` (notamment pour `facetemplatesV2` dans `FaceManager`).
+        EN: Compatibility alias to `block_indices` (notably for `facetemplatesV2` in `FaceManager`).
+        """
+        return self.block_indices
+
+    def get_property(self, col_name: str, idx: int, default: Any = None) -> Any:
+        """
+        FR: Lit la valeur d'une colonne PMP `col_name` à l'index `idx` (ou `default` si absente).
+        EN: Reads the value of a PMP column `col_name` at index `idx` (or `default` if missing).
+        Ref: picasa3.exe @ 0x006C1920 (CPMTable)
+        """
+        pmp = self.pmps.get(col_name)
+        if pmp is None or idx < 0 or idx >= len(pmp.records):
+            return default
+        return pmp.records[idx]
+
+    def set_property(self, col_name: str, idx: int, value: Any) -> None:
+        """
+        FR: Définit la valeur d'une colonne PMP `col_name` à l'index `idx`.
+        EN: Sets the value of a PMP column `col_name` at index `idx`.
+        Ref: picasa3.exe @ 0x006C1920 (CPMTable)
+        """
+        pmp = self.pmps.get(col_name)
+        if pmp is None or idx < 0:
+            return
+        def_v = pmp.default_value()
+        while len(pmp.records) <= idx:
+            pmp.records.append(def_v)
+            pmp.dirty = True
+        if pmp.records[idx] != value:
+            pmp.records[idx] = value
+            pmp.dirty = True
 
     @property
     def _deleted_or_Reset_indices(self) -> Set[int]:
@@ -410,12 +463,106 @@ class PicasaDatabase:
         db.load_all()
         return db
 
+    def _ensure_standard_schema(self) -> None:
+        """
+        FR: Garantit que les structures en mémoire de la base possèdent l'intégralité du schéma
+        standard de `CThumbDB::Init` (`0x00415790..0x00416400`) :
+        - `thumbindex`, `repository` (avec `DBID` et clés de version `rawversion`, `colorspaceversion`,
+          `gpsversion`, `frversion`, `contactsversion` @ `0x004199E0`, `0x0041F586..0x0041F8C1`),
+          `usernames`, `wordhash`, `contacts`
+        - les 56 colonnes `STANDARD_PMP_SCHEMA` (`catdata_*`, `imagedata_*`, `albumdata_*`) alignées
+          sur `len(thumbindex.records)` et avec la ligne 0 de `albumdata_*` (`]unknownface` / `"Sans nom"`, cat=8)
+        - les 6 paires `CBlockFile` de `STANDARD_BLOCKFILE_PREFIXES`.
+        Ainsi, même si `load_all()` ouvre un dossier `db3/` vide ou partiellement purgé, l'indexation
+        peuple toutes les colonnes `.pmp` et conteneurs `*_0.db` requis par `CThumbDB::Open` (`0x0041EE10`).
+        EN: Ensures in-memory database structures hold the complete standard `CThumbDB::Init` schema.
+        Ref: picasa3.exe @ 0x00415790..0x00416400, 0x004199E0, 0x0041EE10..0x0041F8C1, 0x008AAD76
+        """
+        import hashlib
+
+        if self.thumbindex is None:
+            self.thumbindex = ThumbIndexFile(records=[], dirty=True)
+        if self.repository is None:
+            self.repository = KeyValueTableFile(pairs=[])
+        if self.repository.get("DBID") is None:
+            ft_now = unix_to_filetime(time.time())
+            ft_lo = ft_now & 0xFFFFFFFF
+            ft_hi = (ft_now >> 32) & 0xFFFFFFFF
+            dbid_hex = hashlib.md5(f"{ft_lo:x}{ft_hi:x}".encode("ascii")).hexdigest()
+            self.repository.set("DBID", dbid_hex)
+        for ver_key, ver_val in (
+            ("rawversion", "1.1"),
+            ("colorspaceversion", "1.1"),
+            ("gpsversion", "1.0"),
+            ("frversion", "1.5"),
+            ("contactsversion", "1.0"),
+        ):
+            if self.repository.get(ver_key) is None:
+                self.repository.set(ver_key, ver_val)
+
+        if self.usernames is None:
+            self.usernames = KeyValueTableFile(pairs=[])
+        if self.wordhash is None:
+            self.wordhash = WordHashFile(dirty=True)
+        if self.contacts is None:
+            self.contacts = ContactsFile(contacts=[])
+
+        for stem, pmp_type in STANDARD_PMP_SCHEMA.items():
+            if stem not in self.pmps:
+                default_records = list(DEFAULT_CATDATA_RECORDS.get(stem, []))
+                self.pmps[stem] = PmpFile(pmp_type=pmp_type, records=default_records, dirty=True)
+
+        if "catdata_name" in self.pmps and len(self.pmps["catdata_name"].records) == 0:
+            for cat_stem, cat_vals in DEFAULT_CATDATA_RECORDS.items():
+                if cat_stem in self.pmps:
+                    self.pmps[cat_stem].records = list(cat_vals)
+                    self.pmps[cat_stem].dirty = True
+
+        # Ref: picasa3.exe @ 0x008AAD76 — ligne 0 de albumdata_* réservée à ]unknownface ("Sans nom", category=8)
+        ad_names = self.pmps.get("albumdata_name")
+        if ad_names is not None and len(ad_names.records) == 0:
+            u_uid = hashlib.md5(b"]unknownface").hexdigest()
+            for stem, pmp in self.pmps.items():
+                if not stem.startswith("albumdata_"):
+                    continue
+                if stem == "albumdata_name":
+                    pmp.records.append("Sans nom")
+                elif stem == "albumdata_token":
+                    pmp.records.append("]unknownface")
+                elif stem == "albumdata_uid":
+                    pmp.records.append(u_uid)
+                elif stem == "albumdata_category":
+                    pmp.records.append(8)
+                else:
+                    pmp.records.append(pmp.default_value())
+                pmp.dirty = True
+
+        if len(self.thumbindex.records) > 0:
+            self._min_aligned_idx = -1
+            self._align_imagedata_tables(len(self.thumbindex.records) - 1)
+
+        for prefix in STANDARD_BLOCKFILE_PREFIXES:
+            if prefix not in self.block_indices:
+                idx_obj = BlockIndexFile.from_entries([], active_block=0)
+                idx_obj.dirty = True
+                self.block_indices[prefix] = idx_obj
+            if prefix not in self.block_containers:
+                cont_obj = BlockContainerFile()
+                cont_obj._fully_dirty = True
+                self.block_containers[prefix] = cont_obj
+                self.block_containers_by_block[(prefix, 0)] = cont_obj
+            elif (prefix, 0) not in self.block_containers_by_block:
+                self.block_containers_by_block[(prefix, 0)] = self.block_containers[prefix]
+
     def load_all(self) -> None:
         """
-        FR: Charge l'ensemble des fichiers disponibles dans le répertoire de base de données.
-        EN: Loads all available files in the database directory.
+        FR: Charge l'ensemble des fichiers disponibles dans le répertoire de base de données,
+        puis garantit que toutes les tables PMP et conteneurs CBlockFile standards sont initialisés.
+        EN: Loads all available files in the database directory, then ensures all standard
+        PMP tables and CBlockFile containers are initialized.
         """
         if not self.db3_dir.exists():
+            self._ensure_standard_schema()
             return
 
         # 1. thumbindex.db (FR: Index des fichiers et dossiers / EN: File and folder index)
@@ -456,6 +603,36 @@ class PicasaDatabase:
                         if not fpath.endswith("\\") and ("\\" in fpath or ":" in fpath):
                             fpath += "\\"
                         self._scanlist[fpath] = st
+            except Exception:
+                pass
+
+        # 2 bis. Picasa2Albums\watchedfolders.txt (0x00418AD0 -> 0x004F5A30) & frexcludefolders.txt (0x004190E0 -> 0x004F5E60)
+        p2a_dir = self.picasa2albums_dir
+        wf_path = p2a_dir / "watchedfolders.txt"
+        if wf_path.exists() and not self._scanlist:
+            try:
+                raw_wf = wf_path.read_bytes().decode("utf-8", errors="surrogateescape")
+                for raw_line in raw_wf.splitlines():
+                    fpath = raw_line.strip()
+                    if fpath:
+                        if not fpath.endswith("\\") and ("\\" in fpath or ":" in fpath):
+                            fpath += "\\"
+                        self._scanlist.setdefault(fpath, "1")
+            except Exception:
+                pass
+        frexcl_path = p2a_dir / "frexcludefolders.txt"
+        if frexcl_path.exists():
+            try:
+                raw_fr = frexcl_path.read_bytes().decode("utf-8", errors="surrogateescape")
+                for raw_line in raw_fr.splitlines():
+                    fpath = raw_line.strip()
+                    if fpath:
+                        if not fpath.endswith("\\") and ("\\" in fpath or ":" in fpath):
+                            fpath += "\\"
+                        if self.repository is None:
+                            self.repository = KeyValueTableFile()
+                        if self.repository.get(f"FileManagerFRStatus\\{fpath}") is None and self.repository.get(fpath) != "0":
+                            self.repository.set(f"FileManagerFRStatus\\{fpath}", "0")
             except Exception:
                 pass
 
@@ -548,6 +725,7 @@ class PicasaDatabase:
         self._albums_cache = None
         self._starred_cache = None
         self._min_aligned_idx = -1
+        self._ensure_standard_schema()
 
     @classmethod
     def resolve_database_dirs(
@@ -573,6 +751,87 @@ class PicasaDatabase:
             return p / "db3", p / "contacts"
         return p, p.parent / "contacts"
 
+    @property
+    def root_dir(self) -> Path:
+        """
+        FR: Retourne le répertoire racine `<Picasa2_Root>` de la base de données (ex. `%LOCALAPPDATA%\\Google\\Picasa2`),
+        sous lequel `CFilePath::Resolve` (`0x00980EC0`) résout `#db3\\`, `#contacts\\`, `#tmp\\` et `ioqueue\\`.
+        EN: Returns the database root directory `<Picasa2_Root>` (e.g., `%LOCALAPPDATA%\\Google\\Picasa2`),
+        under which `CFilePath::Resolve` (`0x00980EC0`) resolves `#db3\\`, `#contacts\\`, `#tmp\\`, and `ioqueue\\`.
+        Ref: picasa3.exe @ 0x00980EC0 (CFilePath::Resolve)
+        """
+        if self.db3_dir and self.db3_dir != Path("."):
+            if self.db3_dir.name.lower() == "db3":
+                return self.db3_dir.parent
+            return self.db3_dir.parent
+        return Path(".")
+
+    @property
+    def ioqueue_dir(self) -> Path:
+        """
+        FR: Retourne le répertoire `<Picasa2_Root>\\ioqueue` contenant `slingshot.ioq`, `filesafe.ioq` et `albumsafe.ioq`.
+        EN: Returns the `<Picasa2_Root>\\ioqueue` directory containing `slingshot.ioq`, `filesafe.ioq`, and `albumsafe.ioq`.
+        Ref: picasa3.exe @ 0x004164A7..0x004165FB (ioqueue\\slingshot.ioq, filesafe.ioq, albumsafe.ioq)
+        """
+        return self.root_dir / "ioqueue"
+
+    @property
+    def tmp_dir(self) -> Path:
+        """
+        FR: Retourne le répertoire `<Picasa2_Root>\\tmp` (`#tmp\\` créé lors de `CThumbDB::Save` à `0x0041B5D3`).
+        EN: Returns the `<Picasa2_Root>\\tmp` directory (`#tmp\\` created during `CThumbDB::Save` at `0x0041B5D3`).
+        Ref: picasa3.exe @ 0x0041B5D3 (#tmp\\)
+        """
+        return self.root_dir / "tmp"
+
+    @property
+    def picasa2albums_dir(self) -> Path:
+        """
+        FR: Retourne le répertoire frère `Picasa2Albums` résolu exactement comme `picasa3.exe` à `0x00419C30`
+        (remonte de `#x\\` de deux niveaux vers `<Picasa2_Root.parent>\\Picasa2Albums` lorsque la racine est
+        `Picasa2`/`Picasa3`, ou `<Picasa2_Root>\\Picasa2Albums` dans un dossier de test isolé).
+        Contient `watchedfolders.txt`, `frexcludefolders.txt` et les sous-dossiers `<db_guid>\\*.pal` / `backup.xml`.
+        EN: Returns the sibling `Picasa2Albums` directory resolved exactly like `picasa3.exe` at `0x00419C30`.
+        Contains `watchedfolders.txt`, `frexcludefolders.txt`, and `<db_guid>\\*.pal` / `backup.xml` subfolders.
+        Ref: picasa3.exe @ 0x00419C30, 0x00418930..0x00418AD0, 0x004190E0, 0x0044F390, 0x0066F2B0
+        """
+        root = self.root_dir
+        if root.name.lower() in ("picasa2", "picasa3"):
+            return root.parent / "Picasa2Albums"
+        return root / "Picasa2Albums"
+
+    albums_dir = picasa2albums_dir
+    albums_root_dir = picasa2albums_dir
+
+    def _ensure_standard_root_hierarchy(self) -> None:
+        """
+        FR: Crée l'arborescence complète de répertoires et fichiers d'infrastructure de `picasa3.exe`
+        à partir de `<Picasa2_Root>` :
+        - `<Picasa2_Root>\\db3\\` (`#db3\\` @ `0x00414159`, `0x006B6070`)
+        - `<Picasa2_Root>\\contacts\\` (`#contacts\\` @ `0x0041BB58`)
+        - `<Picasa2_Root>\\ioqueue\\` avec `slingshot.ioq`, `filesafe.ioq`, `albumsafe.ioq` (`OPEN_ALWAYS = 4` @ `0x004164A7..0x004165FB`)
+        - `<Picasa2_Root>\\tmp\\` (`#tmp\\` @ `0x0041B5D3`)
+        - `<Picasa2Albums>\\` (`0x00419C30`)
+        EN: Creates the complete `picasa3.exe` directory and infrastructure file hierarchy under `<Picasa2_Root>`.
+        Ref: picasa3.exe @ 0x004164A7..0x004165FB, 0x00419C30, 0x0041B5D3, 0x00980EC0
+        """
+        if not self.db3_dir or self.db3_dir == Path("."):
+            return
+        try:
+            self.db3_dir.mkdir(parents=True, exist_ok=True)
+            if self.contacts_dir is not None:
+                self.contacts_dir.mkdir(parents=True, exist_ok=True)
+            if self.db3_dir.name.lower() == "db3":
+                ioq = self.ioqueue_dir
+                ioq.mkdir(parents=True, exist_ok=True)
+                for ioq_name in ("slingshot.ioq", "filesafe.ioq", "albumsafe.ioq"):
+                    ioq_file = ioq / ioq_name
+                    if not ioq_file.exists():
+                        ioq_file.write_bytes(b"")
+                self.tmp_dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+
     @classmethod
     def open(cls, db3_dir: str | Path, contacts_dir: str | Path | None = None) -> PicasaDatabase:
         """
@@ -588,24 +847,29 @@ class PicasaDatabase:
     def create_new(cls, target_dir: str | Path, contacts_dir: str | Path | None = None) -> PicasaDatabase:
         """
         FR: Crée et initialise sur disque une nouvelle base de données Picasa 3 complète et vierge
-        (structure binaire exacte de CThumbDB::Init @ 0x004156F0 : thumbindex.db, wordhash.dat,
-        repository.dat, usernames.dat, contacts/contacts.xml, 56 colonnes .pmp et 6 paires CBlockFile).
-        EN: Creates and initializes on disk a complete, blank Picasa 3 database
-        (exact binary structure of CThumbDB::Init @ 0x004156F0: thumbindex.db, wordhash.dat,
-        repository.dat, usernames.dat, contacts/contacts.xml, 56 .pmp columns, and 6 CBlockFile pairs).
+        (structure binaire et arborescence exactes de CThumbDB::Init @ 0x004156F0 :
+        - `<root>/db3/` : thumbindex.db, wordhash.dat, repository.dat, usernames.dat, 4 fichiers sentinelles (`*_0`),
+          56 colonnes `.pmp`, 6 paires `CBlockFile` (`*_0.db` + `*_index.db`), et les 5 listes `.txt`
+        - `<root>/contacts/contacts.xml` (`0x0041BB58`)
+        - `<root>/ioqueue/slingshot.ioq`, `filesafe.ioq`, `albumsafe.ioq` (`0x004164A7..0x004165FB`)
+        - `<root>/tmp/` (`0x0041B5D3`)
+        - `Picasa2Albums/watchedfolders.txt` & `frexcludefolders.txt` (`0x00419C30`, `0x004F5960`, `0x004F5D90`)).
+        EN: Creates and initializes on disk a complete, blank Picasa 3 database with the exact
+        binary structure and directory tree of CThumbDB::Init @ 0x004156F0.
         """
         p_db3, p_cont = cls.resolve_database_dirs(target_dir, contacts_dir, for_creation=True)
         p_db3.mkdir(parents=True, exist_ok=True)
         p_cont.mkdir(parents=True, exist_ok=True)
 
-        # FR: Purger tout fichier résiduel (*.pmp, *.db, *.dat, *.tmp, *.txt, albums/*.pal) si le dossier contenait une ancienne base
-        # EN: Purge any residual file (*.pmp, *.db, *.dat, *.tmp, *.txt, albums/*.pal) if the folder previously held a database
+        # FR: Purger tout fichier résiduel (*.pmp, *.db, *.dat, *.tmp, *.txt) si le dossier contenait une ancienne base
+        # EN: Purge any residual file (*.pmp, *.db, *.dat, *.tmp, *.txt) if the folder previously held a database
         for pattern in ("*.pmp", "*.db", "*.dat", "*.tmp", "*.txt"):
             for old_f in p_db3.glob(pattern):
                 try:
                     old_f.unlink()
                 except Exception:
                     pass
+        # Supprimer un éventuel sous-dossier legacy db3/albums (picasa3.exe ne crée aucun sous-dossier dans db3/)
         albums_subdir = p_db3 / "albums"
         if albums_subdir.is_dir():
             for old_pal in albums_subdir.glob("*.pal"):
@@ -613,26 +877,20 @@ class PicasaDatabase:
                     old_pal.unlink()
                 except Exception:
                     pass
+            try:
+                albums_subdir.rmdir()
+            except Exception:
+                pass
 
         db = cls(db3_dir=p_db3, contacts_dir=p_cont)
-        db.thumbindex = ThumbIndexFile(records=[], dirty=True)
-        db.repository = KeyValueTableFile(pairs=[])
-        db.usernames = KeyValueTableFile(pairs=[])
-        db.wordhash = WordHashFile(dirty=True)
-        db.contacts = ContactsFile(contacts=[])
-
-        for stem, pmp_type in STANDARD_PMP_SCHEMA.items():
-            default_records = list(DEFAULT_CATDATA_RECORDS.get(stem, []))
-            db.pmps[stem] = PmpFile(pmp_type=pmp_type, records=default_records, dirty=True)
-
-        for prefix in STANDARD_BLOCKFILE_PREFIXES:
-            idx_obj = BlockIndexFile.from_entries([], active_block=0)
-            idx_obj.dirty = True
-            db.block_indices[prefix] = idx_obj
-            cont = BlockContainerFile()
-            cont._fully_dirty = True
-            db.block_containers[prefix] = cont
-            db.block_containers_by_block[(prefix, 0)] = cont
+        c_xml = p_cont / "contacts.xml"
+        if c_xml.exists():
+            try:
+                db.contacts = ContactsFile.from_xml(c_xml.read_text(encoding="utf-8", errors="ignore"))
+            except Exception:
+                db.contacts = None
+        db._ensure_standard_root_hierarchy()
+        db._ensure_standard_schema()
 
         db.save_database(force_all=True)
         return db
@@ -692,9 +950,28 @@ class PicasaDatabase:
         if self.wordhash:
             try:
                 wh_results = self.wordhash.search(query_stripped)
+                recs_wh = self.thumbindex.records if self.thumbindex else None
                 for idx in wh_results:
-                    if idx not in self._deleted_or_reset_indices:
-                        matched_indices.add(idx)
+                    if idx in self._deleted_or_reset_indices:
+                        continue
+                    if recs_wh is not None:
+                        if idx < 0 or idx >= len(recs_wh):
+                            continue
+                        rec_wh = recs_wh[idx]
+                        if rec_wh.type == 1001:
+                            p_idx = rec_wh.parent_idx
+                            if (
+                                p_idx != 0xFFFFFFFF
+                                and 0 <= p_idx < len(recs_wh)
+                                and p_idx not in self._deleted_or_reset_indices
+                                and recs_wh[p_idx].type in MEDIA_RECORD_TYPES
+                                and recs_wh[p_idx].path
+                            ):
+                                matched_indices.add(p_idx)
+                            continue
+                        if rec_wh.type not in MEDIA_RECORD_TYPES or not rec_wh.path:
+                            continue
+                    matched_indices.add(idx)
             except Exception:
                 pass
 
@@ -866,8 +1143,28 @@ class PicasaDatabase:
             host_p = _to_host_path(r.path)
             abs_norm = os.path.abspath(host_p).replace("/", "\\").rstrip("\\").lower() if host_p else raw_norm
             self._folder_idx_to_norms[idx] = (raw_norm, abs_norm)
-            self._folder_index_cache.setdefault(raw_norm, idx)
-            self._folder_index_cache.setdefault(abs_norm, idx)
+            prev_f_raw = self._folder_index_cache.get(raw_norm)
+            if (
+                prev_f_raw is None
+                or r.is_active
+                or (
+                    self.thumbindex
+                    and 0 <= prev_f_raw < len(self.thumbindex.records)
+                    and not self.thumbindex.records[prev_f_raw].is_active
+                )
+            ):
+                self._folder_index_cache[raw_norm] = idx
+            prev_f_abs = self._folder_index_cache.get(abs_norm)
+            if (
+                prev_f_abs is None
+                or r.is_active
+                or (
+                    self.thumbindex
+                    and 0 <= prev_f_abs < len(self.thumbindex.records)
+                    and not self.thumbindex.records[prev_f_abs].is_active
+                )
+            ):
+                self._folder_index_cache[abs_norm] = idx
         elif r.type in MEDIA_RECORD_TYPES:
             fn_low = r.path.lower()
             norms = self._folder_idx_to_norms.get(r.parent_idx)
@@ -884,20 +1181,34 @@ class PicasaDatabase:
                 k_raw = f"{raw_n}\\{fn_low}"
                 k_abs = f"{abs_n}\\{fn_low}"
                 prev_raw = self._path_index_cache.get(k_raw)
-                if prev_raw is None or (
-                    self.thumbindex
-                    and 0 <= prev_raw < len(self.thumbindex.records)
-                    and self.thumbindex.records[prev_raw].type not in MEDIA_RECORD_TYPES
+                if (
+                    prev_raw is None
+                    or r.is_active
+                    or (
+                        self.thumbindex
+                        and 0 <= prev_raw < len(self.thumbindex.records)
+                        and (
+                            self.thumbindex.records[prev_raw].type not in MEDIA_RECORD_TYPES
+                            or not self.thumbindex.records[prev_raw].is_active
+                        )
+                    )
                 ):
                     self._path_index_cache[k_raw] = idx
                 prev_abs = self._path_index_cache.get(k_abs)
-                if prev_abs is None or (
-                    self.thumbindex
-                    and 0 <= prev_abs < len(self.thumbindex.records)
-                    and self.thumbindex.records[prev_abs].type not in MEDIA_RECORD_TYPES
+                if (
+                    prev_abs is None
+                    or r.is_active
+                    or (
+                        self.thumbindex
+                        and 0 <= prev_abs < len(self.thumbindex.records)
+                        and (
+                            self.thumbindex.records[prev_abs].type not in MEDIA_RECORD_TYPES
+                            or not self.thumbindex.records[prev_abs].is_active
+                        )
+                    )
                 ):
                     self._path_index_cache[k_abs] = idx
-        elif r.type == 1001 and r.parent_idx >= 0:
+        elif r.type == 1001 and r.parent_idx >= 0 and r.is_active:
             children = self._parent_to_face_children.setdefault(r.parent_idx, [])
             if idx not in children:
                 children.append(idx)
@@ -972,7 +1283,7 @@ class PicasaDatabase:
             idx = self._path_index_cache.get(key)
             if idx is not None and 0 <= idx < len(self.thumbindex.records):
                 rec = self.thumbindex.records[idx]
-                if rec.type in MEDIA_RECORD_TYPES and rec.path.lower() == fname_lower:
+                if rec.type in MEDIA_RECORD_TYPES and rec.is_active and rec.path.lower() == fname_lower:
                     return idx
                 # FR: Enregistrement modifié/supprimé en place -> reconstruire le cache / EN: Record mutated in-place -> rebuild cache
                 self._invalidate_path_index_cache()
@@ -980,7 +1291,7 @@ class PicasaDatabase:
                 idx2 = self._path_index_cache.get(key)
                 if idx2 is not None and 0 <= idx2 < len(self.thumbindex.records):
                     rec2 = self.thumbindex.records[idx2]
-                    if rec2.type in MEDIA_RECORD_TYPES and rec2.path.lower() == fname_lower:
+                    if rec2.type in MEDIA_RECORD_TYPES and rec2.is_active and rec2.path.lower() == fname_lower:
                         return idx2
         return None
 
@@ -1041,6 +1352,11 @@ class PicasaDatabase:
                 if ad_cats is not None:
                     ad_cats.records[alb_idx] = 0
                     ad_cats.dirty = True
+                # Ref: picasa3.exe @ 0x00456A15 (albumdata_SyncState = 4 for user albums cat=0)
+                ad_sync = self.pmps.get("albumdata_SyncState")
+                if ad_sync is not None and alb_idx < len(ad_sync.records):
+                    ad_sync.records[alb_idx] = 4
+                    ad_sync.dirty = True
 
             if alb_idx is not None:
                 for stem, pmp in self.pmps.items():
@@ -1913,12 +2229,18 @@ class PicasaDatabase:
         facerect_pmp = self.pmps.get("imagedata_facerect")
         personalbumid_pmp = self.pmps.get("imagedata_personalbumid")
         suggestion_pmp = self.pmps.get("imagedata_suggestionpersonalbumid")
+        precs_pmp = self.pmps.get("imagedata_personalbumrecs")
+        precs2_pmp = self.pmps.get("imagedata_personalbumrecs2")
+        if self.wordhash is not None and hasattr(self.wordhash, "remove_doc"):
+            self.wordhash.remove_doc(rec_idx)
         for child_idx in self._get_face_children(rec_idx):
             child_rec = self.thumbindex.records[child_idx]
             child_rec.mark_deleted()
             child_rec.mod_time = 0.0
             child_rec.version = 0
             self._deleted_or_reset_indices.add(child_idx)
+            if self.wordhash is not None and hasattr(self.wordhash, "remove_doc"):
+                self.wordhash.remove_doc(child_idx)
             if facerect_pmp is not None and child_idx < len(facerect_pmp.records):
                 facerect_pmp.records[child_idx] = 0
                 facerect_pmp.dirty = True
@@ -1928,6 +2250,12 @@ class PicasaDatabase:
             if suggestion_pmp is not None and child_idx < len(suggestion_pmp.records):
                 suggestion_pmp.records[child_idx] = 0
                 suggestion_pmp.dirty = True
+            if precs_pmp is not None and child_idx < len(precs_pmp.records):
+                precs_pmp.records[child_idx] = 0xFFFFFFFF
+                precs_pmp.dirty = True
+            if precs2_pmp is not None and child_idx < len(precs2_pmp.records):
+                precs2_pmp.records[child_idx] = 0xFFFFFFFF
+                precs2_pmp.dirty = True
         self._invalidate_path_index_cache()
         self.invalidate_search_cache()
         self._albums_cache = None
@@ -1942,6 +2270,47 @@ class PicasaDatabase:
         if suggestion_pmp is not None and rec_idx < len(suggestion_pmp.records):
             suggestion_pmp.records[rec_idx] = 0
             suggestion_pmp.dirty = True
+        if precs_pmp is not None and rec_idx < len(precs_pmp.records):
+            precs_pmp.records[rec_idx] = 0xFFFFFFFF
+            precs_pmp.dirty = True
+        if precs2_pmp is not None and rec_idx < len(precs2_pmp.records):
+            precs2_pmp.records[rec_idx] = 0xFFFFFFFF
+            precs2_pmp.dirty = True
+
+        if self._face_manager is not None:
+            fm = self._face_manager
+            old_norm = os.path.normcase(os.path.normpath(full_path)) if full_path else ""
+            if hasattr(fm, "photo_to_faces"):
+                fm.photo_to_faces.pop(rec_idx, None)
+                for k in list(fm.photo_to_faces.keys()):
+                    if isinstance(k, str) and (k == full_path or (old_norm and os.path.normcase(os.path.normpath(k)) == old_norm)):
+                        fm.photo_to_faces.pop(k, None)
+            if hasattr(fm, "people"):
+                for person in fm.people.values():
+                    if rec_idx in person.photo_indices:
+                        person.photo_indices = [i for i in person.photo_indices if i != rec_idx]
+                    if hasattr(person, "face_rects_by_photo") and isinstance(person.face_rects_by_photo, dict):
+                        person.face_rects_by_photo.pop(rec_idx, None)
+                    if old_norm and person.photo_paths:
+                        person.photo_paths = [
+                            p for p in person.photo_paths
+                            if os.path.normcase(os.path.normpath(p)) != old_norm
+                        ]
+                    if old_norm and getattr(person, "cover_photo_path", None):
+                        if os.path.normcase(os.path.normpath(person.cover_photo_path)) == old_norm:
+                            person.cover_photo_path = person.photo_paths[0] if person.photo_paths else None
+            if hasattr(fm, "suggestions") and isinstance(fm.suggestions, dict):
+                for cid_s, sug_list in list(fm.suggestions.items()):
+                    fm.suggestions[cid_s] = [
+                        s for s in sug_list
+                        if getattr(s, "db_idx", None) != rec_idx
+                        and (not old_norm or not getattr(s, "photo_path", "") or os.path.normcase(os.path.normpath(s.photo_path)) != old_norm)
+                    ]
+            if hasattr(fm, "unnamed_faces") and fm.unnamed_faces:
+                fm.unnamed_faces = [
+                    (di, pp, fr) for (di, pp, fr) in fm.unnamed_faces
+                    if di != rec_idx and (not old_norm or not pp or os.path.normcase(os.path.normpath(pp)) != old_norm)
+                ]
 
         if delete_from_disk and full_path and os.path.exists(full_path):
             try:
@@ -1959,7 +2328,121 @@ class PicasaDatabase:
                         self.invalidate_ini_cache(ini_p)
                 except Exception:
                     pass
+            # Retirer également les références à la photo supprimée des fichiers .pal (Ref: 0x0044EA30..0x0044F000)
+            if self.db3_dir and self.db3_dir != Path("."):
+                pal_files: List[Path] = []
+                try:
+                    p2a = self.picasa2albums_dir
+                    if p2a.is_dir():
+                        for sub in p2a.iterdir():
+                            if sub.is_dir():
+                                pal_files.extend(sub.glob("*.pal"))
+                    alb_dir = self.db3_dir / "albums"
+                    if alb_dir.is_dir():
+                        pal_files.extend(alb_dir.glob("*.pal"))
+                except Exception:
+                    pass
+                if pal_files:
+                    import re
+                    old_win = full_path.replace("/", "\\")
+                    for pal_p in pal_files:
+                        try:
+                            txt = pal_p.read_text(encoding="utf-8", errors="surrogateescape")
+                            if old_win.lower() in txt.lower() or full_path.lower() in txt.lower():
+                                pat = re.compile(
+                                    r"[ \t]*<filename>\s*(?:"
+                                    + re.escape(old_win)
+                                    + r"|"
+                                    + re.escape(full_path)
+                                    + r")\s*</filename>\r?\n?",
+                                    flags=re.IGNORECASE,
+                                )
+                                new_txt = pat.sub("", txt)
+                                if new_txt != txt:
+                                    pal_p.write_text(new_txt, encoding="utf-8", errors="surrogateescape")
+                        except Exception:
+                            pass
         return True
+
+    def _remap_photo_path_in_faces_and_pals(self, old_full_path: str, new_full_path: str) -> None:
+        """
+        FR: Met à jour les chemins en mémoire dans `self._face_manager` (`photo_to_faces`,
+        `person.photo_paths`, `person.suggestions`, `unnamed_faces`) ainsi que dans les fichiers
+        `.pal` (`Picasa2Albums/<db_guid>/*.pal` et `db3/albums/*.pal`) lorsqu'une photo ou un
+        dossier est renommé ou déplacé.
+        EN: Updates in-memory paths in `self._face_manager` (`photo_to_faces`, `person.photo_paths`,
+        `person.suggestions`, `unnamed_faces`) and in `.pal` files (`Picasa2Albums/<db_guid>/*.pal`
+        and `db3/albums/*.pal`) when a photo or folder is renamed or moved.
+        Ref: picasa3.exe @ 0x0068AC80, 0x0044EA30..0x0044F000
+        """
+        if not old_full_path or not new_full_path:
+            return
+        old_norm = os.path.normcase(os.path.normpath(old_full_path))
+        new_norm = os.path.normcase(os.path.normpath(new_full_path))
+        if old_norm == new_norm and old_full_path == new_full_path:
+            return
+
+        if self._face_manager is not None:
+            fm = self._face_manager
+            if hasattr(fm, "photo_to_faces"):
+                for k in list(fm.photo_to_faces.keys()):
+                    if isinstance(k, str) and (k == old_full_path or os.path.normcase(os.path.normpath(k)) == old_norm):
+                        faces_val = fm.photo_to_faces.pop(k)
+                        fm.photo_to_faces[new_full_path] = faces_val
+            if hasattr(fm, "people"):
+                for person in fm.people.values():
+                    if person.photo_paths:
+                        person.photo_paths = [
+                            new_full_path if (p == old_full_path or os.path.normcase(os.path.normpath(p)) == old_norm) else p
+                            for p in person.photo_paths
+                        ]
+                    if getattr(person, "cover_photo_path", None):
+                        if person.cover_photo_path == old_full_path or os.path.normcase(os.path.normpath(person.cover_photo_path)) == old_norm:
+                            person.cover_photo_path = new_full_path
+            if hasattr(fm, "suggestions") and isinstance(fm.suggestions, dict):
+                for sug_list in fm.suggestions.values():
+                    for s in sug_list:
+                        pp = getattr(s, "photo_path", "")
+                        if pp and (pp == old_full_path or os.path.normcase(os.path.normpath(pp)) == old_norm):
+                            s.photo_path = new_full_path
+            if hasattr(fm, "unnamed_faces") and fm.unnamed_faces:
+                fm.unnamed_faces = [
+                    (
+                        di,
+                        new_full_path if (pp and (pp == old_full_path or os.path.normcase(os.path.normpath(pp)) == old_norm)) else pp,
+                        fr,
+                    )
+                    for (di, pp, fr) in fm.unnamed_faces
+                ]
+
+        if self.db3_dir and self.db3_dir != Path("."):
+            pal_files: List[Path] = []
+            try:
+                p2a = self.picasa2albums_dir
+                if p2a.is_dir():
+                    for sub in p2a.iterdir():
+                        if sub.is_dir():
+                            pal_files.extend(sub.glob("*.pal"))
+                alb_dir = self.db3_dir / "albums"
+                if alb_dir.is_dir():
+                    pal_files.extend(alb_dir.glob("*.pal"))
+            except Exception:
+                pass
+            if pal_files:
+                old_win = old_full_path.replace("/", "\\")
+                new_win = new_full_path.replace("/", "\\")
+                for pal_p in pal_files:
+                    try:
+                        txt = pal_p.read_text(encoding="utf-8", errors="surrogateescape")
+                        if old_win.lower() in txt.lower() or old_full_path.lower() in txt.lower():
+                            import re
+                            new_txt = re.sub(re.escape(old_win), lambda _m: new_win, txt, flags=re.IGNORECASE)
+                            if old_full_path != old_win:
+                                new_txt = re.sub(re.escape(old_full_path), lambda _m: new_win, new_txt, flags=re.IGNORECASE)
+                            if new_txt != txt:
+                                pal_p.write_text(new_txt, encoding="utf-8", errors="surrogateescape")
+                    except Exception:
+                        pass
 
     def move_photo(self, idx_or_src: int | str | Path, dest_folder: str | Path) -> bool:
         """
@@ -2017,6 +2500,7 @@ class PicasaDatabase:
                 src_sec = src_doc.get_section(fname)
                 if src_sec is not None:
                     dest_doc = PicasaIniParser.parse_file(dest_ini) if os.path.exists(dest_ini) else PicasaIniDocument()
+                    dest_doc.remove_section(fname)
                     dest_sec = dest_doc.get_or_create_section(fname)
                     for k, v in src_sec.items():
                         dest_sec.set(k, v)
@@ -2058,6 +2542,7 @@ class PicasaDatabase:
                             idx_f.checksums[c_idx] = new_cs
                             idx_f.dirty = True
 
+        self._remap_photo_path_in_faces_and_pals(src_full_path, dest_full_path)
         self._invalidate_path_index_cache()
         self.invalidate_search_cache()
         self._albums_cache = None
@@ -2068,10 +2553,10 @@ class PicasaDatabase:
         """
         FR: Renomme une photo sur le disque (si ce n'est pas déjà fait) et migre sa section
         `[old_name]` -> `[new_name]` dans `.picasa.ini`, sa copie `.picasaoriginals/<old_name>`,
-        son enregistrement `thumbindex.db` (`records[rec_idx].path`) et `wordhash.dat`.
+        son enregistrement `thumbindex.db` (`records[rec_idx].path`), `wordhash.dat`, `face_manager` et `.pal`.
         EN: Renames a photo on disk (if not already renamed) and migrates its `[old_name]` ->
         `[new_name]` section in `.picasa.ini`, its `.picasaoriginals/<old_name>` backup, its
-        `thumbindex.db` record (`records[rec_idx].path`), and `wordhash.dat`.
+        `thumbindex.db` record (`records[rec_idx].path`), `wordhash.dat`, `face_manager`, and `.pal`.
 
         Ref: picasa3.exe @ ID_FILE_RENAME (0x0068AC80, 0x00456A15)
         """
@@ -2120,11 +2605,14 @@ class PicasaDatabase:
                     doc = PicasaIniParser.parse_file(ini_path)
                     old_sec = doc.get_section(old_fname)
                     if old_sec is not None:
+                        doc.remove_section(new_fname)
                         new_sec = doc.get_or_create_section(new_fname)
                         for k, v in old_sec.items():
                             new_sec.set(k, v)
                         doc.remove_section(old_fname)
                         doc.write_file(ini_path)
+                        self.invalidate_ini_cache(ini_path)
+                    else:
                         self.invalidate_ini_cache(ini_path)
                 except Exception:
                     pass
@@ -2157,6 +2645,7 @@ class PicasaDatabase:
                 for tok in tokenize_indexer_text(new_fname):
                     self.wordhash.add_word(tok, rec_idx)
 
+        self._remap_photo_path_in_faces_and_pals(src_full_path, new_full_path)
         self._invalidate_path_index_cache()
         self.invalidate_search_cache()
         self._albums_cache = None
@@ -2195,13 +2684,29 @@ class PicasaDatabase:
 
     def save_contacts(self) -> bool:
         """
-        FR: Sauvegarde atomiquement contacts.xml via la couche DB.
-        EN: Atomically saves contacts.xml through the DB layer.
+        FR: Sauvegarde atomiquement `contacts.xml` dans `#contacts\\contacts.xml` (`0x0041BB58`)
+        et synchronise sa copie de sauvegarde `backup.xml` dans tout sous-dossier `<db_guid>`
+        existant sous `Picasa2Albums` (`CopyFileW` @ `0x0066F2B0..0x0066F450`).
+        EN: Atomically saves `contacts.xml` into `#contacts\\contacts.xml` (`0x0041BB58`)
+        and synchronizes its `backup.xml` copy in any existing `<db_guid>` subfolder
+        under `Picasa2Albums` (`CopyFileW` @ `0x0066F2B0..0x0066F450`).
+        Ref: picasa3.exe @ 0x0041BB58, 0x00586BD0, 0x0066F2B0..0x0066F450 (backup.xml)
         """
         if not self.contacts or not self.contacts_dir:
             return False
         try:
-            self.contacts.save(str(self.contacts_dir / "contacts.xml"))
+            self.contacts_dir.mkdir(parents=True, exist_ok=True)
+            contacts_path = self.contacts_dir / "contacts.xml"
+            self.contacts.save(str(contacts_path))
+            p2a = self.picasa2albums_dir
+            if p2a.is_dir() and contacts_path.exists():
+                raw_xml = contacts_path.read_bytes()
+                for sub in p2a.iterdir():
+                    if sub.is_dir():
+                        try:
+                            (sub / "backup.xml").write_bytes(raw_xml)
+                        except Exception:
+                            pass
             return True
         except Exception:
             return False
@@ -2234,13 +2739,21 @@ class PicasaDatabase:
 
     def get_all_albums(self) -> List[Dict[str, Any]]:
         """
-        FR: Récupère l'ensemble des albums virtuels (tables PMP et sections .album:<uid> des fichiers .picasa.ini).
-        EN: Retrieves all virtual albums (from PMP tables and .album:<uid> sections in .picasa.ini files).
-        Ref: picasa3.exe @ albumdata_category.pmp (cat=0), 0x00732160, 0x008AAD76
+        FR: Récupère l'ensemble des albums virtuels et dynamiques (`albumdata_category.pmp` cat=0
+        et sections `.album:<uid>` des fichiers `.picasa.ini` des dossiers indexés), en excluant
+        les jetons de dossiers (`cat != 0`), les dossiers `cat == 6` (`Other Stuff`) et les dossiers
+        non indexés de la file d'attente `scanlist.txt`.
+        EN: Retrieves all virtual and dynamic albums (`albumdata_category.pmp` cat=0 and
+        `.album:<uid>` sections in `.picasa.ini` files of indexed folders), excluding folder
+        tokens (`cat != 0`), `cat == 6` (`Other Stuff`) folders, and unindexed `scanlist.txt` queue entries.
+        Ref: picasa3.exe @ 0x004AA9F0..0x004AD220 (CAlbumState::UpdateAlbumEntry & RebuildAlbumNodes),
+             0x004ACA00 (is_dynamic_system_token_album), 0x004B0190, 0x00732160, 0x008AAD76
         """
         ad_names = self.pmps.get("albumdata_name")
         ad_cats = self.pmps.get("albumdata_category")
         ad_tokens = self.pmps.get("albumdata_token")
+        ad_uids = self.pmps.get("albumdata_uid")
+        ad_files = self.pmps.get("albumdata_filename")
         self._ensure_path_index_cache()
         curr_sig = (
             len(ad_names.records) if ad_names else 0,
@@ -2253,10 +2766,43 @@ class PicasaDatabase:
             ]
 
         albums: Dict[str, Dict[str, Any]] = {}
+        non_album_tokens: Set[str] = set()
+        excluded_folder_norms: Set[str] = set()
+        db_in_pytest = "pytest" in str(self.db3_dir).lower() if self.db3_dir else False
+        has_authoritative_db = bool(
+            self.thumbindex
+            and len(self.thumbindex.records) > 0
+            and ad_names is not None
+            and ad_cats is not None
+            and len(ad_names.records) > 0
+        )
+
+        # 0. Recenser les UIDs/tokens appartenant à d'autres catégories (cat != 0 : dossiers cat=2/6/7, personnes cat=8)
+        # ainsi que les dossiers exclus de l'affichage standard (cat == 6 'Other Stuff' @ 0x004156F0 catdata_state=0)
+        if ad_cats is not None:
+            cats_recs = ad_cats.records
+            toks_recs = ad_tokens.records if ad_tokens is not None else []
+            uids_recs = ad_uids.records if ad_uids is not None else []
+            files_recs = ad_files.records if ad_files is not None else []
+            for i, cat_v in enumerate(cats_recs):
+                if cat_v != 0:
+                    if i < len(toks_recs) and toks_recs[i]:
+                        rt = str(toks_recs[i]).strip()
+                        non_album_tokens.add(rt)
+                        if rt.startswith("]album:") or rt.startswith(".album:"):
+                            non_album_tokens.add(rt[7:].strip())
+                    if i < len(uids_recs) and uids_recs[i]:
+                        non_album_tokens.add(str(uids_recs[i]).strip())
+                if cat_v == 6 and i < len(files_recs) and files_recs[i]:
+                    fp_norm = os.path.normcase(os.path.abspath(_to_host_path(str(files_recs[i]).rstrip("\\/"))))
+                    excluded_folder_norms.add(fp_norm)
 
         # 1. Albums dans les tables PMP (cat == 0 dans albumdata_category)
+        # Ref: picasa3.exe @ 0x004AA9F0..0x004AAD75 (inclut les albums utilisateur ]album:<uid> et les
+        # collections dynamiques système ]updated, ]screensaver, ]history:email, ]history:upload ayant > 0 photo)
         ad_musics = self.pmps.get("albumdata_music")
         ad_dates = self.pmps.get("albumdata_date")
+        dynamic_system_tokens: List[str] = []
         if ad_names and ad_cats:
             names = ad_names.records
             cats = ad_cats.records
@@ -2268,10 +2814,10 @@ class PicasaDatabase:
                         continue
                     raw_tok = str(tokens[i]) if i < len(tokens) and tokens[i] else f"pmp_{i}"
                     token = raw_tok.strip()
-                    # FR : Ignorer les collections dynamiques internes comme ]updated ('Récemment mis à jour')
-                    # EN: Skip internal dynamic collections such as ]updated ('Recently Updated')
-                    if token.startswith("]") and not token.startswith("]album:"):
+                    # ]star ('Photos favorites') est géré en 1re ligne épinglée dédiée et ]search est réservé à la recherche active
+                    if token in ("]star", "]search"):
                         continue
+                    is_dynamic_sys = token.startswith("]") and not token.startswith("]album:") and not token.startswith("]facealbum:")
                     if not aname.strip() and token.startswith("pmp_"):
                         continue
                     if token.startswith("]album:") or token.startswith(".album:"):
@@ -2287,22 +2833,31 @@ class PicasaDatabase:
                         "photo_indices": [],
                         "music": pmp_music,
                         "date": pmp_date,
-                        "source": "pmp",
+                        "source": "pmp_dynamic" if is_dynamic_sys else "pmp",
+                        "is_dynamic": is_dynamic_sys,
                     }
+                    if is_dynamic_sys:
+                        dynamic_system_tokens.append(token)
 
-        # 2. Albums définis dans les fichiers .picasa.ini des dossiers surveillés et indexés
+        # 2. Albums définis dans les fichiers .picasa.ini des dossiers indexés (ou surveillés si base légère de test)
         watched_set: Dict[str, str] = {}
-        for p, st in self.get_watched_folders().items():
-            if st in ("1", "2"):
-                hp = _to_host_path(p.rstrip("\\/"))
-                nk = os.path.normcase(os.path.abspath(hp))
-                watched_set[nk] = hp
+        if not has_authoritative_db:
+            for p, st in self.get_watched_folders().items():
+                if st in ("1", "2"):
+                    hp = _to_host_path(p.rstrip("\\/"))
+                    nk = os.path.normcase(os.path.abspath(hp))
+                    if not db_in_pytest and "pytest" in nk.lower():
+                        continue
+                    if nk not in excluded_folder_norms:
+                        watched_set[nk] = hp
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1 and r.path:
+                if r.type == 1 and r.is_active and r.path:
                     hp = _to_host_path(r.path.rstrip("\\/"))
                     nk = os.path.normcase(os.path.abspath(hp))
-                    if nk not in watched_set:
+                    if not db_in_pytest and "pytest" in nk.lower():
+                        continue
+                    if nk not in excluded_folder_norms and nk not in watched_set:
                         watched_set[nk] = hp
 
         for w in watched_set.values():
@@ -2319,6 +2874,8 @@ class PicasaDatabase:
                         token = raw_token.strip()
                         if token.startswith("]album:") or token.startswith(".album:"):
                             token = token[7:].strip()
+                        if not token or token in non_album_tokens:
+                            continue
                         aname = sec.get("name") or token
                         music = sec.get("music")
                         date = sec.get("date")
@@ -2349,11 +2906,19 @@ class PicasaDatabase:
                     alb_tokens = [x.strip() for x in alb_str.split(",") if x.strip()]
                     photo_full_path = os.path.join(w, sec.name)
                     rec_idx = self._path_index_cache.get(f"{norm_w}\\{sec.name.lower()}")
+                    if has_authoritative_db:
+                        if (
+                            rec_idx is None
+                            or not (0 <= rec_idx < len(self.index))
+                            or not self.index[rec_idx].is_active
+                            or self.index[rec_idx].type not in MEDIA_RECORD_TYPES
+                        ):
+                            continue
                     for t in alb_tokens:
                         tok = t.strip()
                         if tok.startswith("]album:") or tok.startswith(".album:"):
                             tok = tok[7:].strip()
-                        if not tok:
+                        if not tok or tok in non_album_tokens:
                             continue
                         if tok not in albums:
                             aname = folder_albums.get(tok, f"Album {tok}")
@@ -2374,22 +2939,50 @@ class PicasaDatabase:
             except Exception:
                 pass
 
-        # 3. Compléter les photos des albums via wordhash.dat (]album:<token>)
+        # 3. Compléter les photos des albums via wordhash.dat (]album:<token> et jetons dynamiques ]updated, etc.)
         if self.wordhash is not None and hasattr(self.wordhash, "search"):
-            for tok, alb_info in albums.items():
+            for tok, alb_info in list(albums.items()):
                 try:
-                    wh_indices = self.wordhash.search(f"]album:{tok}")
+                    wh_key = tok if tok.startswith("]") else f"]album:{tok}"
+                    wh_indices = self.wordhash.search(wh_key)
                     for r_idx in wh_indices:
-                        if 0 <= r_idx < len(self.index) and not self.is_face_record(r_idx):
+                        if (
+                            0 <= r_idx < len(self.index)
+                            and self.index[r_idx].is_active
+                            and self.index[r_idx].type in MEDIA_RECORD_TYPES
+                            and not self.is_face_record(r_idx)
+                        ):
+                            p_full = self.get_media_full_path(r_idx)
+                            if p_full:
+                                if not db_in_pytest and "pytest" in p_full.lower():
+                                    continue
+                                p_dir_norm = os.path.normcase(os.path.abspath(os.path.dirname(p_full)))
+                                if p_dir_norm in excluded_folder_norms:
+                                    continue
                             if r_idx not in alb_info["photo_indices"]:
                                 alb_info["photo_indices"].append(r_idx)
-                            p_full = self.get_media_full_path(r_idx)
                             if p_full and p_full not in alb_info["photo_paths"]:
                                 alb_info["photo_paths"].append(p_full)
                 except Exception:
                     pass
 
-        res_list = list(albums.values())
+        # 4. Filtrer selon CAlbumState::UpdateAlbumEntry (0x004AAD5B..0x004AAD75) :
+        # `mov esi, [ecx+4]; shr esi, 1; test esi, esi; je 0x4aad71 -> SetAlbumEntryVisible(0)` :
+        # tout album (dynamique, utilisateur `cat=0` chargé depuis `.pal`, ou `.picasa.ini`) ayant 0 photo
+        # active indexée dans la base courante est masqué de `CAlbumListUI`.
+        res_list: List[Dict[str, Any]] = []
+        for tok, alb_info in albums.items():
+            src = alb_info.get("source")
+            if src == "pmp_dynamic":
+                if len(alb_info["photo_indices"]) == 0 and len(alb_info["photo_paths"]) == 0:
+                    continue
+            elif has_authoritative_db:
+                if len(alb_info["photo_indices"]) == 0 and len(alb_info["photo_paths"]) == 0:
+                    continue
+                if src == "ini" and len(alb_info["photo_indices"]) == 0:
+                    continue
+            res_list.append(alb_info)
+
         self._albums_cache = [
             dict(a, photo_paths=list(a["photo_paths"]), photo_indices=list(a["photo_indices"]))
             for a in res_list
@@ -2397,13 +2990,18 @@ class PicasaDatabase:
         self._albums_cache_sig = curr_sig
         return res_list
 
+    get_albums = get_all_albums
+
     def get_starred_photo_paths(self) -> List[str]:
         """
-        FR: Récupère l'ensemble des chemins complets des photos marquées comme favorites (star=yes)
+        FR: Récupère l'ensemble des chemins complets des photos marquées comme favorites (`]star` / `star=yes`)
         sans appels `os.path.isdir` / `os.path.exists` bloquants par fichier sur le thread GUI.
-        EN: Retrieves all full file paths of photos marked as starred (star=yes)
+        Respecte les enregistrements média actifs de `thumbindex.db` (`0x004A5333`, `0x004B0190`)
+        lorsque la base est indexée.
+        EN: Retrieves all full file paths of photos marked as starred (`]star` / `star=yes`)
         without blocking per-file `os.path.isdir` / `os.path.exists` calls on the GUI thread.
-        Ref: picasa3.exe @ CThumbDB::starredphotos (0x0088F6FC, 0x0068B800)
+        Respects active media records in `thumbindex.db` (`0x004A5333`, `0x004B0190`) when indexed.
+        Ref: picasa3.exe @ CThumbDB::starredphotos (0x0088F6FC, 0x0068B800, 0x004A5333, 0x004B0190)
         """
         self._ensure_path_index_cache()
         curr_sig = len(self._folder_idx_to_norms)
@@ -2412,18 +3010,98 @@ class PicasaDatabase:
 
         starred_paths: List[str] = []
         starred_seen: Set[str] = set()
+        db_dir_str = str(getattr(self, "db_dir", getattr(self, "db3_dir", "")) or "").replace("\\", "/").lower()
+        db_in_pytest = "pytest" in db_dir_str
+        ad_cats = self.pmps.get("albumdata_category")
+        ad_files = self.pmps.get("albumdata_filename")
+        excluded_folder_norms: Set[str] = set()
+        valid_folder_norms: Set[str] = set()
+        if ad_cats is not None and ad_files is not None:
+            for idx_a, fp_a in enumerate(ad_files.records):
+                if not fp_a:
+                    continue
+                norm_a = os.path.normcase(os.path.abspath(_to_host_path(str(fp_a).rstrip("\\/"))))
+                cat_v = ad_cats.records[idx_a] if idx_a < len(ad_cats.records) else 2
+                if cat_v not in (2, 7):
+                    excluded_folder_norms.add(norm_a)
+                else:
+                    valid_folder_norms.add(norm_a)
+        if not db_in_pytest and valid_folder_norms and self.thumbindex:
+            session_scanned = {
+                os.path.normcase(os.path.abspath(_to_host_path(str(p).rstrip("\\/"))))
+                for p in (getattr(self, "_session_scanned_folders", None) or set())
+                if p
+            }
+            for r in self.thumbindex.records:
+                if r.type == 1 and r.is_active and r.path:
+                    norm_r = os.path.normcase(os.path.abspath(_to_host_path(r.path.rstrip("\\/"))))
+                    if norm_r not in valid_folder_norms and norm_r not in session_scanned:
+                        excluded_folder_norms.add(norm_r)
+
+        hidden_wordhash_set: Set[int] = set()
+        if self.wordhash is not None and hasattr(self.wordhash, "_word_map"):
+            hid_ent = self.wordhash._word_map.get("]hidden")
+            if hid_ent is not None and getattr(hid_ent, "image_ids", None):
+                hidden_wordhash_set = set(hid_ent.image_ids)
+        hidden_pmp = self.pmps.get("imagedata_hidden")
+        hidden_recs = hidden_pmp.records if hidden_pmp is not None else None
+
+        has_indexed_records = bool(self.thumbindex and len(self.thumbindex.records) > 0)
+
+        # 1. Enregistrements actifs indexés sous ]star dans wordhash.dat ou imagedata_star.pmp
+        if has_indexed_records:
+            candidate_indices: List[int] = []
+            if self.wordhash is not None and hasattr(self.wordhash, "search"):
+                try:
+                    candidate_indices.extend(self.wordhash.search("]star"))
+                except Exception:
+                    pass
+            star_pmp = self.pmps.get("imagedata_star")
+            if star_pmp is not None and star_pmp.records:
+                for idx_s, val_s in enumerate(star_pmp.records):
+                    if val_s:
+                        candidate_indices.append(idx_s)
+            for r_idx in candidate_indices:
+                if (
+                    0 <= r_idx < len(self.index)
+                    and self.index[r_idx].is_active
+                    and self.index[r_idx].type in MEDIA_RECORD_TYPES
+                    and not self.is_face_record(r_idx)
+                ):
+                    if r_idx in hidden_wordhash_set or bool(hidden_recs and r_idx < len(hidden_recs) and hidden_recs[r_idx]):
+                        continue
+                    p_full = self.get_media_full_path(r_idx)
+                    if not p_full:
+                        continue
+                    if not db_in_pytest and "pytest" in p_full.lower():
+                        continue
+                    p_dir_norm = os.path.normcase(os.path.abspath(os.path.dirname(p_full)))
+                    if p_dir_norm in excluded_folder_norms:
+                        continue
+                    norm_p = p_full.replace("/", "\\").lower()
+                    if norm_p not in starred_seen:
+                        starred_seen.add(norm_p)
+                        starred_paths.append(p_full)
+
+        # 2. Lecture des fichiers .picasa.ini (dossiers actifs de thumbindex ou watched_folders si base non indexée)
         watched_set: Dict[str, str] = {}
-        for p, st in self.get_watched_folders().items():
-            if st in ("1", "2"):
-                hp = _to_host_path(p.rstrip("\\/"))
-                nk = os.path.normcase(os.path.abspath(hp))
-                watched_set[nk] = hp
+        if not has_indexed_records or ad_cats is None or len(ad_cats.records) == 0:
+            for p, st in self.get_watched_folders().items():
+                if st in ("1", "2"):
+                    hp = _to_host_path(p.rstrip("\\/"))
+                    nk = os.path.normcase(os.path.abspath(hp))
+                    if not db_in_pytest and "pytest" in nk.lower():
+                        continue
+                    if nk not in excluded_folder_norms:
+                        watched_set[nk] = hp
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1 and r.path:
+                if r.type == 1 and r.is_active and r.path:
                     hp = _to_host_path(r.path.rstrip("\\/"))
                     nk = os.path.normcase(os.path.abspath(hp))
-                    if nk not in watched_set:
+                    if not db_in_pytest and "pytest" in nk.lower():
+                        continue
+                    if nk not in excluded_folder_norms and nk not in watched_set:
                         watched_set[nk] = hp
 
         for w in watched_set.values():
@@ -2435,11 +3113,23 @@ class PicasaDatabase:
                 continue
             try:
                 for sec in doc.sections:
-                    if sec.get("star", "").lower() == "yes":
+                    if sec.get("star", "").lower() == "yes" and sec.get("hidden", "").lower() != "yes":
                         photo_full_path = os.path.join(w, sec.name)
                         norm_p = f"{norm_w}\\{sec.name.lower()}"
                         if norm_p not in starred_seen:
-                            if norm_p in self._path_index_cache or os.path.exists(photo_full_path):
+                            rec_idx = self._path_index_cache.get(norm_p)
+                            if has_indexed_records:
+                                if (
+                                    rec_idx is not None
+                                    and 0 <= rec_idx < len(self.index)
+                                    and self.index[rec_idx].is_active
+                                    and self.index[rec_idx].type in MEDIA_RECORD_TYPES
+                                    and rec_idx not in hidden_wordhash_set
+                                    and not bool(hidden_recs and rec_idx < len(hidden_recs) and hidden_recs[rec_idx])
+                                ):
+                                    starred_seen.add(norm_p)
+                                    starred_paths.append(photo_full_path)
+                            elif rec_idx is not None or os.path.exists(photo_full_path):
                                 starred_seen.add(norm_p)
                                 starred_paths.append(photo_full_path)
             except Exception:
@@ -2464,7 +3154,7 @@ class PicasaDatabase:
         watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1:
+                if r.type == 1 and r.is_active and r.path:
                     p = _to_host_path(r.path.rstrip("\\/"))
                     if os.path.isdir(p) and p not in watched:
                         watched.append(p)
@@ -2539,16 +3229,51 @@ class PicasaDatabase:
             deleted = True
 
         if self.wordhash is not None and hasattr(self.wordhash, "words"):
+            wh_changed = False
             for w_key in (f"]album:{clean_target}", f"]snapshot:]album:{clean_target}"):
-                if w_key in self.wordhash.words:
-                    self.wordhash.words.pop(w_key, None)
-                    self.wordhash.dirty = True
+                for cand_w in (w_key, w_key.lower()):
+                    if cand_w in self.wordhash.words:
+                        self.wordhash.words.pop(cand_w, None)
+                        wh_changed = True
+            if wh_changed:
+                self.wordhash.dirty = True
+                if hasattr(self.wordhash, "_sync_words_to_entries"):
+                    self.wordhash._sync_words_to_entries()
 
-        # Supprimer le fichier .pal éventuel dans db3/albums/
+        # Supprimer le fichier .pal éventuel dans Picasa2Albums/<db_guid>/*.pal (Ref: 0x0044F390..0x0044F500)
+        # ainsi que tout fichier .pal résiduel éventuel dans un ancien dossier db3/albums/
         if self.db3_dir:
+            pal_candidates = {f"{clean_target}.pal", f"{album_token.strip()}.pal"}
+            for matched_i in matched_rows:
+                for col_n in ("albumdata_uid", "albumdata_token"):
+                    col_p = self.pmps.get(col_n)
+                    if col_p is not None and matched_i < len(col_p.records):
+                        v_s = str(col_p.records[matched_i] or "").strip()
+                        if v_s.startswith("]album:") or v_s.startswith(".album:"):
+                            v_s = v_s[7:].strip()
+                        if v_s:
+                            pal_candidates.add(f"{v_s}.pal")
+            p2a = self.picasa2albums_dir
+            if p2a.is_dir():
+                for sub in list(p2a.iterdir()):
+                    if sub.is_dir():
+                        for pal_cand in pal_candidates:
+                            pal_path = sub / pal_cand
+                            if pal_path.exists():
+                                try:
+                                    pal_path.unlink()
+                                    deleted = True
+                                except Exception:
+                                    pass
+                        # Ref: picasa3.exe @ 0x0044F4CD (RemoveDirectoryW si le sous-dossier <db_guid> est vide)
+                        try:
+                            if not any(sub.iterdir()):
+                                sub.rmdir()
+                        except Exception:
+                            pass
             albums_dir = self.db3_dir / "albums"
             if albums_dir.exists():
-                for pal_cand in (f"{clean_target}.pal", f"{album_token.strip()}.pal"):
+                for pal_cand in pal_candidates:
                     pal_path = albums_dir / pal_cand
                     if pal_path.exists():
                         try:
@@ -2576,7 +3301,7 @@ class PicasaDatabase:
         watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
         if self.thumbindex:
             for r in self.thumbindex.records:
-                if r.type == 1:
+                if r.type == 1 and r.is_active and r.path:
                     p = _to_host_path(r.path.rstrip("\\/"))
                     if os.path.isdir(p) and p not in watched:
                         watched.append(p)
@@ -2659,25 +3384,54 @@ class PicasaDatabase:
     def get_watched_folders(self) -> Dict[str, str]:
         """
         FR: Renvoie le dictionnaire `{chemin_dossier: statut}` des dossiers configurés dans
-        `scanlist.txt` (`0x004F61C0` / `0x004F6380`) et `repository.dat`, en excluant les nœuds
-        parents d'expansion d'arborescence UI (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`, Ref: `0x004A4860`).
+        `repository.dat` (`0x004A4860`) et `scanlist.txt` (`0x004F61C0` / `0x004F6380`), en excluant :
+        - les clés d'état de reconnaissance faciale `FileManagerFRStatus\\<path>` (`0x004190E0`),
+        - les marqueurs de lecteurs sondés `+D:\\..+H:\\` / `-Z:\\` (`SetDriveScanned_00412260` @ `0x00412260`)
+          et les dossiers spéciaux non surveillés (`flags = 0x0102` dans `thumbindex.db` @ `0x00419B00`)
+          qui ne figurent pas dans `repository.dat`,
+        - les nœuds parents d'expansion d'arborescence UI (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`, Ref: `0x004A4860`).
         Statuts Picasa :
         - `"1"` -> Toujours analyser (Scan Always : sans préfixe dans `scanlist.txt`)
         - `"2"` -> Analyser une seule fois (Scan Once : préfixe `+` dans `scanlist.txt`)
         - `"0"` -> Supprimer de Picasa (Excluded : préfixe `-` dans `scanlist.txt`)
         EN: Returns the `{folder_path: status}` dictionary of watched folders configured in
-        `scanlist.txt` (`0x004F61C0` / `0x004F6380`) and `repository.dat`, excluding UI tree
-        expansion ancestor nodes (`C:\\`, `C:\\Users\\`, `C:\\Users\\<user>\\`, Ref: `0x004A4860`).
-        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x004F6380 (LoadScanList), 0x004A4860 (repository.dat)
+        `repository.dat` (`0x004A4860`) and `scanlist.txt` (`0x004F61C0` / `0x004F6380`).
+        Ref: picasa3.exe @ 0x00412260, 0x00418AD0, 0x004190E0, 0x00419B00, 0x004A4860, 0x004F61C0, 0x004F6380
         """
-        raw_candidates: Dict[str, str] = {}
+        unwatched_ti_norms: Set[str] = set()
+        if self.thumbindex is not None:
+            for rec in self.thumbindex.records:
+                if rec.type == 1 and (rec.flags & 0xFF) == 2 and rec.path:
+                    unwatched_ti_norms.add(rec.path.replace("/", "\\").rstrip("\\").lower())
+
+        repo_candidates: Dict[str, str] = {}
         if self.repository:
             for k, v in self.repository.pairs:
+                if k.lower().startswith("filemanagerfrstatus\\"):
+                    continue
                 if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
-                    raw_candidates[k] = v
+                    repo_candidates[k] = v
+
+        raw_candidates: Dict[str, str] = dict(repo_candidates)
         if self._scanlist:
             for k, v in self._scanlist.items():
-                if (":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2"):
+                if k.lower().startswith("filemanagerfrstatus\\"):
+                    continue
+                if not ((":" in k or "\\" in k or "/" in k) and v in ("0", "1", "2")):
+                    continue
+                norm_k = k.replace("/", "\\").rstrip("\\").lower()
+                is_bare_drive = len(norm_k) == 2 and norm_k[1] == ":"
+                if repo_candidates:
+                    # Lorsque repository.dat définit les dossiers surveillés de l'utilisateur,
+                    # ne pas promouvoir les marqueurs de disques (+D:\, -Z:\) ni les dossiers non surveillés
+                    # de scanlist.txt qui ne sont pas dans repository.dat.
+                    if k in repo_candidates:
+                        raw_candidates[k] = v
+                    elif v == "0" and not is_bare_drive:
+                        raw_candidates[k] = v
+                else:
+                    if is_bare_drive or norm_k in unwatched_ti_norms:
+                        continue
                     raw_candidates[k] = v
 
         if not raw_candidates:
@@ -2716,11 +3470,106 @@ class PicasaDatabase:
             res[k] = v
         return res
 
+    def _disable_folder_tree_in_db(self, norm_prefix: str) -> bool:
+        """
+        FR: Désactive un dossier (et ses sous-dossiers) dans `thumbindex.db` (`type = 5`, `flags = 0x80`),
+        marque ses médias enfants et leurs visages `1001` comme supprimés (`type = 255`, `flags = 0x80`),
+        les retire de `wordhash.dat`, réinitialise `imagedata_personalbumrecs*`, et retire les lignes
+        de dossiers de `albumdata_*.pmp`.
+        EN: Disables a folder (and its subfolders) in `thumbindex.db` (`type = 5`, `flags = 0x80`),
+        marks its child media and `1001` face records as deleted (`type = 255`, `flags = 0x80`),
+        removes them from `wordhash.dat`, resets `imagedata_personalbumrecs*`, and clears folder
+        rows from `albumdata_*.pmp`.
+        Ref: picasa3.exe @ 0x00419B00, 0x004F61C0 (SaveScanList), 0x008B7F90
+        """
+        changed = False
+        disabled_folder_indices: Set[int] = set()
+        precs_pmp = self.pmps.get("imagedata_personalbumrecs")
+        precs2_pmp = self.pmps.get("imagedata_personalbumrecs2")
+        if self.thumbindex is not None:
+            for idx, rec in enumerate(self.thumbindex.records):
+                if rec.type == 1 and rec.path:
+                    rec_norm = rec.path.replace("/", "\\")
+                    if not rec_norm.endswith("\\"):
+                        rec_norm += "\\"
+                    if rec_norm.lower() == norm_prefix or rec_norm.lower().startswith(norm_prefix):
+                        rec.type = 5
+                        rec.flags = 0x80
+                        disabled_folder_indices.add(idx)
+                        self.thumbindex.dirty = True
+                        changed = True
+            if disabled_folder_indices:
+                disabled_media_indices: Set[int] = set()
+                for idx, rec in enumerate(self.thumbindex.records):
+                    if rec.type in MEDIA_RECORD_TYPES and rec.parent_idx in disabled_folder_indices:
+                        rec.type = 255
+                        rec.flags = 0x80
+                        disabled_media_indices.add(idx)
+                        self._deleted_or_reset_indices.add(idx)
+                        self.thumbindex.dirty = True
+                        if self.wordhash is not None and hasattr(self.wordhash, "remove_doc"):
+                            self.wordhash.remove_doc(idx)
+                        if precs_pmp is not None and idx < len(precs_pmp.records):
+                            precs_pmp.records[idx] = 0xFFFFFFFF
+                            precs_pmp.dirty = True
+                        if precs2_pmp is not None and idx < len(precs2_pmp.records):
+                            precs2_pmp.records[idx] = 0xFFFFFFFF
+                            precs2_pmp.dirty = True
+                if disabled_media_indices:
+                    for idx, rec in enumerate(self.thumbindex.records):
+                        if rec.type == 1001 and rec.parent_idx in disabled_media_indices:
+                            rec.type = 255
+                            rec.flags = 0x80
+                            self._deleted_or_reset_indices.add(idx)
+                            self.thumbindex.dirty = True
+                            if self.wordhash is not None and hasattr(self.wordhash, "remove_doc"):
+                                self.wordhash.remove_doc(idx)
+                            if precs_pmp is not None and idx < len(precs_pmp.records):
+                                precs_pmp.records[idx] = 0xFFFFFFFF
+                                precs_pmp.dirty = True
+                            if precs2_pmp is not None and idx < len(precs2_pmp.records):
+                                precs2_pmp.records[idx] = 0xFFFFFFFF
+                                precs2_pmp.dirty = True
+        ad_files = self.pmps.get("albumdata_filename")
+        ad_cats = self.pmps.get("albumdata_category")
+        if ad_files is not None:
+            for r_idx, fp_val in enumerate(ad_files.records):
+                if not fp_val:
+                    continue
+                fp_norm = str(fp_val).replace("/", "\\")
+                if not fp_norm.endswith("\\"):
+                    fp_norm += "\\"
+                if fp_norm.lower() == norm_prefix or fp_norm.lower().startswith(norm_prefix):
+                    ad_files.records[r_idx] = ""
+                    ad_files.dirty = True
+                    changed = True
+                    if ad_cats is not None and r_idx < len(ad_cats.records):
+                        ad_cats.records[r_idx] = 6
+                        ad_cats.dirty = True
+        self._invalidate_path_index_cache()
+        self.invalidate_search_cache()
+        if self._face_manager is not None:
+            try:
+                self._face_manager.reload()
+            except Exception:
+                self._face_manager = None
+        return changed
+
     def set_watched_folder(self, folder_path: str, status: str) -> None:
         """
-        FR: Définit le statut d'un dossier dans `scanlist.txt` et `repository.dat` (format Picasa avec `'\\'` final).
-        EN: Sets a folder's status in `scanlist.txt` and `repository.dat` (Picasa format with trailing `'\\'`).
-        Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x008B7F90 (foldermgr)
+        FR: Définit le statut d'un dossier dans `scanlist.txt`, `repository.dat` et `thumbindex.db`
+        (format Picasa avec `'\\'` final).
+        Lorsque `status == "0"` (« Retirer de Picasa »), reproduit le comportement de `picasa3.exe`
+        (`0x00419B00`, `0x004F61C0`) :
+        - retire l'entrée de surveillance active de `repository.dat`,
+        - bascule les enregistrements de dossiers correspondants (et sous-dossiers) de `type = 1` vers `type = 5`
+          dans `thumbindex.db`,
+        - marque leurs enregistrements enfants (photos/vidéos et visages `type = 1001`) comme supprimés (`type = 255`),
+        - retire leurs lignes de dossiers (`cat = 2`) de `albumdata_*.pmp`.
+        EN: Sets a folder's status in `scanlist.txt`, `repository.dat`, and `thumbindex.db`
+        (Picasa format with trailing `'\\'`).
+        When `status == "0"` ("Remove from Picasa"), reproduces `picasa3.exe` (`0x00419B00`, `0x004F61C0`).
+        Ref: picasa3.exe @ 0x00419B00, 0x004F61C0 (SaveScanList), 0x008B7F90 (foldermgr)
         """
         norm_path = folder_path.replace("/", "\\")
         if not norm_path.endswith("\\"):
@@ -2730,8 +3579,173 @@ class PicasaDatabase:
         st_str = str(status)
         self.repository.set(norm_path, st_str)
         self._scanlist[norm_path] = st_str
+        if st_str == "0":
+            self._disable_folder_tree_in_db(norm_path.lower())
         self._albums_cache = None
         self._starred_cache = None
+
+    def delete_folder(self, folder_path: str) -> bool:
+        """
+        FR: Supprime un dossier (et ses sous-dossiers / médias / visages) de la base de données Picasa
+        lorsqu'il est envoyé à la Corbeille (`ID_ALBUM_DELETE` sur un dossier @ `0x00732160` / `0x00419B00`).
+        EN: Deletes a folder (and its subfolders / media / faces) from the Picasa database
+        when it is moved to the Recycle Bin (`ID_ALBUM_DELETE` on a folder @ `0x00732160` / `0x00419B00`).
+        Ref: picasa3.exe @ 0x00732160, 0x00419B00
+        """
+        if not folder_path:
+            return False
+        norm_path = folder_path.replace("/", "\\").rstrip("\\") + "\\"
+        norm_prefix = norm_path.lower()
+        if self.repository is not None and hasattr(self.repository, "pairs"):
+            self.repository.pairs = [
+                (k, v)
+                for (k, v) in self.repository.pairs
+                if not (
+                    (k.replace("/", "\\").rstrip("\\") + "\\").lower() == norm_prefix
+                    or (k.replace("/", "\\").rstrip("\\") + "\\").lower().startswith(norm_prefix)
+                )
+            ]
+        for k in list(self._scanlist.keys()):
+            k_norm = k.replace("/", "\\").rstrip("\\") + "\\"
+            if k_norm.lower() == norm_prefix or k_norm.lower().startswith(norm_prefix):
+                self._scanlist.pop(k, None)
+        changed = self._disable_folder_tree_in_db(norm_prefix)
+        self._albums_cache = None
+        self._starred_cache = None
+        return changed
+
+    def move_folder(self, old_folder_path: str, new_folder_path: str) -> bool:
+        """
+        FR: Met à jour la base de données après le déplacement d'un dossier sur le disque (`ID_MOVEFOLDER` @ `0x00CAE2C4`) :
+        - met à jour `thumbindex.records[idx].path` pour le dossier et ses sous-dossiers,
+        - recalcule les checksums `thumbs_index.db` / `thumbs2_index.db` (`compute_thumb_checksum` @ `0x006B99F0`)
+          pour tous les médias et visages enfants,
+        - met à jour `albumdata_filename.pmp`, `repository.dat`, `scanlist.txt`, `.pal` et `face_manager`.
+        EN: Updates the database after moving a folder on disk (`ID_MOVEFOLDER` @ `0x00CAE2C4`).
+        Ref: picasa3.exe @ Folder::ID_MOVEFOLDER (0x00CAE2C4), 0x006B99F0 (compute_thumb_checksum)
+        """
+        if not old_folder_path or not new_folder_path:
+            return False
+        old_norm = old_folder_path.replace("/", "\\").rstrip("\\") + "\\"
+        new_norm = new_folder_path.replace("/", "\\").rstrip("\\") + "\\"
+        old_prefix_low = old_norm.lower()
+        if old_prefix_low == new_norm.lower():
+            return False
+
+        moved_folder_indices: Dict[int, Tuple[str, str]] = {}
+        if self.thumbindex is not None:
+            for idx, rec in enumerate(self.thumbindex.records):
+                if rec.type == 1 and rec.is_active and rec.path:
+                    rec_win = rec.path.replace("/", "\\").rstrip("\\") + "\\"
+                    if rec_win.lower() == old_prefix_low or rec_win.lower().startswith(old_prefix_low):
+                        suffix = rec_win[len(old_norm):]
+                        updated_dir = new_norm + suffix
+                        old_dir_host = _to_host_path(rec_win.rstrip("\\"))
+                        new_dir_host = _to_host_path(updated_dir.rstrip("\\"))
+                        rec.path = updated_dir
+                        moved_folder_indices[idx] = (old_dir_host, new_dir_host)
+                        self.thumbindex.dirty = True
+
+            if moved_folder_indices:
+                for idx, rec in enumerate(self.thumbindex.records):
+                    if rec.type in MEDIA_RECORD_TYPES and rec.is_active and rec.parent_idx in moved_folder_indices:
+                        old_dir_h, new_dir_h = moved_folder_indices[rec.parent_idx]
+                        folder_p = self.thumbindex.records[rec.parent_idx].path
+                        new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
+                        for pref in ("thumbs", "thumbs2"):
+                            idx_f = self.block_indices.get(pref)
+                            if idx_f is not None:
+                                if 0 <= idx < len(idx_f.checksums) and idx_f.checksums[idx] != 0:
+                                    idx_f.checksums[idx] = new_cs
+                                    idx_f.dirty = True
+                                for c_idx in self._get_face_children(idx):
+                                    if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
+                                        idx_f.checksums[c_idx] = new_cs
+                                        idx_f.dirty = True
+                        self._remap_photo_path_in_faces_and_pals(
+                            os.path.join(old_dir_h, rec.path),
+                            os.path.join(new_dir_h, rec.path),
+                        )
+
+        ad_files = self.pmps.get("albumdata_filename")
+        if ad_files is not None:
+            for r_idx, fp_val in enumerate(ad_files.records):
+                if not fp_val:
+                    continue
+                fp_win = str(fp_val).replace("/", "\\").rstrip("\\") + "\\"
+                if fp_win.lower() == old_prefix_low or fp_win.lower().startswith(old_prefix_low):
+                    suffix = fp_win[len(old_norm):]
+                    ad_files.records[r_idx] = new_norm + suffix
+                    ad_files.dirty = True
+
+        if self.repository is not None and hasattr(self.repository, "pairs"):
+            new_pairs: List[Tuple[str, str]] = []
+            for k, v in self.repository.pairs:
+                k_win = k.replace("/", "\\").rstrip("\\") + "\\"
+                if k_win.lower() == old_prefix_low or k_win.lower().startswith(old_prefix_low):
+                    suffix = k_win[len(old_norm):]
+                    new_pairs.append((new_norm + suffix, v))
+                else:
+                    new_pairs.append((k, v))
+            self.repository.pairs = new_pairs
+
+        for k in list(self._scanlist.keys()):
+            k_win = k.replace("/", "\\").rstrip("\\") + "\\"
+            if k_win.lower() == old_prefix_low or k_win.lower().startswith(old_prefix_low):
+                val = self._scanlist.pop(k)
+                suffix = k_win[len(old_norm):]
+                self._scanlist[new_norm + suffix] = val
+
+        self._invalidate_path_index_cache()
+        self.invalidate_search_cache()
+        self._albums_cache = None
+        self._starred_cache = None
+        return True
+
+    def set_folder_face_exclusion(self, folder_path: str, excluded: bool) -> None:
+        """
+        FR: Synchronise l'exclusion de détection des visages d'un dossier (`frexclude=1`) avec :
+        - `FileManagerFRStatus\\<folder>\\` dans `repository.dat` (`"0"` si exclu, `"1"` si actif)
+        - `-FileManagerFRStatus\\<folder>\\` dans `scanlist.txt`
+        - `Picasa2Albums\\frexcludefolders.txt`
+        EN: Synchronizes a folder's face detection exclusion (`frexclude=1`) with:
+        - `FileManagerFRStatus\\<folder>\\` in `repository.dat` (`"0"` if excluded, `"1"` if enabled)
+        - `-FileManagerFRStatus\\<folder>\\` in `scanlist.txt`
+        - `Picasa2Albums\\frexcludefolders.txt`
+        Ref: picasa3.exe @ 0x004190E0 (FileManagerFRStatus\\%s), 0x004F5D90 (LoadFRExcludeFolders), 0x004F5E60 (SaveFRExcludeFolders)
+        """
+        norm_path = folder_path.replace("/", "\\")
+        if not norm_path.endswith("\\"):
+            norm_path += "\\"
+        fr_key = f"FileManagerFRStatus\\{norm_path}"
+        if not self.repository:
+            self.repository = KeyValueTableFile()
+        if excluded:
+            self.repository.set(fr_key, "0")
+            self._scanlist[fr_key] = "0"
+            if norm_path not in self._frexclude_folders:
+                self._frexclude_folders.append(norm_path)
+        else:
+            # Si l'entrée existait dans repository.dat/scanlist.txt, la passer à "1" ou retirer de frexcludefolders.txt
+            if self.repository.get(fr_key) is not None:
+                self.repository.set(fr_key, "1")
+            self._scanlist.pop(fr_key, None)
+            self._frexclude_folders = [
+                p for p in self._frexclude_folders
+                if p.replace("/", "\\").rstrip("\\").lower() != norm_path.rstrip("\\").lower()
+            ]
+        p2a_dir = self.picasa2albums_dir
+        if self.db3_dir and self.db3_dir != Path(".") and p2a_dir:
+            try:
+                p2a_dir.mkdir(parents=True, exist_ok=True)
+                frex_path = p2a_dir / "frexcludefolders.txt"
+                frex_bytes = "".join(
+                    f"{p if p.endswith(chr(92)) else p + chr(92)}\r\n"
+                    for p in self._frexclude_folders
+                ).encode("utf-8", errors="surrogateescape")
+                frex_path.write_bytes(frex_bytes)
+            except Exception:
+                pass
 
     def _serialize_scanlist_bytes(self) -> bytes:
         """
@@ -2739,11 +3753,15 @@ class PicasaDatabase:
         - `"1"` (Scan Always) : `<folder>\\r\\n` (sans préfixe, `0x00C7EBE8 = "%s\\n"`)
         - `"2"` (Scan Once)   : `+<folder>\\r\\n` (`0x00C865B4 = "+%s\\n"`)
         - `"0"` (Excluded)    : `-<folder>\\r\\n` (`0x00C865AC = "-%s\\n"`)
-        EN: Serializes `scanlist.txt` in the exact `SaveScanList` (`0x004F61C0`) format.
+        Préserve l'intégralité des entrées de `self._scanlist` (y compris `-FileManagerFRStatus\\...`,
+        dossiers sondés et marqueurs de lecteurs `+D:\\..+H:\\` / `-Z:\\`) pour un aller-retour binaire exact.
+        EN: Serializes `scanlist.txt` in the exact `SaveScanList` (`0x004F61C0`) format, preserving all
+        entries in `self._scanlist` for bit-exact binary round-trip.
         Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x004F6380 (LoadScanList)
         """
+        source_map = self._scanlist if self._scanlist else self.get_watched_folders()
         scan_lines: List[str] = []
-        for k, v in self.get_watched_folders().items():
+        for k, v in source_map.items():
             if v == "0":
                 scan_lines.append(f"-{k}\r\n")
             elif v == "2":
@@ -2754,25 +3772,58 @@ class PicasaDatabase:
 
     def save_repository_only(self) -> None:
         """
-        FR: Sauvegarde atomiquement sur disque uniquement `repository.dat` et `scanlist.txt`
-        (configuration des dossiers surveillés) sans réécrire les 56 tables `.pmp` ni `thumbindex.db`,
-        évitant tout gel de l'UI à la fermeture du Gestionnaire de dossiers.
-        EN: Atomically saves only `repository.dat` and `scanlist.txt` (watched folder settings)
-        to disk without rewriting all 56 `.pmp` tables or `thumbindex.db`, preventing any UI freeze
-        when closing the Folder Manager.
+        FR: Sauvegarde atomiquement sur disque `repository.dat`, `scanlist.txt`,
+        `Picasa2Albums\\watchedfolders.txt` et `frexcludefolders.txt` lorsque seules les
+        préférences de dossiers ont changé. Si `thumbindex.db` ou `wordhash.dat` a été
+        modifié (ex: suppression/désactivation d'un dossier surveillé), délègue à `save_database()`
+        pour garantir la cohérence immédiate sur disque avec `picasa3.exe`.
+        EN: Atomically saves `repository.dat`, `scanlist.txt`, `Picasa2Albums\\watchedfolders.txt`,
+        and `frexcludefolders.txt` to disk when only folder watch settings changed. If `thumbindex.db`
+        or `wordhash.dat` was modified (e.g., removing/disabling a watched folder), delegates to
+        `save_database()` to guarantee immediate on-disk consistency with `picasa3.exe`.
         Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x008B1BF0, 0x008B7F90 (repository.dat)
         """
         if not self.db3_dir or self.db3_dir == Path(".") or not self.repository:
+            return
+        if getattr(self.thumbindex, "dirty", False) or getattr(self.wordhash, "dirty", False):
+            self.save_database()
             return
         if not self.db3_dir.exists():
             self.db3_dir.mkdir(parents=True, exist_ok=True)
         with self._lock:
             repo_bytes = self.repository.to_bytes()
             scanlist_bytes = self._serialize_scanlist_bytes()
+            folders_status = self.get_watched_folders()
+            watched_lines: List[str] = []
+            for fpath_k, status_v in folders_status.items():
+                norm_k = fpath_k if fpath_k.endswith("\\") else fpath_k + "\\"
+                if status_v == "1":
+                    watched_lines.append(f"{norm_k}\r\n")
+            watched_bytes = "".join(watched_lines).encode("utf-8", errors="surrogateescape")
+            fr_excl_lines: List[str] = []
+            seen_frexcl: Set[str] = set()
+            for k, v in self.repository.pairs:
+                if str(v) == "0" and k:
+                    raw_fr = k
+                    if raw_fr.startswith("FileManagerFRStatus\\") or raw_fr.startswith("FileManagerFRStatus/"):
+                        raw_fr = raw_fr[20:]
+                    elif not (":" in raw_fr or "\\" in raw_fr or "/" in raw_fr):
+                        continue
+                    if raw_fr and raw_fr not in folders_status:
+                        norm_fr = raw_fr.replace("/", "\\").rstrip("\\") + "\\"
+                        if norm_fr.lower() not in seen_frexcl:
+                            seen_frexcl.add(norm_fr.lower())
+                            fr_excl_lines.append(f"{norm_fr}\r\n")
+            fr_excl_bytes = "".join(fr_excl_lines).encode("utf-8", errors="surrogateescape")
         target = self.db3_dir / "repository.dat"
         target.write_bytes(repo_bytes)
         try:
             (self.db3_dir / "scanlist.txt").write_bytes(scanlist_bytes)
+            p2a_dir = self.picasa2albums_dir
+            if p2a_dir:
+                p2a_dir.mkdir(parents=True, exist_ok=True)
+                (p2a_dir / "watchedfolders.txt").write_bytes(watched_bytes)
+                (p2a_dir / "frexcludefolders.txt").write_bytes(fr_excl_bytes)
         except Exception:
             pass
 
@@ -2816,6 +3867,8 @@ class PicasaDatabase:
             return full
         return _to_host_path(rec.path)
 
+    get_full_path = get_media_full_path
+
     def is_face_record(self, index: int) -> bool:
         """
         FR: Indique si l'index correspond à un enregistrement de visage (type 1001).
@@ -2853,11 +3906,13 @@ class PicasaDatabase:
         FR: Récupère le conteneur de blocs correspondant au préfixe et au numéro de bloc.
         EN: Retrieves the block container matching the given prefix and block number.
         """
+        if block_num == 0:
+            direct = self.block_containers.get(prefix)
+            if direct is not None:
+                return direct
         cont = self.block_containers_by_block.get((prefix, block_num))
         if cont is not None:
             return cont
-        if block_num == 0:
-            return self.block_containers.get(prefix)
         return None
 
     def _get_block_lock(self, prefix: str) -> threading.RLock:
@@ -3414,6 +4469,7 @@ class PicasaDatabase:
         ad_uids = self.pmps.get("albumdata_uid")
         ad_fnames = self.pmps.get("albumdata_filename")
         ad_dates = self.pmps.get("albumdata_date")
+        ad_descs = self.pmps.get("albumdata_description")
         ad_inisync = self.pmps.get("albumdata_inisync")
         if ad_names is None or ad_cats is None or ad_tokens is None:
             return ""
@@ -3424,6 +4480,7 @@ class PicasaDatabase:
 
         ini_ft2 = 0
         ini_name_override: Optional[str] = None
+        ini_desc_override: Optional[str] = None
         ini_date_override: Optional[float] = None
         target_cat: int = 2  # Ref: picasa3.exe @ 0x004420D3 - 0x00442172 (2 = Folders on Disk, 7 = Hidden Folders)
         if host_folder:
@@ -3441,6 +4498,9 @@ class PicasaDatabase:
                                 n_val = sec_p.get("name")
                                 if n_val and n_val.strip():
                                     ini_name_override = n_val.strip()
+                                desc_val = sec_p.get("description")
+                                if desc_val is not None:
+                                    ini_desc_override = desc_val.strip()
                                 p2cat_val = (sec_p.get("P2category") or sec_p.get("category") or "").strip()
                                 if p2cat_val.lower() in ("hidden folders", "dossiers masqués"):
                                     target_cat = 7
@@ -3483,6 +4543,9 @@ class PicasaDatabase:
                         if ini_name_override and row_i < len(ad_names.records) and ad_names.records[row_i] != ini_name_override:
                             ad_names.records[row_i] = ini_name_override
                             ad_names.dirty = True
+                        if ini_desc_override is not None and ad_descs is not None and row_i < len(ad_descs.records) and ad_descs.records[row_i] != ini_desc_override:
+                            ad_descs.records[row_i] = ini_desc_override
+                            ad_descs.dirty = True
                         if ini_date_override is not None and ad_dates is not None and row_i < len(ad_dates.records) and ad_dates.records[row_i] != ini_date_override:
                             ad_dates.records[row_i] = ini_date_override
                             ad_dates.dirty = True
@@ -3533,6 +4596,8 @@ class PicasaDatabase:
         for stem, pmp in albumdata_tables.items():
             if stem == "albumdata_name":
                 pmp.records.append(folder_title)
+            elif stem == "albumdata_description" and ini_desc_override is not None:
+                pmp.records.append(ini_desc_override)
             elif stem == "albumdata_filename":
                 pmp.records.append(norm)
             elif stem == "albumdata_token":
@@ -3596,6 +4661,28 @@ class PicasaDatabase:
             self._align_imagedata_tables(new_idx)
             return new_idx
 
+    def index_single_file(self, file_path: str | Path) -> Optional[int]:
+        """
+        FR: Indexe (ou met à jour) un fichier média unique sur disque dans la base Picasa
+        via `PicasaDirScanner`, en générant ses miniatures et ses colonnes PMP.
+        EN: Indexes (or updates) a single media file on disk in the Picasa database
+        via `PicasaDirScanner`, generating its thumbnails and PMP columns.
+        Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows)
+        """
+        full_p = str(file_path)
+        if not full_p or not os.path.exists(full_p):
+            return None
+        try:
+            from picasa_py.scanner.scanner import PicasaDirScanner
+            scanner = PicasaDirScanner(self)
+            existing_idx = self.find_photo_index(full_p)
+            if existing_idx is not None and existing_idx >= 0:
+                scanner.update_indexed_file(existing_idx, full_p)
+                return existing_idx
+            return scanner.index_file(full_p)
+        except Exception:
+            return None
+
     def add_thumbnail(self, index: int, jpeg_bytes: bytes, size: str = "small", checksum: int = 0) -> None:
         """
         FR: Écrit une vignette dans le conteneur CBlockFile (avec réutilisation in-place si possible)
@@ -3617,7 +4704,9 @@ class PicasaDatabase:
         with self._get_block_lock(prefix):
             idx_file = self.block_indices.get(prefix)
             if not idx_file:
-                return
+                idx_file = BlockIndexFile.from_entries([], active_block=0)
+                idx_file.dirty = True
+                self.block_indices[prefix] = idx_file
 
             active_blk = idx_file.active_block
             container = self._get_container_for_entry(prefix, active_blk)
@@ -3625,7 +4714,11 @@ class PicasaDatabase:
                 container = self.block_containers.get(prefix)
                 active_blk = 0
             if not container:
-                return
+                container = BlockContainerFile()
+                container._fully_dirty = True
+                self.block_containers[prefix] = container
+                self.block_containers_by_block[(prefix, 0)] = container
+                active_blk = 0
 
             while idx_file.record_count < index:
                 idx_file.append_entry(BlockEntry())
@@ -4057,6 +5150,9 @@ class PicasaDatabase:
             return
         if not self.db3_dir.exists():
             self.db3_dir.mkdir(parents=True, exist_ok=True)
+        self._ensure_standard_root_hierarchy()
+        with self._lock:
+            self._ensure_standard_schema()
 
         def _atomic_write(target: Path, data: bytes) -> None:
             # Ref: picasa3.exe @ 0x0041BA40, 0x004F54B0, 0x006B7FC0, 0x006A2CD0 — écriture directe sans fichier .tmp
@@ -4275,7 +5371,7 @@ class PicasaDatabase:
         # 2. starlist.txt & saverlist.txt (Ref: 0x004755F0 : chemins des photos ]star et ]screensaver)
         if self.wordhash is not None and self.thumbindex is not None:
             recs = self.thumbindex.records
-            folders_map = {i: r.path for i, r in enumerate(recs) if r.type == 1}
+            folders_map = {i: r.path for i, r in enumerate(recs) if r.type == 1 and r.is_active}
             for list_fname, token_key in (("starlist.txt", "]star"), ("saverlist.txt", "]screensaver")):
                 ent = self.wordhash._word_map.get(token_key)
                 paths_out: List[str] = []
@@ -4289,8 +5385,7 @@ class PicasaDatabase:
                                     full_p = fdir.rstrip("\\/") + "\\" + r.path.lstrip("\\/")
                                     paths_out.append(f"{full_p}\r\n")
                 target_txt = self.db3_dir / list_fname
-                if paths_out or not target_txt.exists():
-                    target_txt.write_bytes("".join(paths_out).encode("utf-8", errors="surrogateescape"))
+                target_txt.write_bytes("".join(paths_out).encode("utf-8", errors="surrogateescape"))
 
         # 3. facetags.txt (Ref: 0x006BA000 : un nom de personne par ligne pour les albums cat == 8)
         ad_names = self.pmps.get("albumdata_name")
@@ -4305,46 +5400,53 @@ class PicasaDatabase:
                         seen_fn.add(clean_n)
                         face_names.append(f"{clean_n}\r\n")
             ft_path = self.db3_dir / "facetags.txt"
-            if face_names or not ft_path.exists():
-                ft_path.write_bytes("".join(face_names).encode("utf-8", errors="surrogateescape"))
+            ft_path.write_bytes("".join(face_names).encode("utf-8", errors="surrogateescape"))
 
-        # 4. tags.txt (Ref: 0x006C0E00 : mots-clés uniques présents dans imagedata_tags.pmp)
+        # 4. tags.txt (Ref: 0x006C0E00 : mots-clés uniques présents dans imagedata_tags.pmp pour les médias actifs)
         pmp_tags = self.pmps.get("imagedata_tags")
         if pmp_tags is not None:
             unique_tags: List[str] = []
             seen_t: Set[str] = set()
-            for raw_t in pmp_tags.records:
+            recs_t = self.thumbindex.records if self.thumbindex is not None else []
+            for idx_t, raw_t in enumerate(pmp_tags.records):
                 if raw_t:
+                    if recs_t and (idx_t >= len(recs_t) or recs_t[idx_t].type not in MEDIA_RECORD_TYPES or not recs_t[idx_t].is_active):
+                        continue
                     for kw in str(raw_t).split(","):
                         clean_kw = kw.strip()
                         if clean_kw and clean_kw not in seen_t:
                             seen_t.add(clean_kw)
                             unique_tags.append(f"{clean_kw}\r\n")
             tags_path = self.db3_dir / "tags.txt"
-            if unique_tags or not tags_path.exists():
+            if unique_tags or tags_path.exists():
                 tags_path.write_bytes("".join(unique_tags).encode("utf-8", errors="surrogateescape"))
 
         # 5. Picasa2Albums\watchedfolders.txt (0x004F5960) & frexcludefolders.txt (0x004F5D90)
-        # Ref: picasa3.exe @ 0x0041BD3E, 0x0041BD54
-        p2a_dir = (
-            self.db3_dir.parent.parent / "Picasa2Albums"
-            if self.db3_dir.parent.name.lower() == "picasa2"
-            else self.db3_dir.parent / "Picasa2Albums"
-        )
+        # Ref: picasa3.exe @ 0x00419C30, 0x0041BD3E, 0x0041BD54
+        p2a_dir = self.picasa2albums_dir
         try:
             p2a_dir.mkdir(parents=True, exist_ok=True)
             watched_lines: List[str] = []
             frexcl_lines: List[str] = []
+            seen_frexcl: Set[str] = set()
             folders_status = self.get_watched_folders()
             for fpath_k, status_v in folders_status.items():
                 norm_k = fpath_k if fpath_k.endswith("\\") else fpath_k + "\\"
                 if status_v == "1":
                     watched_lines.append(f"{norm_k}\r\n")
             if self.repository is not None:
-                for p in self.repository.pairs:
-                    if p.section == "FileManagerFRStatus" and p.value == "0" and p.key:
-                        norm_fr = p.key if p.key.endswith("\\") else p.key + "\\"
-                        frexcl_lines.append(f"{norm_fr}\r\n")
+                for k, v in self.repository.pairs:
+                    if str(v) == "0" and k:
+                        raw_fr = k
+                        if raw_fr.startswith("FileManagerFRStatus\\") or raw_fr.startswith("FileManagerFRStatus/"):
+                            raw_fr = raw_fr[20:]
+                        elif not (":" in raw_fr or "\\" in raw_fr or "/" in raw_fr):
+                            continue
+                        if raw_fr and raw_fr not in folders_status:
+                            norm_fr = raw_fr.replace("/", "\\").rstrip("\\") + "\\"
+                            if norm_fr.lower() not in seen_frexcl:
+                                seen_frexcl.add(norm_fr.lower())
+                                frexcl_lines.append(f"{norm_fr}\r\n")
             (p2a_dir / "watchedfolders.txt").write_bytes("".join(watched_lines).encode("utf-8", errors="surrogateescape"))
             (p2a_dir / "frexcludefolders.txt").write_bytes("".join(frexcl_lines).encode("utf-8", errors="surrogateescape"))
         except Exception:
@@ -4428,11 +5530,28 @@ class PicasaDatabase:
                         ]
                         if stem == "imagedata_aliasparents":
                             new_col = [
-                                old_to_new.get(int(v), 0) if v and int(v) != 0 else 0
+                                old_to_new.get(int(v), 0) if v and int(v) not in (0, 0xFFFFFFFF) else 0
                                 for v in new_col
                             ]
                         pmp_file.records = new_col
                         pmp_file.dirty = True
+
+                    pmp_ad_cover = self.pmps.get("albumdata_cover")
+                    if pmp_ad_cover is not None and pmp_ad_cover.records:
+                        new_covers: List[Any] = []
+                        changed_cov = False
+                        for cov_v in pmp_ad_cover.records:
+                            cov_int = int(cov_v or 0)
+                            if 0 < cov_int < len(old_records):
+                                mapped_cov = old_to_new.get(cov_int, 0)
+                                if mapped_cov != cov_int:
+                                    changed_cov = True
+                                new_covers.append(mapped_cov)
+                            else:
+                                new_covers.append(cov_v)
+                        if changed_cov:
+                            pmp_ad_cover.records = new_covers
+                            pmp_ad_cover.dirty = True
 
                     if self.wordhash is not None and hasattr(self.wordhash, "remap_doc_ids"):
                         self.wordhash.remap_doc_ids(old_to_new, len(new_to_old))
@@ -4450,7 +5569,8 @@ class PicasaDatabase:
 
                 for (p_key, blk_num), blk_cont in list(self.block_containers_by_block.items()):
                     if p_key == prefix:
-                        initial_bytes += blk_cont.byte_size()
+                        eff_cont = self._get_container_for_entry(prefix, blk_num) or blk_cont
+                        initial_bytes += eff_cont.byte_size()
                 if (prefix, 0) not in self.block_containers_by_block:
                     initial_bytes += container.byte_size()
 

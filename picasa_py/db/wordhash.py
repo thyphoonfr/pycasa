@@ -453,6 +453,26 @@ class WordHashFile:
             self.words[existing.word] = ids
             self.dirty = True
 
+    def remove_doc(self, doc_id: int) -> None:
+        """
+        FR: Retire `doc_id` de toutes les entrées de mots dans `wordhash.dat` en O(W log N).
+        EN: Removes `doc_id` from all word entries in `wordhash.dat` in O(W log N).
+        Ref: picasa3.exe @ 0x004D9EE0 (FUN_004d9ee0), 0x004DD3CD (CIndexer::RemoveDocument)
+        """
+        if doc_id < 0:
+            return
+        if len(self.words) != len(self.entries):
+            self._sync_words_to_entries()
+        for entry in self.entries:
+            ids = entry.image_ids
+            if not ids or doc_id < ids[0] or doc_id > ids[-1]:
+                continue
+            pos = bisect.bisect_left(ids, doc_id)
+            if pos < len(ids) and ids[pos] == doc_id:
+                ids.pop(pos)
+                self.words[entry.word] = ids
+                self.dirty = True
+
     def remap_doc_ids(self, old_to_new: Dict[int, int], new_max_doc_id: int) -> None:
         """
         FR: Réindexe tous les identifiants de documents selon la table `old_to_new` lors du compactage

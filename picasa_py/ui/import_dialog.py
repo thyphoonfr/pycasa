@@ -74,6 +74,13 @@ class ImportWorker(QThread):
             try:
                 dest_path = os.path.join(self.destination_dir, fname)
                 if os.path.abspath(src_path) != os.path.abspath(dest_path):
+                    if os.path.exists(dest_path):
+                        # Ref: picasa3.exe @ 0x00514A20 (avoid overwriting existing file on name collision)
+                        stem, ext = os.path.splitext(fname)
+                        seq = 1
+                        while os.path.exists(dest_path):
+                            dest_path = os.path.join(self.destination_dir, f"{stem}-{seq:03d}{ext}")
+                            seq += 1
                     shutil.copy2(src_path, dest_path)
                     if self.delete_source_after:
                         try:
@@ -410,21 +417,29 @@ class PicasaImportDialog(QDialog):
     def _populate_list(self) -> None:
         self.list_widget.clear()
 
-        existing_names: Set[str] = set()
+        existing_name_sizes: Set[tuple[str, int]] = set()
         existing_originfast: Set[int] = set()
         if self.db and self.chk_exclude_dupes.isChecked():
             try:
+                from picasa_py.db.database import MEDIA_RECORD_TYPES
                 # Ref: picasa3.exe @ 0x00513680, 0x00513730 (iCAcquireDupeChecker -> imagedata_originfast.pmp)
+                ti_records = getattr(getattr(self.db, "thumbindex", None), "records", None)
                 pmp_of = getattr(self.db, "pmps", {}).get("imagedata_originfast")
                 if pmp_of is not None:
                     for idx_r, h_val in enumerate(pmp_of.records):
                         if h_val and (
-                            not getattr(self.db, "thumbindex", None)
-                            or (idx_r < len(self.db.thumbindex.records) and self.db.thumbindex.records[idx_r].type != 0)
+                            not ti_records
+                            or (
+                                idx_r < len(ti_records)
+                                and ti_records[idx_r].type in MEDIA_RECORD_TYPES
+                                and ti_records[idx_r].is_active
+                            )
                         ):
                             existing_originfast.add(int(h_val))
-                for entry in self.db.get_all_photos():
-                    existing_names.add(os.path.basename(entry.filepath).lower())
+                if ti_records:
+                    for rec in ti_records:
+                        if rec.type in MEDIA_RECORD_TYPES and rec.is_active and rec.path:
+                            existing_name_sizes.add((rec.path.lower(), int(rec.size)))
             except Exception:
                 pass
 
@@ -441,8 +456,13 @@ class PicasaImportDialog(QDialog):
                             is_dupe = True
                     except Exception:
                         pass
-                if not is_dupe and fname.lower() in existing_names:
-                    is_dupe = True
+                if not is_dupe and existing_name_sizes:
+                    try:
+                        fsize = int(os.path.getsize(p))
+                        if (fname.lower(), fsize) in existing_name_sizes:
+                            is_dupe = True
+                    except Exception:
+                        pass
 
             item = QListWidgetItem(fname)
             item.setData(Qt.ItemDataRole.UserRole, p)

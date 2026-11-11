@@ -386,3 +386,96 @@ def test_unnamed_faces_button_layout_and_ungrouping(qapp, temp_face_env):
     assert len(thumb_view.visible_sections) == 1
     assert thumb_view.visible_sections[0].cluster_faces is None
     assert thumb_view.visible_sections[0].is_unnamed is True
+
+
+def test_grouped_face_albums_inline_naming_and_ignore(qapp, temp_face_env):
+    """
+    FR: Vérifie que "Grouper par visage" affiche chaque groupe comme une section d'album complète
+    avec tous ses visages côte à côte, et permet :
+    - de saisir un nom (avec QCompleter) dans l'en-tête du groupe ou d'ignorer le groupe ;
+    - de saisir un nom (avec QCompleter) sous une photo ou d'ignorer individuellement via '✕'.
+    """
+    from PySide6.QtCore import QPointF, Qt, QEvent
+    from PySide6.QtGui import QMouseEvent
+
+    db = temp_face_env["db"]
+    photo1 = temp_face_env["photo1"]
+    photo2 = temp_face_env["photo2"]
+
+    # Créer un contact existant pour vérifier l'aide à la saisie (QCompleter)
+    fr0 = FaceRect(left=0.05, top=0.05, right=0.20, bottom=0.20)
+    db.face_manager.add_face(photo1, fr0, "Claire Martin", db_idx=0)
+
+    fr1 = FaceRect(left=0.25, top=0.25, right=0.45, bottom=0.45)
+    fr2 = FaceRect(left=0.50, top=0.25, right=0.70, bottom=0.45)
+    fr3 = FaceRect(left=0.25, top=0.50, right=0.45, bottom=0.70)
+    fr4 = FaceRect(left=0.50, top=0.50, right=0.70, bottom=0.70)
+    fr5 = FaceRect(left=0.72, top=0.72, right=0.92, bottom=0.92)
+
+    clusters = [
+        [(0, photo1, fr1), (1, photo2, fr2), (0, photo1, fr3)],  # Groupe 1 (3 visages)
+        [(1, photo2, fr4), (1, photo2, fr5)],                    # Groupe 2 (2 visages)
+    ]
+
+    thumb_view = PicasaThumbnailView()
+    thumb_view.resize(1000, 700)
+    thumb_view.set_database(db)
+    thumb_view.show()
+    thumb_view._apply_unnamed_clusters(clusters)
+
+    # 1. Chaque groupe est une section d'album affichant tous ses visages côte à côte
+    assert len(thumb_view.visible_sections) == 2
+    assert thumb_view.visible_sections[0].name == "Groupe 1"
+    assert len(thumb_view.visible_sections[0].item_indices) == 3
+    assert thumb_view.visible_sections[1].name == "Groupe 2"
+    assert len(thumb_view.visible_sections[1].item_indices) == 2
+
+    # 2. Cliquer sur le bouton '✕' individuel du 1er visage de Groupe 1 -> retire uniquement ce visage
+    sec1 = thumb_view.visible_sections[0]
+    r_first = thumb_view._get_item_rect(sec1, 0)
+    btn_x = thumb_view._get_unnamed_ignore_btn_rect(r_first)
+    pt_x = QPointF(btn_x.center())
+    thumb_view.mousePressEvent(
+        QMouseEvent(QEvent.Type.MouseButtonPress, pt_x, pt_x, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    )
+    assert len(thumb_view.visible_sections[0].item_indices) == 2
+
+    # 3. Cliquer sous une photo de Groupe 1 -> ouvre le QLineEdit inline avec QCompleter et nomme ce visage
+    sec1 = thumb_view.visible_sections[0]
+    r_item = thumb_view._get_item_rect(sec1, 0)
+    cap_pt = QPointF(r_item.center().x(), r_item.bottom() + 8)
+    thumb_view.mousePressEvent(
+        QMouseEvent(QEvent.Type.MouseButtonPress, cap_pt, cap_pt, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    )
+    assert thumb_view._inline_name_edit.isVisible()
+    assert "Claire Martin" in thumb_view._inline_completer_model.stringList()
+    thumb_view._inline_name_edit.setText("Thomas Bernard")
+    thumb_view._commit_inline_face_name_edit()
+    assert not thumb_view._inline_name_edit.isVisible()
+    assert len(thumb_view.visible_sections[0].item_indices) == 1
+    assert "Thomas Bernard" in [p.name for p in db.face_manager.get_people()]
+
+    # 4. Cliquer sur le champ de nom dans l'en-tête de Groupe 1 -> nomme tout le reste de Groupe 1 et retire la section
+    sec1 = thumb_view.visible_sections[0]
+    hdr_y = sec1.y_start - thumb_view.scroll_y
+    hdr_name_rect = thumb_view._get_cluster_action_btn_rect(hdr_y)
+    pt_hdr = QPointF(hdr_name_rect.center())
+    thumb_view.mousePressEvent(
+        QMouseEvent(QEvent.Type.MouseButtonPress, pt_hdr, pt_hdr, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    )
+    assert thumb_view._inline_name_edit.isVisible()
+    thumb_view._on_inline_completer_activated("Claire Martin")
+    assert len(thumb_view.visible_sections) == 1
+    assert thumb_view.visible_sections[0].name == "Groupe 2"
+
+    # 5. Cliquer sur '✖ Ignorer' dans l'en-tête de Groupe 2 -> ignore tous les visages de Groupe 2
+    sec2 = thumb_view.visible_sections[0]
+    hdr2_y = sec2.y_start - thumb_view.scroll_y
+    ign_rect = thumb_view._get_ignore_action_btn_rect(hdr2_y)
+    pt_ign = QPointF(ign_rect.center())
+    thumb_view.mousePressEvent(
+        QMouseEvent(QEvent.Type.MouseButtonPress, pt_ign, pt_ign, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    )
+    assert len(thumb_view.visible_sections[0].item_indices) == 0
+    thumb_view.close()
+

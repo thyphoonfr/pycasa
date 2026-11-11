@@ -26,26 +26,38 @@ from PySide6.QtGui import (
 from picasa_py.ui.exif_reader import extract_full_metadata
 from picasa_py.ui.style import PicasaStyle
 
-_HIST_EXIF_META_CACHE: Dict[str, Tuple[float, Dict[str, Any]]] = {}
+_HIST_EXIF_META_CACHE: Dict[str, Tuple[Tuple[float, float], Dict[str, Any]]] = {}
 
 
 def _get_cached_full_metadata(photo_path: str) -> Dict[str, Any]:
     """
-    FR: Récupère les métadonnées EXIF complètes avec mise en cache par (chemin, mtime).
-    EN: Retrieves full EXIF metadata cached by (path, mtime).
+    FR: Récupère les métadonnées EXIF complètes avec mise en cache par (chemin, (mtime_photo, mtime_ini)).
+    EN: Retrieves full EXIF metadata cached by (path, (photo_mtime, ini_mtime)).
     Ref: picasa3.exe @ 0x00889210 (EXIF parsing & display)
     """
     if not photo_path or not os.path.exists(photo_path):
         return extract_full_metadata(photo_path)
     try:
         mtime = os.path.getmtime(photo_path)
+        ini_mtime = 0.0
+        folder_dir = os.path.dirname(photo_path)
+        if folder_dir:
+            for ini_name in (".picasa.ini", "Picasa.ini"):
+                ini_cand = os.path.join(folder_dir, ini_name)
+                if os.path.exists(ini_cand):
+                    try:
+                        ini_mtime = os.path.getmtime(ini_cand)
+                    except Exception:
+                        ini_mtime = 0.0
+                    break
+        stamp = (mtime, ini_mtime)
         cached = _HIST_EXIF_META_CACHE.get(photo_path)
-        if cached is not None and cached[0] == mtime:
+        if cached is not None and cached[0] == stamp:
             return cached[1]
         meta = extract_full_metadata(photo_path)
         if len(_HIST_EXIF_META_CACHE) >= 512:
             _HIST_EXIF_META_CACHE.clear()
-        _HIST_EXIF_META_CACHE[photo_path] = (mtime, meta)
+        _HIST_EXIF_META_CACHE[photo_path] = (stamp, meta)
         return meta
     except Exception:
         return extract_full_metadata(photo_path)

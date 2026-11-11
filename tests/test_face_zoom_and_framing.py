@@ -152,3 +152,51 @@ def test_to_avatar_pixmap_proportions():
     assert not pix_circ.isNull()
     assert pix_circ.width() == 64
     assert pix_circ.height() == 64
+
+
+def test_switching_people_invalidates_synthetic_scaled_pixmap_cache(qapp):
+    """FR: Vérifie que la consultation successive de plusieurs albums de personnes connues
+    ne réutilise jamais en 1ère et 2ème position les vignettes mises à l'échelle de la personne précédente.
+    EN: Verifies that browsing multiple known people's albums sequentially never reuses
+    the previous person's scaled thumbnails in 1st and 2nd positions.
+    """
+    db = PicasaDatabase.open_default()
+    people_with_two = [p for p in db.face_manager.get_people() if len(p.photo_indices) >= 2]
+    if len(people_with_two) < 2:
+        pytest.skip("Moins de 2 contacts avec au moins 2 photos")
+
+    tv = PicasaThumbnailView()
+    tv.resize(1000, 700)
+    tv.set_database(db)
+    tv.show()
+
+    p1, p2 = people_with_two[0], people_with_two[1]
+    tv.filter_by_person(p1.contact_id, p1.name, p1.photo_indices)
+    qapp.processEvents()
+    tv.repaint()
+    sec1 = tv.visible_sections[0]
+    idx1_0, idx1_1 = sec1.item_indices[0], sec1.item_indices[1]
+    pix1_0 = tv._get_face_pixmap(idx1_0, p1.contact_id)
+    pix1_1 = tv._get_face_pixmap(idx1_1, p1.contact_id)
+    assert pix1_0 is not None and pix1_1 is not None
+
+    tv.filter_by_person(p2.contact_id, p2.name, p2.photo_indices)
+    qapp.processEvents()
+    tv.repaint()
+    sec2 = tv.visible_sections[0]
+    idx2_0, idx2_1 = sec2.item_indices[0], sec2.item_indices[1]
+    pix2_0 = tv._get_face_pixmap(idx2_0, p2.contact_id)
+    pix2_1 = tv._get_face_pixmap(idx2_1, p2.contact_id)
+    assert pix2_0 is not None and pix2_1 is not None
+
+    # Les 1ère et 2ème positions partagent les mêmes indices synthétiques (base_cnt, base_cnt+1)
+    # mais ne doivent jamais conserver les QPixmap mis à l'échelle de la 1ère personne
+    assert idx1_0 == idx2_0
+    assert idx1_1 == idx2_1
+    assert pix1_0.cacheKey() != pix2_0.cacheKey()
+    assert pix1_1.cacheKey() != pix2_1.cacheKey()
+    keys_pos0 = [k for k in tv._scaled_pixmap_cache if k[0] == -idx2_0 - 1]
+    for k in keys_pos0:
+        assert k[3] == pix2_0.cacheKey()
+    tv.close()
+

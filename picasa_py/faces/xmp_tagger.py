@@ -313,10 +313,15 @@ class PicasaWriteFaceTagsWorker(QThread):
                         try:
                             doc = PicasaIniParser.parse_file(str(ini_path))
                             ini_cache[parent_dir] = doc
-                            # FR : Charger les contacts de ce dossier
-                            # EN: Load contacts declared in this folder
+                            # FR : Charger les contacts de ce dossier (y compris variantes 15/16 car. hex)
+                            # EN: Load contacts declared in this folder (including 15/16-char hex variants)
                             for cid, cinfo in doc.get_contacts().items():
                                 contacts_cache[cid] = cinfo.name
+                                cid_low = cid.strip().lower()
+                                contacts_cache[cid_low] = cinfo.name
+                                if all(ch in "0123456789abcdef" for ch in cid_low) and len(cid_low) <= 16:
+                                    contacts_cache[cid_low.lstrip("0") or "0"] = cinfo.name
+                                    contacts_cache[cid_low.zfill(16)] = cinfo.name
                         except Exception:
                             ini_cache[parent_dir] = None
                     else:
@@ -329,12 +334,39 @@ class PicasaWriteFaceTagsWorker(QThread):
                     face_items = doc.get_faces(p.name)
                     for item in face_items:
                         left, top, right, bottom = decode_rect64_string(item.rect64)
-                        name = contacts_cache.get(item.contact_id, "")
+                        cid_key = (item.contact_id or "").strip()
+                        if cid_key.lower() in ("", "0", "ffffffffffffffff"):
+                            continue
+                        name = contacts_cache.get(cid_key) or contacts_cache.get(cid_key.lower(), "")
                         if not name and self.db and getattr(self.db, "contacts", None):
-                            contact = self.db.contacts.by_id.get(item.contact_id)
+                            contact = self.db.contacts.get(cid_key)
                             if contact:
                                 name = contact.name
-                        faces_to_write.append((name, left, top, right, bottom))
+                        if not name and self.db and getattr(self.db, "face_manager", None):
+                            person = self.db.face_manager.get_person(cid_key)
+                            if person and person.name and not getattr(person, "is_unknown_cluster", False):
+                                name = person.name
+                        if name and not name.strip().startswith("<"):
+                            faces_to_write.append((name, left, top, right, bottom))
+
+                if not faces_to_write and self.db and getattr(self.db, "face_manager", None):
+                    fm = self.db.face_manager
+                    for fr in fm.get_faces_for_photo(str(p)):
+                        cid_key = (fr.contact_id or "").strip()
+                        if cid_key.lower() in ("", "0", "ffffffffffffffff"):
+                            continue
+                        person = fm.get_person(cid_key)
+                        name = (
+                            person.name
+                            if person and person.name and not getattr(person, "is_unknown_cluster", False)
+                            else ""
+                        )
+                        if not name and getattr(self.db, "contacts", None):
+                            contact = self.db.contacts.get(cid_key)
+                            if contact:
+                                name = contact.name
+                        if name and not name.strip().startswith("<"):
+                            faces_to_write.append((name, fr.left, fr.top, fr.right, fr.bottom))
 
                 if faces_to_write:
                     with Image.open(p) as img:
@@ -476,7 +508,7 @@ class PicasaWriteFaceTagsDialog(QDialog):
         else:
             if self.db and hasattr(self.db, "index") and self.db.index:
                 for idx, item in enumerate(self.db.index):
-                    if item.type == 1 or not item.path:
+                    if item.type not in (2, 18) or not item.is_active or not item.path:
                         continue
                     full_p = (
                         self.db.get_media_full_path(idx)

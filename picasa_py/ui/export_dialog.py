@@ -52,12 +52,12 @@ class PicasaExportConfig:
     """
     dest_path: str
     folder_name: str
-    add_numbers: bool
-    use_original_size: bool
-    target_size: int
-    quality: int
-    use_watermark: bool
-    watermark_text: str
+    add_numbers: bool = False
+    use_original_size: bool = True
+    target_size: int = 1600
+    quality: int = 85
+    use_watermark: bool = False
+    watermark_text: str = ""
 
 
 class PicasaExportWorker(QThread):
@@ -80,6 +80,9 @@ class PicasaExportWorker(QThread):
         self._is_cancelled = True
 
     def run(self) -> None:
+        import shutil
+        from picasa_py.scanner.scanner import VIDEO_EXTENSIONS
+
         output_dir = Path(self.config.dest_path) / self.config.folder_name
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -87,11 +90,24 @@ class PicasaExportWorker(QThread):
         success_count = 0
         error_count = 0
 
-        # FR : Cache des parsers d'ini par dossier source
-        # EN : Cache of INI parsers per source directory
-        ini_cache = {}
-
         digits = max(2, len(str(total)))
+        used_names_lower: set[str] = {
+            f.name.lower() for f in output_dir.iterdir() if f.is_file()
+        } if output_dir.exists() else set()
+
+        def _resolve_unique_dest(stem: str, ext: str) -> Path:
+            # Ref: picasa3.exe @ 0x00514A20 (résolution de collision par suffixe -001, -002, ...)
+            cand_name = f"{stem}{ext}"
+            if cand_name.lower() not in used_names_lower and not (output_dir / cand_name).exists():
+                used_names_lower.add(cand_name.lower())
+                return output_dir / cand_name
+            seq = 1
+            while True:
+                cand_name = f"{stem}-{seq:03d}{ext}"
+                if cand_name.lower() not in used_names_lower and not (output_dir / cand_name).exists():
+                    used_names_lower.add(cand_name.lower())
+                    return output_dir / cand_name
+                seq += 1
 
         for i, src_path in enumerate(self.items):
             if self._is_cancelled:
@@ -101,6 +117,19 @@ class PicasaExportWorker(QThread):
             self.progress.emit(i + 1, total, src.name)
 
             try:
+                prefix = f"{i + 1:0{digits}d}-" if self.config.add_numbers else ""
+                ext_low = src.suffix.lower()
+
+                # Ref: picasa3.exe @ CImageOutput — copie directe des fichiers vidéo sélectionnés lors de l'exportation
+                if ext_low in VIDEO_EXTENSIONS:
+                    if not src.exists():
+                        error_count += 1
+                        continue
+                    dst_path = _resolve_unique_dest(prefix + src.stem, src.suffix)
+                    shutil.copy2(str(src), str(dst_path))
+                    success_count += 1
+                    continue
+
                 from picasa_py.ui.image_processor import PicasaImageProcessor
                 max_sz = (
                     self.config.target_size
@@ -119,15 +148,25 @@ class PicasaExportWorker(QThread):
                 if self.config.use_watermark and self.config.watermark_text.strip():
                     self._apply_watermark(img, self.config.watermark_text.strip())
 
-                # Nom de fichier de destination
-                if self.config.add_numbers:
-                    prefix = f"{i + 1:0{digits}d}-"
-                    dst_name = prefix + src.stem + ".jpg"
-                else:
-                    dst_name = src.stem + ".jpg"
+                dst_path = _resolve_unique_dest(prefix + src.stem, ".jpg")
+                save_kwargs: dict = {
+                    "quality": int(self.config.quality or 85),
+                    "optimize": True,
+                }
+                # Ref: picasa3.exe @ CImageOutput — préservation des métadonnées EXIF (Orientation = 1) et du profil ICC
+                try:
+                    with Image.open(src) as src_raw:
+                        icc = src_raw.info.get("icc_profile")
+                        if icc:
+                            save_kwargs["icc_profile"] = icc
+                        exif_obj = src_raw.getexif()
+                        if exif_obj:
+                            exif_obj[0x0112] = 1  # Orientation = Normal (1) après transformation
+                            save_kwargs["exif"] = exif_obj.tobytes()
+                except Exception:
+                    pass
 
-                dst_path = output_dir / dst_name
-                img.save(dst_path, "JPEG", quality=self.config.quality, optimize=True)
+                img.save(dst_path, "JPEG", **save_kwargs)
                 success_count += 1
 
             except Exception:

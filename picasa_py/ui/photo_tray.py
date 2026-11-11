@@ -1817,15 +1817,16 @@ class PicasaPhotoTray(QWidget):
         from datetime import datetime
         from PySide6.QtGui import QImageReader
 
+        db = self._db or _ACTIVE_TRAY_DB
         if isinstance(item_or_path, str):
             path = item_or_path
             fname = os.path.basename(path)
             folder_path = os.path.dirname(path)
             folder_name = os.path.basename(folder_path.rstrip("\\/")) if folder_path else ""
             db_idx = -1
-            if self._db is not None and hasattr(self._db, "find_media_index_by_path"):
+            if db is not None and hasattr(db, "find_media_index_by_path"):
                 try:
-                    found_idx = self._db.find_media_index_by_path(path)
+                    found_idx = db.find_media_index_by_path(path)
                     if found_idx is not None:
                         db_idx = int(found_idx)
                 except Exception:
@@ -1845,7 +1846,6 @@ class PicasaPhotoTray(QWidget):
         size_bytes = 0
         tags: List[str] = []
 
-        db = self._db or _ACTIVE_TRAY_DB
         if db is not None and db_idx >= 0:
             try:
                 ti = getattr(db, "thumbindex", None)
@@ -1905,14 +1905,38 @@ class PicasaPhotoTray(QWidget):
                     doc = db.get_parsed_ini(ini_p)
                     if doc is None:
                         doc = db.get_parsed_ini(os.path.join(folder_path, "Picasa.ini"))
-                elif os.path.exists(ini_p):
-                    from picasa_py.ini.parser import PicasaIniParser
-                    doc = PicasaIniParser.parse_file(ini_p)
+                else:
+                    if not os.path.exists(ini_p):
+                        alt_ini = os.path.join(folder_path, "Picasa.ini")
+                        if os.path.exists(alt_ini):
+                            ini_p = alt_ini
+                    if os.path.exists(ini_p):
+                        from picasa_py.ini.parser import PicasaIniParser
+                        doc = PicasaIniParser.parse_file(ini_p)
                 if doc is not None:
                     for kw in doc.get_keywords(fname):
                         kw_s = kw.strip()
                         if kw_s and kw_s not in tags:
                             tags.append(kw_s)
+                    # Ref: picasa3.exe @ 0x0056FD24 (GetImageDimensions inclut recadrage et rotation .picasa.ini)
+                    has_db_edit_dims = False
+                    if db is not None and db_idx >= 0 and hasattr(db, "get_property"):
+                        try:
+                            has_db_edit_dims = (
+                                int(db.get_property("imagedata_edit_width", db_idx) or 0) > 0
+                                and int(db.get_property("imagedata_edit_height", db_idx) or 0) > 0
+                            )
+                        except Exception:
+                            has_db_edit_dims = False
+                    if not has_db_edit_dims and width > 0 and height > 0:
+                        c_rect = doc.get_crop_rect64(fname) if hasattr(doc, "get_crop_rect64") else None
+                        if c_rect is not None:
+                            l_f, t_f, r_f, b_f = c_rect.to_normalized()
+                            width = max(1, int(round(width * max(0.0, r_f - l_f))))
+                            height = max(1, int(round(height * max(0.0, b_f - t_f))))
+                        rot_step = doc.get_rotate(fname) if hasattr(doc, "get_rotate") else 0
+                        if (rot_step % 2) == 1:
+                            width, height = height, width
             except Exception:
                 pass
 

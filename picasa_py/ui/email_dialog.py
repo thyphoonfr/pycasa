@@ -216,7 +216,13 @@ class PicasaEmailDialog(QDialog):
 
         for p in self.photo_paths:
             try:
-                dest_path = os.path.join(out_dir, os.path.basename(p))
+                src_stem, src_ext = os.path.splitext(os.path.basename(p))
+                out_ext = src_ext if src_ext.lower() in (".jpg", ".jpeg") else ".jpg"
+                dest_path = os.path.join(out_dir, f"{src_stem}{out_ext}")
+                counter = 1
+                while os.path.exists(dest_path):
+                    dest_path = os.path.join(out_dir, f"{src_stem}-{counter:03d}{out_ext}")
+                    counter += 1
                 from picasa_py.ui.image_processor import PicasaImageProcessor
                 img_copy = PicasaImageProcessor.load_transformed_image(
                     p, max_size=target_size if target_size > 0 else 0

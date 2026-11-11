@@ -182,7 +182,7 @@ def test_thumbnail_view_filter_by_person(qapp, tmp_path):
     assert len(tv.visible_sections) == 1
     assert tv.visible_sections[0].name == "Alice Martin"
     assert len(tv.filtered_indices) > 0
-    assert len(tv.filtered_indices) == len([i for i, item in enumerate(tv.items) if item.index in alice.photo_indices])
+    assert [tv.items[i].index for i in tv.filtered_indices] == alice.photo_indices
 
 
 def test_red_cfg_full_deserialization_and_pure_python_engine():

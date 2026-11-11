@@ -132,6 +132,18 @@ class PmpFile:
         self.records: List[Any] = records if records is not None else []
         self.dirty: bool = dirty
 
+    @property
+    def values(self) -> List[Any]:
+        """
+        FR: Alias de compatibilité vers `records`.
+        EN: Compatibility alias to `records`.
+        """
+        return self.records
+
+    @values.setter
+    def values(self, val: List[Any]) -> None:
+        self.records = val
+
     @classmethod
     def from_bytes(cls, data: bytes) -> PmpFile:
         """

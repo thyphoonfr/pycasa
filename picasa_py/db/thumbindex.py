@@ -53,6 +53,24 @@ def filetime_to_unix(ft: int) -> float:
     return (ft - EPOCH_AS_FILETIME) / float(HUNDREDS_OF_NANOSECONDS)
 
 
+def ole_to_datetime(ole_val: float):
+    """
+    FR: Convertit une date d'automatisation OLE (flottant double précision depuis le 30/12/1899)
+    en objet `datetime.datetime`, conformément à `VariantTimeToSystemTime` (`0x0041E6D0`).
+    EN: Converts an OLE Automation Date (double-precision float since 1899-12-30)
+    into a `datetime.datetime` object, matching `VariantTimeToSystemTime` (`0x0041E6D0`).
+    Ref: picasa3.exe @ 0x0041E6D0, 0x0077CFD0
+    """
+    from datetime import datetime, timedelta
+    try:
+        v = float(ole_val)
+    except Exception:
+        return None
+    if v <= 0.0:
+        return None
+    return datetime(1899, 12, 30) + timedelta(days=v)
+
+
 @dataclass(init=False)
 class ThumbIndexRecord:
     """
@@ -149,6 +167,14 @@ class ThumbIndexRecord:
         if self.ft2:
             return filetime_to_unix(self.ft2)
         return 0.0
+
+    def to_unix_timestamp(self) -> float:
+        """
+        FR: Retourne l'horodatage Unix (secondes flottantes) de l'enregistrement (`ft1` ou `ft2`).
+        EN: Returns the Unix timestamp (float seconds) of the record (`ft1` or `ft2`).
+        Ref: picasa3.exe @ 0x004F25F0, 0x0056FCE8
+        """
+        return self.mod_time
 
     @mod_time.setter
     def mod_time(self, value: float) -> None:
@@ -344,7 +370,12 @@ class ThumbIndexFile:
         count = len(self.records)
         # Passe 1 : invalider les entrées supprimées ou comportant un cycle de parenté (> 10 sauts, Ref: 0x004F56BA)
         for idx, rec in enumerate(self.records):
-            if rec.type == 0 or rec.flags_hi == 0:
+            is_flag_deleted = rec.flags_hi == 0 and (
+                getattr(rec, "_flags_hi_modified", False)
+                or getattr(rec, "_flags_hi_explicit", False)
+                or (rec.type != 1001 and rec.path == "")
+            )
+            if rec.type == 0 or is_flag_deleted:
                 rec.mark_deleted()
                 continue
             cur = rec.parent_idx
@@ -355,7 +386,12 @@ class ThumbIndexFile:
                     has_cycle_or_oob = True
                     break
                 parent_rec = self.records[cur]
-                if parent_rec.type == 0 or parent_rec.flags_hi == 0:
+                parent_flag_deleted = parent_rec.flags_hi == 0 and (
+                    getattr(parent_rec, "_flags_hi_modified", False)
+                    or getattr(parent_rec, "_flags_hi_explicit", False)
+                    or (parent_rec.type != 1001 and parent_rec.path == "")
+                )
+                if parent_rec.type == 0 or parent_flag_deleted:
                     has_cycle_or_oob = True
                     break
                 cur = parent_rec.parent_idx
@@ -364,6 +400,8 @@ class ThumbIndexFile:
                 rec.mark_deleted()
 
         # Passe 2 : vérifier le type du parent direct pour tous les types d'enfants (pas seulement type == 4)
+        # Ref: picasa3.exe @ 0x004A59E9..0x004A5A29 (CAlbumState::RebuildFromThumbDB media record types)
+        media_types = (2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32)
         for rec in self.records:
             if rec.type == 0:
                 continue
@@ -371,11 +409,11 @@ class ThumbIndexFile:
             if rec.type == 4:
                 if p_idx < 0 or p_idx >= count or p_idx == 0xFFFFFFFF or self.records[p_idx].type not in (1, 0x19):
                     rec.mark_deleted()
-            elif rec.type in (2, 7, 18, 32) and p_idx != 0xFFFFFFFF:
+            elif rec.type in media_types and p_idx != 0xFFFFFFFF:
                 if p_idx < 0 or p_idx >= count or self.records[p_idx].type not in (1, 0x19):
                     rec.mark_deleted()
             elif rec.type == 1001:
-                if p_idx < 0 or p_idx >= count or p_idx == 0xFFFFFFFF or self.records[p_idx].type not in (2, 7, 18, 32):
+                if p_idx < 0 or p_idx >= count or p_idx == 0xFFFFFFFF or self.records[p_idx].type not in media_types:
                     rec.mark_deleted()
 
     # Ref: picasa3.exe @ 0x004F54B0
@@ -391,7 +429,11 @@ class ThumbIndexFile:
             for rec in self.records:
                 if rec.type == 0 or (
                     rec.flags_hi == 0
-                    and (getattr(rec, "_flags_hi_modified", False) or getattr(rec, "_flags_hi_explicit", False) or rec.path == "")
+                    and (
+                        getattr(rec, "_flags_hi_modified", False)
+                        or getattr(rec, "_flags_hi_explicit", False)
+                        or (rec.type != 1001 and rec.path == "")
+                    )
                 ):
                     rec.mark_deleted()
                 elif rec.type == 4 and (

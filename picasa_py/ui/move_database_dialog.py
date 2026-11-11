@@ -232,7 +232,8 @@ class PicasaMoveDatabaseDialog(QDialog):
     def _reset_default(self) -> None:
         local_appdata = os.environ.get("LOCALAPPDATA", "")
         if local_appdata:
-            default_p = os.path.join(local_appdata, "Google", "Picasa2", "db3")
+            # Ref: picasa3.exe @ 0x004073A5, 0x0097E366 (AppLocalDataPath = %LOCALAPPDATA%\Google\Picasa2)
+            default_p = os.path.join(local_appdata, "Google", "Picasa2")
             self.edit_new.setText(default_p)
 
     def _apply_move(self) -> None:
@@ -253,19 +254,36 @@ class PicasaMoveDatabaseDialog(QDialog):
         )
         if res == QMessageBox.StandardButton.Yes:
             try:
-                os.makedirs(target, exist_ok=True)
-                src = self.edit_curr.text()
-                if os.path.exists(src):
-                    for item in os.listdir(src):
-                        s = os.path.join(src, item)
-                        d = os.path.join(target, item)
+                # Ref: picasa3.exe @ 0x0097E366, 0x00980EC0 (AppLocalDataPath : sauvegarde la base
+                # en mémoire puis copie l'arborescence db3/, contacts/, ioqueue/, tmp/ sous la racine cible)
+                if self.db is not None and hasattr(self.db, "save_database"):
+                    try:
+                        self.db.save_database()
+                    except Exception:
+                        pass
+                target_path = Path(target)
+                target_root = target_path.parent if target_path.name.lower() == "db3" else target_path
+                target_root.mkdir(parents=True, exist_ok=True)
+                src_path = Path(self.edit_curr.text())
+                src_root = src_path.parent if src_path.name.lower() == "db3" else src_path
+                if (src_root / "db3").is_dir():
+                    for sub_name in ("db3", "contacts", "ioqueue", "tmp"):
+                        s_sub = src_root / sub_name
+                        if s_sub.is_dir():
+                            shutil.copytree(str(s_sub), str(target_root / sub_name), dirs_exist_ok=True)
+                elif src_path.exists():
+                    dest_db3 = target_root / "db3" if target_path.name.lower() != "db3" else target_path
+                    dest_db3.mkdir(parents=True, exist_ok=True)
+                    for item in os.listdir(str(src_path)):
+                        s = os.path.join(str(src_path), item)
+                        d = os.path.join(str(dest_db3), item)
                         if os.path.isdir(s):
                             shutil.copytree(s, d, dirs_exist_ok=True)
                         else:
                             shutil.copy2(s, d)
                 from picasa_py.db.preferences import PicasaPreferences
-                PicasaPreferences.set_repository_path(target)
-                self.new_db_path = target
+                PicasaPreferences.set_repository_path(str(target_root))
+                self.new_db_path = str(target_root)
                 QMessageBox.information(
                     self,
                     "Déplacement terminé",

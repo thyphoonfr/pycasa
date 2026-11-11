@@ -28,7 +28,6 @@ def _escape_xml_attr(val: str) -> str:
     )
 
 
-@dataclass
 class Contact:
     """
     FR: Représente un contact individuel (personne identifiée) dans contacts.xml.
@@ -36,9 +35,44 @@ class Contact:
     """
     id: str
     name: str
-    modified_time: str = ""
-    local_contact: str = "1"
-    extra_attrs: Dict[str, str] = field(default_factory=dict)
+    modified_time: str
+    local_contact: str
+    extra_attrs: Dict[str, str]
+
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        modified_time: str = "",
+        local_contact: str = "1",
+        extra_attrs: Optional[Dict[str, str]] = None,
+        email: str = "",
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.modified_time = modified_time
+        self.local_contact = local_contact
+        self.extra_attrs = dict(extra_attrs) if extra_attrs else {}
+        if email:
+            self.extra_attrs["email0"] = email
+
+    def __repr__(self) -> str:
+        return (
+            f"Contact(id={self.id!r}, name={self.name!r}, "
+            f"modified_time={self.modified_time!r}, local_contact={self.local_contact!r}, "
+            f"extra_attrs={self.extra_attrs!r})"
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Contact):
+            return NotImplemented
+        return (
+            self.id == other.id
+            and self.name == other.name
+            and self.modified_time == other.modified_time
+            and self.local_contact == other.local_contact
+            and self.extra_attrs == other.extra_attrs
+        )
 
     @property
     def email(self) -> str:
@@ -72,6 +106,26 @@ class ContactsFile:
         """
         self.contacts: List[Contact] = contacts if contacts is not None else []
 
+    @staticmethod
+    def _cid_variants(contact_id: str) -> List[str]:
+        """
+        FR: Retourne les variantes 15 et 16 caractères d'un identifiant hexadécimal 64 bits.
+        Ref: picasa3.exe @ 0x008A2F76 ("%I64x") vs 0x0065DF80 ("%016I64x")
+        EN: Returns the 15-char and 16-char variants of a 64-bit hexadecimal contact ID.
+        """
+        cid = (contact_id or "").strip().lower()
+        if not cid:
+            return []
+        res = [cid]
+        if all(c in "0123456789abcdef" for c in cid) and len(cid) <= 16:
+            stripped = cid.lstrip("0") or "0"
+            padded = cid.zfill(16)
+            if stripped not in res:
+                res.append(stripped)
+            if padded not in res:
+                res.append(padded)
+        return res
+
     @property
     def by_id(self) -> Dict[str, Contact]:
         """
@@ -82,18 +136,28 @@ class ContactsFile:
 
     def get(self, contact_id: str, default: Optional[Contact] = None) -> Optional[Contact]:
         """
-        FR: Récupère un contact par son identifiant hexadécimal.
-        EN: Retrieves a contact by its hexadecimal identifier.
+        FR: Récupère un contact par son identifiant hexadécimal (insensible à la casse et au zéro initial 15/16 car.).
+        Ref: picasa3.exe @ 0x008A2F76 ("%I64x") vs 0x0065DF80 ("%016I64x")
+        EN: Retrieves a contact by its hexadecimal identifier (case-insensitive and 15/16-char zero-padding tolerant).
         """
-        return self.by_id.get(contact_id, default)
+        direct = self.by_id.get(contact_id)
+        if direct is not None:
+            return direct
+        variants = set(self._cid_variants(contact_id))
+        if variants:
+            for c in self.contacts:
+                if c.id.strip().lower() in variants or set(self._cid_variants(c.id)) & variants:
+                    return c
+        return default
 
     def add_contact(self, contact: Contact) -> None:
         """
-        FR: Ajoute ou met à jour un contact dans la liste.
-        EN: Adds or updates a contact in the list.
+        FR: Ajoute ou met à jour un contact dans la liste (en unifiant les variantes 15/16 caractères).
+        EN: Adds or updates a contact in the list (unifying 15/16-char variants).
         """
+        variants = set(self._cid_variants(contact.id))
         for i, existing in enumerate(self.contacts):
-            if existing.id == contact.id:
+            if existing.id == contact.id or (variants and existing.id.strip().lower() in variants):
                 self.contacts[i] = contact
                 return
         self.contacts.append(contact)

@@ -47,6 +47,7 @@ class PicasaTopBar(QWidget):
     filter_geo_toggled = Signal(bool)
     folder_view_mode_changed = Signal(str)  # "flat" (ID_VIEW_FOLDERS) ou "tree" (ID_VIEW_ALL)
     folder_sort_requested = Signal(str)     # "date", "name", "size"
+    people_sort_requested = Signal(int)     # 0 (ID_PEOPLEBYNAME), 1 (ID_PEOPLEBYAMOUNT), 2 (ID_PEOPLEBYAMOUNTTOP10)
     slideshow_requested = Signal()
 
     def __init__(self, style: Optional[PicasaStyle] = None, parent: Optional[QWidget] = None):
@@ -420,27 +421,83 @@ class PicasaTopBar(QWidget):
 
     def _show_folder_view_popup(self) -> None:
         """
-        FR : Affiche le menu contextuel d'options de vue/tri des dossiers (thumbui/folderviewpopup).
-        EN : Displays the folder view/sort options popup menu (thumbui/folderviewpopup).
+        FR : Affiche le menu contextuel d'options de vue/tri des dossiers et personnes (`thumbui/folderviewpopup`, menu 0x86).
+        EN : Displays the folder and people view/sort options popup menu (`thumbui/folderviewpopup`, menu 0x86).
+        Ref: picasa3.exe @ 0x00733480 - 0x0073399E, 0x005E2070 - 0x005E2270
         Ref: respack.yt @ thumbui/folderviewpopup (rect 225,9,247,31)
         """
         from PySide6.QtWidgets import QMenu
+        from picasa_py.db.preferences import PicasaPreferences
+
+        rm = PicasaResourceManager.get()
         menu = QMenu(self)
-        act_flat = menu.addAction("Affichage simple des dossiers")
+        act_flat = menu.addAction(rm.get_stringres("Menu::ID_VIEW_FOLDERS", "Affichage simple des dossiers"))
         act_flat.setCheckable(True)
         act_flat.setChecked(self.btn_view_flat.isChecked())
         act_flat.triggered.connect(lambda: self._select_folder_mode("flat"))
 
-        act_tree = menu.addAction("Affichage arborescent")
+        act_tree = menu.addAction(rm.get_stringres("Menu::ID_VIEW_ALL", "Affichage arborescent"))
         act_tree.setCheckable(True)
         act_tree.setChecked(self.btn_view_tree.isChecked())
         act_tree.triggered.connect(lambda: self._select_folder_mode("tree"))
 
         menu.addSeparator()
-        act_sort_date = menu.addAction("Trier les dossiers par date")
+        win = self.window()
+        lib_tree = getattr(win, "library_tree", None) if win is not None else None
+        cur_dsort = (
+            int(getattr(lib_tree, "date_sort_mode", 0))
+            if lib_tree is not None
+            else PicasaPreferences.get_date_sort_mode()
+        )
+        # FR : Options de tri des Dossiers / Albums (Ref: 0x005E20A1 - 0x005E2112)
+        # EN : Folder / Album sort options (Ref: 0x005E20A1 - 0x005E2112)
+        act_sort_date = menu.addAction(rm.get_stringres("AlbumList::ID_SORTBYDATE", "Trier les dossiers par date"))
+        act_sort_date.setCheckable(True)
+        act_sort_date.setChecked(cur_dsort == 0)
         act_sort_date.triggered.connect(lambda: self.folder_sort_requested.emit("date"))
-        act_sort_name = menu.addAction("Trier les dossiers par nom")
+
+        act_sort_size = menu.addAction(rm.get_stringres("AlbumList::ID_SORTBYSIZE", "Trier les dossiers par taille"))
+        act_sort_size.setCheckable(True)
+        act_sort_size.setChecked(cur_dsort == 1)
+        act_sort_size.triggered.connect(lambda: self.folder_sort_requested.emit("size"))
+
+        act_sort_name = menu.addAction(rm.get_stringres("AlbumList::ID_SORTBYNAME", "Trier les dossiers par nom"))
+        act_sort_name.setCheckable(True)
+        act_sort_name.setChecked(cur_dsort == 2)
         act_sort_name.triggered.connect(lambda: self.folder_sort_requested.emit("name"))
+
+        # FR : Options de tri de la collection Personnes (Ref: 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C)
+        # EN : People collection sort options (Ref: 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C)
+        menu.addSeparator()
+        cur_psort = (
+            int(getattr(lib_tree, "people_sort_mode", 0))
+            if lib_tree is not None
+            else PicasaPreferences.get_people_sort_mode()
+        )
+
+        act_p_name = menu.addAction(
+            rm.get_stringres("AlbumList::ID_PEOPLEBYNAME", "Trier les &personnes par nom")
+        )
+        act_p_name.setCheckable(True)
+        act_p_name.setChecked(cur_psort == 0)
+        act_p_name.triggered.connect(lambda: self.people_sort_requested.emit(0))
+
+        act_p_amount = menu.addAction(
+            rm.get_stringres("AlbumList::ID_PEOPLEBYAMOUNT", "Trier les personnes par &nombre")
+        )
+        act_p_amount.setCheckable(True)
+        act_p_amount.setChecked(cur_psort == 1)
+        act_p_amount.triggered.connect(lambda: self.people_sort_requested.emit(1))
+
+        act_p_top10 = menu.addAction(
+            rm.get_stringres(
+                "AlbumList::ID_PEOPLEBYAMOUNTTOP10",
+                "Trier en fonction des &10premières personnes",
+            )
+        )
+        act_p_top10.setCheckable(True)
+        act_p_top10.setChecked(cur_psort == 2)
+        act_p_top10.triggered.connect(lambda: self.people_sort_requested.emit(2))
 
         menu.exec(self.btn_folder_popup.mapToGlobal(self.btn_folder_popup.rect().bottomLeft()))
 

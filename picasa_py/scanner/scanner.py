@@ -77,7 +77,7 @@ from PySide6.QtCore import QThread, Signal
 
 Image.MAX_IMAGE_PIXELS = None
 
-from picasa_py.db.database import PicasaDatabase
+from picasa_py.db.database import MEDIA_RECORD_TYPES, PicasaDatabase
 from picasa_py.db.thumbindex import ThumbIndexRecord
 
 
@@ -162,7 +162,7 @@ VIDEO_EXTENSIONS = {
 
 IMAGE_EXTENSIONS = {
     ".jpg", ".jpeg", ".jpe", ".png", ".bmp", ".gif",
-    ".tif", ".tiff", ".webp", ".psd",
+    ".tif", ".tiff", ".webp", ".psd", ".tga",
 } | RAW_EXTENSIONS
 
 SUPPORTED_EXTENSIONS = IMAGE_EXTENSIONS | VIDEO_EXTENSIONS
@@ -172,15 +172,16 @@ EXTENSION_TYPE_MAP = {
     ".jpg": 2,
     ".jpeg": 2,
     ".jpe": 2,
+    ".gif": 3,
     ".bmp": 6,
     ".psd": 7,
     ".tif": 13,
     ".tiff": 13,
+    ".png": 14,
     # FR: Formats RAW appareil photo / EN: Camera RAW formats (type 18 = 0x12, Ref: 0x00D33418, 0x00412826, 0x00434FB0)
     **{ext: 18 for ext in RAW_EXTENSIONS},
+    ".tga": 22,
     ".webp": 31,
-    ".png": 31,
-    ".gif": 31,
     # FR: Formats vidéos Picasa 3 / EN: Picasa 3 video formats (Ref: SupportMovies, SupportQuicktime, DirEntry.IsMovie)
     ".avi": 0x20,
     ".wmv": 0x20,
@@ -464,14 +465,14 @@ def detect_media_type(file_path: Union[str, Path]) -> int:
     table `0x00D33418`) et `DetectSignatureType` (`0x00A4C600`, appelée par `0x005B1460` / `0x005B1570`).
     Dans `0x00A4C600`, les en-têtes TIFF (`II*\\0`, `MM\\0*`, `IIN1`) retournent `0` afin que les fichiers
     TIFF (`13`) et RAW basés sur TIFF (`18`) conservent le code de leur extension ; pour les autres formats
-    (`JPEG -> 2`, `BMP -> 6`, `PNG/GIF/WEBP -> 31`), la signature prime sur l'extension.
+    (`JPEG -> 2`, `GIF -> 3`, `BMP -> 6`, `PNG -> 14`, `WEBP -> 31`), la signature prime sur l'extension.
     EN: Determines the `thumbindex.db` `type` code matching `LookupExtensionType` (`0x00A4C140`,
     table `0x00D33418`) and `DetectSignatureType` (`0x00A4C600`, called by `0x005B1460` / `0x005B1570`).
     Ref: picasa3.exe @ 0x00A4C600, 0x00A4C140, 0x005B1460, 0x005B1570, 0x004FADB0, 0x00D33418
     """
     ext = os.path.splitext(str(file_path))[1].lower()
     ext_type = EXTENSION_TYPE_MAP.get(ext, 2)
-    if ext_type in (18, 32) or ext in VIDEO_EXTENSIONS:
+    if ext_type in (8, 9, 10, 11, 12, 18, 22, 29, 32) or ext in VIDEO_EXTENSIONS:
         return ext_type
     try:
         with open(file_path, "rb") as f:
@@ -480,7 +481,11 @@ def detect_media_type(file_path: Union[str, Path]) -> int:
         return ext_type
     if head[:3] == b"\xff\xd8\xff":
         return 2
-    if head[:8] == b"\x89PNG\r\n\x1a\n" or head[:6] in (b"GIF87a", b"GIF89a") or (head[:4] == b"RIFF" and head[8:12] == b"WEBP"):
+    if head[:8] == b"\x89PNG\r\n\x1a\n":
+        return 14
+    if head[:6] in (b"GIF87a", b"GIF89a"):
+        return 3
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
         return 31
     if head[:2] == b"BM":
         return 6
@@ -1328,13 +1333,14 @@ class PicasaDirScanner:
         FR: Retourne l'ensemble des extensions de fichiers activées selon les préférences Picasa 3
         (`SupportBMP`, `SupportGIF`, `SupportPNG`, `SupportTGA`, `SupportTIF`, `SupportWEBP`,
         `SupportPSD`, `SupportRAW`, `SupportMovies`).
-        Conformément à `picasa3.exe @ 0x004E04A0..0x004E0780`, `.gif`, `.png` et `.tga` sont
-        désactivés par défaut (`0`), tandis que `.jpg`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW et vidéos
-        sont activés par défaut (`1`).
+        Conformément à `picasa3.exe @ 0x00418528 & 0x00418664` (`esi = 1` pour `SupportPNG`) et
+        `0x004E04A0..0x004E0780`, `.jpg`, `.png`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW et vidéos
+        sont activés par défaut (`1`), tandis que `.gif` et `.tga` sont désactivés par défaut (`0`).
         EN: Returns the set of enabled file extensions according to Picasa 3 preferences.
-        Per `picasa3.exe @ 0x004E04A0..0x004E0780`, `.gif`, `.png`, and `.tga` are disabled by
-        default (`0`), while `.jpg`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW, and videos are enabled (`1`).
-        Ref: picasa3.exe @ 0x004E04A0..0x004E0985, 0x004FADB0, 0x004FB948
+        Per `picasa3.exe @ 0x00418528 & 0x00418664` (`esi = 1` for `SupportPNG`) and
+        `0x004E04A0..0x004E0780`, `.jpg`, `.png`, `.bmp`, `.tif`, `.webp`, `.psd`, RAW, and videos
+        are enabled by default (`1`), while `.gif` and `.tga` are disabled by default (`0`).
+        Ref: picasa3.exe @ 0x00418528, 0x00418664, 0x004E04A0..0x004E0985, 0x004FADB0, 0x004FB948
         """
         exts: Set[str] = {".jpg", ".jpeg", ".jpe"}
         try:
@@ -1358,7 +1364,7 @@ class PicasaDirScanner:
                 exts.add(".bmp")
             if _is_enabled("SupportGIF", False):
                 exts.add(".gif")
-            if _is_enabled("SupportPNG", False):
+            if _is_enabled("SupportPNG", True):
                 exts.add(".png")
             if _is_enabled("SupportTGA", False):
                 exts.add(".tga")
@@ -1373,7 +1379,7 @@ class PicasaDirScanner:
             if _is_enabled("SupportMovies", True):
                 exts.update(VIDEO_EXTENSIONS)
         except Exception:
-            exts.update({".bmp", ".tif", ".tiff", ".webp", ".psd"} | RAW_EXTENSIONS | VIDEO_EXTENSIONS)
+            exts.update({".bmp", ".png", ".tif", ".tiff", ".webp", ".psd"} | RAW_EXTENSIONS | VIDEO_EXTENSIONS)
         return exts
 
     def scan_folder_for_media(self, folder_path: str, recursive: bool = True, is_cancelled=None) -> List[str]:
@@ -1608,6 +1614,11 @@ class PicasaDirScanner:
                 if ad_cat.records[existing_row] != 0:
                     ad_cat.records[existing_row] = 0
                     ad_cat.dirty = True
+                if "albumdata_SyncState" in albumdata_tables:
+                    ad_sync = albumdata_tables["albumdata_SyncState"]
+                    if ad_sync.records[existing_row] == 0:
+                        ad_sync.records[existing_row] = 4
+                        ad_sync.dirty = True
                 if adate and "albumdata_date" in albumdata_tables:
                     ad_date = albumdata_tables["albumdata_date"]
                     if ad_date.records[existing_row] != adate:
@@ -1635,6 +1646,9 @@ class PicasaDirScanner:
                         pmp.records.append(auid)
                     elif stem == "albumdata_category":
                         pmp.records.append(0)
+                    elif stem == "albumdata_SyncState":
+                        # Ref: picasa3.exe @ 0x00456A15 (albumdata_SyncState = 4 for user albums cat=0)
+                        pmp.records.append(4)
                     elif stem == "albumdata_date":
                         pmp.records.append(adate)
                     elif stem == "albumdata_description":
@@ -1670,6 +1684,8 @@ class PicasaDirScanner:
                 if pmp_ft.records[folder_idx] != 1:
                     pmp_ft.records[folder_idx] = 1
                     pmp_ft.dirty = True
+            if hasattr(self.db, "ensure_folder_album_row"):
+                self.db.ensure_folder_album_row(folder_path)
             return folder_idx
 
     def _check_deleted_records(self, folder_paths: Optional[List[str]] = None) -> int:
@@ -1685,14 +1701,16 @@ class PicasaDirScanner:
 
         with self.db._lock:
             raw_records = [
-                (i, r.type, r.path, r.parent_idx)
+                (i, r.type, r.path, r.parent_idx, r.is_active)
                 for i, r in enumerate(self.db.index)
             ]
-        folders_map = {i: path for i, rtype, path, _ in raw_records if rtype == 1}
+        folders_map = {i: path for i, rtype, path, _, is_act in raw_records if rtype == 1 and is_act}
         allowed_folders_norm: Optional[Set[str]] = None
         if folder_paths:
+            if isinstance(folder_paths, (str, Path)):
+                folder_paths = [str(folder_paths)]
             allowed_folders_norm = {
-                os.path.abspath(p.replace("\\", os.sep) if os.sep != "\\" else p).replace("/", "\\").rstrip("\\").lower()
+                os.path.abspath(str(p).replace("\\", os.sep) if os.sep != "\\" else str(p)).replace("/", "\\").rstrip("\\").lower()
                 for p in folder_paths if p
             }
 
@@ -1701,13 +1719,14 @@ class PicasaDirScanner:
         deleted_count = 0
         is_bg_thread = threading.current_thread() is not threading.main_thread()
 
-        for idx, rtype, rpath, rparent in raw_records:
+        for idx, rtype, rpath, rparent, is_act in raw_records:
             if is_bg_thread and idx > 0 and (idx % 64) == 0:
                 BackgroundScanWorker.yield_for_gui(0.001)
-            if rtype == 0:
-                deleted_photo_indices.add(idx)
+            if rtype == 0 or not is_act:
+                if rtype in (0,) or rtype in MEDIA_RECORD_TYPES:
+                    deleted_photo_indices.add(idx)
                 continue
-            if rtype not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+            if rtype not in MEDIA_RECORD_TYPES:
                 continue
             fdir = folders_map.get(rparent, "")
             if not fdir:
@@ -1747,40 +1766,40 @@ class PicasaDirScanner:
                 for idx in newly_deleted_indices:
                     if 0 <= idx < len(self.db.index):
                         rec = self.db.index[idx]
-                        rec.type = 0
-                        rec.path = ""
-                        rec.parent_idx = 0xFFFFFFFF
+                        rec.mark_deleted()
                         self.db.thumbindex.dirty = True
                         if isinstance(del_set, set):
                             del_set.add(idx)
-                        for col_name in (
-                            "imagedata_personalbumrecs",
-                            "imagedata_personalbumrecs2",
-                            "imagedata_aliasparents",
+                        if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_doc"):
+                            self.db.wordhash.remove_doc(idx)
+                        for col_name, sentinel_val in (
+                            ("imagedata_personalbumrecs", 0xFFFFFFFF),
+                            ("imagedata_personalbumrecs2", 0xFFFFFFFF),
+                            ("imagedata_aliasparents", 0),
                         ):
                             pmp = self.db.pmps.get(col_name)
-                            if pmp is not None and idx < len(pmp.records) and pmp.records[idx] != 0:
-                                pmp.records[idx] = 0
+                            if pmp is not None and idx < len(pmp.records) and pmp.records[idx] != sentinel_val:
+                                pmp.records[idx] = sentinel_val
                                 pmp.dirty = True
                 for c_idx, c_rec in enumerate(self.db.index):
                     if c_rec.type == 1001 and c_rec.parent_idx in deleted_photo_indices:
-                        c_rec.type = 0
-                        c_rec.path = ""
-                        c_rec.parent_idx = 0xFFFFFFFF
+                        c_rec.mark_deleted()
                         self.db.thumbindex.dirty = True
                         if isinstance(del_set, set):
                             del_set.add(c_idx)
-                        for col_name in (
-                            "imagedata_facerect",
-                            "imagedata_personalbumid",
-                            "imagedata_suggestionpersonalbumid",
-                            "imagedata_personalbumrecs",
-                            "imagedata_personalbumrecs2",
-                            "imagedata_aliasparents",
+                        if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_doc"):
+                            self.db.wordhash.remove_doc(c_idx)
+                        for col_name, sentinel_val in (
+                            ("imagedata_facerect", 1),
+                            ("imagedata_personalbumid", 0),
+                            ("imagedata_suggestionpersonalbumid", 0),
+                            ("imagedata_personalbumrecs", 0xFFFFFFFF),
+                            ("imagedata_personalbumrecs2", 0xFFFFFFFF),
+                            ("imagedata_aliasparents", 0),
                         ):
                             pmp = self.db.pmps.get(col_name)
                             if pmp is not None and c_idx < len(pmp.records):
-                                pmp.records[c_idx] = 0
+                                pmp.records[c_idx] = sentinel_val
                                 pmp.dirty = True
                 if hasattr(self.db, "_invalidate_path_index_cache"):
                     self.db._invalidate_path_index_cache()
@@ -1802,22 +1821,23 @@ class PicasaDirScanner:
         # EN: Map existing indexed records: (folder_norm, filename_lower) outside global lock
         with self.db._lock:
             raw_records = [
-                (i, r.type, r.path, r.parent_idx, getattr(r, "ft2", 0))
+                (i, r.type, r.path, r.parent_idx, getattr(r, "ft2", 0), r.is_active)
                 for i, r in enumerate(self.db.index)
             ]
         indexed: Set[Tuple[str, str]] = set()
-        folders_map = {i: path for i, rtype, path, _, _ in raw_records if rtype == 1}
+        folders_map = {i: path for i, rtype, path, _, _, is_act in raw_records if rtype == 1 and is_act}
         folder_ft2_by_norm = {
             path.replace("/", "\\").rstrip("\\").lower(): ft2
-            for _, rtype, path, _, ft2 in raw_records
-            if rtype == 1 and path
+            for _, rtype, path, _, ft2, is_act in raw_records
+            if rtype == 1 and is_act and path
         }
 
-        for _, rtype, rpath, rparent, _ in raw_records:
-            if rtype in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+        for _, rtype, rpath, rparent, _, is_act in raw_records:
+            if is_act and rtype in MEDIA_RECORD_TYPES:
                 fpath = folders_map.get(rparent, "")
-                norm_f = fpath.replace("/", "\\").rstrip("\\").lower()
-                indexed.add((norm_f, rpath.lower()))
+                if fpath:
+                    norm_f = fpath.replace("/", "\\").rstrip("\\").lower()
+                    indexed.add((norm_f, rpath.lower()))
 
         self._check_deleted_records(folder_paths)
 
@@ -1862,6 +1882,7 @@ class PicasaDirScanner:
             raw_records = [
                 (i, rec.type, rec.path, rec.parent_idx, rec.mod_time, rec.file_size, getattr(rec, "mtime", 0))
                 for i, rec in enumerate(self.db.index)
+                if rec.is_active
             ]
         folders_map: Dict[int, str] = {}
         folders_norm_map: Dict[int, Tuple[str, str]] = {}
@@ -1883,7 +1904,7 @@ class PicasaDirScanner:
                 break
             if is_bg_thread and idx > 0 and (idx % 64) == 0:
                 BackgroundScanWorker.yield_for_gui(0.001)
-            if rtype not in (2, 3, 4, 6, 7, 8, 13, 18, 31, 32):
+            if rtype not in MEDIA_RECORD_TYPES:
                 continue
             fnorm_pair = folders_norm_map.get(rparent)
             if not fnorm_pair:
@@ -1996,11 +2017,12 @@ class PicasaDirScanner:
 
             if getattr(self.db, "wordhash", None) is not None:
                 folder_p = os.path.dirname(file_path).replace("/", "\\").rstrip("\\") + "\\"
-                folder_alb_tok = (
+                raw_folder_alb_tok = (
                     self.db.ensure_folder_album_row(folder_p)
-                    if hasattr(self.db, "ensure_folder_album_row") and not is_video_rec
+                    if hasattr(self.db, "ensure_folder_album_row")
                     else ""
                 )
+                folder_alb_tok = "" if is_video_rec else raw_folder_alb_tok
                 for tok in wordhash_tokens_for_media(
                     os.path.basename(file_path), w, h, rec_type, folder_alb_tok, color_toks
                 ):
@@ -2117,7 +2139,7 @@ class PicasaDirScanner:
             # en heure locale pour les vidéos (199/199)
             _set_pmp_col("imagedata_tagdate", float(ole_date) if is_video_rec else 0.0)
             _set_pmp_col("imagedata_filetype", media_type)
-            _set_pmp_col("imagedata_fileflags", 0)
+            _set_pmp_col("imagedata_fileflags", 1 if media_type == 18 else 0)
             _set_pmp_col("imagedata_originfast", originfast_val)
             _set_pmp_col("imagedata_colorspace", 0)
             _set_pmp_col("imagedata_facerect", 0)
@@ -2135,11 +2157,12 @@ class PicasaDirScanner:
                 _set_pmp_col("imagedata_lat", float(gps_lat))
                 _set_pmp_col("imagedata_long", float(gps_lon))
 
-            folder_alb_tok = (
+            raw_folder_alb_tok = (
                 self.db.ensure_folder_album_row(folder_path)
-                if hasattr(self.db, "ensure_folder_album_row") and not is_video_rec
+                if hasattr(self.db, "ensure_folder_album_row")
                 else ""
             )
+            folder_alb_tok = "" if is_video_rec else raw_folder_alb_tok
             if getattr(self.db, "wordhash", None) is not None:
                 for tok in wordhash_tokens_for_media(
                     filename, w, h, media_type, folder_alb_tok, color_toks
@@ -2176,13 +2199,16 @@ class PicasaDirScanner:
         Ref: picasa3.exe @ 0x00415790 (AVytDirScannerWindows)
         """
         folders = [str(folder_path)]
+        indexed_count = 0
         for fpath in self.find_unindexed_files(folders):
             if self.index_file(fpath) is not None:
-                pass
-        changed = getattr(self, "_last_deleted_count", 0)
-        # Recompute total changed count from indexed + modified
-        # Note: find_unindexed_files already called _check_deleted_records and _sync_ini_albums_to_pmp
-        return changed
+                indexed_count += 1
+        deleted_count = getattr(self, "_last_deleted_count", 0)
+        modified_count = 0
+        for rec_idx, fpath in self.find_modified_files(folders):
+            if self.update_indexed_file(rec_idx, fpath):
+                modified_count += 1
+        return deleted_count + indexed_count + modified_count
 
 
 class BackgroundScanWorker(QThread):
@@ -2361,22 +2387,18 @@ class BackgroundScanWorker(QThread):
                     if (now - last_progress_emit) >= 0.15 or (j + 1) == len(to_update):
                         _flush_pending_batches(force=True)
 
-        if self._is_cancelled:
-            return
-
         if pending_by_folder:
             _flush_pending_batches(force=True)
 
         with self.db._lock:
             alb_synced = scanner._sync_ini_albums_to_pmp()
-        if alb_synced > 0 and changed == 0 and not self._is_cancelled:
+        if changed > 0 and not self._is_cancelled:
             try:
-                self.db.save_database()
+                self.db.face_manager.reload()
+                self._reloaded_face_manager = True
             except Exception:
                 pass
-
-        # FR: Sauvegarder les modifications atomiquement sur disque / EN: Save changes atomically to disk
-        if changed > 0 and not self._is_cancelled:
+        if (alb_synced > 0 or changed > 0):
             try:
                 self.db.save_database()
             except Exception:

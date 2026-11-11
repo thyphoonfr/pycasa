@@ -265,9 +265,12 @@ class PicasaContactManagerDialog(QDialog):
 
         people: List[PersonCluster] = []
         known_ids = set()
-        if getattr(self.db, "face_manager", None):
-            people.extend(self.db.face_manager.get_people())
-            known_ids = {p.contact_id.lower() for p in people}
+        fm = getattr(self.db, "face_manager", None)
+        if fm is not None:
+            people.extend(fm.get_people())
+            for p in people:
+                for v in fm._cid_variants(p.contact_id):
+                    known_ids.add(v)
 
         # Inclure également les contacts du fichier contacts.xml si présents
         if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
@@ -279,16 +282,29 @@ class PicasaContactManagerDialog(QDialog):
                 if cid and cid not in known_ids:
                     cluster = PersonCluster(contact_id=cid, name=getattr(contact, "name", "") or cid)
                     people.append(cluster)
-                    known_ids.add(cid)
+                    if fm is not None:
+                        for v in fm._cid_variants(cid):
+                            known_ids.add(v)
+                    else:
+                        known_ids.add(cid)
 
-        self.all_people = sorted(people, key=lambda p: p.name.lower())
+        self.all_people = sorted(
+            people,
+            key=lambda p: (1 if getattr(p, "is_unknown", False) or not p.name else 0, (p.name or p.display_name or p.contact_id).lower()),
+        )
         search_txt = self.edit_search.text().strip().lower()
 
         for p in self.all_people:
-            if search_txt and search_txt not in p.name.lower():
+            label_text = p.name or getattr(p, "display_name", "") or p.contact_id
+            if search_txt and search_txt not in label_text.lower():
                 continue
-            item = QListWidgetItem(p.name)
+            item = QListWidgetItem(label_text)
             item.setData(Qt.ItemDataRole.UserRole, p.contact_id)
+            if (p.avatar_pixmap is None or p.avatar_pixmap.isNull()) and fm is not None:
+                try:
+                    fm.get_person_avatar(p.contact_id, size=32)
+                except Exception:
+                    pass
             if p.avatar_pixmap and not p.avatar_pixmap.isNull():
                 item.setIcon(QIcon(p.avatar_pixmap.scaled(32, 32, Qt.AspectRatioMode.KeepAspectRatioByExpanding)))
             self.list_contacts.addItem(item)
@@ -321,8 +337,9 @@ class PicasaContactManagerDialog(QDialog):
         item = self.list_contacts.item(row)
         contact_id = item.data(Qt.ItemDataRole.UserRole)
         self.current_person = None
-        if getattr(self.db, "face_manager", None):
-            self.current_person = self.db.face_manager.get_person(contact_id)
+        fm = getattr(self.db, "face_manager", None)
+        if fm is not None:
+            self.current_person = fm.get_person(contact_id)
         if not self.current_person:
             for p in self.all_people:
                 if p.contact_id.lower() == str(contact_id).lower():
@@ -330,25 +347,31 @@ class PicasaContactManagerDialog(QDialog):
                     break
 
         if self.current_person:
-            self.lbl_person_title.setText(self.current_person.name)
+            title_str = self.current_person.name or getattr(self.current_person, "display_name", "") or self.current_person.contact_id
+            self.lbl_person_title.setText(title_str)
             count = len(self.current_person.photo_indices)
             self.lbl_photo_count.setText(f"{count} photos associées")
+            if (self.current_person.avatar_pixmap is None or self.current_person.avatar_pixmap.isNull()) and fm is not None:
+                try:
+                    fm.get_person_avatar(self.current_person.contact_id, size=64)
+                except Exception:
+                    pass
             if self.current_person.avatar_pixmap and not self.current_person.avatar_pixmap.isNull():
                 self.lbl_avatar.setPixmap(
                     self.current_person.avatar_pixmap.scaled(64, 64, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
                 )
             else:
+                self.lbl_avatar.setPixmap(QPixmap())
                 self.lbl_avatar.setText("👤")
 
             self.edit_name.setEnabled(True)
             self.edit_name.setText(self.current_person.name)
             self.edit_email.setEnabled(True)
             email_val = ""
-            if getattr(self.db, "contacts", None) and hasattr(self.db.contacts, "contacts"):
-                for c in self.db.contacts.contacts:
-                    if c.id.lower() == self.current_person.contact_id.lower():
-                        email_val = getattr(c, "email", "") or ""
-                        break
+            if getattr(self.db, "contacts", None):
+                c = self.db.contacts.get(self.current_person.contact_id)
+                if c is not None:
+                    email_val = getattr(c, "email", "") or ""
             self.edit_email.setText(email_val)
             self.btn_save_person.setEnabled(True)
             self.btn_delete.setEnabled(True)
@@ -362,20 +385,34 @@ class PicasaContactManagerDialog(QDialog):
             return
         new_email = self.edit_email.text().strip()
 
-        old_name = self.current_person.name
-        self.current_person.name = new_name
-        self.lbl_person_title.setText(new_name)
+        old_name = self.current_person.name or getattr(self.current_person, "display_name", "") or self.current_person.contact_id
+        cid = self.current_person.contact_id
 
-        # Mettre à jour contacts.xml via self.db
-        self._update_contact_in_xml(self.current_person.contact_id, new_name, new_email)
+        # Mettre à jour contacts.xml via self.db (notamment pour l'adresse e-mail) avant rename_person
+        self._update_contact_in_xml(cid, new_name, new_email)
+
+        fm = getattr(self.db, "face_manager", None)
+        if fm is not None and new_name != self.current_person.name:
+            # FR : Déléguer à face_manager.rename_person pour synchroniser albumdata_name.pmp, .picasa.ini, contacts.xml et wordhash.dat
+            # EN: Delegate to face_manager.rename_person to synchronize albumdata_name.pmp, .picasa.ini, contacts.xml and wordhash.dat
+            fm.rename_person(cid, new_name)
+            updated = fm.get_person(cid)
+            if updated is not None:
+                self.current_person = updated
+            else:
+                self.current_person.name = new_name
+        else:
+            self.current_person.name = new_name
+
+        self.lbl_person_title.setText(new_name)
 
         # Mettre à jour l'élément de la liste
         curr_item = self.list_contacts.currentItem()
         if curr_item:
             curr_item.setText(new_name)
 
-        if getattr(self.db, "face_manager", None):
-            self.db.face_manager.notify_people_changed()
+        if fm is not None:
+            fm.notify_people_changed()
 
         QMessageBox.information(self, "Personne modifiée", f"« {old_name} » a été renommé en « {new_name} ».")
 
@@ -384,28 +421,55 @@ class PicasaContactManagerDialog(QDialog):
             return
         if getattr(self.db, "contacts", None) is None:
             self.db.contacts = ContactsFile()
-        found = False
-        for c in self.db.contacts.contacts:
-            if c.id.lower() == contact_id.lower():
-                c.name = new_name
-                if new_email is not None:
-                    c.email = new_email
-                found = True
-                break
-        if not found:
+        existing = self.db.contacts.get(contact_id)
+        if existing is not None:
+            existing.name = new_name
+            if new_email is not None:
+                existing.email = new_email
+        else:
             self.db.contacts.contacts.append(Contact(id=contact_id, name=new_name, email=new_email or ""))
         if hasattr(self.db, "save_contacts"):
             self.db.save_contacts()
+        # Synchroniser également [Contacts2] (<cid>=<name>;<email>;) dans les fichiers .picasa.ini du contact
+        # Ref: picasa3.exe @ 0x0068AD1C (WriteContacts2Section "%s=%s;%s;\r\n")
+        if self.current_person and getattr(self.current_person, "photo_paths", None):
+            from picasa_py.ini.parser import PicasaIniParser
+            email_val = (new_email if new_email is not None else (existing.email if existing else "")) or ""
+            seen_dirs = set()
+            for pp in self.current_person.photo_paths:
+                if not pp:
+                    continue
+                d = os.path.dirname(pp)
+                if not d or d in seen_dirs:
+                    continue
+                seen_dirs.add(d)
+                for ini_name in (".picasa.ini", "Picasa.ini"):
+                    ini_p = os.path.join(d, ini_name)
+                    if os.path.exists(ini_p):
+                        try:
+                            doc = PicasaIniParser.parse_file(ini_p)
+                            csec = doc.get_section("Contacts2")
+                            if csec is not None and csec.get(contact_id) is not None:
+                                csec.set(contact_id, f"{new_name};{email_val};")
+                                doc.write_file(ini_p)
+                                if hasattr(self.db, "invalidate_ini_cache"):
+                                    self.db.invalidate_ini_cache(ini_p)
+                        except Exception:
+                            pass
+                        break
 
     def _create_person(self) -> None:
         name, ok = QInputDialog.getText(self, "Nouveau contact", "Nom de la nouvelle personne :")
         if ok and name.strip():
-            cid = uuid.uuid4().hex[:16]
-            self._update_contact_in_xml(cid, name.strip())
-            new_cluster = PersonCluster(contact_id=cid, name=name.strip())
-            if getattr(self.db, "face_manager", None):
-                self.db.face_manager.people[cid] = new_cluster
-                self.db.face_manager.notify_people_changed()
+            clean_name = name.strip()
+            fm = getattr(self.db, "face_manager", None)
+            if fm is not None:
+                new_cluster = fm.create_person(clean_name)
+                cid = new_cluster.contact_id
+                self._update_contact_in_xml(cid, clean_name)
+            else:
+                cid = uuid.uuid4().hex[:16]
+                self._update_contact_in_xml(cid, clean_name)
             self._load_people()
             # Sélectionner le nouvel élément
             for r in range(self.list_contacts.count()):

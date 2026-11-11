@@ -224,11 +224,11 @@ def test_sticky_album_header_pin_and_push(qapp):
     assert idx == 0
     assert sy == 0  # Collé en haut à y=0
 
-    # 3. Arrivée de Dossier 2 qui pousse l'en-tête (sec1 top = 312 - 300 = 12 < 38)
+    # 3. Arrivée de Dossier 2 qui pousse l'en-tête (sec1 top = 312 - 300 = 12 < 64)
     view.scroll_y = 300
     idx, sy = view._get_sticky_header_info()
     assert idx == 0
-    assert sy == 12 - 38  # Poussé vers le haut à -26 px
+    assert sy == 12 - 64  # Poussé vers le haut à -52 px (en-tête sur 2 lignes = 64 px)
 
     # 4. Entrée complète dans Dossier 2 (scroll_y = 330) : Dossier 2 devient épinglé à y=0
     view.scroll_y = 330

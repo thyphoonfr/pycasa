@@ -496,6 +496,18 @@ class PicasaAdjustTimeDialog(QDialog):
                         if pmp_of is not None and idx < len(pmp_of.records):
                             pmp_of.records[idx] = compute_originfast_hash(p)
                             pmp_of.dirty = True
+                        if hasattr(self.db, "pmps"):
+                            from picasa_py.scanner.scanner import datetime_to_ole
+                            ole_dt = datetime_to_ole(final_dt)
+                            pmp_dt = self.db.pmps.get("imagedata_datetime")
+                            if pmp_dt is not None and idx < len(pmp_dt.records):
+                                pmp_dt.records[idx] = ole_dt
+                                pmp_dt.dirty = True
+                            if rec.type == 32:
+                                pmp_td = self.db.pmps.get("imagedata_tagdate")
+                                if pmp_td is not None and idx < len(pmp_td.records):
+                                    pmp_td.records[idx] = ole_dt
+                                    pmp_td.dirty = True
                         folder_p = ""
                         if 0 <= rec.parent_idx < len(self.db.thumbindex.records):
                             folder_p = self.db.thumbindex.records[rec.parent_idx].path

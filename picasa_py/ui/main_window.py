@@ -401,9 +401,10 @@ class PicasaMainWindow(QMainWindow):
             lambda scale: self.photo_tray.set_oneup_zoom_from_canvas(scale, self.one_up_view.canvas._get_fit_scale())
         )
 
-        # Recherche, mode d'affichage des dossiers et filtres rapides
+        # Recherche, mode d'affichage des dossiers, tri des personnes et filtres rapides
         self.top_bar.folder_view_mode_changed.connect(self._on_top_bar_folder_view_mode_changed)
         self.top_bar.folder_sort_requested.connect(self.action_sort_folder_by)
+        self.top_bar.people_sort_requested.connect(self.action_sort_people_by)
         self.top_bar.new_album_requested.connect(self.action_new_album)
         self.top_bar.search_query_changed.connect(self._on_search_query)
         self.top_bar.filter_starred_toggled.connect(lambda v: self.thumb_view.apply_quick_filters(filter_starred=v))
@@ -525,9 +526,7 @@ class PicasaMainWindow(QMainWindow):
                 try:
                     if hasattr(self.one_up_view, "_full_res_preview_timer"):
                         self.one_up_view._full_res_preview_timer.stop()
-                    if hasattr(self.one_up_view, "_ flush_pending_thumb_db_sync"):
-                        self.one_up_view._flush_pending_thumb_db_sync()
-                    elif hasattr(self.one_up_view, "_flush_pending_thumb_db_sync"):
+                    if hasattr(self.one_up_view, "_flush_pending_thumb_db_sync"):
                         self.one_up_view._flush_pending_thumb_db_sync()
                     if hasattr(self.one_up_view, "_thumb_db_sync_timer"):
                         self.one_up_view._thumb_db_sync_timer.stop()
@@ -939,12 +938,19 @@ class PicasaMainWindow(QMainWindow):
                 break
 
         paths_set = set()
+        db_indices_set = set()
         if target_album:
             paths_set = {p.replace("\\", "/").lower() for p in target_album.get("photo_paths", [])}
+            db_indices_set = set(target_album.get("photo_indices", []))
 
         matching = []
         folder_ini_cache: dict = {}
         for i, item in enumerate(self.thumb_view.items):
+            if getattr(item, "is_synthetic_unnamed", False) or getattr(item, "is_person_item", False):
+                continue
+            if item.index in db_indices_set:
+                matching.append(i)
+                continue
             norm_item_p = item.path.replace("\\", "/").lower()
             if norm_item_p in paths_set:
                 matching.append(i)
@@ -983,10 +989,17 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_photo_edited(self, photo_path: str) -> None:
         """
-        FR: Déclenché lorsqu'une photo est éditée ou recadrée.
-        EN: Triggered when a photo is edited or cropped.
+        FR: Déclenché lorsqu'une photo est éditée, recadrée ou qu'une capture d'écran vidéo est enregistrée.
+        EN: Triggered when a photo is edited, cropped, or a video frame snapshot is saved.
         """
         if photo_path:
+            norm_target = os.path.normcase(os.path.normpath(photo_path))
+            in_thumb_items = any(
+                it.path == photo_path or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target)
+                for it in self.thumb_view.items
+            )
+            if not in_thumb_items and os.path.exists(photo_path):
+                self.notify_folders_changed()
             if hasattr(self, "one_up_view") and hasattr(self.one_up_view, "filmstrip"):
                 if self.db is not None and hasattr(self.db, "find_media_index_by_path"):
                     db_idx = self.db.find_media_index_by_path(photo_path)
@@ -1737,10 +1750,11 @@ class PicasaMainWindow(QMainWindow):
             return
 
         fm = self.db.face_manager
+        cid_vars = fm._cid_variants(contact_id) if hasattr(fm, "_cid_variants") else {contact_id.lower()}
         if not face_rect:
-            faces = fm.photo_to_faces.get(photo_path, [])
+            faces = fm.get_faces_for_photo(photo_path)
             for fr in faces:
-                if fr.contact_id.lower() == contact_id.lower():
+                if (fr.contact_id or "").lower() in cid_vars:
                     face_rect = fr
                     break
             if not face_rect and faces:
@@ -2021,7 +2035,12 @@ class PicasaMainWindow(QMainWindow):
         for p in paths:
             try:
                 p_obj = Path(p)
+                # Ref: picasa3.exe @ 0x0054368A, 0x0085A0B0 (.picasaoriginals et dossier legacy Originals)
                 orig_backup = p_obj.parent / ".picasaoriginals" / p_obj.name
+                if not orig_backup.exists():
+                    legacy_backup = p_obj.parent / "Originals" / p_obj.name
+                    if legacy_backup.exists():
+                        orig_backup = legacy_backup
                 if orig_backup.exists():
                     import shutil
                     shutil.copy2(str(orig_backup), str(p_obj))
@@ -2034,7 +2053,8 @@ class PicasaMainWindow(QMainWindow):
                     if self.db is not None and self.db.thumbindex is not None:
                         try:
                             from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
-                            from PIL import Image
+                            from picasa_py.db.blockfile import compute_thumb_checksum
+                            from PIL import Image, ImageOps
                             rec_idx = self.db.find_photo_index(p) if hasattr(self.db, "find_photo_index") else None
                             if rec_idx is not None and 0 <= rec_idx < len(self.db.thumbindex.records):
                                 _, ft2_rest, fsize_rest = file_filetimes(p_obj)
@@ -2044,17 +2064,44 @@ class PicasaMainWindow(QMainWindow):
                                 rec.file_size = fsize_rest
                                 self.db.thumbindex.dirty = True
                                 with Image.open(p_obj) as r_img:
-                                    rw, rh = r_img.size
+                                    try:
+                                        tr_img = ImageOps.exif_transpose(r_img)
+                                        rw, rh = tr_img.size
+                                    except Exception:
+                                        rw, rh = r_img.size
                                 for col_n, col_v in (
                                     ("imagedata_width", int(rw)),
                                     ("imagedata_height", int(rh)),
+                                    ("imagedata_edit_width", int(rw)),
+                                    ("imagedata_edit_height", int(rh)),
                                     ("imagedata_originfast", compute_originfast_hash(p_obj)),
                                     ("imagedata_revertable", 0),
+                                    ("imagedata_backuphash", 0),
+                                    ("imagedata_edited", 0),
                                 ):
                                     pmp_c = self.db.pmps.get(col_n)
                                     if pmp_c is not None and rec_idx < len(pmp_c.records):
                                         pmp_c.records[rec_idx] = col_v
                                         pmp_c.dirty = True
+                                # Mettre à jour les checksums CBlockFile (thumbs / thumbs2) après restauration de l'original
+                                p_idx = rec.parent_idx
+                                folder_p = (
+                                    self.db.thumbindex.records[p_idx].path
+                                    if 0 <= p_idx < len(self.db.thumbindex.records)
+                                    else ""
+                                )
+                                new_cs = compute_thumb_checksum(folder_p, rec.path, rec.ft2, rec.size)
+                                for pref in ("thumbs", "thumbs2"):
+                                    idx_f = self.db.block_indices.get(pref)
+                                    if idx_f is not None:
+                                        if 0 <= rec_idx < len(idx_f.checksums) and idx_f.checksums[rec_idx] != 0:
+                                            idx_f.checksums[rec_idx] = new_cs
+                                            idx_f.dirty = True
+                                        if hasattr(self.db, "_get_face_children"):
+                                            for c_idx in self.db._get_face_children(rec_idx):
+                                                if 0 <= c_idx < len(idx_f.checksums) and idx_f.checksums[c_idx] != 0:
+                                                    idx_f.checksums[c_idx] = new_cs
+                                                    idx_f.dirty = True
                         except Exception:
                             pass
             except Exception:
@@ -2218,10 +2265,12 @@ class PicasaMainWindow(QMainWindow):
 
     def action_select_starred(self) -> None:
         """
-        FR: Sélectionne toutes les photos étoilées (ID_SELECTSTAR).
-        EN: Selects all starred photos (ID_SELECTSTAR).
+        FR: Sélectionne toutes les photos étoilées de la vue active (ID_SELECTSTAR).
+        EN: Selects all starred photos in the active view (ID_SELECTSTAR).
+        Ref: picasa3.exe @ 0x0088F6FC (ID_SELECTSTAR)
         """
-        starred_indices = {i for i, it in enumerate(self.thumb_view.items) if it.starred}
+        visible = set(self.thumb_view.filtered_indices)
+        starred_indices = {i for i in visible if 0 <= i < len(self.thumb_view.items) and self.thumb_view.items[i].starred}
         self.thumb_view.selected_indices = starred_indices
         self.thumb_view.selection_changed.emit(list(starred_indices))
         self.thumb_view.update()
@@ -2404,6 +2453,52 @@ class PicasaMainWindow(QMainWindow):
             else:
                 self.status_bar.showMessage("Aucune modification en attente à enregistrer.")
 
+    def _save_transformed_photo_copy(self, orig_path: str, dest_path: str) -> None:
+        """
+        FR: Enregistre une copie pleine résolution de `orig_path` vers `dest_path` avec préservation
+        des métadonnées EXIF (`Orientation = 1`) et du profil ICC, puis indexe le nouveau fichier
+        dans `self.db` et rafraîchit la photothèque.
+        EN: Saves a full-resolution copy of `orig_path` to `dest_path` preserving EXIF (`Orientation = 1`)
+        and ICC profile metadata, then indexes the new file into `self.db` and refreshes the library.
+        Ref: picasa3.exe @ ID_FILE_SAVEAS, ID_FILE_SAVEACOPY (0x005E83A0)
+        """
+        if self.stack.currentWidget() == self.one_up_view:
+            self.one_up_view.save_current_photo_as(dest_path)
+        else:
+            from PIL import Image
+            from picasa_py.ui.image_processor import PicasaImageProcessor
+            pil_img = PicasaImageProcessor.load_transformed_image(orig_path, max_size=0)
+            if pil_img is not None:
+                save_kwargs: Dict[str, Any] = {}
+                try:
+                    with Image.open(orig_path) as meta_im:
+                        icc_prof = meta_im.info.get("icc_profile")
+                        if icc_prof:
+                            save_kwargs["icc_profile"] = icc_prof
+                        raw_exif = meta_im.getexif()
+                        if raw_exif:
+                            if 0x0112 in raw_exif:
+                                raw_exif[0x0112] = 1
+                            save_kwargs["exif"] = raw_exif.tobytes()
+                except Exception:
+                    pass
+                ext_low = Path(dest_path).suffix.lower()
+                if ext_low in (".jpg", ".jpeg"):
+                    pil_img.convert("RGB").save(dest_path, format="JPEG", quality=95, **save_kwargs)
+                else:
+                    pil_img.save(dest_path, **save_kwargs)
+            else:
+                import shutil
+                shutil.copy2(orig_path, dest_path)
+            if self.db is not None and os.path.exists(dest_path):
+                try:
+                    from picasa_py.scanner.scanner import PicasaDirScanner
+                    PicasaDirScanner(self.db).index_file(dest_path)
+                except Exception:
+                    pass
+        if os.path.exists(dest_path):
+            self.notify_folders_changed()
+
     def action_save_as(self) -> None:
         """
         FR: Enregistre sous un nouveau nom (ID_FILE_SAVEAS, Ctrl+Shift+S).
@@ -2421,16 +2516,7 @@ class PicasaMainWindow(QMainWindow):
             f"Image files (*{ext} *{'*.jpg' if ext != '.jpg' else ''});;All Files (*.*)"
         )
         if save_path:
-            if self.stack.currentWidget() == self.one_up_view:
-                self.one_up_view.save_current_photo_as(save_path)
-            else:
-                from picasa_py.ui.image_processor import PicasaImageProcessor
-                pil_img = PicasaImageProcessor.load_transformed_image(orig_path)
-                if pil_img is not None:
-                    pil_img.save(save_path, quality=95)
-                else:
-                    import shutil
-                    shutil.copy2(orig_path, save_path)
+            self._save_transformed_photo_copy(orig_path, save_path)
             self.status_bar.showMessage(f"Fichier enregistré sous : {os.path.basename(save_path)}")
 
     def action_save_a_copy(self) -> None:
@@ -2450,16 +2536,7 @@ class PicasaMainWindow(QMainWindow):
             copy_name = f"{p.stem}-{counter}{p.suffix}"
         copy_path = str(p.parent / copy_name)
 
-        if self.stack.currentWidget() == self.one_up_view:
-            self.one_up_view.save_current_photo_as(copy_path)
-        else:
-            from picasa_py.ui.image_processor import PicasaImageProcessor
-            pil_img = PicasaImageProcessor.load_transformed_image(orig_path)
-            if pil_img is not None:
-                pil_img.save(copy_path, quality=95)
-            else:
-                import shutil
-                shutil.copy2(orig_path, copy_path)
+        self._save_transformed_photo_copy(orig_path, copy_path)
         self.status_bar.showMessage(f"Copie créée : {copy_name}")
 
     def action_set_desktop_wallpaper(self, paths: Optional[List[str]] = None) -> None:
@@ -2576,20 +2653,55 @@ class PicasaMainWindow(QMainWindow):
 
     def _get_album_music(self, album_name: str) -> Optional[str]:
         """
-        FR: Recherche le chemin de la musique associée à un album dans les fichiers .picasa.ini.
-        EN: Searches for the music track path associated with an album in .picasa.ini files.
+        FR: Recherche le chemin de la musique associée à un album dans `albumdata_music.pmp`
+        (via `self.db.get_all_albums()`) ainsi que dans les fichiers `.picasa.ini` des dossiers indexés.
+        EN: Searches for the music track path associated with an album in `albumdata_music.pmp`
+        (via `self.db.get_all_albums()`) as well as in `.picasa.ini` files of indexed folders.
+        Ref: picasa3.exe @ 0x00456A15 (albumdata_music.pmp / [.album:<uid>] music=)
         """
-        if not self.db:
+        if not self.db or not album_name:
             return None
-        watched = [p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")]
-        for w in watched:
+        clean_target = album_name.strip()
+        if clean_target.startswith("]album:") or clean_target.startswith(".album:"):
+            clean_target = clean_target[7:].strip()
+        target_low = clean_target.lower()
+
+        if hasattr(self.db, "get_all_albums"):
+            try:
+                for alb in self.db.get_all_albums():
+                    tok = str(alb.get("token") or "").strip().lower()
+                    aname = str(alb.get("name") or "").strip().lower()
+                    if target_low in (tok, aname):
+                        m = str(alb.get("music") or "").strip()
+                        if m and os.path.exists(m):
+                            return m
+            except Exception:
+                pass
+
+        folders_to_check: List[str] = [
+            p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")
+        ]
+        if getattr(self.db, "thumbindex", None) is not None:
+            for r in self.db.thumbindex.records:
+                if r.type == 1 and r.is_active and r.path:
+                    fp = r.path.rstrip("\\/")
+                    if fp and fp not in folders_to_check:
+                        folders_to_check.append(fp)
+
+        for w in folders_to_check:
             ini_p = os.path.join(w, ".picasa.ini")
-            if os.path.exists(ini_p):
+            doc = (
+                self.db.get_parsed_ini(ini_p)
+                if hasattr(self.db, "get_parsed_ini")
+                else (PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else None)
+            )
+            if doc is not None:
                 try:
-                    doc = PicasaIniParser.parse_file(ini_p)
                     for sec in doc.sections:
-                        if sec.name.startswith(".album:"):
-                            if sec.get("name", "").strip().lower() == album_name.strip().lower() or sec.name[7:].strip() == album_name.strip():
+                        if sec.name.startswith(".album:") or sec.name.startswith("]album:"):
+                            sec_tok = (sec.get("token") or sec.name[7:]).strip().lower()
+                            sec_name = sec.get("name", "").strip().lower()
+                            if target_low in (sec_tok, sec_name, sec.name[7:].strip().lower()):
                                 m = sec.get("music", "").strip()
                                 if m and os.path.exists(m):
                                     return m
@@ -2618,19 +2730,37 @@ class PicasaMainWindow(QMainWindow):
 
     def action_slideshow_for_person(self, contact_id: str) -> None:
         """
-        FR: Lance le diaporama pour une personne.
-        EN: Starts the slideshow for a person.
+        FR: Lance le diaporama pour une personne en résolvant les chemins de ses photos depuis la base.
+        EN: Starts the slideshow for a person by resolving their photo paths from the database.
+        Ref: picasa3.exe @ CPersonAlbumView::OnSlideshow (0x008AAD76)
         """
         if not self.db or not self.db.face_manager:
             return
         person = self.db.face_manager.get_person(contact_id)
-        if person:
-            paths = [
-                self.thumb_view.items[idx].path
-                for idx in person.photo_indices
-                if idx < len(self.thumb_view.items) and self.thumb_view.items[idx].path
-            ]
-            self._on_album_slideshow(paths)
+        if not person:
+            return
+        paths: List[str] = []
+        seen_norms: set[str] = set()
+
+        def _add_candidate(p_str: Optional[str]) -> None:
+            if not p_str:
+                return
+            norm_p = os.path.normcase(os.path.normpath(p_str))
+            if norm_p not in seen_norms and os.path.exists(p_str):
+                seen_norms.add(norm_p)
+                paths.append(p_str)
+
+        for p_direct in getattr(person, "photo_paths", []) or []:
+            _add_candidate(p_direct)
+        for db_idx in getattr(person, "photo_indices", []) or []:
+            eff_idx = (
+                self.db.get_face_parent_photo_idx(db_idx)
+                if hasattr(self.db, "is_face_record") and self.db.is_face_record(db_idx)
+                else db_idx
+            )
+            if eff_idx is not None and hasattr(self.db, "get_media_full_path"):
+                _add_candidate(self.db.get_media_full_path(eff_idx))
+        self._on_album_slideshow(paths)
 
     def action_new_album(self) -> None:
         """
@@ -2644,15 +2774,54 @@ class PicasaMainWindow(QMainWindow):
         """
         FR: Ouvre le dialogue complet de création d'album (album.fen) et associe les photos.
         EN: Opens the full album creation dialog (album.fen) and links the photos.
+        Ref: picasa3.exe @ 0x00456A15, album.fen (date par défaut issue de DateTimeOriginal EXIF / imagedata_datetime)
         """
         photos = photo_paths or []
-        photo_dates = []
+        photo_dates: List[datetime] = []
         for p in photos:
-            try:
-                mtime = os.path.getmtime(p)
-                photo_dates.append(datetime.fromtimestamp(mtime))
-            except Exception:
-                pass
+            dt_found: Optional[datetime] = None
+            if self.db is not None and hasattr(self.db, "find_photo_index"):
+                try:
+                    r_idx = self.db.find_photo_index(p)
+                    if r_idx is not None:
+                        for dt_col in ("imagedata_datetime", "imagedata_tagdate"):
+                            pmp_dt = self.db.pmps.get(dt_col)
+                            if pmp_dt is not None and r_idx < len(pmp_dt.records):
+                                ole_v = float(pmp_dt.records[r_idx] or 0.0)
+                                if ole_v > 100.0:
+                                    from picasa_py.db.thumbindex import ole_to_datetime
+                                    dt_cand = ole_to_datetime(ole_v)
+                                    if dt_cand is not None:
+                                        dt_found = dt_cand
+                                        break
+                except Exception:
+                    pass
+            if dt_found is None:
+                try:
+                    from PIL import Image
+                    with Image.open(p) as img_dt:
+                        exif_dt = img_dt.getexif()
+                        if exif_dt:
+                            raw_dt = exif_dt.get(0x9003) or exif_dt.get(0x0132)
+                            if not raw_dt:
+                                try:
+                                    from PIL import ExifTags
+                                    exif_ifd = exif_dt.get_ifd(ExifTags.IFD.Exif)
+                                    raw_dt = exif_ifd.get(0x9003) or exif_ifd.get(0x9004)
+                                except Exception:
+                                    pass
+                            if raw_dt and isinstance(raw_dt, str):
+                                dt_found = datetime.strptime(raw_dt.strip()[:19], "%Y:%m:%d %H:%M:%S")
+                except Exception:
+                    pass
+            if dt_found is None:
+                try:
+                    mtime = os.path.getmtime(p)
+                    dt_found = datetime.fromtimestamp(mtime)
+                except Exception:
+                    pass
+            if dt_found is not None:
+                photo_dates.append(dt_found)
 
         dlg = PicasaAlbumDialog(photo_dates=photo_dates, parent=self)
         if dlg.exec() != QDialog.DialogCode.Accepted:
@@ -2664,7 +2833,8 @@ class PicasaMainWindow(QMainWindow):
             return
 
         import uuid
-        album_uid = uuid.uuid4().hex[:16]
+        # Ref: picasa3.exe @ 0x00456A15 (32-hex album UID in [.album:<uid>] and albumdata_uid.pmp)
+        album_uid = uuid.uuid4().hex
 
         # Enregistrer la section [.album:<uid>] dans le dossier de la première photo,
         # ou dans le premier dossier surveillé, ou dans le dossier utilisateur
@@ -2734,11 +2904,57 @@ class PicasaMainWindow(QMainWindow):
 
     def action_reset_faces(self, photo_paths: List[str]) -> None:
         """
-        FR: Réinitialise les visages détectés pour les photos (ID_PICTURE_RESET_FACES).
-        EN: Resets detected faces for the specified photos (ID_PICTURE_RESET_FACES).
+        FR: Réinitialise les visages détectés pour les photos (ID_PICTURE_RESET_FACES)
+        dans `.picasa.ini`, `thumbindex.db` (enregistrements 1001), `imagedata_*.pmp` et `wordhash.dat`.
+        EN: Resets detected faces for the specified photos (ID_PICTURE_RESET_FACES)
+        in `.picasa.ini`, `thumbindex.db` (1001 records), `imagedata_*.pmp`, and `wordhash.dat`.
+        Ref: picasa3.exe @ ID_PICTURE_RESET_FACES (0x00CADEE8)
         """
+        reset_parent_indices: Set[int] = set()
         for p in photo_paths:
             self._update_photo_ini(p, lambda doc, fname: doc.get_or_create_section(fname).remove("faces"))
+            if self.db and hasattr(self.db, "find_photo_index"):
+                p_idx = self.db.find_photo_index(p)
+                if p_idx is not None and p_idx >= 0:
+                    reset_parent_indices.add(p_idx)
+        if self.db and reset_parent_indices:
+            with self.db._lock:
+                del_set = getattr(self.db, "_deleted_or_reset_indices", None)
+                recs = self.db.thumbindex.records if self.db.thumbindex else []
+                for p_idx in reset_parent_indices:
+                    if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                        self.db.wordhash.remove_word("]face", p_idx)
+                for c_idx, c_rec in enumerate(recs):
+                    if c_rec.type == 1001 and c_rec.parent_idx in reset_parent_indices:
+                        c_rec.mark_deleted()
+                        if self.db.thumbindex:
+                            self.db.thumbindex.dirty = True
+                        if isinstance(del_set, set):
+                            del_set.add(c_idx)
+                        for col_name, sentinel_val in (
+                            ("imagedata_facerect", 1),
+                            ("imagedata_personalbumid", 0),
+                            ("imagedata_suggestionpersonalbumid", 0),
+                            ("imagedata_personalbumrecs", 0xFFFFFFFF),
+                            ("imagedata_personalbumrecs2", 0xFFFFFFFF),
+                            ("imagedata_tagdate", 0.0),
+                        ):
+                            pmp = self.db.pmps.get(col_name)
+                            if pmp is not None and c_idx < len(pmp.records):
+                                old_v = pmp.records[c_idx]
+                                pmp.records[c_idx] = sentinel_val
+                                pmp.dirty = True
+                                if col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid") and old_v and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                                    self.db.wordhash.remove_word(f"]facealbum:{old_v}", c_idx)
+                        if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                            self.db.wordhash.remove_word("]unknownface", c_idx)
+                            self.db.wordhash.remove_word("]ignoreface", c_idx)
+            if self.db.face_manager:
+                for p_idx in reset_parent_indices:
+                    self.db.face_manager._scanned_photo_indices.discard(p_idx)
+                self.db.face_manager.reload()
+                if hasattr(self, "library_tree"):
+                    self.library_tree.refresh_people()
         self.status_bar.showMessage(f"Visages réinitialisés pour {len(photo_paths)} photo(s).")
 
     def action_edit_folder_description(self, folder_path: str) -> None:
@@ -2764,8 +2980,13 @@ class PicasaMainWindow(QMainWindow):
             sec.set("name", new_desc.strip())
             sec.set("description", new_desc.strip())
             doc.write_file(ini_path)
-            if self.db and hasattr(self.db, "_ini_cache"):
-                self.db._ini_cache.pop(os.path.normcase(os.path.abspath(ini_path)), None)
+            if self.db is not None:
+                if hasattr(self.db, "invalidate_ini_cache"):
+                    self.db.invalidate_ini_cache(ini_path)
+                elif hasattr(self.db, "_ini_cache"):
+                    self.db._ini_cache.pop(os.path.normcase(os.path.abspath(ini_path)), None)
+                if hasattr(self.db, "ensure_folder_album_row"):
+                    self.db.ensure_folder_album_row(folder_path)
             self.notify_folders_changed()
             self.status_bar.showMessage(f"Description du dossier enregistrée : {new_desc.strip()}")
 
@@ -2780,8 +3001,14 @@ class PicasaMainWindow(QMainWindow):
             data = dlg.get_album_data()
             new_name = data.get("name", album_name)
             if self.db:
-                watched = [p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")]
-                for w in watched:
+                candidate_dirs: Set[str] = {
+                    p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")
+                }
+                if self.db.thumbindex:
+                    for r in self.db.thumbindex.records:
+                        if r.type == 1 and r.is_active and r.path:
+                            candidate_dirs.add(r.path.rstrip("\\/"))
+                for w in candidate_dirs:
                     ini_p = os.path.join(w, ".picasa.ini")
                     if os.path.exists(ini_p):
                         try:
@@ -2815,6 +3042,26 @@ class PicasaMainWindow(QMainWindow):
                                     self.db._ini_cache.pop(os.path.normcase(os.path.abspath(ini_p)), None)
                         except Exception:
                             pass
+                ad_names = self.db.pmps.get("albumdata_name")
+                ad_cats = self.db.pmps.get("albumdata_category")
+                ad_descs = self.db.pmps.get("albumdata_description")
+                ad_locs = self.db.pmps.get("albumdata_location")
+                ad_music = self.db.pmps.get("albumdata_music")
+                if ad_names and ad_cats:
+                    for i in range(len(ad_names.records)):
+                        if i < len(ad_cats.records) and ad_cats.records[i] == 0 and ad_names.records[i] == album_name:
+                            if new_name:
+                                ad_names.records[i] = new_name
+                                ad_names.dirty = True
+                            if ad_descs and i < len(ad_descs.records) and "description" in data:
+                                ad_descs.records[i] = data.get("description") or ""
+                                ad_descs.dirty = True
+                            if ad_locs and i < len(ad_locs.records) and "location" in data:
+                                ad_locs.records[i] = data.get("location") or ""
+                                ad_locs.dirty = True
+                            if ad_music and i < len(ad_music.records) and "music" in data:
+                                ad_music.records[i] = data.get("music") or ""
+                                ad_music.dirty = True
             self.notify_albums_changed()
             self.status_bar.showMessage(f"Propriétés de l'album « {new_name} » mises à jour.")
 
@@ -2837,8 +3084,12 @@ class PicasaMainWindow(QMainWindow):
         rep = QMessageBox.question(self, "Supprimer le dossier", f"Voulez-vous supprimer le dossier « {os.path.basename(folder_path)} » et ses photos vers la Corbeille ?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if rep == QMessageBox.StandardButton.Yes:
             recycle_or_delete_file(folder_path)
+            if self.db is not None and hasattr(self.db, "delete_folder"):
+                self.db.delete_folder(folder_path)
             self.thumb_view.filter_by_folder(None)
             self.notify_folders_changed()
+            if hasattr(self, "library_tree"):
+                self.library_tree.refresh_people()
             self.status_bar.showMessage("Dossier placé dans la Corbeille.")
 
     def action_delete_album(self, album_name: str) -> None:
@@ -3816,6 +4067,11 @@ class PicasaMainWindow(QMainWindow):
         for ini_p, doc in docs_by_ini.items():
             try:
                 doc.write_file(ini_p)
+                if self.db is not None and hasattr(self.db, "invalidate_ini_cache"):
+                    try:
+                        self.db.invalidate_ini_cache(ini_p, invalidate_albums_starred=False)
+                    except TypeError:
+                        self.db.invalidate_ini_cache(ini_p)
             except Exception:
                 pass
 
@@ -4042,7 +4298,11 @@ class PicasaMainWindow(QMainWindow):
                 return
             try:
                 shutil.move(folder_path, new_path)
+                if self.db is not None and hasattr(self.db, "move_folder"):
+                    self.db.move_folder(folder_path, new_path)
                 self.notify_folders_changed()
+                if hasattr(self, "library_tree") and self.library_tree:
+                    self.library_tree.refresh_people()
                 self.thumb_view.filter_by_folder(new_path)
                 self.status_bar.showMessage(f"Dossier déplacé vers {new_path}")
             except Exception as e:
@@ -4151,30 +4411,72 @@ class PicasaMainWindow(QMainWindow):
         if rep != QMessageBox.StandardButton.Yes:
             return
 
+        cid_key = fm._resolve_person_key(contact_id) if hasattr(fm, "_resolve_person_key") else contact_id.lower()
+        cid_vars = set(fm._cid_variants(cid_key)) if hasattr(fm, "_cid_variants") else {cid_key, contact_id.lower()}
+
         for p in photo_paths:
-            faces = fm.photo_to_faces.get(p, [])
-            for fr in list(faces):
-                if fr.contact_id.lower() == contact_id.lower():
+            db_idx = self.db.find_photo_index(p) if hasattr(self.db, "find_photo_index") else None
+            cand_faces: List[Any] = []
+            if db_idx is not None and db_idx >= 0 and hasattr(fm, "get_faces_for_photo"):
+                cand_faces.extend(fm.get_faces_for_photo(db_idx, p))
+            if p in fm.photo_to_faces:
+                for f_extra in fm.photo_to_faces.get(p, []):
+                    if f_extra not in cand_faces:
+                        cand_faces.append(f_extra)
+            if person and not cand_faces:
+                for fl in person.face_rects_by_photo.values():
+                    for f_extra in fl:
+                        if f_extra not in cand_faces:
+                            cand_faces.append(f_extra)
+
+            for fr in list(cand_faces):
+                if (fr.contact_id or "").lower() in cid_vars:
+                    if face_rect is not None and _face_overlap(fr, face_rect) < 0.45:
+                        continue
                     def _remove_face(doc: PicasaIniDocument, fname: str) -> None:
                         """
                         FR: Retire les entrées de visage associées au contact dans la section INI.
                         EN: Removes the face entries associated with the contact in the INI section.
                         """
                         f_list = doc.get_faces(fname)
-                        f_list = [f for f in f_list if f.contact_id.lower() != contact_id.lower()]
+                        f_list = [f for f in f_list if f.contact_id.lower() not in cid_vars]
                         doc.set_faces(fname, f_list)
                     self._update_photo_ini(p, _remove_face)
 
-                    if contact_id.lower() in fm.people:
-                        cl = fm.people[contact_id.lower()]
+                    cl = fm.people.get(cid_key) or person
+                    if cl is not None:
                         cl.photo_paths = [pth for pth in cl.photo_paths if pth != p]
                         for idx_k in list(cl.face_rects_by_photo.keys()):
                             cl.face_rects_by_photo[idx_k] = [
                                 f for f in cl.face_rects_by_photo[idx_k] if _face_overlap(f, fr) < 0.5
                             ]
+                            if not cl.face_rects_by_photo[idx_k]:
+                                del cl.face_rects_by_photo[idx_k]
+                                if idx_k in cl.photo_indices:
+                                    cl.photo_indices.remove(idx_k)
+                    rec_idx = getattr(fr, "record_index", None)
+                    if rec_idx is None and db_idx is not None and hasattr(fm, "_find_matching_1001_child"):
+                        rec_idx = fm._find_matching_1001_child(db_idx, fr)
+                    target_rec_idx = rec_idx if rec_idx is not None else db_idx
+                    if target_rec_idx is not None and self.db:
+                        with self.db._lock:
+                            for col_name in ("imagedata_personalbumid", "imagedata_suggestionpersonalbumid"):
+                                pmp = self.db.pmps.get(col_name)
+                                if pmp is not None and 0 <= target_rec_idx < len(pmp.records) and pmp.records[target_rec_idx] != 0:
+                                    old_alb = pmp.records[target_rec_idx]
+                                    pmp.records[target_rec_idx] = 0
+                                    pmp.dirty = True
+                                    if getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                                        self.db.wordhash.remove_word(f"]facealbum:{old_alb}", target_rec_idx)
+                            pmp_td = self.db.pmps.get("imagedata_tagdate")
+                            if pmp_td is not None and 0 <= target_rec_idx < len(pmp_td.records) and pmp_td.records[target_rec_idx] != 0.0:
+                                pmp_td.records[target_rec_idx] = 0.0
+                                pmp_td.dirty = True
+                            if getattr(self.db, "wordhash", None) is not None and getattr(self.db, "is_face_record", lambda i: False)(target_rec_idx):
+                                self.db.wordhash.add_word("]unknownface", target_rec_idx)
                     fr.contact_id = ""
                     fr.contact_name = None
-                    fm.unnamed_faces.append((None, p, fr))
+                    fm.unnamed_faces.append((target_rec_idx, p, fr))
 
         fm.notify_people_changed()
         if hasattr(self, "library_tree"):
@@ -4275,11 +4577,33 @@ class PicasaMainWindow(QMainWindow):
     def action_sort_folder_by(self, criterion: str, target_folder: Optional[str] = None) -> None:
         """
         FR: Trie le dossier courant par nom, date ou taille (Sort::ID_NAMESORT, DATESORT, SIZESORT)
-            en triant `sec.item_indices` au sein des sections cibles sans invalider les indices globaux.
+            ou trie la liste globale des dossiers et sections (`AlbumList::ID_SORTBYDATE`, `ID_SORTBYSIZE`,
+            `ID_SORTBYNAME`, `ID_SORTBYMOST_RECENT_PHOTO`, `albumlistflip` @ `0x005D30F0..0x005D319A`)
+            lorsque `target_folder is None`.
         EN: Sorts the current folder by name, date, or size (Sort::ID_NAMESORT, DATESORT, SIZESORT)
-            by sorting `sec.item_indices` within the target sections without invalidating global indices.
-        Ref: picasa3.exe @ Folder::SortFolderBy (0x00CAE204)
+            or sorts the global folder list and sections (`AlbumList::ID_SORTBYDATE`, `ID_SORTBYSIZE`,
+            `ID_SORTBYNAME`, `ID_SORTBYMOST_RECENT_PHOTO`, `albumlistflip` @ `0x005D30F0..0x005D319A`)
+            when `target_folder is None`.
+        Ref: picasa3.exe @ Folder::SortFolderBy (0x00CAE204), 0x005D30F0 - 0x005D319A
         """
+        if target_folder is None:
+            mode_map = {"date": 0, "size": 1, "name": 2, "recent": 4}
+            if criterion == "flip":
+                if hasattr(self, "library_tree") and self.library_tree is not None:
+                    self.library_tree.set_date_sort_mode(
+                        self.library_tree.date_sort_mode, toggle_flip_if_same=True
+                    )
+                if hasattr(self.thumb_view, "sort_folder_sections"):
+                    self.thumb_view.sort_folder_sections(refresh_layout=True)
+                return
+            if criterion in mode_map:
+                if hasattr(self, "library_tree") and self.library_tree is not None:
+                    self.library_tree.set_date_sort_mode(
+                        mode_map[criterion], toggle_flip_if_same=True
+                    )
+                if hasattr(self.thumb_view, "sort_folder_sections"):
+                    self.thumb_view.sort_folder_sections(refresh_layout=True)
+
         if not self.thumb_view.items:
             return
 
@@ -4288,18 +4612,26 @@ class PicasaMainWindow(QMainWindow):
                 if 0 <= idx < len(self.thumb_view.items):
                     return self.thumb_view.items[idx].filename.lower()
                 return ""
-        elif criterion == "date":
+        elif criterion in ("date", "recent"):
             pmp_dates = (
-                self.db.pmps.get("imagedata_date").values
+                self.db.pmps.get("imagedata_date").records
                 if (self.db is not None and hasattr(self.db, "pmps") and "imagedata_date" in self.db.pmps)
                 else None
             )
+            ti_recs = getattr(getattr(self.db, "thumbindex", None), "records", None) if self.db is not None else None
             def _sort_key(idx: int):
                 if 0 <= idx < len(self.thumb_view.items):
                     it = self.thumb_view.items[idx]
                     if pmp_dates is not None and 0 <= it.index < len(pmp_dates) and pmp_dates[it.index]:
                         try:
                             return float(pmp_dates[it.index])
+                        except Exception:
+                            pass
+                    if ti_recs is not None and 0 <= it.index < len(ti_recs) and hasattr(ti_recs[it.index], "to_unix_timestamp"):
+                        try:
+                            ts = ti_recs[it.index].to_unix_timestamp()
+                            if ts > 0:
+                                return float(ts)
                         except Exception:
                             pass
                     try:
@@ -4309,16 +4641,22 @@ class PicasaMainWindow(QMainWindow):
                 return 0
         elif criterion == "size":
             pmp_sizes = (
-                self.db.pmps.get("imagedata_filesize").values
+                self.db.pmps.get("imagedata_filesize").records
                 if (self.db is not None and hasattr(self.db, "pmps") and "imagedata_filesize" in self.db.pmps)
                 else None
             )
+            ti_recs = getattr(getattr(self.db, "thumbindex", None), "records", None) if self.db is not None else None
             def _sort_key(idx: int):
                 if 0 <= idx < len(self.thumb_view.items):
                     it = self.thumb_view.items[idx]
                     if pmp_sizes is not None and 0 <= it.index < len(pmp_sizes) and pmp_sizes[it.index]:
                         try:
                             return int(pmp_sizes[it.index])
+                        except Exception:
+                            pass
+                    if ti_recs is not None and 0 <= it.index < len(ti_recs) and getattr(ti_recs[it.index], "size", 0):
+                        try:
+                            return int(ti_recs[it.index].size)
                         except Exception:
                             pass
                     try:
@@ -4348,7 +4686,7 @@ class PicasaMainWindow(QMainWindow):
             if vp is not None:
                 vp.update()
         self.thumb_view.update()
-        labels = {"name": "nom", "date": "date", "size": "taille"}
+        labels = {"name": "nom", "date": "date", "size": "taille", "recent": "photo la plus récente"}
         self.status_bar.showMessage(f"Photothèque triée par {labels.get(criterion, criterion)}.")
 
     def action_sort_album_by(self, criterion: str, target_album: Optional[str] = None) -> None:
@@ -4362,13 +4700,23 @@ class PicasaMainWindow(QMainWindow):
             try:
                 norm_t = (target_album or "").strip().lower()
                 for alb in self.db.get_albums():
-                    if not norm_t or alb.name.strip().lower() == norm_t or alb.uid.strip().lower() == norm_t or alb.token.strip().lower() == norm_t:
+                    if isinstance(alb, dict):
+                        a_name = str(alb.get("name", "") or "").strip().lower()
+                        a_uid = str(alb.get("uid", "") or "").strip().lower()
+                        a_tok = str(alb.get("token", "") or "").strip().lower()
+                        paths_list = alb.get("photo_paths")
+                    else:
+                        a_name = str(getattr(alb, "name", "") or "").strip().lower()
+                        a_uid = str(getattr(alb, "uid", "") or "").strip().lower()
+                        a_tok = str(getattr(alb, "token", "") or "").strip().lower()
+                        paths_list = getattr(alb, "photo_paths", None)
+                    if isinstance(paths_list, list) and (not norm_t or a_name == norm_t or a_uid == norm_t or a_tok == norm_t):
                         if criterion == "name":
-                            alb.photo_paths.sort(key=lambda p: os.path.basename(p).lower())
+                            paths_list.sort(key=lambda p: os.path.basename(p).lower())
                         elif criterion == "size":
-                            alb.photo_paths.sort(key=lambda p: os.path.getsize(p) if os.path.exists(p) else 0)
+                            paths_list.sort(key=lambda p: os.path.getsize(p) if os.path.exists(p) else 0)
                         elif criterion == "date":
-                            alb.photo_paths.sort(key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0.0)
+                            paths_list.sort(key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0.0)
             except Exception:
                 pass
 
@@ -4825,11 +5173,20 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_collage_created(self, saved_path: str) -> None:
         """
-        FR: Lance l'indexation du dossier parent après la création d'un montage photo.
-        EN: Triggers background indexing of the parent folder after a photo collage is created.
+        FR: Indexe immédiatement le montage photo créé dans la base Picasa et lance l'analyse du dossier parent.
+        EN: Immediately indexes the created photo collage into the Picasa database and triggers a parent folder scan.
+        Ref: picasa3.exe @ CCollagePanel (ajout immédiat à la photothèque)
         """
         self.status_bar.showMessage(f"Nouveau montage photo créé : {Path(saved_path).name}")
         parent_dir = str(Path(saved_path).parent)
+        if self.db is not None and os.path.exists(saved_path) and hasattr(self.db, "index_single_file"):
+            try:
+                new_idx = self.db.index_single_file(saved_path)
+                if new_idx is not None:
+                    self.thumb_view.sync_from_database_incremental(self.db, new_idx)
+                    self.notify_folders_changed()
+            except Exception:
+                pass
         self._start_background_scan([parent_dir])
 
     def action_movie(self, face_mode: bool = False, contact_id: Optional[str] = None) -> None:
@@ -4862,11 +5219,20 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_movie_created(self, saved_path: str) -> None:
         """
-        FR: Lance l'indexation du dossier parent après la création d'un film vidéo.
-        EN: Triggers background indexing of the parent folder after a video movie is created.
+        FR: Indexe immédiatement le film vidéo créé dans la base Picasa et lance l'analyse du dossier parent.
+        EN: Immediately indexes the created video movie into the Picasa database and triggers a parent folder scan.
+        Ref: picasa3.exe @ CMakeMoviePanel (ajout immédiat à la photothèque)
         """
         self.status_bar.showMessage(f"Nouveau film vidéo créé : {Path(saved_path).name}")
         parent_dir = str(Path(saved_path).parent)
+        if self.db is not None and os.path.exists(saved_path) and hasattr(self.db, "index_single_file"):
+            try:
+                new_idx = self.db.index_single_file(saved_path)
+                if new_idx is not None:
+                    self.thumb_view.sync_from_database_incremental(self.db, new_idx)
+                    self.notify_folders_changed()
+            except Exception:
+                pass
         self._start_background_scan([parent_dir])
 
     # --- FR: Gestionnaire de dossiers & Auto-indexation en arrière-plan / EN: Folder Manager & Background Auto-Indexing ---
@@ -4886,15 +5252,34 @@ class PicasaMainWindow(QMainWindow):
 
     def _on_folders_updated(self, newly_watched: List[str]) -> None:
         """
-        FR: Réagit à la mise à jour des dossiers dans le Gestionnaire de dossiers.
-        EN: Handles folder watch status updates from the Folder Manager.
+        FR: Réagit à la mise à jour des dossiers dans le Gestionnaire de dossiers :
+        rafraîchit immédiatement la grille de vignettes et les trois sections de l'arborescence
+        (Dossiers, Albums, Personnes) lorsqu'un dossier a été retiré/désactivé, et lance le scan
+        pour les nouveaux dossiers surveillés.
+        EN: Handles folder watch status updates from the Folder Manager:
+        immediately refreshes the thumbnail grid and all three library tree sections
+        (Folders, Albums, People) when a folder is removed/disabled, and starts scanning
+        any newly watched folders.
+        Ref: picasa3.exe @ 0x005D41F4 (NOTIFY_FOLDERS_CHANGED), 0x008B7F90 (foldermgr)
         """
         if self.watcher:
             self.watcher.reload_from_database()
-        self.notify_folders_changed()
+        if self.db is not None:
+            if self.db.thumbindex is not None and self.db.thumbindex.dirty:
+                try:
+                    self.db.save_database()
+                except Exception:
+                    pass
+            self.thumb_view.set_database(self.db, preserve_view_state=False)
+            self.library_tree.populate_from_database(self.db)
+        else:
+            self.notify_folders_changed()
         if newly_watched:
             self.status_bar.showMessage(f"Dossiers mis à jour. Lancement de l'indexation de {len(newly_watched)} dossier(s)...")
             self._start_background_scan(newly_watched)
+        else:
+            count = len(self.thumb_view.items) if self.thumb_view else 0
+            self.status_bar.showMessage(f"Dossiers mis à jour ({count} photo(s) affichée(s)).")
 
     def _on_watcher_scan_requested(self, paths: List[str]) -> None:
         """
@@ -5052,8 +5437,12 @@ class PicasaMainWindow(QMainWindow):
         if total_added > 0 and self.db:
             self.library_tree.refresh_folders()
             self.library_tree.refresh_albums()
-            if getattr(self.db, "_face_manager", None) is not None:
-                self.library_tree.refresh_people()
+            try:
+                if not getattr(self.scan_worker, "_reloaded_face_manager", False):
+                    self.db.face_manager.reload()
+            except Exception:
+                pass
+            self.library_tree.refresh_people()
             if not self.thumb_view.sync_from_database_incremental(self.db):
                 self.thumb_view.set_database(self.db, preserve_view_state=True)
             self.status_bar.showMessage(f"Indexation terminée : {total_added} photo(s) indexée(s)")
@@ -5116,18 +5505,45 @@ class PicasaMainWindow(QMainWindow):
         self.face_worker.finished.connect(self._on_face_detect_finished)
         self.face_worker.start(QThread.Priority.LowestPriority)
 
+    def action_sort_people_by(self, mode: int) -> None:
+        """
+        FR: Change le mode de tri de la collection Personnes (`Preferences\\peoplesort` :
+        0 = par nom [défaut], 1 = par nombre, 2 = top 10), rafraîchit l'arborescence et le tiroir droit.
+        EN: Changes the People collection sort mode (`Preferences\\peoplesort`:
+        0 = by name [default], 1 = by amount, 2 = top 10), refreshes the library tree and right drawer.
+        Ref: picasa3.exe @ 0x005D31B9 - 0x005D3205, 0x004A37E8, 0x004A7A18
+        """
+        norm = int(mode) if int(mode) in (0, 1, 2) else 0
+        if self.library_tree is not None:
+            self.library_tree.set_people_sort_mode(norm, persist=True)
+        if hasattr(self, "right_drawer") and self.right_drawer is not None and self.right_drawer.isVisible():
+            self._on_drawer_state_changed()
+
     def _on_face_detect_progress(self, current: int, total: int, fname: str) -> None:
         """
-        FR: Affiche la progression de la détection des visages dans la barre d'état.
-        EN: Displays background face detection progress in the status bar.
+        FR: Met à jour la ligne épinglée de la catégorie Personnes (`"Analyse des visages..."` / `"Analyse, x % terminés"`)
+        ainsi que la barre d'état pendant la détection des visages en arrière-plan.
+        EN: Updates the sticky row in the People category (`"Scanning for faces..."` / `"Scanning, x% complete"`)
+        and the status bar during background face detection.
+        Ref: picasa3.exe @ 0x00764454 - 0x00764685, 0x0047C110, 0x0047C240
         """
-        self.status_bar.showMessage(f"Détection des visages en arrière-plan : {current}/{total} — {fname}")
+        if self.library_tree is not None:
+            self.library_tree.set_face_scan_progress(True, current, total)
+        if fname:
+            self.status_bar.showMessage(f"Détection des visages en arrière-plan : {current}/{total} — {fname}")
+        else:
+            self.status_bar.showMessage(f"Détection des visages en arrière-plan : {current}/{total}")
 
     def _on_face_detect_finished(self, total_faces: int) -> None:
         """
-        FR: Met à jour les personnes et la barre d'état à la fin de la détection des visages.
-        EN: Updates people and the status bar when background face detection finishes.
+        FR: Met à jour la ligne épinglée de la catégorie Personnes (`"Sans nom (N)"`), les personnes et la barre d'état
+        à la fin de la détection des visages.
+        EN: Updates the People category sticky row (`"Unnamed (N)"`), people, and the status bar when
+        background face detection finishes.
+        Ref: picasa3.exe @ 0x007645DE - 0x00764685
         """
+        if self.library_tree is not None:
+            self.library_tree.set_face_scan_progress(False, 0, 0)
         if total_faces > 0:
             self._on_people_changed()
             self.status_bar.showMessage(f"Détection des visages terminée : {total_faces} nouveau(x) visage(s) détecté(s)")
@@ -5181,6 +5597,8 @@ class PicasaMainWindow(QMainWindow):
                 fw.deleteLater()
             except Exception:
                 pass
+            if hasattr(self, "library_tree") and self.library_tree is not None:
+                self.library_tree.set_face_scan_progress(False, 0, 0)
         if hasattr(self, "thumb_view") and getattr(self.thumb_view, "_cluster_worker", None):
             cw = self.thumb_view._cluster_worker
             self.thumb_view._cluster_worker = None

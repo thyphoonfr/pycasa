@@ -74,6 +74,7 @@ class PicasaFolderWatcher(QObject):
         self.watcher = QFileSystemWatcher(self)
         self.watched_paths: Set[str] = set()
         self.pending_changed_paths: Set[str] = set()
+        self._watched_status_norm: Dict[str, str] = {}
 
         # FR: Minuterie de debounce (500 ms conformément à 0x00704F20)
         # EN: Debounce timer (500 ms in accordance with 0x00704F20)
@@ -153,44 +154,71 @@ class PicasaFolderWatcher(QObject):
         except Exception:
             pass
 
+    def _is_subpath_excluded_from_watch(self, path_str: str) -> bool:
+        """
+        FR: Vérifie si un chemin (ou son ancêtre le plus spécifique dans `repository.dat` / `scanlist.txt`)
+        est en statut '0' (Supprimer de Picasa) ou '2' (Analyser une seule fois).
+        Ref: picasa3.exe @ 0x004AD190 (héritage hiérarchique des règles de surveillance), 0x00704F20
+        EN: Checks whether a path (or its most specific ancestor in `repository.dat` / `scanlist.txt`)
+        has status '0' (Remove from Picasa) or '2' (Scan Once).
+        """
+        if not self._watched_status_norm:
+            return False
+        clean_p = path_str.rstrip("\\/")
+        if os.sep != "\\":
+            clean_p = clean_p.replace("\\", os.sep)
+        norm_p = os.path.normcase(os.path.abspath(clean_p))
+        if norm_p in self._watched_status_norm:
+            return self._watched_status_norm[norm_p] in ("0", "2")
+        best_len = -1
+        best_status: Optional[str] = None
+        for rule_norm, status in self._watched_status_norm.items():
+            prefix = rule_norm.rstrip("\\/") + os.sep
+            if norm_p.startswith(prefix) and len(rule_norm) > best_len:
+                best_len = len(rule_norm)
+                best_status = status
+        return best_status in ("0", "2")
+
     def reload_from_database(self) -> None:
         """
         FR: Charge les dossiers à surveiller (statut == '1') depuis la base de données,
-        avec repli sur les dossiers indexés existants (rec.type == 1) non exclus.
+        avec repli sur les dossiers indexés existants (rec.type == 1) uniquement si aucune règle
+        n'est définie dans `repository.dat` / `scanlist.txt`.
         EN: Loads the folders to watch (status == '1') from the database,
-        falling back to existing non-excluded indexed folders (rec.type == 1).
-        Ref: picasa3.exe @ 0x00704F20, 0x008B7F90 (foldermgr/watched_folders)
+        falling back to existing indexed folders (rec.type == 1) only when no rules are defined
+        in `repository.dat` / `scanlist.txt`.
+        Ref: picasa3.exe @ 0x00704F20, 0x008B7F90 (foldermgr/watched_folders), 0x004AD190
         """
         if not self.db:
             return
 
         watched_dict = self.db.get_watched_folders()
-        excluded_norm: Set[str] = set()
+        self._watched_status_norm.clear()
         paths_to_watch: Set[str] = set()
         for folder_path, status in watched_dict.items():
             clean_path = folder_path.rstrip("\\/")
             if os.sep != "\\":
                 clean_path = clean_path.replace("\\", os.sep)
             norm_key = os.path.normcase(os.path.abspath(clean_path))
-            if status in ("0", "2"):
-                excluded_norm.add(norm_key)
-            elif status == "1" and os.path.isdir(clean_path):
+            self._watched_status_norm[norm_key] = str(status)
+            if status == "1" and os.path.isdir(clean_path):
                 bname = os.path.basename(clean_path)
                 if not bname or not self._is_excluded_dir_name(bname, clean_path):
                     paths_to_watch.add(clean_path)
 
-        # Si aucun dossier n'est explicitement en statut '1' dans repository.dat mais que la base
-        # contient déjà des dossiers indexés (rec.type == 1) non exclus, les surveiller également.
-        if not paths_to_watch and getattr(self.db, "index", None):
+        # Si aucune règle n'est définie dans repository.dat/scanlist.txt (ex: base synthétique de test),
+        # surveiller les dossiers actifs déjà indexés (rec.type == 1). Si en revanche watched_dict
+        # contient des entrées et qu'aucune n'est en statut '1' (ex: tous les dossiers ont été désactivés),
+        # ne surveiller aucun dossier.
+        if not watched_dict and getattr(self.db, "index", None):
             for rec in self.db.index:
-                if getattr(rec, "type", 0) == 1 and getattr(rec, "path", ""):
+                if getattr(rec, "type", 0) == 1 and getattr(rec, "is_active", True) and getattr(rec, "path", ""):
                     clean_p = rec.path.rstrip("\\/")
                     if os.sep != "\\":
                         clean_p = clean_p.replace("\\", os.sep)
-                    norm_p = os.path.normcase(os.path.abspath(clean_p))
                     bname_p = os.path.basename(clean_p)
                     if (
-                        norm_p not in excluded_norm
+                        not self._is_subpath_excluded_from_watch(clean_p)
                         and os.path.isdir(clean_p)
                         and (not bname_p or not self._is_excluded_dir_name(bname_p, clean_p))
                     ):
@@ -219,12 +247,16 @@ class PicasaFolderWatcher(QObject):
         for p in paths:
             host_p = p.replace("\\", os.sep) if os.sep != "\\" else p
             norm = os.path.abspath(host_p)
-            if os.path.isdir(norm):
+            if os.path.isdir(norm) and not self._is_subpath_excluded_from_watch(norm):
                 new_dirs.add(norm)
                 try:
                     with os.scandir(norm) as it:
                         for entry in it:
-                            if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name, entry.path):
+                            if (
+                                entry.is_dir(follow_symlinks=False)
+                                and not self._is_excluded_dir_name(entry.name, entry.path)
+                                and not self._is_subpath_excluded_from_watch(entry.path)
+                            ):
                                 sub_abs = os.path.abspath(entry.path)
                                 new_dirs.add(sub_abs)
                                 if sync_budget > 0:
@@ -232,7 +264,11 @@ class PicasaFolderWatcher(QObject):
                                     try:
                                         with os.scandir(sub_abs) as sub_it:
                                             for sub_e in sub_it:
-                                                if sub_e.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(sub_e.name, sub_e.path):
+                                                if (
+                                                    sub_e.is_dir(follow_symlinks=False)
+                                                    and not self._is_excluded_dir_name(sub_e.name, sub_e.path)
+                                                    and not self._is_subpath_excluded_from_watch(sub_e.path)
+                                                ):
                                                     new_dirs.add(os.path.abspath(sub_e.path))
                                                     deferred_roots.append(os.path.abspath(sub_e.path))
                                     except Exception:
@@ -271,7 +307,7 @@ class PicasaFolderWatcher(QObject):
         while self._pending_walk_roots and processed < 25:
             curr = self._pending_walk_roots.pop(0)
             processed += 1
-            if not os.path.isdir(curr):
+            if not os.path.isdir(curr) or self._is_subpath_excluded_from_watch(curr):
                 continue
             if curr not in self.watched_paths:
                 self.watched_paths.add(curr)
@@ -279,7 +315,11 @@ class PicasaFolderWatcher(QObject):
             try:
                 with os.scandir(curr) as it:
                     for entry in it:
-                        if entry.is_dir(follow_symlinks=False) and not self._is_excluded_dir_name(entry.name, entry.path):
+                        if (
+                            entry.is_dir(follow_symlinks=False)
+                            and not self._is_excluded_dir_name(entry.name, entry.path)
+                            and not self._is_subpath_excluded_from_watch(entry.path)
+                        ):
                             sub_abs = os.path.abspath(entry.path)
                             if sub_abs not in self.watched_paths:
                                 self.watched_paths.add(sub_abs)

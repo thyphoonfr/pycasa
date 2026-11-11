@@ -314,6 +314,19 @@ class PicasaPosterDialog(QDialog):
                 margin_x = int(tile_w * 0.03) if overlap else 0
                 margin_y = int(tile_h * 0.03) if overlap else 0
 
+                save_kwargs: dict = {"quality": 95}
+                try:
+                    with Image.open(self.photo_path) as src_raw:
+                        icc = src_raw.info.get("icc_profile")
+                        if icc:
+                            save_kwargs["icc_profile"] = icc
+                        exif_obj = src_raw.getexif()
+                        if exif_obj:
+                            exif_obj[0x0112] = 1
+                            save_kwargs["exif"] = exif_obj.tobytes()
+                except Exception:
+                    pass
+
                 count = 0
                 for r in range(grid_sz):
                     for c in range(grid_sz):
@@ -328,10 +341,17 @@ class PicasaPosterDialog(QDialog):
                         tile_path = out_dir / tile_name
                         if tile_img.mode in ("RGBA", "P"):
                             tile_img = tile_img.convert("RGB")
-                        tile_img.save(str(tile_path), "JPEG", quality=95)
+                        tile_img.save(str(tile_path), "JPEG", **save_kwargs)
                         count += 1
             else:
                 count = 0
+
+            parent_w = self.parent()
+            if parent_w is not None and hasattr(parent_w, "_start_background_scan"):
+                try:
+                    parent_w._start_background_scan([str(out_dir)])
+                except Exception:
+                    pass
 
             QMessageBox.information(
                 self,

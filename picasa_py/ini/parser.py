@@ -272,6 +272,34 @@ class PicasaIniDocument:
                 return True
         return False
 
+    def get_key(self, section_name: str, key: str, default: Optional[str] = None) -> Optional[str]:
+        """
+        FR: Récupère la valeur d'une clé dans la section `section_name`, ou `default` si absente.
+        EN: Retrieves the value of a key in `section_name`, or `default` if missing.
+        Ref: picasa3.exe @ 0x009BE730
+        """
+        sec = self.get_section(section_name)
+        if sec is None:
+            return default
+        return sec.get(key, default)
+
+    def set_key(self, section_name: str, key: str, value: Optional[str]) -> None:
+        """
+        FR: Définit ou supprime une clé dans la section `section_name`.
+        EN: Sets or removes a key in `section_name`.
+        Ref: picasa3.exe @ 0x009BD7B8
+        """
+        if value is None:
+            sec = self.get_section(section_name)
+            if sec is not None:
+                sec.remove(key)
+            return
+        sec = self.get_or_create_section(section_name)
+        sec.set(key, value)
+
+    get_value = get_key
+    set_value = set_key
+
     # --- FR: Accesseurs haut niveau calqués sur Picasa / EN: High-level Picasa accessors ---
 
     # Ref: picasa3.exe @ 0x0068BABA ("faces=%s\r\n")

@@ -1535,21 +1535,11 @@ class PurePythonRedEngine:
         frontal = self._frontal_cascade.detectMultiScale(
             eq,
             scaleFactor=1.12,
-            minNeighbors=5,
-            minSize=(max(min_dim, 36), max(min_dim, 36)),
+            minNeighbors=7,
+            minSize=(max(min_dim, 44), max(min_dim, 44)),
         )
         for (x, y, bw, bh) in frontal:
             raw_boxes.append((int(x), int(y), int(bw), int(bh), 0.0, 0.85))
-
-        if self._profile_cascade is not None and not raw_boxes:
-            prof = self._profile_cascade.detectMultiScale(
-                eq,
-                scaleFactor=1.15,
-                minNeighbors=5,
-                minSize=(max(min_dim, 40), max(min_dim, 40)),
-            )
-            for (x, y, bw, bh) in prof:
-                raw_boxes.append((int(x), int(y), int(bw), int(bh), 35.0, 0.65))
 
         results: List[RedDetectionResult] = []
         for (x, y, bw, bh, pan_est, base_conf) in raw_boxes:
@@ -1560,17 +1550,20 @@ class PurePythonRedEngine:
             ly = y + 0.4790 * bh
             ry = y + 0.4790 * bh
 
-            # FR : Affinage local des yeux dans la moitié supérieure du visage
-            # EN: Local eye refinement in the upper half of the face
-            if self._eye_cascade is not None and bw >= 64 and bh >= 64:
+            # FR : Validation et affinage local des yeux dans la moitié supérieure du visage
+            # (évite les faux positifs de Haar sur les textures sans yeux)
+            # EN: Local eye validation and refinement in the upper half of the face
+            # (prevents Haar false positives on non-face textures)
+            if self._eye_cascade is not None and bw >= 48 and bh >= 48:
                 roi_h = max(16, int(0.60 * bh))
                 roi = eq[y : y + roi_h, x : x + bw]
                 eyes = self._eye_cascade.detectMultiScale(
                     roi,
                     scaleFactor=1.1,
-                    minNeighbors=3,
+                    minNeighbors=4,
                     minSize=(max(8, bw // 10), max(8, bh // 10)),
                 )
+                eyes_valid = False
                 if len(eyes) >= 2:
                     eyes_sorted = sorted(eyes, key=lambda e: e[0])
                     le = eyes_sorted[0]
@@ -1580,8 +1573,11 @@ class PurePythonRedEngine:
                     cand_rx = x + re[0] + 0.5 * re[2]
                     cand_ry = y + re[1] + 0.5 * re[3]
                     cand_dist = math.hypot(cand_rx - cand_lx, cand_ry - cand_ly)
-                    if 0.18 * bw <= cand_dist <= 0.55 * bw and abs(cand_ry - cand_ly) <= 0.25 * bh:
+                    if 0.20 * bw <= cand_dist <= 0.52 * bw and abs(cand_ry - cand_ly) <= 0.20 * bh:
                         lx, ly, rx, ry = cand_lx, cand_ly, cand_rx, cand_ry
+                        eyes_valid = True
+                if not eyes_valid:
+                    continue
 
             eye_dist = math.hypot(rx - lx, ry - ly)
             if eye_dist < 10.0:

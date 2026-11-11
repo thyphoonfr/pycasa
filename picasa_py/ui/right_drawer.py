@@ -204,7 +204,13 @@ def _setup_inline_completer(
     """
     if not names:
         return
-    unique_names = sorted(set(names))
+    unique_names = sorted(
+        {
+            n
+            for n in names
+            if n and n.strip().lower() not in ("sans nom", "unnamed", "<personne inconnue>", "<unknown person>")
+        }
+    )
     if not unique_names:
         return
     completer = QCompleter(unique_names, edit)
@@ -590,7 +596,11 @@ class PicasaPeoplePanel(QWidget):
                 for fr in photo_faces:
                     name_str = fr.contact_name or ""
                     if fr.contact_id and name_str and not name_str.startswith("? ") and name_str != "Sans nom":
-                        cid = fr.contact_id.lower()
+                        cid = (
+                            db.face_manager._resolve_person_key(fr.contact_id)
+                            if (db and getattr(db, "face_manager", None))
+                            else fr.contact_id.lower()
+                        )
                         if cid not in known_people:
                             known_people[cid] = {
                                 "name": name_str,
@@ -636,8 +646,36 @@ class PicasaPeoplePanel(QWidget):
         card_idx = 0
         self.faces_container.setUpdatesEnabled(False)
         try:
-            # 1. Cartes des personnes identifiées
-            for cid, info in sorted(known_people.items(), key=lambda kv: len(kv[1]["photos"]), reverse=True):
+            # 1. Cartes des personnes identifiées (Ref: picasa3.exe @ 0x004A198C, 0x004A7A18, 0x006C8849)
+            from picasa_py.db.preferences import PicasaPreferences
+            win = self.window()
+            lib_tree = getattr(win, "library_tree", None) if win is not None else None
+            psort = (
+                int(getattr(lib_tree, "people_sort_mode", 0))
+                if lib_tree is not None
+                else PicasaPreferences.get_people_sort_mode()
+            )
+            if psort == 1:
+                sorted_known = sorted(
+                    known_people.items(),
+                    key=lambda kv: (-len(kv[1]["photos"]), str(kv[1].get("name", "")).lower()),
+                )
+            elif psort == 2:
+                by_amt = sorted(
+                    known_people.items(),
+                    key=lambda kv: (-len(kv[1]["photos"]), str(kv[1].get("name", "")).lower()),
+                )
+                top10_cids = {cid for cid, _ in by_amt[:10]}
+                sorted_known = sorted(
+                    known_people.items(),
+                    key=lambda kv: (0 if kv[0] in top10_cids else 1, str(kv[1].get("name", "")).lower()),
+                )
+            else:
+                sorted_known = sorted(
+                    known_people.items(),
+                    key=lambda kv: (str(kv[1].get("name", "")).lower(), -len(kv[1]["photos"])),
+                )
+            for cid, info in sorted_known:
                 card = self._create_multi_person_card(cid, info["name"], len(info["photos"]), info["sample_face"], info["sample_path"])
                 self.faces_layout.insertWidget(card_idx, card)
                 card_idx += 1
@@ -3105,10 +3143,13 @@ class PicasaTagsPanel(QWidget):
             if t:
                 counts[t] = counts.get(t, 0) + 2
         if self.db is not None:
-            pmp_kw = self.db.pmps.get("imagedata_keywords")
+            ti_recs = getattr(getattr(self.db, "thumbindex", None), "records", None)
+            pmp_kw = self.db.pmps.get("imagedata_tags") or self.db.pmps.get("imagedata_keywords")
             if pmp_kw is not None:
-                for raw in pmp_kw.records:
+                for idx_kw, raw in enumerate(pmp_kw.records):
                     if not raw or not isinstance(raw, str):
+                        continue
+                    if ti_recs is not None and idx_kw < len(ti_recs) and not ti_recs[idx_kw].is_active:
                         continue
                     for kw in raw.replace(";", ",").split(","):
                         k = kw.strip()
@@ -4241,13 +4282,14 @@ class PicasaRightDrawer(QWidget):
         cached_folder = getattr(self, "_cached_sibling_folder", None)
         if cached_folder == folder and getattr(self, "_cached_sibling_paths", None):
             return self._cached_sibling_paths
-        db = getattr(self, "_active_db", None) or getattr(self, "_current_db", None)
+        db = getattr(self, "_active_db", None) or getattr(self, "db", None)
         if db is not None and hasattr(db, "index") and db.index:
             norm_folder = folder.replace("\\", "/").rstrip("/").lower()
             matching_parent_ids = {
                 i
                 for i, rec in enumerate(db.index)
                 if getattr(rec, "type", 0) == 1
+                and getattr(rec, "is_active", True)
                 and getattr(rec, "path", "").replace("\\", "/").rstrip("/").lower() == norm_folder
             }
             if matching_parent_ids:
@@ -4255,6 +4297,7 @@ class PicasaRightDrawer(QWidget):
                     os.path.join(folder, rec.path)
                     for rec in db.index
                     if getattr(rec, "parent_idx", -1) in matching_parent_ids
+                    and getattr(rec, "is_active", True)
                     and getattr(rec, "type", 0) in (2, 6, 7, 13, 18, 31, 0x20)
                 ]
                 if paths:

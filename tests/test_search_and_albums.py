@@ -276,3 +276,89 @@ def test_library_tree_live_refresh(qapp, tmp_path):
     album_names = [tree.cat_albums.child(i).text(0) for i in range(tree.cat_albums.childCount())]
     assert any("Concert" in n for n in album_names)
     assert any("Voyage Italie" in n for n in album_names)
+
+
+def test_folders_and_albums_parity_with_picasa3(qapp, tmp_path):
+    """
+    FR: Vérifie la conformité de l'affichage des Dossiers et des Albums avec picasa3.exe :
+    - inclusion des PNG (type=14) et BMP/GIF (type=3),
+    - exclusion des dossiers cat=6 ("Other Stuff") de Dossiers et de ThumbnailView.sections,
+    - exclusion des tokens de dossiers (cat=2, "]album:<folder_uid>") de la liste des Albums (cat=0),
+    - inclusion de l'album dynamique système "]updated" ("Récemment mis à jour") lorsqu'il a des photos actives,
+    - tri par défaut par date décroissante (Preferences\\datesort = 0) puis par nom.
+    EN: Verifies Folders and Albums display parity with picasa3.exe.
+    Ref: picasa3.exe @ 0x004A59E9, 0x004A7A18 - 0x004A8054, 0x004AA9F0, 0x004ACA00
+    """
+    from picasa_py.db.pmp import PmpFile, PmpType
+    from picasa_py.db.wordhash import WordHashFile, WordHashEntry
+
+    f_old = tmp_path / "AlphaOld"
+    f_new = tmp_path / "BetaNew"
+    f_other = tmp_path / "GammaOtherStuff"
+    for d in (f_old, f_new, f_other):
+        d.mkdir()
+
+    db_dir = tmp_path / "db3"
+    db_dir.mkdir()
+    db = PicasaDatabase(db3_dir=db_dir)
+    records = [
+        ThumbIndexRecord(path=str(f_old) + "\\", ft1=0, ft2=0, size=0, type=1, flags=0x0102, parent_idx=0xFFFFFFFF),
+        ThumbIndexRecord(path="old_jpg.jpg", ft1=0, ft2=0, size=1000, type=2, flags=0x0100, parent_idx=0),
+        ThumbIndexRecord(path=str(f_new) + "\\", ft1=0, ft2=0, size=0, type=1, flags=0x0102, parent_idx=0xFFFFFFFF),
+        ThumbIndexRecord(path="screen1.png", ft1=0, ft2=0, size=2000, type=14, flags=0x0100, parent_idx=2),
+        ThumbIndexRecord(path="anim.gif", ft1=0, ft2=0, size=1500, type=3, flags=0x0100, parent_idx=2),
+        ThumbIndexRecord(path=str(f_other) + "\\", ft1=0, ft2=0, size=0, type=1, flags=0x0102, parent_idx=0xFFFFFFFF),
+        ThumbIndexRecord(path="thumb_cache.jpg", ft1=0, ft2=0, size=500, type=2, flags=0x0100, parent_idx=5),
+    ]
+    db.thumbindex = ThumbIndexFile(records=records)
+
+    db.pmps["albumdata_name"] = PmpFile(
+        PmpType.STRING,
+        ["Photos favorites", "Récemment mis à jour", "AlphaOld", "BetaNew", "GammaOtherStuff"],
+    )
+    db.pmps["albumdata_category"] = PmpFile(PmpType.UINT32, [0, 0, 2, 2, 6])
+    db.pmps["albumdata_token"] = PmpFile(
+        PmpType.STRING,
+        ["]star", "]updated", "]album:fold_old", "]album:fold_new", "]album:fold_other"],
+    )
+    db.pmps["albumdata_uid"] = PmpFile(
+        PmpType.STRING,
+        ["starred", "updated", "fold_old", "fold_new", "fold_other"],
+    )
+    db.pmps["albumdata_filename"] = PmpFile(
+        PmpType.STRING,
+        ["", "", str(f_old) + "\\", str(f_new) + "\\", str(f_other) + "\\"],
+    )
+    db.pmps["albumdata_date"] = PmpFile(
+        PmpType.DOUBLE,
+        [0.0, 0.0, 44000.0, 45500.0, 46000.0],
+    )
+
+    wh = WordHashFile()
+    wh._word_map["]updated"] = WordHashEntry(word="]updated", str_offset=0, image_ids=[3, 4])
+    db.wordhash = wh
+
+    tree = PicasaLibraryTree()
+    tree.set_date_sort_mode(0, persist=False)
+    tree.populate_from_database(db)
+
+    # 1. Dossiers : BetaNew (date 45500, 2 fichiers : PNG type=14 + GIF type=3) avant AlphaOld (date 44000, 1 JPG),
+    # et GammaOtherStuff (cat=6) exclu
+    folder_labels = [tree.cat_folders.child(i).text(0) for i in range(tree.cat_folders.childCount())]
+    assert folder_labels == ["BetaNew (2)", "AlphaOld (1)"]
+
+    # 2. Tri par nom (mode 2) : AlphaOld avant BetaNew
+    tree.set_date_sort_mode(2, persist=False)
+    folder_labels_by_name = [tree.cat_folders.child(i).text(0) for i in range(tree.cat_folders.childCount())]
+    assert folder_labels_by_name == ["AlphaOld (1)", "BetaNew (2)"]
+
+    # 3. Albums : Photos favorites (0) + Récemment mis à jour (2), sans aucun token de dossier "]album:fold_*"
+    album_labels = [tree.cat_albums.child(i).text(0) for i in range(tree.cat_albums.childCount())]
+    assert album_labels == ["Photos favorites (0)", "Récemment mis à jour (2)"]
+
+    # 4. ThumbnailView : sections contient BetaNew (2) et AlphaOld (1), mais pas GammaOtherStuff (cat=6)
+    view = PicasaThumbnailView()
+    view.set_database(db)
+    sec_names_counts = [(s.name, len(s.item_indices)) for s in view.visible_sections]
+    assert sec_names_counts == [("BetaNew", 2), ("AlphaOld", 1)]
+

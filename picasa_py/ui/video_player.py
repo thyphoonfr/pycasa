@@ -343,6 +343,10 @@ class PicasaVideoPlayer(QWidget):
             from picasa_py.ini.parser import PicasaIniParser
             p = Path(file_path)
             ini_p = p.parent / ".picasa.ini"
+            if not ini_p.exists():
+                alt_p = p.parent / "Picasa.ini"
+                if alt_p.exists():
+                    ini_p = alt_p
             if ini_p.exists():
                 doc = PicasaIniParser.parse_file(str(ini_p))
                 sec = doc.get_section(p.name)
@@ -475,16 +479,18 @@ class PicasaVideoPlayer(QWidget):
         """
         FR: Enregistre la clé de découpage vidéo (`moviestart` ou `movieend`) dans `.picasa.ini`.
         EN: Persists the video trim key (`moviestart` or `movieend`) to `.picasa.ini`.
+        Ref: picasa3.exe @ 0x0088E914 (moviestart / movieend in .picasa.ini)
         """
         if not self.current_video_path:
             return
         try:
-            from picasa_py.ini.parser import PicasaIniParser
+            from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
             from picasa_py.ini.writer import PicasaIniWriter
-            from picasa_py.ini.model import IniDocument
             p = Path(self.current_video_path)
             ini_p = p.parent / ".picasa.ini"
-            doc = PicasaIniParser.parse_file(str(ini_p)) if ini_p.exists() else IniDocument()
+            if not ini_p.exists() and (p.parent / "Picasa.ini").exists():
+                ini_p = p.parent / "Picasa.ini"
+            doc = PicasaIniParser.parse_file(str(ini_p)) if ini_p.exists() else PicasaIniDocument()
             sec = doc.get_or_create_section(p.name)
             sec.set(key, value)
             PicasaIniWriter.write_file(str(ini_p), doc)

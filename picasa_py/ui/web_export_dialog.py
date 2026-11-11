@@ -244,9 +244,18 @@ class PicasaWebExportDialog(QDialog):
         processed_photos = []
 
         for idx, src_p in enumerate(self.photo_paths):
-            fname = Path(src_p).name
+            p_obj = Path(src_p)
+            src_stem = p_obj.stem
+            out_ext = p_obj.suffix if p_obj.suffix.lower() in (".jpg", ".jpeg") else ".jpg"
+            fname = f"{src_stem}{out_ext}"
             img_dest = images_dir / fname
             thumb_dest = thumbs_dir / fname
+            counter = 1
+            while img_dest.exists() or thumb_dest.exists():
+                fname = f"{src_stem}-{counter:03d}{out_ext}"
+                img_dest = images_dir / fname
+                thumb_dest = thumbs_dir / fname
+                counter += 1
 
             try:
                 from picasa_py.ui.image_processor import PicasaImageProcessor
@@ -267,9 +276,27 @@ class PicasaWebExportDialog(QDialog):
                         thumb_img = thumb_img.convert("RGB")
                     thumb_img.save(str(thumb_dest), "JPEG", quality=85)
 
+                    # Ref: picasa3.exe @ 0x007A5E10 (webexport.fen : lecture de caption= dans .picasa.ini)
+                    caption_txt = ""
+                    try:
+                        ini_cand = p_obj.parent / ".picasa.ini"
+                        if not ini_cand.exists():
+                            alt_cand = p_obj.parent / "Picasa.ini"
+                            if alt_cand.exists():
+                                ini_cand = alt_cand
+                        if ini_cand.exists():
+                            from picasa_py.ini.parser import PicasaIniParser
+                            doc = PicasaIniParser.parse_file(str(ini_cand))
+                            sec = doc.get_section(p_obj.name)
+                            if sec is not None:
+                                caption_txt = (sec.get("caption") or "").strip()
+                    except Exception:
+                        caption_txt = ""
+
                     processed_photos.append({
-                        "name": Path(src_p).name,
+                        "name": p_obj.name,
                         "file": fname,
+                        "caption": caption_txt or p_obj.name,
                     })
             except Exception:
                 pass
@@ -368,9 +395,10 @@ class PicasaWebExportDialog(QDialog):
   <div class="gallery">
 """
         for i, item in enumerate(processed_photos):
+            cap_label = item.get("caption") or item["name"]
             html_content += f"""    <div class="card" onclick="openPhoto({i})">
       <img src="thumbnails/{item['file']}" alt="{item['name']}">
-      <div class="caption">{item['name']}</div>
+      <div class="caption">{cap_label}</div>
     </div>\n"""
 
         html_content += f"""  </div>

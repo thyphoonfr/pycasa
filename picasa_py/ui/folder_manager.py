@@ -599,15 +599,25 @@ class PicasaFolderManagerDialog(QDialog):
         newly_watched: List[str] = []
 
         for path, status in self.folder_settings.items():
-            self.db.set_watched_folder(path, status)
-            changed_folders.append(path)
-            if status in ("1", "2") and self._initial_folder_settings.get(path) not in ("1", "2"):
+            prev_status = self._initial_folder_settings.get(path)
+            if prev_status != status or not self._initial_folder_settings:
+                self.db.set_watched_folder(path, status)
+                changed_folders.append(path)
+            if status in ("1", "2") and prev_status not in ("1", "2"):
                 newly_watched.append(path)
 
-        # FR: Persister l'option de détection des visages (frexclude=1 dans [Picasa] de .picasa.ini)
-        # EN: Persist the face detection option (frexclude=1 in [Picasa] section of .picasa.ini)
+        # FR: Persister l'option de détection des visages (frexclude=1 dans [Picasa] de .picasa.ini
+        # + FileManagerFRStatus\<folder>\ dans repository.dat / scanlist.txt / frexcludefolders.txt)
+        # EN: Persist the face detection option (frexclude=1 in [Picasa] section of .picasa.ini
+        # + FileManagerFRStatus\<folder>\ in repository.dat / scanlist.txt / frexcludefolders.txt)
+        # Ref: picasa3.exe @ 0x004190E0, 0x004F5E60
         from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
         for folder_path, enabled in self.face_detect_settings.items():
+            if hasattr(self.db, "set_folder_face_exclusion"):
+                try:
+                    self.db.set_folder_face_exclusion(folder_path, excluded=not enabled)
+                except Exception:
+                    pass
             if not os.path.isdir(folder_path):
                 continue
             ini_p = os.path.join(folder_path, ".picasa.ini")
@@ -619,6 +629,8 @@ class PicasaFolderManagerDialog(QDialog):
                 else:
                     sec.remove("frexclude")
                 doc.write_file(ini_p)
+                if hasattr(self.db, "invalidate_ini_cache"):
+                    self.db.invalidate_ini_cache(ini_p)
             except Exception:
                 pass
 
