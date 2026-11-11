@@ -249,6 +249,8 @@ class PicasaXMPFaceTagger:
             final_data = b"".join(new_data_parts)
 
             # Ref: picasa3.exe @ 0x009ED330 — écriture directe sans fichier .tmp_xmp
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(os.path.dirname(os.path.abspath(str(jpeg_path))))
             with open(jpeg_path, "wb") as f:
                 f.write(final_data)
             return True
@@ -374,6 +376,8 @@ class PicasaWriteFaceTagsWorker(QThread):
                     existing_xmp = PicasaXMPFaceTagger.extract_xmp_from_jpeg(str(p))
                     xmp_bytes = PicasaXMPFaceTagger.build_xmp_packet(w, h, faces_to_write, existing_xmp=existing_xmp)
                     if PicasaXMPFaceTagger.inject_xmp_into_jpeg(str(p), xmp_bytes):
+                        if self.db is not None and hasattr(self.db, "sync_file_stat_and_checksums"):
+                            self.db.sync_file_stat_and_checksums(str(p))
                         succ += 1
                     else:
                         err += 1

@@ -131,6 +131,20 @@ class PicasaPreferences:
         """
         self._settings.setValue(key, val)
 
+    def remove(self, key: str) -> None:
+        """
+        FR: Supprime une clé de préférence du registre ou du fichier de configuration système.
+        EN: Removes a preference key from the system registry or configuration file.
+        """
+        self._settings.remove(key)
+
+    def contains(self, key: str) -> bool:
+        """
+        FR: Indique si une clé de préférence existe dans le registre ou le fichier de configuration système.
+        EN: Returns whether a preference key exists in the system registry or configuration file.
+        """
+        return bool(self._settings.contains(key))
+
     def sync(self) -> None:
         """
         FR: Force la synchronisation des préférences sur le disque ou dans le registre.

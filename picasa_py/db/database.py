@@ -348,6 +348,16 @@ class PicasaDatabase:
         self._scanlist: Dict[str, str] = {}
         self._frexclude_folders: List[str] = []
         self._session_scanned_folders: Set[str] = set()
+        self._session_created_albums: Set[str] = set()
+
+    def _is_dummy_db_dir(self) -> bool:
+        """
+        FR: Indique si `self.db3_dir` est vide, égal à `.` ou pointe vers un chemin factice de test (`__non_existent__`).
+        EN: Indicates whether `self.db3_dir` is empty, equal to `.`, or points to a dummy test path (`__non_existent__`).
+        """
+        if not self.db3_dir or str(self.db3_dir) == ".":
+            return True
+        return "__non_existent__" in self.db3_dir.parts
 
     @property
     def thumbs(self) -> Dict[str, BlockIndexFile]:
@@ -760,9 +770,7 @@ class PicasaDatabase:
         under which `CFilePath::Resolve` (`0x00980EC0`) resolves `#db3\\`, `#contacts\\`, `#tmp\\`, and `ioqueue\\`.
         Ref: picasa3.exe @ 0x00980EC0 (CFilePath::Resolve)
         """
-        if self.db3_dir and self.db3_dir != Path("."):
-            if self.db3_dir.name.lower() == "db3":
-                return self.db3_dir.parent
+        if self.db3_dir and not self._is_dummy_db_dir():
             return self.db3_dir.parent
         return Path(".")
 
@@ -815,7 +823,7 @@ class PicasaDatabase:
         EN: Creates the complete `picasa3.exe` directory and infrastructure file hierarchy under `<Picasa2_Root>`.
         Ref: picasa3.exe @ 0x004164A7..0x004165FB, 0x00419C30, 0x0041B5D3, 0x00980EC0
         """
-        if not self.db3_dir or self.db3_dir == Path("."):
+        if self._is_dummy_db_dir():
             return
         try:
             self.db3_dir.mkdir(parents=True, exist_ok=True)
@@ -1314,6 +1322,8 @@ class PicasaDatabase:
                 clean_tok = clean_tok[7:].strip()
             if not clean_tok:
                 continue
+            self._session_created_albums.add(clean_tok)
+            self._albums_cache = None
 
             ad_tokens = self.pmps.get("albumdata_token")
             ad_uids = self.pmps.get("albumdata_uid")
@@ -1883,6 +1893,79 @@ class PicasaDatabase:
             return str(pmp_cap.records[eff_idx])
         return ""
 
+    def sync_file_stat_and_checksums(self, file_path_or_idx: str | Path | int) -> bool:
+        """
+        FR: Synchronise `ft2`, `size`, `file_size`, `imagedata_filesize.pmp` et les checksums 32 bits
+        (`thumbs_index.db`, `thumbs2_index.db`, `bigthumbs_index.db`, `previews_index.db`) de la photo
+        et de ses sous-enregistrements de visages `1001` après une réécriture sur disque (IPTC, XMP, Ctrl+S).
+        EN: Synchronizes `ft2`, `size`, `file_size`, `imagedata_filesize.pmp`, and 32-bit checksums
+        (`thumbs_index.db`, `thumbs2_index.db`, `bigthumbs_index.db`, `previews_index.db`) for the photo
+        and its `1001` child face records after an on-disk rewrite (IPTC, XMP, Ctrl+S).
+        Ref: picasa3.exe @ 0x006B99F0, 0x004E3AB0, 0x0042A800, 0x009ED330
+        """
+        if isinstance(file_path_or_idx, int):
+            eff_idx = self._resolve_photo_record_index(file_path_or_idx)
+            full_path = self.get_media_full_path(eff_idx) if eff_idx is not None else None
+        else:
+            full_path = str(file_path_or_idx)
+            eff_idx = self.find_photo_index(full_path)
+            if eff_idx is not None:
+                eff_idx = self._resolve_photo_record_index(eff_idx)
+        if eff_idx is None or not full_path or not os.path.isfile(full_path):
+            return False
+        if self.thumbindex is None or not (0 <= eff_idx < len(self.thumbindex.records)):
+            return False
+        try:
+            from picasa_py.scanner.scanner import file_filetimes
+            _, ft2_new, fsize_new = file_filetimes(Path(full_path))
+            with self._lock:
+                rec = self.thumbindex.records[eff_idx]
+                rec.ft2 = ft2_new
+                rec.size = fsize_new
+                rec.file_size = fsize_new
+                rec.dirty = True
+                self.thumbindex.dirty = True
+
+                pmp_fs = self.pmps.get("imagedata_filesize")
+                if pmp_fs is not None:
+                    def_v = pmp_fs.default_value()
+                    while len(pmp_fs.records) <= eff_idx:
+                        pmp_fs.records.append(def_v)
+                    if pmp_fs.records[eff_idx] != fsize_new:
+                        pmp_fs.records[eff_idx] = fsize_new
+                        pmp_fs.dirty = True
+
+                folder_path = ""
+                if 0 <= rec.parent_idx < len(self.thumbindex.records):
+                    folder_path = self.thumbindex.records[rec.parent_idx].path
+                new_thumb_cs = compute_thumb_checksum(folder_path, rec.path, rec.ft2, rec.size)
+                child_indices = self._get_face_children(eff_idx)
+                affected_indices = [eff_idx, *child_indices]
+
+                for prefix in ("thumbs", "thumbs2"):
+                    idx_f = self.block_indices.get(prefix)
+                    if idx_f is not None:
+                        for r_i in affected_indices:
+                            if 0 <= r_i < idx_f.record_count:
+                                if idx_f.offsets[r_i] != 0 or idx_f.sizes_and_blocks[r_i] != 0:
+                                    if idx_f.checksums[r_i] != new_thumb_cs:
+                                        idx_f.checksums[r_i] = new_thumb_cs
+                                        idx_f.dirty = True
+
+                new_prev_cs = self.compute_entry_checksum(eff_idx, "previews")
+                for prefix in ("bigthumbs", "previews"):
+                    idx_f = self.block_indices.get(prefix)
+                    if idx_f is not None:
+                        for r_i in affected_indices:
+                            if 0 <= r_i < idx_f.record_count:
+                                if idx_f.offsets[r_i] != 0 or idx_f.sizes_and_blocks[r_i] != 0:
+                                    if idx_f.checksums[r_i] != new_prev_cs:
+                                        idx_f.checksums[r_i] = new_prev_cs
+                                        idx_f.dirty = True
+            return True
+        except Exception:
+            return False
+
     def _update_jpeg_iptc_metadata(
         self,
         full_path: str,
@@ -2069,13 +2152,7 @@ class PicasaDatabase:
             PicasaIniWriter.mark_internal_write(os.path.dirname(full_path))
             with open(full_path, "wb") as fh:
                 fh.write(new_jpeg)
-            st = os.stat(full_path)
-            if self.thumbindex is not None and 0 <= eff_idx < len(self.thumbindex.records):
-                rec = self.thumbindex.records[eff_idx]
-                rec.size = int(st.st_size) & 0xFFFFFFFF
-                rec.ft2 = int(st.st_mtime * 10_000_000) + 116_444_736_000_000_000
-                rec.dirty = True
-                self.thumbindex.dirty = True
+            self.sync_file_stat_and_checksums(eff_idx)
             return True
         except OSError:
             return False
@@ -2692,7 +2769,7 @@ class PicasaDatabase:
         under `Picasa2Albums` (`CopyFileW` @ `0x0066F2B0..0x0066F450`).
         Ref: picasa3.exe @ 0x0041BB58, 0x00586BD0, 0x0066F2B0..0x0066F450 (backup.xml)
         """
-        if not self.contacts or not self.contacts_dir:
+        if not self.contacts or not self.contacts_dir or self._is_dummy_db_dir():
             return False
         try:
             self.contacts_dir.mkdir(parents=True, exist_ok=True)
@@ -2969,14 +3046,15 @@ class PicasaDatabase:
         # 4. Filtrer selon CAlbumState::UpdateAlbumEntry (0x004AAD5B..0x004AAD75) :
         # `mov esi, [ecx+4]; shr esi, 1; test esi, esi; je 0x4aad71 -> SetAlbumEntryVisible(0)` :
         # tout album (dynamique, utilisateur `cat=0` chargé depuis `.pal`, ou `.picasa.ini`) ayant 0 photo
-        # active indexée dans la base courante est masqué de `CAlbumListUI`.
+        # active indexée dans la base courante est masqué de `CAlbumListUI`, à l'exception des albums
+        # créés par l'utilisateur durant la session courante (`self._session_created_albums`).
         res_list: List[Dict[str, Any]] = []
         for tok, alb_info in albums.items():
             src = alb_info.get("source")
             if src == "pmp_dynamic":
                 if len(alb_info["photo_indices"]) == 0 and len(alb_info["photo_paths"]) == 0:
                     continue
-            elif has_authoritative_db:
+            elif has_authoritative_db and tok not in self._session_created_albums:
                 if len(alb_info["photo_indices"]) == 0 and len(alb_info["photo_paths"]) == 0:
                     continue
                 if src == "ini" and len(alb_info["photo_indices"]) == 0:
@@ -3150,6 +3228,8 @@ class PicasaDatabase:
         clean_target = album_token.strip()
         if clean_target.startswith("]album:") or clean_target.startswith(".album:"):
             clean_target = clean_target[7:].strip()
+        self._session_created_albums.discard(clean_target)
+        self._session_created_albums.discard(album_token.strip())
         deleted = False
         watched = [_to_host_path(p.rstrip("\\/")) for p, st in self.get_watched_folders().items() if st in ("1", "2")]
         if self.thumbindex:
@@ -3735,7 +3815,7 @@ class PicasaDatabase:
                 if p.replace("/", "\\").rstrip("\\").lower() != norm_path.rstrip("\\").lower()
             ]
         p2a_dir = self.picasa2albums_dir
-        if self.db3_dir and self.db3_dir != Path(".") and p2a_dir:
+        if not self._is_dummy_db_dir() and p2a_dir:
             try:
                 p2a_dir.mkdir(parents=True, exist_ok=True)
                 frex_path = p2a_dir / "frexcludefolders.txt"
@@ -3783,7 +3863,7 @@ class PicasaDatabase:
         `save_database()` to guarantee immediate on-disk consistency with `picasa3.exe`.
         Ref: picasa3.exe @ 0x004F61C0 (SaveScanList), 0x008B1BF0, 0x008B7F90 (repository.dat)
         """
-        if not self.db3_dir or self.db3_dir == Path(".") or not self.repository:
+        if self._is_dummy_db_dir() or not self.repository:
             return
         if getattr(self.thumbindex, "dirty", False) or getattr(self.wordhash, "dirty", False):
             self.save_database()
@@ -4825,20 +4905,25 @@ class PicasaDatabase:
             if w <= 0 or h <= 0:
                 return False
 
-            def _encode_scaled_jpeg(max_dim: int, quality: int = 90) -> bytes:
-                # Ref: picasa3.exe @ 0x00424CA0 (FUN_00424ca0 -> ceil(max_dim * min_side / max_side))
-                if w > max_dim or h > max_dim:
-                    if w >= h:
-                        tw = max_dim
-                        th = max(1, int(math.ceil(max_dim * h / float(w))))
-                    else:
-                        th = max_dim
-                        tw = max(1, int(math.ceil(max_dim * w / float(h))))
-                    sub = rgb_img.resize((tw, th), Image.Resampling.BILINEAR)
-                else:
-                    sub = rgb_img
+            from picasa_py.scanner.scanner import (
+                _scale_box_dimensions,
+                classify_image_color_tokens,
+                compute_thumbnail_avgcolor,
+            )
+
+            def _resize_fit(src_img: Image.Image, max_dim: int) -> Image.Image:
+                # Ref: picasa3.exe @ 0x009B4AA0 (FUN_009b4aa0 -> _scale_box_dimensions float32 + 0.499)
+                sw, sh = src_img.size
+                if sw <= max_dim and sh <= max_dim:
+                    return src_img
+                tw, th = _scale_box_dimensions(sw, sh, max_dim)
+                if tw == sw and th == sh:
+                    return src_img
+                return src_img.resize((tw, th), Image.Resampling.BILINEAR)
+
+            def _encode_pil_jpeg(img_obj: Image.Image, quality: int = 90) -> bytes:
                 buf = io.BytesIO()
-                sub.save(buf, format="JPEG", quality=quality)
+                img_obj.save(buf, format="JPEG", quality=quality)
                 return buf.getvalue()
 
             def _has_existing_block_entry(stem: str, r_idx: int) -> bool:
@@ -4849,23 +4934,33 @@ class PicasaDatabase:
                 return entry is not None and not entry.is_empty
 
             # FR: Compression JPEG et calcul de la couleur moyenne HORS verrou global (Ref: 0x00414C90 CThumbMaker)
-            # bigthumbs_0.db et previews_0.db ne sont mis à jour que si l'enregistrement possède déjà une entrée
-            # (dans db3/, bigthumbs_0.db est réservé aux visages 1001 et seules quelques photos ont un preview)
+            # Cascade 288 -> 144 -> 72 fidèle à FUN_00425210 @ 0x004252DF..0x00425550
             # EN: JPEG compression and average color computation OUTSIDE the global lock (Ref: 0x00414C90 CThumbMaker)
-            # bigthumbs_0.db and previews_0.db are only updated if the record already has an entry
-            encoded_small = _encode_scaled_jpeg(144, 90) if "thumbs" in self.block_indices else None
-            encoded_med = _encode_scaled_jpeg(72, 90) if "thumbs2" in self.block_indices else None
-            encoded_large = _encode_scaled_jpeg(288, 90) if _has_existing_block_entry("bigthumbs", resolved_idx) else None
-            encoded_prev = _encode_scaled_jpeg(640, 90) if "previews" in self.block_indices else None
+            # 288 -> 144 -> 72 cascade faithful to FUN_00425210 @ 0x004252DF..0x00425550
+            thumb_288 = _resize_fit(rgb_img, 288)
+            thumb_144 = _resize_fit(thumb_288, 144)
+            thumb_72 = _resize_fit(thumb_144, 72)
+
+            encoded_small = _encode_pil_jpeg(thumb_144, 90) if "thumbs" in self.block_indices else None
+            encoded_med = _encode_pil_jpeg(thumb_72, 90) if "thumbs2" in self.block_indices else None
+            encoded_large = _encode_pil_jpeg(thumb_288, 90) if _has_existing_block_entry("bigthumbs", resolved_idx) else None
+            encoded_prev = _encode_pil_jpeg(_resize_fit(rgb_img, 640), 90) if "previews" in self.block_indices else None
 
             avg_u32: Optional[int] = None
             if "imagedata_avgcolor" in self.pmps:
                 try:
-                    avg_px = rgb_img.resize((1, 1), Image.Resampling.BILINEAR).getpixel((0, 0))
-                    if isinstance(avg_px, tuple) and len(avg_px) >= 3:
-                        avg_u32 = 0xFF000000 | ((int(avg_px[0]) & 0xFF) << 16) | ((int(avg_px[1]) & 0xFF) << 8) | (int(avg_px[2]) & 0xFF)
+                    # Ref: picasa3.exe @ 0x009AC640 (FUN_009ac640 -> compute_thumbnail_avgcolor)
+                    avg_u32 = compute_thumbnail_avgcolor(thumb_144)
                 except Exception:
                     avg_u32 = None
+
+            color_tokens: List[str] = []
+            if self.wordhash is not None:
+                try:
+                    # Ref: picasa3.exe @ 0x007BC810 (FUN_007bc810 -> classify_image_color_tokens)
+                    color_tokens = classify_image_color_tokens(thumb_144)
+                except Exception:
+                    color_tokens = []
 
             with self._lock:
                 self._align_imagedata_tables(resolved_idx)
@@ -4906,6 +5001,24 @@ class PicasaDatabase:
                         pmp_avg.records.append(def_v)
                     pmp_avg.records[resolved_idx] = avg_u32
                     pmp_avg.dirty = True
+
+                if self.wordhash is not None:
+                    if hasattr(self.wordhash, "remove_word"):
+                        for old_ctok in (
+                            "color:red",
+                            "color:orange",
+                            "color:yellow",
+                            "color:green",
+                            "color:blue",
+                            "color:purple",
+                            "color:pink",
+                            "color:black",
+                            "color:white",
+                            "color:gray",
+                        ):
+                            self.wordhash.remove_word(old_ctok, resolved_idx)
+                    for ctok in color_tokens:
+                        self.wordhash.add_word(ctok, resolved_idx)
 
                 # 6. Sous-enregistrements de visages enfants (type == 1001, Ref: FUN_00425210 @ 0x004258D1..0x00425B6C)
                 if self.thumbindex is not None:
@@ -5035,7 +5148,7 @@ class PicasaDatabase:
         without rewriting all 56 PMP tables when only a thumbnail changed.
         Ref: picasa3.exe @ 0x006B7FC0 (CBlockFile::SaveIndex), 0x0080CFA0
         """
-        if not self.db3_dir or self.db3_dir == Path(".") or not self.db3_dir.exists():
+        if self._is_dummy_db_dir() or not self.db3_dir.exists():
             return
 
         def _atomic_write(target: Path, data: bytes) -> None:
@@ -5146,7 +5259,7 @@ class PicasaDatabase:
         performing all disk I/O outside `self._lock`.
         Ref: picasa3.exe @ 0x004F54B0, 0x006B7FC0 (CBlockFile::SaveIndex), 0x006A2CD0, 0x006C1920 (CPMTable), 0x004DB4F0
         """
-        if not self.db3_dir or self.db3_dir == Path("."):
+        if self._is_dummy_db_dir():
             return
         if not self.db3_dir.exists():
             self.db3_dir.mkdir(parents=True, exist_ok=True)
@@ -5359,7 +5472,7 @@ class PicasaDatabase:
         `saverlist.txt`, `facetags.txt`, `tags.txt`) matching `CThumbDB::Save` (`0x0041BA40`).
         Ref: picasa3.exe @ 0x0041BA40, 0x004F61C0, 0x004755F0, 0x006BA000, 0x006C0E00
         """
-        if not self.db3_dir or self.db3_dir == Path(".") or not self.db3_dir.exists():
+        if self._is_dummy_db_dir() or not self.db3_dir.exists():
             return
 
         # 1. scanlist.txt (Ref: 0x004F61C0 : "<folder>\r\n" pour status 1, "+<folder>\r\n" pour status 2, "-<folder>\r\n" pour status 0)

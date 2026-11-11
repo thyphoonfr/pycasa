@@ -3623,7 +3623,12 @@ class PicasaFaceManager:
                     break
             if not found_c:
                 self.db.contacts.contacts.append(Contact(id=contact_id, name=clean_name))
-                if getattr(self.db, "contacts_dir", None):
+                if hasattr(self.db, "save_contacts"):
+                    try:
+                        self.db.save_contacts()
+                    except Exception:
+                        pass
+                elif getattr(self.db, "contacts_dir", None):
                     try:
                         self.db.contacts_dir.mkdir(parents=True, exist_ok=True)
                         (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
@@ -3899,7 +3904,12 @@ class PicasaFaceManager:
             if getattr(self.db, "contacts", None) is None:
                 self.db.contacts = ContactsFile()
             self.db.contacts.contacts.append(Contact(id=cid, name=clean_name))
-            if getattr(self.db, "contacts_dir", None):
+            if hasattr(self.db, "save_contacts"):
+                try:
+                    self.db.save_contacts()
+                except Exception:
+                    pass
+            elif getattr(self.db, "contacts_dir", None):
                 try:
                     self.db.contacts_dir.mkdir(parents=True, exist_ok=True)
                     (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
@@ -4072,7 +4082,12 @@ class PicasaFaceManager:
             del self.people[cid]
             if self.db and getattr(self.db, "contacts", None):
                 self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() not in cid_vars]
-                if getattr(self.db, "contacts_dir", None):
+                if hasattr(self.db, "save_contacts"):
+                    try:
+                        self.db.save_contacts()
+                    except Exception:
+                        pass
+                elif getattr(self.db, "contacts_dir", None):
                     try:
                         (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
                     except Exception:
@@ -4140,7 +4155,12 @@ class PicasaFaceManager:
                     break
             if not found_c and not self._is_unknown_person_placeholder(clean_new):
                 self.db.contacts.contacts.append(Contact(id=cid, name=clean_new))
-            if getattr(self.db, "contacts_dir", None):
+            if hasattr(self.db, "save_contacts"):
+                try:
+                    self.db.save_contacts()
+                except Exception:
+                    pass
+            elif getattr(self.db, "contacts_dir", None):
                 try:
                     (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
                 except Exception:
@@ -4322,7 +4342,12 @@ class PicasaFaceManager:
 
         if self.db and getattr(self.db, "contacts", None):
             self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() not in cid_vars]
-            if getattr(self.db, "contacts_dir", None):
+            if hasattr(self.db, "save_contacts"):
+                try:
+                    self.db.save_contacts()
+                except Exception:
+                    pass
+            elif getattr(self.db, "contacts_dir", None):
                 try:
                     (self.db.contacts_dir / "contacts.xml").write_text(self.db.contacts.to_xml(), encoding="utf-8")
                 except Exception:

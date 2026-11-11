@@ -1406,4 +1406,180 @@ def test_pass9_repository_only_save_ini_get_key_contact_email_and_db_helpers(tmp
     assert reloaded_ini.get_key("Contacts2", cid_alice) == "Alice Martin;alice.new@example.com;"
 
 
+def test_pass10_xml_resources_tooltips_preferences_remove_and_session_albums(tmp_path: Path):
+    """
+    FR: Vérifie les corrections de la passe 10 :
+    1. `PicasaResourceManager.get_xml_string()` :
+       - supporte les appels à 3 arguments (`get_xml_string("ABOUT", "about/window1.title", default)` dans `version.py:78`),
+       - lit `type="Tooltip"` dans `TOOLTIPS*.XML` et `*TEXT*.XML` sans écraser les libellés `type="Label"`/`type="Text"`,
+       - charge automatiquement les fichiers `*_TEXT_*.XML` et `*TEXT_*.XML` (`COLLAGEPANELTEXT`, `MAKEMOVIEPANELTEXT`, `PEOPLEPANEL_TEXT`, etc.),
+       - résout les clés de `STRINGRES_*.XML` et les alias (`_XML_ID_ALIASES`).
+    2. `PicasaPreferences.remove()` et `contains()` : permettent de nettoyer une clé de préférence.
+    3. `PicasaThumbnailView.current_person_filter` : synchronisé lors de `filter_by_person()` et réinitialisé lors du retour aux dossiers/albums/favoris.
+    4. Albums vides créés durant la session (`_session_created_albums`) : conservés dans `get_all_albums()` jusqu'à leur suppression par `delete_album()`.
+    5. `PicasaDatabase._is_dummy_db_dir()` : ne crée aucun dossier parasite lorsque `db3_dir` contient `"__non_existent__"`.
+    """
+    from PySide6.QtWidgets import QApplication
+    from PIL import Image
+    from picasa_py.ui.resources import PicasaResourceManager
+    from picasa_py.version import get_about_dialog_title, APP_NAME
+    from picasa_py.db.preferences import PicasaPreferences
+    from picasa_py.ui.thumbnail_view import PicasaThumbnailView
+    from picasa_py.ini.parser import PicasaIniDocument
+
+    _app = QApplication.instance() or QApplication([])
+
+    # 1. XML resources & tooltips
+    res_mgr = PicasaResourceManager()
+    res_mgr.set_language("fr")
+    about_title_fr = get_about_dialog_title(res_mgr)
+    assert APP_NAME in about_title_fr and "propos" in about_title_fr.lower()
+
+    res_mgr.set_language("en")
+    about_title_en = get_about_dialog_title(res_mgr)
+    assert APP_NAME in about_title_en and "about" in about_title_en.lower()
+
+    res_mgr.set_language("fr")
+    assert res_mgr.get_xml_string("editpanel/tab1.tooltip", "") != ""
+    assert res_mgr.get_xml_string("editpanel/crop.tooltip", "") != ""
+    assert res_mgr.get_xml_string("collagepanel/scramble.title", "") != ""
+    assert res_mgr.get_xml_string("makemoviepanel/create.title", "") != ""
+    assert res_mgr.get_xml_string("peoplepanel/add_person", "") != ""
+    assert res_mgr.get_xml_string("AlbumPhoto::ID_PICTURE_VIEW", "") != ""
+    assert res_mgr.get_xml_string("STRINGRES", "IDS_LISTUPDATED", "") != ""
+
+    # 2. PicasaPreferences.remove() & contains()
+    prefs = PicasaPreferences(db3_dir=tmp_path / "db3_prefs10")
+    test_key = "Pass10TestTempKey"
+    prefs.setValue(test_key, 42)
+    assert prefs.contains(test_key) is True
+    prefs.remove(test_key)
+    assert prefs.contains(test_key) is False
+
+    # 3. PicasaThumbnailView.current_person_filter
+    tv = PicasaThumbnailView()
+    assert tv.current_person_filter is None
+    tv.filter_by_person("06e55417b6930726", "Alice", [])
+    assert tv.current_person_filter == "06e55417b6930726"
+    tv.filter_by_starred()
+    assert tv.current_person_filter is None
+    tv.close()
+    tv.deleteLater()
+    _app.processEvents()
+
+    # 4. Session-created empty album visibility & deletion
+    db = PicasaDatabase.create_new(tmp_path / "PicasaRoot10")
+    photos_dir = tmp_path / "Photos10"
+    photos_dir.mkdir(parents=True)
+    img_p = photos_dir / "photo10.jpg"
+    Image.new("RGB", (64, 64), (100, 150, 200)).save(img_p, "JPEG")
+    db.set_watched_folder(str(photos_dir), "1")
+    db.index_single_file(str(img_p))
+
+    doc = PicasaIniDocument()
+    sec = doc.get_or_create_section(".album:deadbeef12345678")
+    sec.set("name", "Mon Album Vide")
+    sec.set("token", "deadbeef12345678")
+    db._sync_album_sections_from_ini_doc(doc)
+
+    albs = db.get_all_albums()
+    tokens = {a["token"] for a in albs}
+    assert "deadbeef12345678" in tokens
+
+    db.delete_album("deadbeef12345678")
+    albs_after = db.get_all_albums()
+    assert "deadbeef12345678" not in {a["token"] for a in albs_after}
+
+    # 5. Dummy db_dir guard
+    dummy_db = PicasaDatabase(db3_dir=tmp_path / "__non_existent__")
+    dummy_db.save_database()
+    assert not (tmp_path / "__non_existent__").exists()
+
+
+def test_pass11_file_stat_checksums_and_contacts_backup_sync(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les corrections de la onzième passe d'audit Ghidra vs PyCasa :
+    1. `sync_file_stat_and_checksums()` met à jour `ft2`, `size`, `imagedata_filesize.pmp` et les checksums
+       32 bits de `thumbs_index.db`, `thumbs2_index.db`, `bigthumbs_index.db` et `previews_index.db`
+       (y compris les visages enfants `1001`) lors de l'injection IPTC (`set_caption` / `set_keywords`)
+       et de l'injection XMP (`PicasaXMPFaceTagger` / `PicasaWriteFaceTagsWorker`).
+    2. `update_thumbnails_from_pil()` utilise `_fit_long_side` (`0x009B4AA0`) avec la cascade `288 -> 144 -> 72`,
+       calcule `imagedata_avgcolor` via `compute_thumbnail_avgcolor(thumb_144)` (`0x009AC640`) et met à jour
+       les jetons `]color:...` dans `wordhash.dat` (`0x007BC810`).
+    3. `PicasaFaceManager` (`create_person`, `rename_person`, `delete_person`) appelle `db.save_contacts()`
+       pour synchroniser à la fois `contacts/contacts.xml` et `Picasa2Albums/<db_guid>/backup.xml` (`0x0066F2B0`).
+    """
+    from PIL import Image
+    from picasa_py.db.blockfile import compute_thumb_checksum
+    from picasa_py.faces.facerect import FaceRect
+    from picasa_py.faces.xmp_tagger import PicasaXMPFaceTagger
+    from picasa_py.scanner.scanner import _scale_box_dimensions, compute_thumbnail_avgcolor
+
+    db = PicasaDatabase.create_new(tmp_path / "PicasaRoot11")
+    photos_dir = tmp_path / "Photos11"
+    photos_dir.mkdir(parents=True)
+    img_p = photos_dir / "photo11.jpg"
+    Image.new("RGB", (400, 300), (220, 40, 40)).save(img_p, "JPEG", quality=92)
+
+    db.set_watched_folder(str(photos_dir), "1")
+    idx = db.index_single_file(str(img_p))
+    assert idx is not None and idx >= 0
+
+    # Ajouter un visage sur la photo pour créer un sous-enregistrement 1001 et synchroniser contacts/backup.xml
+    fm = db.face_manager
+    fr = FaceRect(left=0.2, top=0.2, right=0.6, bottom=0.6)
+    fm.add_face(str(img_p), fr, "Clara", db_idx=idx)
+    child_1001 = db._get_face_children(idx)
+    assert len(child_1001) == 1
+    c_idx = child_1001[0]
+
+    # 1. Vérifier que set_caption (qui injecte IPTC APP13 dans le JPEG) met à jour ft2, size, imagedata_filesize
+    # et les checksums de thumbs_index.db / thumbs2_index.db pour la photo et son enfant 1001
+    assert db.set_caption(idx, "Légende IPTC Pass 11") is True
+    rec = db.thumbindex.records[idx]
+    folder_path = db.thumbindex.records[rec.parent_idx].path
+    expected_cs = compute_thumb_checksum(folder_path, rec.path, rec.ft2, rec.size)
+    assert rec.size == img_p.stat().st_size
+    assert db.block_indices["thumbs"].checksums[idx] == expected_cs
+    assert db.block_indices["thumbs2"].checksums[idx] == expected_cs
+    assert db.block_indices["thumbs"].checksums[c_idx] == expected_cs
+
+    # Tester aussi après injection XMP + sync_file_stat_and_checksums
+    xmp_bytes = PicasaXMPFaceTagger.build_xmp_packet(400, 300, [("Clara", 0.2, 0.2, 0.6, 0.6)])
+    assert PicasaXMPFaceTagger.inject_xmp_into_jpeg(str(img_p), xmp_bytes) is True
+    assert db.sync_file_stat_and_checksums(str(img_p)) is True
+    rec_after_xmp = db.thumbindex.records[idx]
+    expected_cs_xmp = compute_thumb_checksum(folder_path, rec_after_xmp.path, rec_after_xmp.ft2, rec_after_xmp.size)
+    assert db.block_indices["thumbs"].checksums[idx] == expected_cs_xmp
+    assert db.block_indices["thumbs"].checksums[c_idx] == expected_cs_xmp
+
+    # 2. Vérifier update_thumbnails_from_pil : _scale_box_dimensions, compute_thumbnail_avgcolor et color:gray
+    bw_img = Image.new("RGB", (500, 333), (128, 128, 128))
+    assert db.update_thumbnails_from_pil(idx, bw_img, persist_to_disk=False) is True
+    tw288, th288 = _scale_box_dimensions(500, 333, 288)
+    tw144, th144 = _scale_box_dimensions(tw288, th288, 144)
+    expected_avg = compute_thumbnail_avgcolor(
+        bw_img.resize((tw288, th288), Image.Resampling.BILINEAR).resize((tw144, th144), Image.Resampling.BILINEAR)
+    )
+    assert db.pmps["imagedata_avgcolor"].records[idx] == expected_avg
+    assert idx in db.search("color:gray")
+    assert idx not in db.search("color:red")
+
+    # 3. Vérifier que rename_person et delete_person synchronisent Picasa2Albums/<db_guid>/backup.xml
+    guid_dir = db.picasa2albums_dir / "11223344556677889900aabbccddeeff"
+    guid_dir.mkdir(parents=True, exist_ok=True)
+    clara_clusters = [p for p in fm.people.values() if p.name == "Clara"]
+    assert len(clara_clusters) == 1
+    cid = clara_clusters[0].contact_id
+    assert fm.rename_person(cid, "Clara Renommée") is True
+    backup_xmls = list(db.picasa2albums_dir.rglob("backup.xml"))
+    assert len(backup_xmls) == 1
+    assert "Clara Renommée" in backup_xmls[0].read_text(encoding="utf-8")
+
+    assert fm.delete_person(cid) is True
+    assert "Clara Renommée" not in backup_xmls[0].read_text(encoding="utf-8")
+
+
+
+
 

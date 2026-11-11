@@ -1871,6 +1871,10 @@ class PicasaMainWindow(QMainWindow):
         if not album_token and self.thumb_view.current_folder_filter and self.thumb_view.current_folder_filter.startswith("album:"):
             album_token = self.thumb_view.current_folder_filter[6:]
 
+        clean_tok = (album_token or "").strip()
+        if clean_tok.startswith("]album:") or clean_tok.startswith(".album:"):
+            clean_tok = clean_tok[7:].strip()
+
         for p in paths:
             def _rem_alb(doc: PicasaIniDocument, fname: str) -> None:
                 """
@@ -1884,8 +1888,13 @@ class PicasaMainWindow(QMainWindow):
                 if not cur:
                     return
                 parts = [x.strip() for x in cur.split(",") if x.strip()]
-                if album_token:
-                    new_parts = [x for x in parts if x.lower() != album_token.lower()]
+                if clean_tok:
+                    def _norm_tok(val: str) -> str:
+                        s = val.strip()
+                        if s.startswith("]album:") or s.startswith(".album:"):
+                            s = s[7:].strip()
+                        return s.lower()
+                    new_parts = [x for x in parts if _norm_tok(x) != clean_tok.lower()]
                 else:
                     new_parts = []
                 if new_parts:
@@ -1893,6 +1902,14 @@ class PicasaMainWindow(QMainWindow):
                 else:
                     sec.remove("albums")
             self._update_photo_ini(p, _rem_alb)
+            if self.db is not None and clean_tok and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
+                rec_idx = self.db.find_photo_index(p) if hasattr(self.db, "find_photo_index") else None
+                if rec_idx is not None and rec_idx >= 0:
+                    self.db.wordhash.remove_word(f"]album:{clean_tok}", rec_idx)
+                    self.db.wordhash.remove_word(f"]snapshot:]album:{clean_tok}", rec_idx)
+                    if clean_tok.lower() == "screensaver":
+                        self.db.wordhash.remove_word("]screensaver", rec_idx)
+                    self.db._albums_cache = None
 
         self.notify_albums_changed()
         self.status_bar.showMessage(f"{len(paths)} photo(s) retirée(s) de l'album.")
@@ -2370,6 +2387,9 @@ class PicasaMainWindow(QMainWindow):
                 save_kwargs["exif"] = exif_bytes
             if icc_profile:
                 save_kwargs["icc_profile"] = icc_profile
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(os.path.dirname(os.path.abspath(target_path)))
+
             ext = target_p.suffix.lower()
             if ext in (".jpg", ".jpeg"):
                 # Ref: picasa3.exe @ 0x00A3D67B (quality=90 = 0x5A), 0x009D5432 (subsampling="keep")
@@ -2410,14 +2430,38 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None:
                 rec_idx = self.db.find_photo_index(target_path) if hasattr(self.db, "find_photo_index") else None
                 if rec_idx is not None and rec_idx >= 0:
-                    for col_n, col_v in (
-                        ("imagedata_backuphash", int(b_hash) & 0xFFFF),
-                        ("imagedata_revertable", 1),
-                    ):
-                        pmp_c = self.db.pmps.get(col_n)
-                        if pmp_c is not None and rec_idx < len(pmp_c.records):
-                            pmp_c.records[rec_idx] = col_v
-                            pmp_c.dirty = True
+                    try:
+                        from picasa_py.scanner.scanner import file_filetimes, compute_originfast_hash
+                        _, ft2_new, fsize_new = file_filetimes(target_p)
+                        if self.db.thumbindex is not None and 0 <= rec_idx < len(self.db.thumbindex.records):
+                            rec = self.db.thumbindex.records[rec_idx]
+                            rec.ft2 = ft2_new
+                            rec.size = fsize_new
+                            rec.file_size = fsize_new
+                            rec.dirty = True
+                            self.db.thumbindex.dirty = True
+                        saved_w = int(full_rendered.width)
+                        saved_h = int(full_rendered.height)
+                        for col_n, col_v in (
+                            ("imagedata_filesize", fsize_new),
+                            ("imagedata_width", saved_w),
+                            ("imagedata_height", saved_h),
+                            ("imagedata_edit_width", 0),
+                            ("imagedata_edit_height", 0),
+                            ("imagedata_originfast", compute_originfast_hash(target_p)),
+                            ("imagedata_backuphash", int(b_hash) & 0xFFFF),
+                            ("imagedata_revertable", 1),
+                            ("imagedata_edited", 0),
+                            ("imagedata_filters", ""),
+                        ):
+                            pmp_c = self.db.pmps.get(col_n)
+                            if pmp_c is not None and rec_idx < len(pmp_c.records):
+                                pmp_c.records[rec_idx] = col_v
+                                pmp_c.dirty = True
+                        if hasattr(self.db, "sync_file_stat_and_checksums"):
+                            self.db.sync_file_stat_and_checksums(rec_idx)
+                    except Exception:
+                        pass
                 if hasattr(self.db, "update_photo_thumbnails_from_disk"):
                     self.db.update_photo_thumbnails_from_disk(target_path, persist_to_disk=False)
             self.thumb_view.invalidate_item(target_path)
@@ -2883,8 +2927,14 @@ class PicasaMainWindow(QMainWindow):
         """
         FR: Ajoute une liste de photos à un album virtuel identifié par son jeton.
         EN: Adds a list of photos to a virtual album identified by its token.
+        Ref: picasa3.exe @ 0x00456A15 (albums=<uid1>,<uid2>)
         """
         if not photo_paths:
+            return
+        clean_tok = (album_token or "").strip()
+        if clean_tok.startswith("]album:") or clean_tok.startswith(".album:"):
+            clean_tok = clean_tok[7:].strip()
+        if not clean_tok:
             return
         for p in photo_paths:
             def _add_alb(doc: PicasaIniDocument, fname: str) -> None:
@@ -2895,8 +2945,12 @@ class PicasaMainWindow(QMainWindow):
                 sec = doc.get_or_create_section(fname)
                 cur = sec.get("albums", "")
                 parts = [x.strip() for x in cur.split(",") if x.strip()]
-                if album_token not in parts:
-                    parts.append(album_token)
+                norm_parts = {
+                    (x[7:].strip() if (x.startswith("]album:") or x.startswith(".album:")) else x).lower()
+                    for x in parts
+                }
+                if clean_tok.lower() not in norm_parts:
+                    parts.append(clean_tok)
                     sec.set("albums", ",".join(parts))
             self._update_photo_ini(p, _add_alb)
         self.notify_albums_changed()

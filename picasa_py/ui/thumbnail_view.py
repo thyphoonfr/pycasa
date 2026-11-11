@@ -149,6 +149,7 @@ class ViewportThumbWorker:
         self._failed_items: Set[int] = set()
         self.completed: Deque[Tuple[int, int, QImage, Any]] = deque()
         self._thread: Optional[threading.Thread] = None
+        self._stopped: bool = False
 
     def schedule(
         self,
@@ -172,6 +173,7 @@ class ViewportThumbWorker:
             return
         queue_key = (-item_idx - 1) if is_face else item_idx
         with self._cond:
+            self._stopped = False
             if queue_key in self._in_flight or queue_key in self._failed_items:
                 return
             self._pending_lifo = [t for t in self._pending_lifo if t[0] != queue_key]
@@ -216,6 +218,22 @@ class ViewportThumbWorker:
             self._failed_items.clear()
             self.completed.clear()
 
+    def stop(self) -> None:
+        """
+        FR: Arrête proprement le thread d'arrière-plan et vide la file d'attente lors de la fermeture de la vue.
+        EN: Cleanly stops the background thread and clears the queue when the view is closed.
+        Ref: picasa3.exe @ 0x00414C90 (CThumbMaker::~CThumbMaker)
+        """
+        with self._cond:
+            self._stopped = True
+            self._pending_lifo.clear()
+            self._in_flight.clear()
+            self.completed.clear()
+            self._cond.notify_all()
+        thr = self._thread
+        if thr is not None and thr.is_alive() and thr is not threading.current_thread():
+            thr.join(timeout=0.5)
+
     def _run_loop(self) -> None:
         """
         FR: Boucle de traitement d'arrière-plan qui décode les miniatures DB, recadre les avatars de visages
@@ -233,9 +251,11 @@ class ViewportThumbWorker:
 
         while True:
             with self._cond:
+                if self._stopped:
+                    return
                 if not self._pending_lifo:
                     self._cond.wait(timeout=2.0)
-                    if not self._pending_lifo:
+                    if self._stopped or not self._pending_lifo:
                         return
                 queue_key, db_idx, path, is_backup_only, db_ref, db_fast, face_rect, contact_id, avatar_size = self._pending_lifo.pop()
                 self._in_flight.add(queue_key)
@@ -358,6 +378,8 @@ class ViewportThumbWorker:
 
             with self._cond:
                 self._in_flight.discard(queue_key)
+                if self._stopped:
+                    return
                 if qimg is not None and not qimg.isNull():
                     self.completed.append((queue_key, db_idx, qimg, pil_img))
                 else:
@@ -494,6 +516,7 @@ class PicasaThumbnailView(QWidget):
 
         # En-tête globale / filtre actif
         self.current_folder_filter: Optional[str] = None
+        self._current_person_filter: Optional[str] = None
         self._unfiltered_special_sections: List[AlbumSection] = []
         self.show_hidden: bool = False  # Ref: picasa3.exe @ 0x00564ED4, 0x00660C84 ([eax + 0x3188] ShowHidden)
         self.quick_filter_starred: bool = False
@@ -561,6 +584,22 @@ class PicasaThumbnailView(QWidget):
         EN: Forces repainting of album and person headers when the active language changes.
         """
         self.update()
+
+    def closeEvent(self, event) -> None:
+        """
+        FR: Arrête les minuteries et les threads de vignettes/regroupement lors de la fermeture de la vue.
+        EN: Stops timers and thumbnail/clustering worker threads when the view is closed.
+        Ref: picasa3.exe @ 0x00414C90 (CThumbMaker::~CThumbMaker), 0x007301F0
+        """
+        for timer_attr in ("_thumb_flush_timer", "_selection_emit_timer", "_zoom_settle_timer"):
+            timer = getattr(self, timer_attr, None)
+            if timer is not None:
+                timer.stop()
+        if hasattr(self, "_thumb_worker") and self._thumb_worker is not None:
+            self._thumb_worker.stop()
+        if hasattr(self, "_cluster_worker") and self._cluster_worker is not None and self._cluster_worker.isRunning():
+            self._cluster_worker.wait(500)
+        super().closeEvent(event)
 
     def _extract_album_meta_map(self, db: PicasaDatabase) -> Dict[str, Tuple[str, str]]:
         """
@@ -1273,6 +1312,8 @@ class PicasaThumbnailView(QWidget):
         EN: Filters thumbnails by a specific folder, or displays all albums in a
         continuous scrolling stream if None (authentic Picasa 3 behavior).
         """
+        if folder_path is None or not str(folder_path).startswith("person:"):
+            self._current_person_filter = None
         if folder_path is None or (not folder_path.startswith("person:") and folder_path != "unnamed_faces"):
             self._reset_synthetic_items()
         self.current_folder_filter = folder_path
@@ -1536,6 +1577,7 @@ class PicasaThumbnailView(QWidget):
         # Rétablir l'ensemble des sections visibles pour le flux continu en respectant ShowHidden et les filtres rapides
         if self.current_folder_filter is not None:
             self._reset_synthetic_items()
+            self._current_person_filter = None
             self.current_folder_filter = None
             self._unfiltered_special_sections.clear()
             self._apply_current_filters(reset_scroll=False)
@@ -1554,6 +1596,25 @@ class PicasaThumbnailView(QWidget):
             self.scroll_y = new_scroll
             self.update()
 
+    @property
+    def current_person_filter(self) -> Optional[str]:
+        """
+        FR: Retourne l'identifiant du contact de la personne actuellement filtrée dans la grille (ou None).
+        EN: Returns the contact ID of the person currently filtered in the grid (or None).
+        Ref: picasa3.exe @ PplAlbumPhoto context menu
+        """
+        if self._current_person_filter:
+            return self._current_person_filter
+        if self.current_folder_filter and str(self.current_folder_filter).startswith("person:"):
+            cid = str(self.current_folder_filter)[7:]
+            if cid and cid != "__unnamed__":
+                return cid
+        return None
+
+    @current_person_filter.setter
+    def current_person_filter(self, val: Optional[str]) -> None:
+        self._current_person_filter = val
+
     def filter_by_person(
         self,
         contact_id: str,
@@ -1568,6 +1629,7 @@ class PicasaThumbnailView(QWidget):
         suggestion items, and suggestions-only filtering.
         Ref: picasa3.exe @ faceheaderpanel/face_zoom, picture_zoom, sug_filter, confirmsug, sug_label
         """
+        self._current_person_filter = contact_id if contact_id and contact_id != "__unnamed__" else None
         self.current_folder_filter = f"person:{contact_id}"
 
         # Nettoyer les items spécifiques précédents et invalider les caches associés aux anciens indices synthétiques
@@ -1743,6 +1805,7 @@ class PicasaThumbnailView(QWidget):
         Ref: picasa3.exe @ unknownfaceheaderpanel (cluster, addname, ignore), CThumbDB::unknownfacealbum
         """
         self._cancel_inline_face_name_edit()
+        self._current_person_filter = None
         self.current_folder_filter = "unnamed_faces"
 
         # Retirer les items synthétiques précédents en O(1) via la tranche de base
@@ -2033,6 +2096,7 @@ class PicasaThumbnailView(QWidget):
         Ref: picasa3.exe @ 0x0074C200 (unknownfaceheaderpanel), 0x00789C00 (faceclusterpanel)
         """
         self._cancel_inline_face_name_edit()
+        self._current_person_filter = None
         self.current_folder_filter = "unnamed_faces"
         self._reset_synthetic_items()
 
@@ -2149,6 +2213,7 @@ class PicasaThumbnailView(QWidget):
         EN: Displays photos associated with a virtual album.
         Ref: picasa3.exe @ 0x00732160 (Album display & slice)
         """
+        self._current_person_filter = None
         self.current_folder_filter = f"album:{album_token}"
         album_sec = AlbumSection(
             name=album_name,
@@ -2174,6 +2239,7 @@ class PicasaThumbnailView(QWidget):
         EN: Displays the virtual album of starred (favorite) photos.
         Ref: picasa3.exe @ CThumbDB::starredphotos (0x0088F6FC, 0x0068B800, 0x00C811D4)
         """
+        self._current_person_filter = None
         self.current_folder_filter = "special:starred"
         base_items = self._get_base_items()
         excluded_other_folders: Set[str] = set()
@@ -2233,6 +2299,7 @@ class PicasaThumbnailView(QWidget):
         EN: Displays photos matching the search query criteria.
         Ref: picasa3.exe @ 0x0088C3EC (Search & Filters)
         """
+        self._current_person_filter = None
         self.current_folder_filter = f"search:{query}"
         search_sec = AlbumSection(
             name=f'Recherche : "{query}"',

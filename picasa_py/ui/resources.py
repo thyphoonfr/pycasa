@@ -342,6 +342,36 @@ class PicasaResourceManager:
         self._cursors[cursor_id] = cursor
         return cursor
 
+    _XML_ID_ALIASES: Dict[str, str] = {
+        "collagepanel/scramble.title": "collagepanel/rand_placement-label",
+        "collagepanel/create.title": "collagepanel/sharebutton-label",
+        "customaspectratio/labelgroup2.title": "customaspectratio/labelgroup3.title",
+        "customaspectratio/button15.title": "customaspectratio/ok.title",
+        "customaspectratio/button16.title": "customaspectratio/cancel.title",
+        "compose_mail_text/to.title": "compose_mail/to_text",
+        "compose_mail_text/subject.title": "compose_mail/subject_text",
+        "CFolderMgrDialog::title": "foldermgr::title",
+        "acquirepanel/fromtext": "acquirepanel/import_from_label",
+        "acquirepanel/totext": "acquirepanel/import_to_label",
+        "acquirepanel/foldertitletext": "acquirepanel/subfolder_label",
+        "acquirepanel/dup_checkbox": "acquirepanel/excludedupes_label",
+        "acquirepanel/aftercopyinglabel": "acquirepanel/delete_label",
+        "SelectAll": "Address::ID_SELECTALL",
+        "SelectNone": "publish/selectnone",
+        "CAlbumList::liststicky8": "CAlbumList::liststicky7",
+        "makemoviepanel/create.title": "makemoviepanel/render",
+        "peoplepanel/add_person": "peoplepanel/manual_add",
+        "peoplepanel/cancel.title": "peoplepanel/manual_cancel",
+        "buttonmgr": "buttonmgr::title",
+        "buttonmgr/available": "buttonmgr/leftlist_text",
+        "buttonmgr/current": "buttonmgr/rightlist_text",
+        "buttonmgr/reset": "buttonmgr/usedefaults",
+        "outputlayout/email": "outputlayout/ebutton",
+        "outputlayout/print": "outputlayout/pbutton",
+        "outputlayout/export": "outputlayout/folderbutton",
+        "outputlayout/movie": "outputlayout/makemovie",
+    }
+
     def get_stringres(self, res_id: str, default: str = "") -> str:
         r"""
         FR: Récupère une chaîne traduite depuis STRINGRES.XML ou STRINGRES_{LANG}.XML.
@@ -353,85 +383,148 @@ class PicasaResourceManager:
         if cache is None:
             cache = {}
             xml_dir = self.base_dir / "xml"
-            res_file = xml_dir / f"STRINGRES{suffix}.XML"
-            if not res_file.exists() and suffix:
-                res_file = xml_dir / "STRINGRES.XML"
-
-            if res_file.exists():
-                import xml.etree.ElementTree as ET
+            candidates = [
+                xml_dir / f"STRINGRES{suffix}.XML",
+                xml_dir / "STRINGRES.XML",
+                xml_dir / "STRINGRES_EN-GB.XML",
+            ]
+            import xml.etree.ElementTree as ET
+            seen: set[Path] = set()
+            for res_file in candidates:
+                if res_file in seen or not res_file.exists():
+                    continue
+                seen.add(res_file)
                 try:
                     tree = ET.parse(res_file)
                     root = tree.getroot()
                     for sres in root.findall(".//stringres"):
                         s_id = sres.attrib.get("id")
                         xmb = sres.find("xmbtext")
-                        if s_id and xmb is not None and xmb.text:
+                        if s_id and xmb is not None and xmb.text and s_id not in cache:
                             cache[s_id] = xmb.text
                 except Exception:
                     pass
             self._stringres_cache[suffix] = cache
 
-        return cache.get(res_id, default)
+        if res_id in cache:
+            return cache[res_id]
+        alias_id = self._XML_ID_ALIASES.get(res_id)
+        if alias_id and alias_id in cache:
+            return cache[alias_id]
+        return default
 
-    def get_xml_string(self, xml_id: str, default: str = "") -> str:
+    def get_xml_string(self, xml_id: str, default: str = "", extra_default: Optional[str] = None) -> str:
         """
         FR: Récupère une chaîne depuis les fichiers XML de ressources (ex: options/tab3.title).
+        Supporte également l'appel à 3 arguments `(file_stem, xml_id, default)`.
         Recherche en priorité dans la version de la langue active, puis dans le fichier de base,
         puis en anglais (_EN-GB), puis en français (_FR). Ne remplace jamais une clé déjà trouvée.
         EN: Retrieves a string from XML resource files (e.g., options/tab3.title).
+        Also supports 3-argument calls `(file_stem, xml_id, default)`.
         Searches first in the active language file, then in the base file, then in English (_EN-GB),
         then in French (_FR). Never overwrites an already cached key.
+        Ref: picasa3.exe @ 0x004055D4 (XML / STRINGRES / TOOLTIPS loader)
         """
+        explicit_stem: Optional[str] = None
+        if extra_default is not None:
+            explicit_stem = xml_id.upper()
+            xml_id = default
+            default = extra_default
+
+        lookup_id = self._XML_ID_ALIASES.get(xml_id, xml_id)
         if xml_id in self._xml_strings:
             return self._xml_strings[xml_id]
+        if lookup_id in self._xml_strings:
+            return self._xml_strings[lookup_id]
 
-        if "/" in xml_id:
-            prefix = xml_id.split("/")[0].upper()
-            xml_dir = self.base_dir / "xml"
-            suffix = self._get_lang_suffix()
-            candidates = [
-                xml_dir / f"{prefix}{suffix}.XML",
-                xml_dir / f"{prefix}.XML",
-                xml_dir / f"{prefix}_EN-GB.XML",
-                xml_dir / f"{prefix}_FR.XML",
-                xml_dir / f"TOOLTIPS{suffix}.XML",
-                xml_dir / "TOOLTIPS.XML",
-                xml_dir / "TOOLTIPS_EN-GB.XML",
-                xml_dir / "TOOLTIPS_FR.XML",
-            ]
-            import xml.etree.ElementTree as ET
-            seen: set[Path] = set()
-            for cand in candidates:
-                if cand in seen or not cand.exists():
-                    continue
-                seen.add(cand)
-                try:
-                    tree = ET.parse(cand)
-                    root = tree.getroot()
-                    for sres in root.findall(".//stringres"):
-                        s_id = sres.attrib.get("id")
-                        xmb = sres.find("xmbtext")
-                        if s_id and xmb is not None and xmb.text and s_id not in self._xml_strings:
+        xml_dir = self.base_dir / "xml"
+        suffix = self._get_lang_suffix()
+        prefixes: list[str] = []
+        if explicit_stem:
+            prefixes.append(explicit_stem)
+        if "/" in lookup_id:
+            p0 = lookup_id.split("/")[0].upper()
+            for cand_p in (p0, f"{p0}_TEXT", f"{p0}TEXT"):
+                if cand_p not in prefixes:
+                    prefixes.append(cand_p)
+        elif "/" in xml_id:
+            p0 = xml_id.split("/")[0].upper()
+            for cand_p in (p0, f"{p0}_TEXT", f"{p0}TEXT"):
+                if cand_p not in prefixes:
+                    prefixes.append(cand_p)
+        elif "::" in lookup_id:
+            p0 = lookup_id.split("::")[0].upper().lstrip("C")
+            for cand_p in (p0, f"{p0}_TEXT", f"{p0}TEXT"):
+                if cand_p not in prefixes:
+                    prefixes.append(cand_p)
+
+        candidates: list[Path] = []
+        for pref in prefixes:
+            candidates.extend([
+                xml_dir / f"{pref}{suffix}.XML",
+                xml_dir / f"{pref}.XML",
+                xml_dir / f"{pref}_EN-GB.XML",
+                xml_dir / f"{pref}_FR.XML",
+            ])
+        candidates.extend([
+            xml_dir / f"TOOLTIPS{suffix}.XML",
+            xml_dir / "TOOLTIPS.XML",
+            xml_dir / "TOOLTIPS_EN-GB.XML",
+            xml_dir / "TOOLTIPS_FR.XML",
+        ])
+
+        import xml.etree.ElementTree as ET
+        seen: set[Path] = set()
+        for cand in candidates:
+            if cand in seen or not cand.exists():
+                continue
+            seen.add(cand)
+            try:
+                tree = ET.parse(cand)
+                root = tree.getroot()
+                for sres in root.findall(".//stringres"):
+                    s_id = sres.attrib.get("id")
+                    xmb = sres.find("xmbtext")
+                    if s_id and xmb is not None and xmb.text:
+                        if s_id not in self._xml_strings:
                             self._xml_strings[s_id] = xmb.text
-                    for act in root.findall(".//action"):
-                        target = act.attrib.get("target")
-                        prop = act.attrib.get("property", "")
-                        xmb = act.find("xmbtext")
-                        if target and xmb is not None and xmb.text:
-                            if prop == "Tooltip":
-                                tip_key = f"{target}.tooltip"
-                                if tip_key not in self._xml_strings:
-                                    self._xml_strings[tip_key] = xmb.text
-                                if target not in self._xml_strings:
-                                    self._xml_strings[target] = xmb.text
-                            elif target not in self._xml_strings:
+                        if s_id.endswith(".title"):
+                            bare = s_id[:-6]
+                            if bare not in self._xml_strings:
+                                self._xml_strings[bare] = xmb.text
+                for act in root.findall(".//action"):
+                    target = act.attrib.get("target")
+                    prop = act.attrib.get("type") or act.attrib.get("property", "")
+                    xmb = act.find("xmbtext")
+                    if target and xmb is not None and xmb.text:
+                        if prop == "Tooltip":
+                            tip_key = f"{target}.tooltip"
+                            if tip_key not in self._xml_strings:
+                                self._xml_strings[tip_key] = xmb.text
+                        else:
+                            if target not in self._xml_strings:
                                 self._xml_strings[target] = xmb.text
-                except Exception:
-                    pass
+                            title_key = f"{target}.title"
+                            if title_key not in self._xml_strings:
+                                self._xml_strings[title_key] = xmb.text
+            except Exception:
+                pass
 
-        val = self._xml_strings.get(xml_id, default)
-        self._xml_strings[xml_id] = val
-        return val
+        if xml_id in self._xml_strings:
+            return self._xml_strings[xml_id]
+        if lookup_id in self._xml_strings:
+            self._xml_strings[xml_id] = self._xml_strings[lookup_id]
+            return self._xml_strings[lookup_id]
+
+        # Repli sur STRINGRES_*.XML si la clé y est définie
+        sres_val = self.get_stringres(lookup_id, "")
+        if not sres_val and lookup_id != xml_id:
+            sres_val = self.get_stringres(xml_id, "")
+        if sres_val:
+            self._xml_strings[xml_id] = sres_val
+            return sres_val
+
+        return default
 
     def get_edit_tab_icon(self, tab_index: int) -> QIcon:
         """

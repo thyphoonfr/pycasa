@@ -3152,6 +3152,9 @@ class PicasaOneUpView(QWidget):
             if icc_profile:
                 save_kwargs["icc_profile"] = icc_profile
 
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(os.path.dirname(os.path.abspath(target_path)))
+
             ext = target_p.suffix.lower()
             if ext in (".jpg", ".jpeg"):
                 # Ref: picasa3.exe @ 0x00A3D67B (quality=90 = 0x5A), 0x009D5432 (preserve source chroma subsampling)
@@ -3224,22 +3227,28 @@ class PicasaOneUpView(QWidget):
                         rec.ft2 = ft2_new
                         rec.size = fsize_new
                         rec.file_size = fsize_new
+                        rec.dirty = True
                         self.db.thumbindex.dirty = True
                         saved_w = int(img_to_save.width)
                         saved_h = int(img_to_save.height)
                         for col_n, col_v in (
+                            ("imagedata_filesize", fsize_new),
                             ("imagedata_width", saved_w),
                             ("imagedata_height", saved_h),
-                            ("imagedata_edit_width", saved_w),
-                            ("imagedata_edit_height", saved_h),
+                            ("imagedata_edit_width", 0),
+                            ("imagedata_edit_height", 0),
                             ("imagedata_originfast", compute_originfast_hash(Path(target_path))),
                             ("imagedata_revertable", 1),
                             ("imagedata_backuphash", int(b_hash) & 0xFFFF),
+                            ("imagedata_edited", 0),
+                            ("imagedata_filters", ""),
                         ):
                             pmp_c = self.db.pmps.get(col_n)
                             if pmp_c is not None and rec_idx < len(pmp_c.records):
                                 pmp_c.records[rec_idx] = col_v
                                 pmp_c.dirty = True
+                        if hasattr(self.db, "sync_file_stat_and_checksums"):
+                            self.db.sync_file_stat_and_checksums(rec_idx)
                 except Exception:
                     pass
 
