@@ -755,8 +755,16 @@ class PicasaFaceManager:
             if conf is not None:
                 try:
                     pan = float(getattr(face_rect, "pan", 0.0) or 0.0)
-                    lx, ly = getattr(face_rect, "left_eye", (0.0, 0.0)) or (0.0, 0.0)
-                    rx, ry = getattr(face_rect, "right_eye", (0.0, 0.0)) or (0.0, 0.0)
+                    lx, ly = (
+                        getattr(face_rect, "leye", None)
+                        or getattr(face_rect, "left_eye", None)
+                        or (0.0, 0.0)
+                    )
+                    rx, ry = (
+                        getattr(face_rect, "reye", None)
+                        or getattr(face_rect, "right_eye", None)
+                        or (0.0, 0.0)
+                    )
                     mx, my = getattr(face_rect, "mouth", (0.0, 0.0)) or (0.0, 0.0)
                     # Ref: picasa3.exe @ 0x00414584, formats @ 0x00C80C90
                     _setc(

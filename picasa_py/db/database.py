@@ -1606,12 +1606,18 @@ class PicasaDatabase:
                     from picasa_py.scanner.scanner import _extract_exif_gps
                     with _PilImg.open(photo_path_str) as _im:
                         _ex = _im.getexif() if hasattr(_im, "getexif") else None
-                        _lat, _lon = _extract_exif_gps(_ex, _im)
+                        _lat, _lon = _extract_exif_gps(_im, _ex)
                         if _lat is not None and _lon is not None:
                             return float(_lat), float(_lon)
                 except Exception:
                     pass
             return 0.0, 0.0
+
+        iptc_cap, iptc_kws = (
+            self.extract_jpeg_iptc_metadata(photo_path_str)
+            if photo_path_str
+            else ("", [])
+        )
 
         edited_val = 0
         lat_val: Optional[float] = None
@@ -1624,8 +1630,10 @@ class PicasaDatabase:
             _set_pmp("imagedata_edited", edited_val)
             _set_pmp("imagedata_text", "")
             _set_pmp("imagedata_textactive", 0)
-            _set_pmp("imagedata_tags", "")
-            _set_pmp("imagedata_caption", "")
+            tags_fallback = ",".join(iptc_kws) if iptc_kws else ""
+            cap_fallback = iptc_cap or ""
+            _set_pmp("imagedata_tags", tags_fallback)
+            _set_pmp("imagedata_caption", cap_fallback)
             _set_pmp("imagedata_deferredface", "")
             _set_pmp("imagedata_backuphash", 0)
             pmp_lat_c = self.pmps.get("imagedata_lat")
@@ -1646,16 +1654,25 @@ class PicasaDatabase:
                 _set_pmp("imagedata_revertable", 1)
             elif photo_path_str and os.path.exists(photo_path_str):
                 _set_pmp("imagedata_revertable", 0)
-            if self.wordhash is not None and hasattr(self.wordhash, "remove_word"):
+            if self.wordhash is not None:
                 from picasa_py.scanner.scanner import tokenize_indexer_text
-                path_keep: Set[str] = set(tokenize_indexer_text(photo_path_str or ""))
-                for old_src in (old_tags_val, old_cap_val, old_text_val):
-                    if old_src:
-                        for old_tok in tokenize_indexer_text(old_src):
-                            if old_tok not in path_keep:
-                                self.wordhash.remove_word(old_tok, idx)
-                for st_tok in ("]star", "]hidden", "]screensaver", "]rating"):
-                    self.wordhash.remove_word(st_tok, idx)
+                fallback_words: List[str] = []
+                for kw in iptc_kws:
+                    if kw.strip():
+                        fallback_words.extend(tokenize_indexer_text(kw.strip()))
+                if cap_fallback:
+                    fallback_words.extend(tokenize_indexer_text(cap_fallback))
+                if hasattr(self.wordhash, "remove_word"):
+                    path_keep: Set[str] = set(fallback_words) | set(tokenize_indexer_text(photo_path_str or ""))
+                    for old_src in (old_tags_val, old_cap_val, old_text_val):
+                        if old_src:
+                            for old_tok in tokenize_indexer_text(old_src):
+                                if old_tok not in path_keep:
+                                    self.wordhash.remove_word(old_tok, idx)
+                    for st_tok in ("]star", "]hidden", "]screensaver", "]rating"):
+                        self.wordhash.remove_word(st_tok, idx)
+                for fw_tok in fallback_words:
+                    self.wordhash.add_word(fw_tok, idx)
                 ad_uids_col = self.pmps.get("albumdata_uid")
                 ad_toks_col = self.pmps.get("albumdata_token")
                 ad_cats_col = self.pmps.get("albumdata_category")
@@ -1670,9 +1687,10 @@ class PicasaDatabase:
                                 s = s[7:].strip()
                             if s and not s.startswith("]"):
                                 known_albs.add(s)
-                for ka in known_albs:
-                    self.wordhash.remove_word(f"]album:{ka}", idx)
-                    self.wordhash.remove_word(f"]snapshot:]album:{ka}", idx)
+                if hasattr(self.wordhash, "remove_word"):
+                    for ka in known_albs:
+                        self.wordhash.remove_word(f"]album:{ka}", idx)
+                        self.wordhash.remove_word(f"]snapshot:]album:{ka}", idx)
         else:
             filters_str = sec.get("filters", "") or ""
             # Ref: func_00456a15.c:3352-3460 — legacy fix=1 / bw=1 synthesis when filters= is absent
@@ -1706,10 +1724,10 @@ class PicasaDatabase:
             edited_val = 1 if (filters_str or crop_u64 or text_active) else (2 if rot > 0 else 0)
             _set_pmp("imagedata_edited", edited_val)
 
-            tags_val = sec.get("keywords", "") or ""
+            tags_val = sec.get("keywords", "") or (",".join(iptc_kws) if iptc_kws else "")
             _set_pmp("imagedata_tags", tags_val if tags_val else "")
 
-            cap_val = sec.get("caption", "") or ""
+            cap_val = sec.get("caption", "") or iptc_cap or ""
             _set_pmp("imagedata_caption", cap_val if cap_val else "")
 
             # Ref: func_00456a15.c:809-862 (onlinechecksum -> uint16 dans imagedata_peoplealbumchecksum.pmp)
@@ -2121,6 +2139,129 @@ class PicasaDatabase:
             return True
         except Exception:
             return False
+
+    @staticmethod
+    def extract_jpeg_iptc_metadata(file_path: str | Path) -> Tuple[str, List[str]]:
+        """
+        FR: Extrait la légende (`IPTC 2:120 Caption-Abstract`) et la liste des mots-clés
+        (`IPTC 2:25 Keywords`, avec gestion de `1:90 Coded Character Set = "\\x1b%G"` en UTF-8)
+        depuis le segment `APP13` (`0xFFED`, `"Photoshop 3.0\\x008BIM\\x04\\x04"`) d'un fichier JPEG,
+        sans lire le flux d'image compressé après `SOS` (`0xFFDA`).
+        Ref: picasa3.exe @ 0x00438450..0x004385CE, 0x00456150..0x004561F3, 0x00C77B10, 0x00AB06D0, 0x009ED330
+        EN: Extracts the caption (`IPTC 2:120 Caption-Abstract`) and keyword list
+        (`IPTC 2:25 Keywords`, supporting `1:90 Coded Character Set = "\\x1b%G"` UTF-8)
+        from the `APP13` (`0xFFED`, `"Photoshop 3.0\\x008BIM\\x04\\x04"`) segment of a JPEG file,
+        without reading the compressed scan stream past `SOS` (`0xFFDA`).
+        """
+        if not file_path:
+            return "", []
+        fp_str = str(file_path)
+        if not fp_str.lower().endswith((".jpg", ".jpeg")) or not os.path.isfile(fp_str):
+            return "", []
+
+        photoshop_hdr = b"Photoshop 3.0\x00"
+        app13_payload: Optional[bytes] = None
+        try:
+            with open(fp_str, "rb") as fh:
+                if fh.read(2) != b"\xff\xd8":
+                    return "", []
+                while True:
+                    b = fh.read(1)
+                    if not b:
+                        break
+                    if b != b"\xff":
+                        break
+                    while b == b"\xff":
+                        b = fh.read(1)
+                    if not b:
+                        break
+                    marker = b[0]
+                    if marker in (0xD9, 0xDA):
+                        break
+                    if marker in (0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8):
+                        continue
+                    len_b = fh.read(2)
+                    if len(len_b) < 2:
+                        break
+                    seg_len = struct.unpack(">H", len_b)[0]
+                    if seg_len < 2:
+                        break
+                    payload_len = seg_len - 2
+                    if marker == 0xED:
+                        payload = fh.read(payload_len)
+                        if len(payload) == payload_len and payload.startswith(photoshop_hdr):
+                            app13_payload = payload
+                            break
+                    else:
+                        fh.seek(payload_len, 1)
+        except OSError:
+            return "", []
+
+        if not app13_payload:
+            return "", []
+
+        bpos = len(photoshop_hdr)
+        blen = len(app13_payload)
+        iptc_datasets: List[Tuple[int, int, bytes]] = []
+        while bpos + 8 <= blen:
+            if app13_payload[bpos : bpos + 4] != b"8BIM":
+                break
+            res_id = struct.unpack_from(">H", app13_payload, bpos + 4)[0]
+            name_len = app13_payload[bpos + 6]
+            padded_name_len = name_len + 1 + ((name_len + 1) & 1)
+            size_off = bpos + 6 + padded_name_len
+            if size_off + 4 > blen:
+                break
+            res_size = struct.unpack_from(">I", app13_payload, size_off)[0]
+            data_start = size_off + 4
+            data_end = data_start + res_size
+            if data_end > blen:
+                break
+            padded_data_end = data_end + (res_size & 1)
+            if res_id == 0x0404:
+                iptc_raw = app13_payload[data_start:data_end]
+                ipos = 0
+                ilen = len(iptc_raw)
+                while ipos + 5 <= ilen:
+                    if iptc_raw[ipos] != 0x1C:
+                        break
+                    rec_no = iptc_raw[ipos + 1]
+                    ds_no = iptc_raw[ipos + 2]
+                    ds_len = struct.unpack_from(">H", iptc_raw, ipos + 3)[0]
+                    if ipos + 5 + ds_len > ilen:
+                        break
+                    iptc_datasets.append((rec_no, ds_no, iptc_raw[ipos + 5 : ipos + 5 + ds_len]))
+                    ipos += 5 + ds_len
+                break
+            bpos = padded_data_end
+
+        if not iptc_datasets:
+            return "", []
+
+        is_utf8 = any(r == 1 and d == 90 and v == b"\x1b%G" for (r, d, v) in iptc_datasets)
+
+        def _decode_iptc_str(raw_v: bytes) -> str:
+            if not raw_v:
+                return ""
+            if is_utf8:
+                return raw_v.decode("utf-8", errors="replace").strip("\x00")
+            try:
+                return raw_v.decode("utf-8").strip("\x00")
+            except UnicodeDecodeError:
+                return raw_v.decode("cp1252", errors="replace").strip("\x00")
+
+        caption_out = ""
+        keywords_out: List[str] = []
+        seen_kw: Set[str] = set()
+        for rec_no, ds_no, val_b in iptc_datasets:
+            if rec_no == 2 and ds_no == 120:
+                caption_out = _decode_iptc_str(val_b)
+            elif rec_no == 2 and ds_no == 25:
+                kw_s = _decode_iptc_str(val_b).strip()
+                if kw_s and kw_s.lower() not in seen_kw:
+                    seen_kw.add(kw_s.lower())
+                    keywords_out.append(kw_s)
+        return caption_out, keywords_out
 
     def _update_jpeg_iptc_metadata(
         self,
@@ -3835,6 +3976,30 @@ class PicasaDatabase:
         # tout album (dynamique, utilisateur `cat=0` chargé depuis `.pal`, ou `.picasa.ini`) ayant 0 photo
         # active indexée dans la base courante est masqué de `CAlbumListUI`, à l'exception des albums
         # créés par l'utilisateur durant la session courante (`self._session_created_albums`).
+        fsize_pmp = self.pmps.get("imagedata_filesize")
+        fsize_recs = fsize_pmp.records if fsize_pmp is not None else None
+        idate_pmp = self.pmps.get("imagedata_date") or self.pmps.get("imagedata_tagdate")
+        idate_recs = idate_pmp.records if idate_pmp is not None else None
+        ti_recs = self.thumbindex.records if self.thumbindex is not None else None
+
+        def _parse_album_ole_date(raw_dt: Any) -> float:
+            if raw_dt is None or raw_dt == "":
+                return 0.0
+            if isinstance(raw_dt, (int, float)):
+                return float(raw_dt)
+            s_dt = str(raw_dt).strip()
+            try:
+                return float(s_dt)
+            except ValueError:
+                pass
+            for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y"):
+                try:
+                    dt_obj = datetime.strptime(s_dt[:10], fmt)
+                    return (dt_obj - datetime(1899, 12, 30)).total_seconds() / 86400.0
+                except Exception:
+                    pass
+            return 0.0
+
         res_list: List[Dict[str, Any]] = []
         for tok, alb_info in albums.items():
             src = alb_info.get("source")
@@ -3846,6 +4011,43 @@ class PicasaDatabase:
                     continue
                 if src == "ini" and len(alb_info["photo_indices"]) == 0:
                     continue
+            ole_d = _parse_album_ole_date(alb_info.get("date"))
+            max_ph_d = ole_d
+            tot_sz = 0
+            for r_idx in alb_info["photo_indices"]:
+                if fsize_recs is not None and 0 <= r_idx < len(fsize_recs) and fsize_recs[r_idx]:
+                    try:
+                        tot_sz += int(fsize_recs[r_idx])
+                    except Exception:
+                        pass
+                elif ti_recs is not None and 0 <= r_idx < len(ti_recs) and getattr(ti_recs[r_idx], "size", 0):
+                    try:
+                        tot_sz += int(ti_recs[r_idx].size)
+                    except Exception:
+                        pass
+                if idate_recs is not None and 0 <= r_idx < len(idate_recs) and idate_recs[r_idx]:
+                    try:
+                        dv = float(idate_recs[r_idx])
+                        if dv > max_ph_d:
+                            max_ph_d = dv
+                        continue
+                    except Exception:
+                        pass
+                if ti_recs is not None and 0 <= r_idx < len(ti_recs) and hasattr(ti_recs[r_idx], "to_unix_timestamp"):
+                    try:
+                        ts = ti_recs[r_idx].to_unix_timestamp()
+                        if ts > 0:
+                            dv = 25569.0 + (ts / 86400.0)
+                            if dv > max_ph_d:
+                                max_ph_d = dv
+                    except Exception:
+                        pass
+            if ole_d <= 0.0 and max_ph_d > 0.0:
+                ole_d = max_ph_d
+            alb_info["ole_date"] = ole_d
+            alb_info["max_photo_date"] = max_ph_d
+            alb_info["total_size"] = tot_sz
+            alb_info["count"] = max(len(alb_info["photo_paths"]), len(alb_info["photo_indices"]))
             res_list.append(alb_info)
 
         self._albums_cache = [

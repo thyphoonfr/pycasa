@@ -527,18 +527,45 @@ class PicasaLibraryTree(QWidget):
         and `self.album_list_flip` (`Preferences\\albumlistflip`), matching `CompareAlbumsAndFolders` (`0x004A7D7F..0x004A8054`).
         Ref: picasa3.exe @ 0x004A7D7F - 0x004A8054
         """
+        def _alb_ole(a: Dict[str, Any]) -> float:
+            raw = a.get("ole_date", a.get("date", 0.0))
+            if raw is None or raw == "":
+                return 0.0
+            try:
+                return float(raw)
+            except Exception:
+                return 0.0
+
+        def _alb_max_photo_date(a: Dict[str, Any]) -> float:
+            raw = a.get("max_photo_date")
+            if raw is not None and raw != "":
+                try:
+                    return float(raw)
+                except Exception:
+                    pass
+            return _alb_ole(a)
+
         mode = self.date_sort_mode
         if mode == 1:
             res = sorted(
                 albums,
-                key=lambda a: (-int(a.get("count", len(a.get("photo_paths", [])))), (a.get("name") or "").lower()),
+                key=lambda a: (
+                    -int(a.get("total_size", 0) or 0),
+                    -int(a.get("count", len(a.get("photo_paths", [])))),
+                    (a.get("name") or "").lower(),
+                ),
             )
         elif mode == 2:
             res = sorted(albums, key=lambda a: (a.get("name") or "").lower())
+        elif mode in (4, 5):
+            res = sorted(
+                albums,
+                key=lambda a: (-_alb_max_photo_date(a), -_alb_ole(a), (a.get("name") or "").lower()),
+            )
         else:
             res = sorted(
                 albums,
-                key=lambda a: (-float(a.get("ole_date", 0.0) or 0.0), (a.get("name") or "").lower()),
+                key=lambda a: (-_alb_ole(a), (a.get("name") or "").lower()),
             )
         if self.album_list_flip:
             res.reverse()
@@ -617,7 +644,11 @@ class PicasaLibraryTree(QWidget):
                 idate_recs = (
                     self.db.pmps["imagedata_date"].records
                     if "imagedata_date" in self.db.pmps
-                    else None
+                    else (
+                        self.db.pmps["imagedata_tagdate"].records
+                        if "imagedata_tagdate" in self.db.pmps
+                        else None
+                    )
                 )
                 hidden_wordhash_set: Set[int] = set()
                 wh = getattr(self.db, "wordhash", None)

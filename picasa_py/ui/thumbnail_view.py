@@ -697,7 +697,11 @@ class PicasaThumbnailView(QWidget):
         idate_recs = (
             self.db.pmps["imagedata_date"].records
             if "imagedata_date" in self.db.pmps
-            else None
+            else (
+                self.db.pmps["imagedata_tagdate"].records
+                if "imagedata_tagdate" in self.db.pmps
+                else None
+            )
         )
 
         folder_secs: List[AlbumSection] = []

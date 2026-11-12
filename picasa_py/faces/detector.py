@@ -483,6 +483,8 @@ class PicasaFaceDetector:
                     fr.pan = float(det.pan)  # type: ignore[attr-defined]
                     fr.leye = (float(det.left_norm) + 0.3625 * bw_py, float(det.top_norm) + 0.4790 * bh_py)  # type: ignore[attr-defined]
                     fr.reye = (float(det.left_norm) + 0.6375 * bw_py, float(det.top_norm) + 0.4790 * bh_py)  # type: ignore[attr-defined]
+                    fr.left_eye = fr.leye  # type: ignore[attr-defined]
+                    fr.right_eye = fr.reye  # type: ignore[attr-defined]
                     fr.mouth = (float(det.left_norm) + 0.5000 * bw_py, float(det.top_norm) + 0.7500 * bh_py)  # type: ignore[attr-defined]
                     results_py.append(fr)
                 return results_py
@@ -531,6 +533,8 @@ class PicasaFaceDetector:
                     fr.roll = float(_roll)  # type: ignore[attr-defined]
                     fr.leye = (float(l_f) + 0.3625 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
                     fr.reye = (float(l_f) + 0.6375 * bw_n, float(t_f) + 0.4790 * bh_n)  # type: ignore[attr-defined]
+                    fr.left_eye = fr.leye  # type: ignore[attr-defined]
+                    fr.right_eye = fr.reye  # type: ignore[attr-defined]
                     fr.mouth = (float(l_f) + 0.5000 * bw_n, float(t_f) + 0.7500 * bh_n)  # type: ignore[attr-defined]
                     results.append(fr)
                 return results
@@ -563,6 +567,8 @@ class PicasaFaceDetector:
                         fr.pan = float(det.pan)  # type: ignore[attr-defined]
                         fr.leye = (float(det.left_norm) + 0.3625 * bw_fb, float(det.top_norm) + 0.4790 * bh_fb)  # type: ignore[attr-defined]
                         fr.reye = (float(det.left_norm) + 0.6375 * bw_fb, float(det.top_norm) + 0.4790 * bh_fb)  # type: ignore[attr-defined]
+                        fr.left_eye = fr.leye  # type: ignore[attr-defined]
+                        fr.right_eye = fr.reye  # type: ignore[attr-defined]
                         fr.mouth = (float(det.left_norm) + 0.5000 * bw_fb, float(det.top_norm) + 0.7500 * bh_fb)  # type: ignore[attr-defined]
                         fallback_results.append(fr)
                     return fallback_results

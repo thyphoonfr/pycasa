@@ -711,6 +711,8 @@ def _extract_exif_gps(raw_img: Image.Image, exif_data) -> Tuple[Optional[float],
     EN: Extracts EXIF GPS coordinates (IFD `0x8825`) as signed decimal degrees `(lat, lon)`.
     Ref: picasa3.exe @ imagedata_lat.pmp, imagedata_long.pmp
     """
+    if hasattr(exif_data, "getexif") and not hasattr(raw_img, "getexif"):
+        raw_img, exif_data = exif_data, raw_img
     gps_ifd = None
     try:
         if exif_data is not None and hasattr(exif_data, "get_ifd"):
@@ -2027,6 +2029,9 @@ class PicasaDirScanner:
             if gps_lat is not None and gps_lon is not None:
                 _set_pmp_col("imagedata_lat", float(gps_lat))
                 _set_pmp_col("imagedata_long", float(gps_lon))
+            else:
+                _set_pmp_col("imagedata_lat", 0.0)
+                _set_pmp_col("imagedata_long", 0.0)
 
             if getattr(self.db, "wordhash", None) is not None:
                 folder_p = os.path.dirname(file_path).replace("/", "\\").rstrip("\\") + "\\"
@@ -2036,12 +2041,33 @@ class PicasaDirScanner:
                     else ""
                 )
                 folder_alb_tok = "" if is_video_rec else raw_folder_alb_tok
+                if hasattr(self.db.wordhash, "remove_word"):
+                    all_color_toks = (
+                        "color:red",
+                        "color:orange",
+                        "color:yellow",
+                        "color:green",
+                        "color:cyan",
+                        "color:blue",
+                        "color:purple",
+                        "color:pink",
+                        "color:brown",
+                        "color:black",
+                        "color:white",
+                        "color:gray",
+                    )
+                    new_color_set = set(color_toks)
+                    for old_c_tok in all_color_toks:
+                        if old_c_tok not in new_color_set:
+                            self.db.wordhash.remove_word(old_c_tok, record_idx)
                 for tok in wordhash_tokens_for_media(
                     os.path.basename(file_path), w, h, rec_type, folder_alb_tok, color_toks
                 ):
                     self.db.wordhash.add_word(tok, record_idx)
                 if gps_lat is not None and gps_lon is not None and (float(gps_lat) != 0.0 or float(gps_lon) != 0.0):
                     self.db.wordhash.add_word("]geo", record_idx)
+                elif hasattr(self.db.wordhash, "remove_word"):
+                    self.db.wordhash.remove_word("]geo", record_idx)
 
         # FR: Écritures de miniatures HORS de `with self.db._lock:` (protégées par `_get_block_lock(prefix)`)
         # EN: Thumbnail writes OUTSIDE `with self.db._lock:` (protected by `_get_block_lock(prefix)`)

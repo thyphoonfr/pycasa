@@ -2299,6 +2299,172 @@ def test_pass17_picasaoriginals_ini_face_remap_and_rotate_thumb_parity(tmp_path:
     assert db.pmps["imagedata_height"].records[c_idx] == 100
 
 
+def test_pass18_exif_gps_restore_iptc_scan_wordhash_color_eye_coords_and_album_sort_parity(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les corrections de la 18e passe d'audit picasa3.exe vs PyCasa :
+    1. `_restore_exif_gps_or_zero` dans `sync_photo_ini_to_db` (`clear_geotag`) restaure les coordonnées
+       GPS EXIF d'origine de l'image lorsque `geotag=` est retiré de `.picasa.ini` (`_extract_exif_gps(_im, _ex)`).
+    2. `extract_jpeg_iptc_metadata` extrait sans perte la légende (`IPTC 2:120`) et les mots-clés (`IPTC 2:25`)
+       du segment `APP13` (`0xFFED`) lors du scan ou de la resynchronisation d'un JPEG sans `.picasa.ini`,
+       en peuplant `imagedata_caption.pmp`, `imagedata_tags.pmp` et `wordhash.dat` (`0x00438450`, `0x00456150`, `0x00AB06D0`).
+    3. `PicasaDirScanner.update_indexed_file` retire les anciens jetons `color:*` et `]geo` de `wordhash.dat`
+       lorsqu'une image existante est modifiée sur le disque.
+    4. `_get_or_create_1001_child` persiste les coordonnées oculaires (`leye` / `reye`) non nulles dans
+       `imagedata_facerectdata.pmp` pour les visages issus de `PicasaFaceDetector` (`0x00414584`, `0x00C80C90`).
+    5. `get_all_albums` calcule `ole_date`, `max_photo_date` et `total_size`, et `_sort_album_entries`
+       trie fidèlement les albums par date (`mode=0`), taille (`mode=1`), nom (`mode=2`) et photo la plus récente (`mode=4`).
+    """
+    from PIL import Image
+    from picasa_py.faces.face_manager import PicasaFaceManager
+    from picasa_py.faces.facerect import FaceRect
+    from picasa_py.scanner.scanner import _extract_exif_gps
+
+    db = PicasaDatabase.create_new(tmp_path / "db_root_p18")
+    folder = tmp_path / "PhotosP18"
+    folder.mkdir(parents=True, exist_ok=True)
+
+    # 1. Créer une image JPEG avec GPS EXIF (43.2965 N, 5.3698 E — Marseille)
+    gps_photo = folder / "marseille_gps.jpg"
+    im_red = Image.new("RGB", (80, 80), (240, 20, 20))
+    exif = im_red.getexif()
+    exif[0x8825] = {
+        1: "N",
+        2: (43.0, 17.0, 47.40),
+        3: "E",
+        4: (5.0, 22.0, 11.28),
+    }
+    im_red.save(str(gps_photo), format="JPEG", quality=95, exif=exif.tobytes())
+
+    # Vérifier la résilience de _extract_exif_gps aux deux ordres d'arguments
+    with Image.open(str(gps_photo)) as chk_im:
+        chk_ex = chk_im.getexif()
+        lat_a, lon_a = _extract_exif_gps(chk_im, chk_ex)
+        lat_b, lon_b = _extract_exif_gps(chk_ex, chk_im)
+        assert lat_a is not None and lon_a is not None
+        assert abs(lat_a - 43.2965) < 1e-3
+        assert abs(lon_a - 5.3698) < 1e-3
+        assert lat_a == lat_b and lon_a == lon_b
+
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(folder)
+    idx_gps = db.find_photo_index(str(gps_photo))
+    assert idx_gps is not None
+    assert abs(float(db.pmps["imagedata_lat"].records[idx_gps]) - 43.2965) < 1e-3
+
+    # Surcharger via set_geotag (Paris : 48.8566, 2.3522), puis clear_geotag -> doit restaurer Marseille (43.2965, 5.3698) !
+    assert db.set_geotag(idx_gps, 48.8566, 2.3522) is True
+    assert abs(float(db.pmps["imagedata_lat"].records[idx_gps]) - 48.8566) < 1e-3
+    assert db.clear_geotag(idx_gps) is True
+    assert abs(float(db.pmps["imagedata_lat"].records[idx_gps]) - 43.2965) < 1e-3
+    assert abs(float(db.pmps["imagedata_long"].records[idx_gps]) - 5.3698) < 1e-3
+    assert idx_gps in db.search("]geo")
+
+    # 2. Créer un JPEG contenant des métadonnées IPTC APP13 (2:120 Caption + 2:25 Keywords) mais SANS .picasa.ini
+    iptc_photo = folder / "iptc_externe.jpg"
+    Image.new("RGB", (80, 80), (20, 200, 40)).save(str(iptc_photo), format="JPEG", quality=95)
+    db._update_jpeg_iptc_metadata(
+        str(iptc_photo),
+        -1,
+        caption="Coucher de soleil breton",
+        keywords=["Bretagne", "Océan"],
+    )
+    cap_ext, kws_ext = PicasaDatabase.extract_jpeg_iptc_metadata(iptc_photo)
+    assert cap_ext == "Coucher de soleil breton"
+    assert kws_ext == ["Bretagne", "Océan"]
+
+    idx_iptc = scanner.index_file(iptc_photo)
+    assert idx_iptc >= 0
+    assert db.pmps["imagedata_caption"].records[idx_iptc] == "Coucher de soleil breton"
+    assert db.pmps["imagedata_tags"].records[idx_iptc] == "Bretagne,Océan"
+    assert idx_iptc in db.search("breton")
+    assert idx_iptc in db.search("bretagne")
+
+    # 3. update_indexed_file : remplacer l'image rouge avec GPS par une image bleue sans GPS sur disque
+    assert idx_gps in db.search("color:red")
+    Image.new("RGB", (80, 80), (20, 40, 240)).save(str(gps_photo), format="JPEG", quality=95)
+    assert scanner.update_indexed_file(idx_gps, gps_photo) is True
+    assert idx_gps in db.search("color:blue")
+    assert idx_gps not in db.search("color:red")
+    assert idx_gps not in db.search("]geo")
+    assert float(db.pmps["imagedata_lat"].records[idx_gps]) == 0.0
+
+    # 4. Coordonnées oculaires leye / reye persistées dans imagedata_facerectdata.pmp via _get_or_create_1001_child
+    fm = PicasaFaceManager(db)
+    det_fr = FaceRect(0.20, 0.20, 0.60, 0.60)
+    det_fr.confidence = 0.925  # type: ignore[attr-defined]
+    det_fr.pan = 0.120  # type: ignore[attr-defined]
+    det_fr.leye = (0.345, 0.392)  # type: ignore[attr-defined]
+    det_fr.reye = (0.455, 0.392)  # type: ignore[attr-defined]
+    det_fr.mouth = (0.400, 0.500)  # type: ignore[attr-defined]
+    c_1001 = fm._get_or_create_1001_child(idx_iptc, det_fr, "contact_test_18")
+    assert c_1001 is not None
+    fr_data_str = db.pmps["imagedata_facerectdata"].records[c_1001]
+    assert "leye(0.345,0.392)" in fr_data_str
+    assert "reye(0.455,0.392)" in fr_data_str
+    assert "mouth(0.400,0.500)" in fr_data_str
+
+    # 5. Tri des albums (get_all_albums + _sort_album_entries) par date, taille, nom et photo la plus récente
+    db.pmps["imagedata_tagdate"].records[idx_gps] = 44000.0
+    db.pmps["imagedata_tagdate"].records[idx_iptc] = 45500.0
+    db.thumbindex.records[idx_gps].size = 10000
+    db.thumbindex.records[idx_iptc].size = 90000
+
+    from picasa_py.ini.parser import PicasaIniParser
+    tok_a = "aaaa1111222233334444555566667777"
+    tok_b = "bbbb1111222233334444555566667777"
+    doc_p18 = PicasaIniParser.parse_bytes(
+        (
+            f"[.album:{tok_a}]\r\n"
+            f"name=Zeta Album\r\n"
+            f"token={tok_a}\r\n"
+            f"date=45000.0\r\n"
+            f"[.album:{tok_b}]\r\n"
+            f"name=Alpha Album\r\n"
+            f"token={tok_b}\r\n"
+            f"date=43000.0\r\n"
+            f"[marseille_gps.jpg]\r\n"
+            f"albums={tok_a}\r\n"
+            f"[iptc_externe.jpg]\r\n"
+            f"albums={tok_b}\r\n"
+        ).encode("utf-8")
+    )
+    doc_p18.write_file(str(folder / ".picasa.ini"))
+    db.invalidate_ini_cache(str(folder / ".picasa.ini"))
+    db.sync_photo_ini_to_db(idx_gps)
+    db.sync_photo_ini_to_db(idx_iptc)
+    db._albums_cache = None
+
+    albs = [a for a in db.get_all_albums() if a["token"] in (tok_a, tok_b)]
+    assert len(albs) == 2
+    by_tok = {a["token"]: a for a in albs}
+    assert by_tok[tok_a]["ole_date"] == 45000.0
+    assert by_tok[tok_a]["max_photo_date"] == 45000.0
+    assert by_tok[tok_b]["ole_date"] == 43000.0
+    assert by_tok[tok_b]["max_photo_date"] == 45500.0
+    assert by_tok[tok_b]["total_size"] > by_tok[tok_a]["total_size"]
+
+    from picasa_py.ui.library_tree import PicasaLibraryTree
+    dummy_tree = PicasaLibraryTree.__new__(PicasaLibraryTree)
+    dummy_tree.album_list_flip = False
+
+    # Mode 0 (par date d'album décroissante) : tok_a (45000.0) avant tok_b (43000.0)
+    dummy_tree.date_sort_mode = 0
+    assert [a["token"] for a in dummy_tree._sort_album_entries(albs)] == [tok_a, tok_b]
+
+    # Mode 4 (par photo la plus récente) : tok_b (max_photo_date=45500.0) avant tok_a (45000.0)
+    dummy_tree.date_sort_mode = 4
+    assert [a["token"] for a in dummy_tree._sort_album_entries(albs)] == [tok_b, tok_a]
+
+    # Mode 1 (par taille décroissante) : tok_b (90000 octets) avant tok_a (10000 octets)
+    dummy_tree.date_sort_mode = 1
+    assert [a["token"] for a in dummy_tree._sort_album_entries(albs)] == [tok_b, tok_a]
+
+    # Mode 2 (par nom) : Alpha Album (tok_b) avant Zeta Album (tok_a)
+    dummy_tree.date_sort_mode = 2
+    assert [a["token"] for a in dummy_tree._sort_album_entries(albs)] == [tok_b, tok_a]
+
+
+
 
 
 
