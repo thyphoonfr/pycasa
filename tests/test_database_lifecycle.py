@@ -2464,6 +2464,132 @@ def test_pass18_exif_gps_restore_iptc_scan_wordhash_color_eye_coords_and_album_s
     assert [a["token"] for a in dummy_tree._sort_album_entries(albs)] == [tok_b, tok_a]
 
 
+def test_pass19_effects_copy_paste_offset_time_and_geotag_priority(tmp_path: Path):
+    """
+    FR: Vérifie les correctifs de la 19e passe d'audit Ghidra :
+    1. Menu Outils (`ID_TOOLS_FOLDER_MGR` -> "Gestionnaire de &dossiers...", `ID_VIEW_TWOUP`, `ID_GEOTAG_EXPORT_KML`, `ID_TOOLS_BACKUP`).
+    2. `get_photo_datetime` (`offset_time_dialog.py`) lit `DateTimeOriginal` (36867) dans le sous-IFD Exif (0x8769)
+       et `PicasaAdjustTimeDialog.execute_adjustment` synchronise `imagedata_filesize` et `rec.dirty`.
+    3. `extract_full_metadata` (`exif_reader.py`) donne la priorité à `.picasa.ini` `geotag=` sur l'EXIF GPS brut (`0x00456A15`).
+    4. `action_copy_all_effects` / `action_paste_all_effects` ne copie jamais `star=yes` et nettoie les anciennes
+       clés de retouche (`crop`, `tilt`, `filters`) absentes de la pile copiée (`0x0088C3EC`).
+    EN: Verifies the 19th-pass Ghidra audit fixes.
+    """
+    import datetime as dt_mod
+    from PIL import Image
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.scanner.scanner import PicasaDirScanner
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.ui.menu import MENU_I18N
+    from picasa_py.ui.offset_time_dialog import get_photo_datetime, PicasaAdjustTimeDialog
+    from picasa_py.ui.exif_reader import extract_full_metadata
+
+    # 1. Traductions françaises de la barre de menus (STRINGRES_FR.XML)
+    fr_map = MENU_I18N["fr"]
+    assert fr_map["ID_TOOLS_FOLDER_MGR"] == "Gestionnaire de &dossiers..."
+    assert fr_map["ID_TOOLS_INCLUDEEXCLUDEFOLDERS"] == "Ajouter un &dossier à Picasa..."
+    assert "ID_VIEW_TWOUP" in fr_map
+    assert "ID_GEOTAG_EXPORT_KML" in fr_map
+    assert "ID_TOOLS_BACKUP" in fr_map
+
+    db = PicasaDatabase.create_new(tmp_path / "db_root_p19")
+    folder = tmp_path / "PhotosPass19"
+    folder.mkdir(parents=True, exist_ok=True)
+    scanner = PicasaDirScanner(db)
+
+    # 2. Créer un JPEG avec DateTimeOriginal uniquement dans le sous-IFD Exif (0x8769) et un GPS EXIF initial
+    photo1 = folder / "subifd_date.jpg"
+    im1 = Image.new("RGB", (100, 80), (180, 90, 40))
+    exif1 = im1.getexif()
+    exif1[0x8769] = {
+        36867: "2021:06:15 14:30:00",
+        36868: "2021:06:15 14:30:00",
+    }
+    exif1[0x8825] = {
+        1: "N",
+        2: (48.0, 51.0, 24.0),
+        3: "E",
+        4: (2.0, 21.0, 7.0),
+    }
+    im1.save(str(photo1), format="JPEG", quality=92, exif=exif1.tobytes())
+
+    idx1 = scanner.index_file(photo1)
+    assert idx1 >= 0
+
+    # get_photo_datetime doit lire DateTimeOriginal (2021-06-15 14:30:00) dans le sous-IFD 0x8769
+    parsed_dt = get_photo_datetime(str(photo1))
+    assert parsed_dt == dt_mod.datetime(2021, 6, 15, 14, 30, 0)
+
+    # Tester execute_adjustment sans ouvrir d'interface graphique bloquante
+    adj = PicasaAdjustTimeDialog.__new__(PicasaAdjustTimeDialog)
+    adj.file_paths = [str(photo1)]
+    adj.db = db
+    adj.original_dt = parsed_dt
+    adj.get_target_datetime = lambda: dt_mod.datetime(2022, 8, 20, 10, 15, 0)  # type: ignore[method-assign]
+    adj.is_relative = lambda: False  # type: ignore[method-assign]
+    res_adj = adj.execute_adjustment()
+    assert len(res_adj) == 1
+    assert get_photo_datetime(str(photo1)) == dt_mod.datetime(2022, 8, 20, 10, 15, 0)
+    assert db.thumbindex.records[idx1].dirty is True
+    assert db.thumbindex.records[idx1].size == photo1.stat().st_size
+
+    # 3. Priorité de .picasa.ini geotag= sur l'EXIF GPS brut dans extract_full_metadata
+    doc_geo = PicasaIniParser.parse_bytes(
+        b"[subifd_date.jpg]\r\n"
+        b"geotag=45.764043,4.835659\r\n"
+        b"star=yes\r\n"
+        b"filters=bw=1;\r\n"
+    )
+    doc_geo.write_file(str(folder / ".picasa.ini"))
+    meta1 = extract_full_metadata(str(photo1))
+    assert meta1["gps"] is not None
+    assert abs(meta1["gps"][0] - 45.764043) < 1e-4
+    assert abs(meta1["gps"][1] - 4.835659) < 1e-4
+
+    # 4. Copier/Coller tous les effets : ne copie pas star=yes et nettoie les anciens effets de la cible
+    photo2 = folder / "target_effects.jpg"
+    Image.new("RGB", (100, 80), (40, 120, 200)).save(str(photo2), format="JPEG", quality=92)
+    idx2 = scanner.index_file(photo2)
+    assert idx2 >= 0
+
+    doc_init = PicasaIniParser.parse_bytes(
+        b"[subifd_date.jpg]\r\n"
+        b"star=yes\r\n"
+        b"filters=sepia=1;\r\n"
+        b"[target_effects.jpg]\r\n"
+        b"crop=rect64(1000100080008000)\r\n"
+        b"tilt=tilt(5.000000,0.000000)\r\n"
+        b"filters=crop64=1,1000100080008000;invert=1;\r\n"
+    )
+    doc_init.write_file(str(folder / ".picasa.ini"))
+    db.invalidate_ini_cache(str(folder / ".picasa.ini"))
+
+    from picasa_py.ui.main_window import PicasaMainWindow
+    dummy_win = PicasaMainWindow.__new__(PicasaMainWindow)
+    dummy_win.db = db
+    dummy_win._effects_clipboard = {}
+    dummy_win.stack = type("_S", (), {"currentWidget": lambda self: None})()  # type: ignore[assignment]
+    dummy_win.one_up_view = type("_O", (), {"current_photo_path": None})()  # type: ignore[assignment]
+    dummy_win.status_bar = type("_B", (), {"showMessage": lambda self, msg: None})()  # type: ignore[assignment]
+    dummy_win.thumb_view = type("_T", (), {"invalidate_item": lambda self, p: None, "update": lambda self: None})()  # type: ignore[assignment]
+    dummy_win._get_active_photo_paths = lambda: [str(photo1)]  # type: ignore[method-assign]
+    dummy_win._update_photo_ini = lambda p, fn: db.update_photo_ini(p, fn)  # type: ignore[method-assign]
+
+    dummy_win.action_copy_all_effects()
+    assert "star" not in dummy_win._effects_clipboard
+    assert dummy_win._effects_clipboard.get("filters") == "sepia=1;"
+
+    dummy_win.action_paste_all_effects([str(photo2)])
+    doc_after = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    sec2 = doc_after.get_section("target_effects.jpg")
+    assert sec2 is not None
+    assert sec2.get("star") is None
+    assert sec2.get("crop") is None
+    assert sec2.get("tilt") is None
+    assert sec2.get("filters") == "sepia=1;"
+
+
+
 
 
 

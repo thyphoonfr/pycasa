@@ -34,8 +34,8 @@ APP_NAME: str = "PyCasa"
 
 VERSION_Z: int = 3
 VERSION_Y: int = 9
-VERSION_X: int = 169
-VERSION_W: int = 415
+VERSION_X: int = 170
+VERSION_W: int = 416
 
 APP_VERSION: str = f"{VERSION_Z}.{VERSION_Y}.{VERSION_X}.{VERSION_W}"
 

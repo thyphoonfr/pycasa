@@ -1659,10 +1659,12 @@ class PicasaMainWindow(QMainWindow):
                 fname = os.path.basename(target_path)
                 sec = doc.get_section(fname)
                 if sec:
+                    # Ref: picasa3.exe @ 0x0088C3EC (ID_EDIT_COPYALLEFFECTS, CFilterStack::CopyEffects) :
+                    # seuls les paramètres de retouche/filtres appartiennent à la pile d'effets (jamais star=yes)
                     effect_keys = [
                         "crop", "rotate", "tilt", "text", "textactive",
                         "filters", "backlight", "autolight", "colorfix",
-                        "redeye", "retouch", "star"
+                        "redeye", "retouch", "fix", "bw"
                     ]
                     for k in effect_keys:
                         val = sec.get(k)
@@ -1675,7 +1677,13 @@ class PicasaMainWindow(QMainWindow):
         if self.stack.currentWidget() == self.one_up_view:
             if getattr(self.one_up_view, "_active_crop_rect", None):
                 r = self.one_up_view._active_crop_rect
-                effects["crop"] = f"rect64({int(r[0]*65535):04x}{int(r[1]*65535):04x}{int(r[2]*65535):04x}{int(r[3]*65535):04x})"
+                crop_hex = f"{int(r[0]*65535):04x}{int(r[1]*65535):04x}{int(r[2]*65535):04x}{int(r[3]*65535):04x}"
+                effects["crop"] = f"rect64({crop_hex})"
+                f_str = effects.get("filters", "")
+                if f"crop64=1,{crop_hex}" not in f_str:
+                    kept_f = [t for t in f_str.split(";") if t.strip() and not t.strip().lower().startswith("crop64=")]
+                    kept_f.append(f"crop64=1,{crop_hex}")
+                    effects["filters"] = ";".join(kept_f) + ";"
             if getattr(self.one_up_view, "_active_tilt", 0.0) != 0.0:
                 effects["tilt"] = f"tilt({self.one_up_view._active_tilt:.6f},0.000000)"
             if getattr(self.one_up_view, "_active_rotate", 0) != 0:
@@ -1710,10 +1718,17 @@ class PicasaMainWindow(QMainWindow):
 
         def _apply_effects(doc: PicasaIniDocument, fname: str) -> None:
             """
-            FR: Copie les clés d'effets du presse-papiers dans la section INI de la photo.
-            EN: Copies the clipboard effect keys into the photo's INI section.
+            FR: Remplace la pile d'effets de la section INI de la photo par celle du presse-papiers.
+            EN: Replaces the photo's INI section effect stack with the clipboard effect stack.
+            Ref: picasa3.exe @ 0x0088C3EC (ID_EDIT_PASTEALLEFFECTS, CFilterStack::PasteEffects)
             """
             sec = doc.get_or_create_section(fname)
+            for clear_k in (
+                "crop", "rotate", "tilt", "text", "textactive",
+                "filters", "redo", "backlight", "autolight", "colorfix",
+                "redeye", "retouch", "fix", "bw"
+            ):
+                sec.remove(clear_k)
             for k, v in self._effects_clipboard.items():
                 sec.set(k, v)
 
@@ -3119,12 +3134,44 @@ class PicasaMainWindow(QMainWindow):
         """
         FR: Édition des propriétés complètes de l'album (album.fen).
         EN: Edits the complete properties of the album (album.fen).
+        Ref: picasa3.exe @ album.fen, 0x0046AC10 (Picasa2Albums/*.pal)
         """
-        music_path = self._get_album_music(album_name) or ""
-        dlg = PicasaAlbumDialog(album_name=album_name, music_path=music_path, parent=self)
+        init_name = album_name
+        init_date = ""
+        init_desc = ""
+        init_loc = ""
+        init_music = self._get_album_music(album_name) or ""
+        target_uid = ""
+        if self.db and hasattr(self.db, "get_all_albums"):
+            try:
+                for alb in self.db.get_all_albums():
+                    a_name = str(alb.get("name", ""))
+                    a_uid = str(alb.get("uid", alb.get("token", "")))
+                    if album_name in (a_name, a_uid):
+                        if a_name:
+                            init_name = a_name
+                        target_uid = a_uid
+                        init_date = str(alb.get("date", "") or "")
+                        init_desc = str(alb.get("description", "") or "")
+                        init_loc = str(alb.get("location", "") or "")
+                        if not init_music and alb.get("music"):
+                            init_music = str(alb.get("music") or "")
+                        break
+            except Exception:
+                pass
+
+        dlg = PicasaAlbumDialog(
+            album_name=init_name,
+            date_str=init_date,
+            music_path=init_music,
+            location=init_loc,
+            description=init_desc,
+            parent=self,
+        )
         if dlg.exec() == QDialog.DialogCode.Accepted:
             data = dlg.get_album_data()
-            new_name = data.get("name", album_name)
+            new_name = data.get("name", init_name)
+            match_targets = {t for t in (album_name, init_name, target_uid) if t}
             if self.db:
                 candidate_dirs: Set[str] = {
                     p.rstrip("\\/") for p, st in self.db.get_watched_folders().items() if st in ("1", "2")
@@ -3145,18 +3192,30 @@ class PicasaMainWindow(QMainWindow):
                             doc = PicasaIniParser.parse_file(ini_p)
                             mod = False
                             for sec in doc.sections:
-                                if sec.name.startswith(".album:") and (sec.get("name") == album_name or sec.name[7:] == album_name):
+                                if sec.name.startswith(".album:") and (
+                                    sec.get("name") in match_targets or sec.name[7:] in match_targets
+                                ):
                                     if new_name:
                                         sec.set("name", new_name)
                                     if data.get("date"):
                                         sec.set("date", data["date"])
-                                    if data.get("music"):
-                                        sec.set("music", data["music"])
-                                    if data.get("location"):
-                                        sec.set("location", data["location"])
-                                    if data.get("description"):
-                                        sec.set("description", data["description"])
-                                        sec.set("caption", data["description"])
+                                    if "music" in data:
+                                        if data["music"]:
+                                            sec.set("music", data["music"])
+                                        else:
+                                            sec.remove("music")
+                                    if "location" in data:
+                                        if data["location"]:
+                                            sec.set("location", data["location"])
+                                        else:
+                                            sec.remove("location")
+                                    if "description" in data:
+                                        if data["description"]:
+                                            sec.set("description", data["description"])
+                                            sec.set("caption", data["description"])
+                                        else:
+                                            sec.remove("description")
+                                            sec.remove("caption")
                                     mod = True
                             if mod:
                                 doc.write_file(ini_p)
@@ -3172,16 +3231,35 @@ class PicasaMainWindow(QMainWindow):
                         except Exception:
                             pass
                 ad_names = self.db.pmps.get("albumdata_name")
+                ad_uids = self.db.pmps.get("albumdata_uid")
+                ad_tokens = self.db.pmps.get("albumdata_token")
                 ad_cats = self.db.pmps.get("albumdata_category")
+                ad_dates = self.db.pmps.get("albumdata_date")
                 ad_descs = self.db.pmps.get("albumdata_description")
                 ad_locs = self.db.pmps.get("albumdata_location")
                 ad_music = self.db.pmps.get("albumdata_music")
                 if ad_names and ad_cats:
                     for i in range(len(ad_names.records)):
-                        if i < len(ad_cats.records) and ad_cats.records[i] == 0 and ad_names.records[i] == album_name:
+                        row_uid = str(ad_uids.records[i]) if (ad_uids and i < len(ad_uids.records)) else ""
+                        row_tok = str(ad_tokens.records[i]) if (ad_tokens and i < len(ad_tokens.records)) else ""
+                        if row_tok.startswith("]"):
+                            row_tok = row_tok[1:]
+                        if i < len(ad_cats.records) and ad_cats.records[i] == 0 and (
+                            ad_names.records[i] in match_targets or row_uid in match_targets or row_tok in match_targets
+                        ):
+                            if not target_uid:
+                                target_uid = row_uid or row_tok
                             if new_name:
                                 ad_names.records[i] = new_name
                                 ad_names.dirty = True
+                            if ad_dates and i < len(ad_dates.records) and data.get("date"):
+                                try:
+                                    from picasa_py.scanner.scanner import datetime_to_ole
+                                    dt_obj = datetime.fromisoformat(str(data["date"]).split("T")[0])
+                                    ad_dates.records[i] = datetime_to_ole(dt_obj)
+                                    ad_dates.dirty = True
+                                except Exception:
+                                    pass
                             if ad_descs and i < len(ad_descs.records) and "description" in data:
                                 ad_descs.records[i] = data.get("description") or ""
                                 ad_descs.dirty = True
@@ -3191,6 +3269,19 @@ class PicasaMainWindow(QMainWindow):
                             if ad_music and i < len(ad_music.records) and "music" in data:
                                 ad_music.records[i] = data.get("music") or ""
                                 ad_music.dirty = True
+                            if target_uid and hasattr(self.db, "_write_pal_file_for_album"):
+                                try:
+                                    self.db._write_pal_file_for_album(
+                                        uid=target_uid,
+                                        name=new_name,
+                                        date_str=data.get("date") or init_date,
+                                        category=0,
+                                        description=data.get("description") or "",
+                                        location=data.get("location") or "",
+                                        music=data.get("music") or "",
+                                    )
+                                except Exception:
+                                    pass
             self.notify_albums_changed()
             self.status_bar.showMessage(f"Propriétés de l'album « {new_name} » mises à jour.")
 
@@ -3912,21 +4003,38 @@ class PicasaMainWindow(QMainWindow):
         for p in paths:
             if not p or not os.path.exists(p):
                 continue
-            ini_p = os.path.join(os.path.dirname(p), ".picasa.ini")
-            if not os.path.exists(ini_p):
-                alt_p = os.path.join(os.path.dirname(p), "Picasa.ini")
-                if os.path.exists(alt_p):
-                    ini_p = alt_p
             lat, lon = None, None
-            if os.path.exists(ini_p):
+            # Ref: picasa3.exe @ 0x0074D240 (ID_GEOTAG_EXPORT_KML) :
+            # lit les coordonnées depuis .picasa.ini (geotag=), imagedata_lat/long.pmp ou les tags GPS EXIF
+            if self.db is not None and hasattr(self.db, "get_geotag"):
                 try:
-                    doc = self.db.get_parsed_ini(ini_p) if self.db else PicasaIniParser.parse_file(ini_p)
-                    if doc:
-                        sec = doc.get_section(os.path.basename(p))
-                        if sec and sec.get("geotag"):
-                            parts = [x.strip() for x in sec.get("geotag", "").split(",")]
-                            if len(parts) >= 2:
-                                lat, lon = float(parts[0]), float(parts[1])
+                    coords = self.db.get_geotag(p)
+                    if coords is not None:
+                        lat, lon = float(coords[0]), float(coords[1])
+                except Exception:
+                    pass
+            if lat is None or lon is None:
+                ini_p = os.path.join(os.path.dirname(p), ".picasa.ini")
+                if not os.path.exists(ini_p):
+                    alt_p = os.path.join(os.path.dirname(p), "Picasa.ini")
+                    if os.path.exists(alt_p):
+                        ini_p = alt_p
+                if os.path.exists(ini_p):
+                    try:
+                        doc = self.db.get_parsed_ini(ini_p) if self.db else PicasaIniParser.parse_file(ini_p)
+                        if doc:
+                            sec = doc.get_section(os.path.basename(p))
+                            if sec and sec.get("geotag"):
+                                parts = [x.strip() for x in sec.get("geotag", "").split(",")]
+                                if len(parts) >= 2:
+                                    lat, lon = float(parts[0]), float(parts[1])
+                    except Exception:
+                        pass
+            if (lat is None or lon is None) and hasattr(self, "_extract_exif_gps"):
+                try:
+                    exif_coords = self._extract_exif_gps(p)
+                    if exif_coords is not None:
+                        lat, lon = float(exif_coords[0]), float(exif_coords[1])
                 except Exception:
                     pass
             if lat is not None and lon is not None:
@@ -4405,7 +4513,20 @@ class PicasaMainWindow(QMainWindow):
                     if os.path.exists(alt_src):
                         ini_src = alt_src
                 if os.path.exists(ini_src) and ini_src not in copied_inis:
-                    shutil.copy2(ini_src, os.path.join(target_sub, ".picasa.ini"))
+                    dst_ini = os.path.join(target_sub, ".picasa.ini")
+                    if os.name == "nt" and os.path.exists(dst_ini):
+                        try:
+                            import ctypes
+                            ctypes.windll.kernel32.SetFileAttributesW(str(dst_ini), 0x80)  # FILE_ATTRIBUTE_NORMAL
+                        except Exception:
+                            pass
+                    shutil.copy2(ini_src, dst_ini)
+                    if os.name == "nt":
+                        try:
+                            import ctypes
+                            ctypes.windll.kernel32.SetFileAttributesW(str(dst_ini), 0x02)  # FILE_ATTRIBUTE_HIDDEN
+                        except Exception:
+                            pass
                     copied_inis.add(ini_src)
             except Exception:
                 pass

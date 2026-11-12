@@ -109,6 +109,9 @@ MENU_I18N = {
         "eMenuCreateMovie::MOVIE": "À partir de la &sélection...",
         "eMenuCreateMovie::ID_FACES": "À partir des &visages de la sélection (Face Movie)...",
         "ID_TOOLS_FOLDER_MGR": "Gestionnaire de &dossiers...",
+        "ID_VIEW_TWOUP": "Comparaison côte à côte (&Deux vues)",
+        "ID_GEOTAG_EXPORT_KML": "Exporter vers un fichier &Google Earth (KML)...",
+        "ID_TOOLS_BACKUP": "&Sauvegarder les photos...",
     },
     "es": {
         "menu_file": "&Archivo",
@@ -395,7 +398,7 @@ class PicasaMenuBuilder:
         menu_tools = mb.addMenu(self._tr("menu_tools", "&Tools"))
         self._add_action(menu_tools, self._tr("ID_TOOLS_OPTIONS", "&Options..."), "ID_TOOLS_OPTIONS", self.win.action_options if hasattr(self.win, "action_options") else None)
         self._add_action(menu_tools, self._tr("ID_TOOLS_ADJUST_TIMESTAMP", "Adjust &Date and Time..."), "ID_TOOLS_ADJUST_TIMESTAMP", self.win.action_adjust_time if hasattr(self.win, "action_adjust_time") else None)
-        self._add_action(menu_tools, self._tr("ID_TOOLS_INCLUDEEXCLUDEFOLDERS", "&Folder Manager..."), "ID_TOOLS_INCLUDEEXCLUDEFOLDERS", self.win.action_folder_manager if hasattr(self.win, "action_folder_manager") else None)
+        self._add_action(menu_tools, self._tr("ID_TOOLS_FOLDER_MGR", "&Folder Manager..."), "ID_TOOLS_INCLUDEEXCLUDEFOLDERS", self.win.action_folder_manager if hasattr(self.win, "action_folder_manager") else None)
         self._add_action(menu_tools, self._tr("ID_TOOLS_PEOPLE_MGR", "&People Manager..."), "ID_TOOLS_PEOPLE_MGR", self.win.action_contact_manager if hasattr(self.win, "action_contact_manager") else None)
         self._add_action(menu_tools, self._tr("ID_TOOLS_WRITE_FACETAGS", "Write &Face Tags to XMP..."), "ID_TOOLS_WRITE_FACETAGS", self.win.action_write_facetags if hasattr(self.win, "action_write_facetags") else None)
         self._add_action(menu_tools, self._tr("ID_GEOTAG_EXPORT_KML", "Export &Google Earth File (KML)..."), "ID_GEOTAG_EXPORT_KML", self.win.action_export_kml if hasattr(self.win, "action_export_kml") else None)

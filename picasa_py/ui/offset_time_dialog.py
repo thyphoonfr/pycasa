@@ -58,22 +58,28 @@ def filetime_to_unix(filetime: int) -> float:
 
 def get_photo_datetime(path: str) -> datetime.datetime:
     """
-    FR: Extrait la date et l'heure réelles de la photo, en privilégiant l'EXIF DateTimeOriginal / DateTime,
-    puis le mtime du fichier sur disque.
-    EN: Extracts the actual photo date and time, preferring EXIF DateTimeOriginal / DateTime,
-    then falling back to disk mtime.
+    FR: Extrait la date et l'heure réelles de la photo, en privilégiant l'EXIF DateTimeOriginal / DateTime
+    (y compris dans le sous-IFD Exif 0x8769), puis le mtime du fichier sur disque.
+    EN: Extracts the actual photo date and time, preferring EXIF DateTimeOriginal / DateTime
+    (including inside the Exif SubIFD 0x8769), then falling back to disk mtime.
+    Ref: picasa3.exe @ 0x0077C670 (COffsetDate), 0x00490580
     """
     p = Path(path)
     if p.exists() and p.suffix.lower() in (".jpg", ".jpeg"):
         try:
             with Image.open(p) as img:
                 exif = img.getexif()
+                exif_ifd = {}
+                try:
+                    exif_ifd = exif.get_ifd(0x8769) or {}
+                except Exception:
+                    exif_ifd = {}
                 # 36867: DateTimeOriginal, 36868: DateTimeDigitized, 306: DateTime
                 for tag in (36867, 36868, 306):
-                    val = exif.get(tag)
+                    val = exif_ifd.get(tag) if tag in exif_ifd else exif.get(tag)
                     if val and isinstance(val, str):
                         try:
-                            return datetime.datetime.strptime(val.strip(), "%Y:%m:%d %H:%M:%S")
+                            return datetime.datetime.strptime(val.strip()[:19], "%Y:%m:%d %H:%M:%S")
                         except Exception:
                             pass
         except Exception:
@@ -462,12 +468,22 @@ class PicasaAdjustTimeDialog(QDialog):
                                 else:
                                     out_chunks.insert(1, new_app1)
                             out_chunks.append(raw_jpg[pos:])
+                            try:
+                                from picasa_py.ini.writer import PicasaIniWriter
+                                PicasaIniWriter.mark_internal_write(os.path.dirname(os.path.abspath(str(p))))
+                            except Exception:
+                                pass
                             p.write_bytes(b"".join(out_chunks))
                     except Exception:
                         pass
 
                 # FR: 3. Mise à jour de l'horodatage sur disque
                 # EN: 3. Update timestamp on disk
+                try:
+                    from picasa_py.ini.writer import PicasaIniWriter
+                    PicasaIniWriter.mark_internal_write(os.path.dirname(os.path.abspath(str(p))))
+                except Exception:
+                    pass
                 os.utime(str(p), (new_ts, new_ts))
 
                 # FR: 4. Mise à jour de la base de données si active (thumbindex.db, imagedata_originfast, thumbs_index.db)
@@ -491,7 +507,12 @@ class PicasaAdjustTimeDialog(QDialog):
                         rec.ft2 = ft2_disk or ft
                         rec.size = fsize_disk
                         rec.file_size = fsize_disk
+                        rec.dirty = True
                         self.db.thumbindex.dirty = True
+                        pmp_fs = self.db.pmps.get("imagedata_filesize") if hasattr(self.db, "pmps") else None
+                        if pmp_fs is not None and idx < len(pmp_fs.records):
+                            pmp_fs.records[idx] = fsize_disk
+                            pmp_fs.dirty = True
                         pmp_of = self.db.pmps.get("imagedata_originfast") if hasattr(self.db, "pmps") else None
                         if pmp_of is not None and idx < len(pmp_of.records):
                             pmp_of.records[idx] = compute_originfast_hash(p)

@@ -292,8 +292,9 @@ def extract_full_metadata(file_path: str) -> Dict[str, Any]:
                     if wb is not None:
                         props.append(("Balance des blancs", "Automatique" if wb == 0 else "Manuelle"))
 
-                # FR: Coordonnées GPS / EN: GPS Coordinates
-                gps_coords = parse_gps_coordinates(exif) or ini_geotag
+                # FR: Coordonnées GPS (priorité à .picasa.ini geotag= sur l'EXIF brut, Ref: 0x00456A15)
+                # EN: GPS Coordinates (.picasa.ini geotag= takes priority over raw EXIF, Ref: 0x00456A15)
+                gps_coords = ini_geotag or parse_gps_coordinates(exif)
                 if gps_coords:
                     data["gps"] = gps_coords
                     data["gps_formatted"] = format_gps_dms(gps_coords[0], gps_coords[1], gps_coords[2])
