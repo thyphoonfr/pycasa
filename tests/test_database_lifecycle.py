@@ -2784,6 +2784,124 @@ def test_pass21_tray_slideshow_filmstrip_and_rename_parity(tmp_path: Path) -> No
     assert sec_mig is not None and sec_mig.get("caption") == "Souvenir"
 
 
+def test_pass22_contacts2_email_preservation_cluster_reject_and_originals_ini_rename(tmp_path: Path) -> None:
+    """
+    FR : Passe 22 — Vérifie :
+    1. Préservation de l'adresse e-mail dans `[Contacts2]` (`<cid>=<nom>;<email>;`) lors de `add_face`,
+       `rename_person` et `_sync_faces_to_ini` (`Ref: picasa3.exe @ 0x0068AD1C`).
+    2. Rejet de suggestion sur une carte de grappe (`PicasaPeoplePanel._create_cluster_card` -> `on_reject_sug`)
+       mettant à jour `imagedata_suggestionpersonalbumid.pmp`, `wordhash.dat` et `_rejected_suggestions`
+       (`Ref: picasa3.exe @ 0x008A13D8`).
+    3. Migration de `[old_name]` -> `[new_name]` dans `.picasaoriginals/.picasa.ini` lors d'un renommage en lot
+       via `PicasaRenameDialog.execute_rename()` + `db.rename_photo()` (`Ref: picasa3.exe @ 0x00543642, 0x00462BA0`).
+    """
+    from PySide6.QtWidgets import QApplication, QPushButton
+    from PIL import Image
+    from picasa_py.faces.facerect import FaceRect
+    from picasa_py.faces.face_manager import FaceSuggestion
+    from picasa_py.db.contacts import Contact
+    from picasa_py.ui.right_drawer import PicasaPeoplePanel
+    from picasa_py.ui.rename_dialog import PicasaRenameDialog
+    from picasa_py.ini.parser import PicasaIniParser
+
+    app = QApplication.instance() or QApplication([])
+    assert app is not None
+
+    db = PicasaDatabase.create_new(tmp_path / "db_pass22")
+    scanner = PicasaDirScanner(db)
+
+    folder = tmp_path / "Album_Pass22"
+    folder.mkdir()
+    photo_p = folder / "photo_email.jpg"
+    Image.new("RGB", (320, 240), (90, 120, 150)).save(str(photo_p), format="JPEG")
+    photo_idx = scanner.index_file(photo_p)
+    assert photo_idx >= 0
+
+    # 1. Préservation de l'adresse e-mail dans [Contacts2] (<cid>=<nom>;<email>;)
+    cid = "aabbccdd11223344"
+    db.contacts.contacts.append(Contact(id=cid, name="Alice Martin", email="alice@example.com"))
+    rect1 = FaceRect(left=0.1, top=0.1, right=0.4, bottom=0.4, contact_id=cid, contact_name="Alice Martin")
+    db.face_manager.add_face(str(photo_p), rect1, "Alice Martin", contact_id=cid, db_idx=photo_idx)
+
+    doc1 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    sec_c2_1 = doc1.get_section("Contacts2")
+    assert sec_c2_1 is not None
+    assert sec_c2_1.get(cid) == "Alice Martin;alice@example.com;"
+
+    assert db.face_manager.rename_person(cid, "Alice Dupont") is True
+    doc2 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    sec_c2_2 = doc2.get_section("Contacts2")
+    assert sec_c2_2 is not None
+    assert sec_c2_2.get(cid) == "Alice Dupont;alice@example.com;"
+
+    db.face_manager._sync_faces_to_ini(photo_idx)
+    doc3 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    sec_c2_3 = doc3.get_section("Contacts2")
+    assert sec_c2_3 is not None
+    assert sec_c2_3.get(cid) == "Alice Dupont;alice@example.com;"
+
+    # 2. Rejet de suggestion sur une carte de grappe (on_reject_sug -> reject_suggestion)
+    rect_sug = FaceRect(left=0.55, top=0.15, right=0.85, bottom=0.45, contact_id=cid, contact_name="? Alice Dupont")
+    sug_child_idx = db.face_manager._get_or_create_1001_child(photo_idx, rect_sug)
+    assert sug_child_idx is not None and sug_child_idx > 0
+    alb_idx = db.face_manager._get_or_create_person_album_id(cid, "Alice Dupont")
+    assert alb_idx is not None and alb_idx > 0
+    pmp_sug = db.pmps["imagedata_suggestionpersonalbumid"]
+    while len(pmp_sug.records) <= sug_child_idx:
+        pmp_sug.records.append(0)
+    pmp_sug.records[sug_child_idx] = alb_idx
+    db.wordhash.add_word(f"]facealbum:{alb_idx}", sug_child_idx)
+
+    sug_obj = FaceSuggestion(
+        photo_path=str(photo_p),
+        face_rect=rect_sug,
+        contact_id=cid,
+        contact_name="Alice Dupont",
+        similarity=0.88,
+        db_idx=sug_child_idx,
+    )
+    db.face_manager.suggestions.setdefault(cid, []).append(sug_obj)
+
+    panel = PicasaPeoplePanel()
+    panel.db = db
+    cluster_items = [(sug_child_idx, str(photo_p), rect_sug)]
+    card = panel._create_cluster_card(0, cluster_items)
+    reject_btns = [b for b in card.findChildren(QPushButton) if b.toolTip() == "Rejeter cette suggestion"]
+    assert len(reject_btns) == 1
+    reject_btns[0].click()
+
+    assert pmp_sug.records[sug_child_idx] == 0
+    assert (sug_child_idx, cid) in getattr(db.face_manager, "_rejected_suggestions", set())
+    assert sug_obj not in db.face_manager.suggestions.get(cid, [])
+    assert sug_child_idx in db.wordhash.search("]unknownface")
+
+    # 3. Migration de [old_name] -> [new_name] dans .picasaoriginals/.picasa.ini lors d'un renommage en lot
+    orig_dir = folder / ".picasaoriginals"
+    orig_dir.mkdir()
+    orig_backup = orig_dir / photo_p.name
+    Image.new("RGB", (320, 240), (90, 120, 150)).save(str(orig_backup), format="JPEG")
+    orig_ini_doc = PicasaIniParser.parse_bytes(
+        f"[{photo_p.name}]\r\nfilters=crop64=1,20002000e000e000;\r\n".encode("utf-8")
+    )
+    orig_ini_doc.write_file(str(orig_dir / ".picasa.ini"))
+
+    ren_dlg2 = PicasaRenameDialog([str(photo_p)])
+    ren_dlg2.edit_basename.setText("portrait_final")
+    pairs2 = ren_dlg2.execute_rename()
+    assert len(pairs2) == 1
+    old_s, new_s = pairs2[0]
+    new_name_only = Path(new_s).name
+    assert db.rename_photo(photo_idx, new_name_only) is True
+    assert (orig_dir / new_name_only).exists()
+
+    orig_ini_after = PicasaIniParser.parse_file(str(orig_dir / ".picasa.ini"))
+    assert orig_ini_after.get_section("photo_email.jpg") is None
+    sec_orig_new = orig_ini_after.get_section(new_name_only)
+    assert sec_orig_new is not None
+    assert sec_orig_new.get("filters") == "crop64=1,20002000e000e000;"
+
+
+
 
 
 

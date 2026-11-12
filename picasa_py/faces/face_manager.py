@@ -3625,7 +3625,7 @@ class PicasaFaceManager:
             doc = doc_opt if doc_opt is not None else PicasaIniDocument()
 
             sec_c2 = doc.get_or_create_section("Contacts2")
-            sec_c2.set(contact_id, f"{clean_name};;")
+            sec_c2.set(contact_id, self._format_contacts2_value(contact_id, clean_name, sec_c2))
 
             r64_clean = face_rect.to_rect64()[7:-1]
             faces = doc.get_faces(fname)
@@ -4039,9 +4039,10 @@ class PicasaFaceManager:
                     ini_path, legacy_ini_path, doc = self._load_folder_ini_doc(os.path.dirname(ppath), require_existing=True)
                     if doc is not None:
                         sec_c2 = doc.get_or_create_section("Contacts2")
+                        target_val_c2 = self._format_contacts2_value(target_cid, existing_target.name, sec_c2, fallback_ids=cid_vars)
                         for v in cid_vars:
                             sec_c2.remove(v)
-                        sec_c2.set(target_cid, f"{existing_target.name};;")
+                        sec_c2.set(target_cid, target_val_c2)
                         fname = os.path.basename(ppath)
                         faces = doc.get_faces(fname)
                         changed_f = False
@@ -4122,7 +4123,16 @@ class PicasaFaceManager:
 
             del self.people[cid]
             if self.db and getattr(self.db, "contacts", None):
+                merged_email = ""
+                for c in self.db.contacts.contacts:
+                    if c.id.lower() in cid_vars and getattr(c, "email", None):
+                        merged_email = c.email
+                        break
                 self.db.contacts.contacts = [c for c in self.db.contacts.contacts if c.id.lower() not in cid_vars]
+                if merged_email:
+                    target_c = self.db.contacts.get(target_cid)
+                    if target_c is not None and not getattr(target_c, "email", None):
+                        target_c.email = merged_email
                 if hasattr(self.db, "save_contacts"):
                     try:
                         self.db.save_contacts()
@@ -4180,10 +4190,11 @@ class PicasaFaceManager:
                     continue
                 updated_inis.add(ini_path)
                 sec_c2 = doc.get_or_create_section("Contacts2")
+                new_val_c2 = self._format_contacts2_value(cid, clean_new, sec_c2, fallback_ids=cid_vars)
                 for v in cid_vars:
                     if v != cid:
                         sec_c2.remove(v)
-                sec_c2.set(cid, f"{clean_new};;")
+                sec_c2.set(cid, new_val_c2)
                 doc.write_file(ini_path)
                 self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
             except Exception:
@@ -4668,6 +4679,44 @@ class PicasaFaceManager:
 
         return candidates
 
+    def _format_contacts2_value(
+        self,
+        contact_id: str,
+        name: str,
+        sec_c2: Optional[Any] = None,
+        fallback_ids: Optional[Set[str]] = None,
+    ) -> str:
+        """
+        FR : Formate une valeur `[Contacts2]` (`<nom>;<email>;<surnom>`) en préservant l'adresse e-mail
+        et le 3ème champ éventuel depuis `self.db.contacts` ou la section `[Contacts2]` existante.
+        EN: Format a `[Contacts2]` value (`<name>;<email>;<nickname>`) while preserving the email address
+        and optional 3rd field from `self.db.contacts` or the existing `[Contacts2]` section.
+        Ref: picasa3.exe @ 0x0068AD1C (WriteContacts2Section "%s=%s;%s;\r\n")
+        """
+        email_val = ""
+        extra_tail = ""
+        lookup_ids: List[str] = [contact_id]
+        if fallback_ids:
+            for fid in fallback_ids:
+                if fid not in lookup_ids:
+                    lookup_ids.append(fid)
+        if self.db and getattr(self.db, "contacts", None):
+            for lid in lookup_ids:
+                c_obj = self.db.contacts.get(lid)
+                if c_obj is not None and getattr(c_obj, "email", None):
+                    email_val = c_obj.email.strip()
+                    break
+        if sec_c2 is not None:
+            for lid in lookup_ids:
+                raw_existing = sec_c2.get(lid)
+                if raw_existing and ";" in raw_existing:
+                    parts = raw_existing.split(";")
+                    if not email_val and len(parts) >= 2 and parts[1].strip():
+                        email_val = parts[1].strip()
+                    if not extra_tail and len(parts) >= 3 and parts[2].strip():
+                        extra_tail = parts[2].strip()
+        return f"{name};{email_val};{extra_tail}"
+
     def _sync_faces_to_ini(self, photo_idx_or_path: int | str | Path) -> None:
         """
         FR : Synchronise les visages d'une photo (et les contacts associés dans `[Contacts2]`)
@@ -4717,7 +4766,7 @@ class PicasaFaceManager:
                 if not cname and cid in self.people:
                     cname = self.people[cid].name
                 if cname:
-                    sec_c2.set(cid, f"{cname};;")
+                    sec_c2.set(cid, self._format_contacts2_value(cid, cname, sec_c2))
             r64_clean = fr.to_rect64()[7:-1]
             seen_r64.add(r64_clean.lower())
             items.append(FaceItem(rect64=r64_clean, contact_id=cid))

@@ -428,17 +428,39 @@ class PicasaRenameDialog(QDialog):
                     if dst_p.exists() and dst_p.resolve() != src_p.resolve():
                         dst_p = src_p.parent / f"{dst_p.stem}_bis{dst_p.suffix}"
 
+                    from picasa_py.ini.writer import PicasaIniWriter
+                    PicasaIniWriter.mark_internal_write(parent_dir)
+
                     src_p.rename(dst_p)
                     renamed_pairs.append((str(src_p), str(dst_p)))
 
-                    # FR: Renommer également la copie dans .picasaoriginals si elle existe (Ref: 0x00543642)
-                    # EN: Also rename the backup copy in .picasaoriginals if it exists (Ref: 0x00543642)
+                    # FR: Renommer également la copie dans .picasaoriginals si elle existe et sa section dans .picasaoriginals/.picasa.ini
+                    # EN: Also rename the backup copy in .picasaoriginals if it exists and its section in .picasaoriginals/.picasa.ini
+                    # Ref: picasa3.exe @ 0x00543642, 0x00462BA0, 0x00463523
                     for orig_sub in (".picasaoriginals", "Originals"):
-                        orig_src = src_p.parent / orig_sub / src_p.name
-                        orig_dst = src_p.parent / orig_sub / dst_p.name
+                        orig_dir = src_p.parent / orig_sub
+                        orig_src = orig_dir / src_p.name
+                        orig_dst = orig_dir / dst_p.name
                         if orig_src.exists() and not orig_dst.exists():
                             try:
                                 orig_src.rename(orig_dst)
+                            except Exception:
+                                pass
+                        orig_ini = orig_dir / ".picasa.ini"
+                        if orig_ini.exists():
+                            try:
+                                b_doc = PicasaIniParser.parse_file(str(orig_ini))
+                                old_b_sec = b_doc.get_section(src_p.name)
+                                if old_b_sec is not None:
+                                    existing_b_dst = b_doc.get_section(dst_p.name)
+                                    if existing_b_dst is not None and existing_b_dst is not old_b_sec:
+                                        b_doc.remove_section(dst_p.name)
+                                    old_b_sec.name = dst_p.name
+                                    old_b_sec.raw_header = f"[{dst_p.name}]\r\n"
+                                    b_doc._modified = True
+                                    b_doc._untagged_utf8_preserved = False
+                                    PicasaIniWriter.mark_internal_write(str(orig_dir))
+                                    b_doc.write_file(str(orig_ini))
                             except Exception:
                                 pass
 

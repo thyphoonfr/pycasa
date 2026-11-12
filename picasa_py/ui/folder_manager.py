@@ -473,16 +473,18 @@ class PicasaFolderManagerDialog(QDialog):
         """
         if folder_path in self.face_detect_settings:
             return self.face_detect_settings[folder_path]
-        ini_p = os.path.join(folder_path, ".picasa.ini")
-        if os.path.exists(ini_p):
-            try:
-                from picasa_py.ini.parser import PicasaIniParser
-                doc = PicasaIniParser.parse_file(ini_p)
-                sec = doc.get_section("Picasa")
-                if sec and sec.get("frexclude") in ("1", "yes", "true"):
-                    return False
-            except Exception:
-                pass
+        for ini_name in (".picasa.ini", "Picasa.ini"):
+            ini_p = os.path.join(folder_path, ini_name)
+            if os.path.exists(ini_p):
+                try:
+                    from picasa_py.ini.parser import PicasaIniParser
+                    doc = PicasaIniParser.parse_file(ini_p)
+                    sec = doc.get_section("Picasa")
+                    if sec and sec.get("frexclude") in ("1", "yes", "true"):
+                        return False
+                except Exception:
+                    pass
+                break
         return True
 
     def _on_face_detect_toggled(self, checked: bool) -> None:
@@ -612,6 +614,7 @@ class PicasaFolderManagerDialog(QDialog):
         # + FileManagerFRStatus\<folder>\ in repository.dat / scanlist.txt / frexcludefolders.txt)
         # Ref: picasa3.exe @ 0x004190E0, 0x004F5E60
         from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
+        from picasa_py.ini.writer import PicasaIniWriter
         for folder_path, enabled in self.face_detect_settings.items():
             if hasattr(self.db, "set_folder_face_exclusion"):
                 try:
@@ -621,13 +624,19 @@ class PicasaFolderManagerDialog(QDialog):
             if not os.path.isdir(folder_path):
                 continue
             ini_p = os.path.join(folder_path, ".picasa.ini")
+            leg_p = os.path.join(folder_path, "Picasa.ini")
             try:
-                doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+                doc = (
+                    PicasaIniParser.parse_file(ini_p)
+                    if os.path.exists(ini_p)
+                    else (PicasaIniParser.parse_file(leg_p) if os.path.exists(leg_p) else PicasaIniDocument())
+                )
                 sec = doc.get_or_create_section("Picasa")
                 if not enabled:
                     sec.set("frexclude", "1")
                 else:
                     sec.remove("frexclude")
+                PicasaIniWriter.mark_internal_write(folder_path)
                 doc.write_file(ini_p)
                 if hasattr(self.db, "invalidate_ini_cache"):
                     self.db.invalidate_ini_cache(ini_p)

@@ -46,8 +46,9 @@ from picasa_py.ui.resources import PicasaResourceManager
 from picasa_py.ui.exif_reader import extract_full_metadata, format_gps_dms
 from picasa_py.db.database import PicasaDatabase
 from picasa_py.faces.facerect import FaceRect
-from picasa_py.faces.face_manager import _face_overlap
+from picasa_py.faces.face_manager import FaceSuggestion, _face_overlap
 from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
+from picasa_py.ini.writer import PicasaIniWriter
 from picasa_py.ui.name_face_dialog import PicasaNameFaceDialog
 from picasa_py.ui.histogram_widget import PicasaHistogramWidget
 
@@ -1110,12 +1111,38 @@ class PicasaPeoplePanel(QWidget):
 
             def on_reject_sug():
                 """
-                FR: Rejette la suggestion de nom sur la grappe de visages.
-                EN: Rejects the name suggestion on the face cluster.
+                FR: Rejette la suggestion de nom sur la grappe de visages et met à jour
+                `imagedata_suggestionpersonalbumid.pmp`, `wordhash.dat` et `_rejected_suggestions`.
+                EN: Rejects the name suggestion on the face cluster and updates
+                `imagedata_suggestionpersonalbumid.pmp`, `wordhash.dat` and `_rejected_suggestions`.
+                Ref: picasa3.exe @ 0x008A13D8 (peoplepanel/suggestion_no)
                 """
-                for _, _, fr in cluster:
-                    if fr.contact_name and fr.contact_name.startswith("? "):
+                fm = getattr(self.db, "face_manager", None) if self.db else None
+                for c_idx, c_path, fr in cluster:
+                    if fm is not None:
+                        sug_cid = (fr.contact_id or "").strip() or fm._resolve_person_key(suggested_name)
+                        matched_sug = None
+                        for s in list(fm.suggestions.get(sug_cid, [])):
+                            if (
+                                (c_idx is not None and s.db_idx == c_idx)
+                                or (c_path and s.photo_path and os.path.normpath(s.photo_path).lower() == os.path.normpath(c_path).lower())
+                            ) and _face_overlap(s.face_rect, fr) >= 0.45:
+                                matched_sug = s
+                                break
+                        if matched_sug is None:
+                            matched_sug = FaceSuggestion(
+                                photo_path=c_path or "",
+                                face_rect=fr,
+                                contact_id=sug_cid,
+                                contact_name=suggested_name,
+                                similarity=0.0,
+                                db_idx=c_idx,
+                            )
+                        fm.reject_suggestion(matched_sug)
+                    if fr.contact_name and fr.contact_name.startswith("?"):
                         fr.contact_name = ""
+                if fm is not None:
+                    self.people_changed.emit()
                 self.set_multiple_photos(
                     self.db,
                     self.multi_indices,
@@ -3508,6 +3535,7 @@ class PicasaTagsPanel(QWidget):
                     doc = PicasaIniDocument()
                 _mod(doc, filename)
                 try:
+                    PicasaIniWriter.mark_internal_write(folder)
                     doc.write_file(ini_path)
                 except Exception:
                     pass
@@ -4630,6 +4658,7 @@ class PicasaRightDrawer(QWidget):
                 )
                 _set_geo(doc, os.path.basename(p))
                 try:
+                    PicasaIniWriter.mark_internal_write(folder_p)
                     doc.write_file(ini_p)
                 except Exception:
                     pass
@@ -4676,6 +4705,7 @@ class PicasaRightDrawer(QWidget):
                     try:
                         doc = PicasaIniParser.parse_file(ini_p if os.path.exists(ini_p) else leg_p)
                         _clear_geo(doc, os.path.basename(p))
+                        PicasaIniWriter.mark_internal_write(folder_p)
                         doc.write_file(ini_p)
                     except Exception:
                         pass

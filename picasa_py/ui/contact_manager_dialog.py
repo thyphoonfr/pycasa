@@ -396,9 +396,11 @@ class PicasaContactManagerDialog(QDialog):
             # FR : Déléguer à face_manager.rename_person pour synchroniser albumdata_name.pmp, .picasa.ini, contacts.xml et wordhash.dat
             # EN: Delegate to face_manager.rename_person to synchronize albumdata_name.pmp, .picasa.ini, contacts.xml and wordhash.dat
             fm.rename_person(cid, new_name)
-            updated = fm.get_person(cid)
+            updated = fm.get_person(cid) or fm.get_person(new_name)
             if updated is not None:
                 self.current_person = updated
+                if self.current_person.contact_id != cid and new_email:
+                    self._update_contact_in_xml(self.current_person.contact_id, self.current_person.name, new_email)
             else:
                 self.current_person.name = new_name
         else:
@@ -414,7 +416,10 @@ class PicasaContactManagerDialog(QDialog):
         if fm is not None:
             fm.notify_people_changed()
 
-        QMessageBox.information(self, "Personne modifiée", f"« {old_name} » a été renommé en « {new_name} ».")
+        if old_name != new_name:
+            QMessageBox.information(self, "Personne modifiée", f"« {old_name} » a été renommé en « {new_name} ».")
+        else:
+            QMessageBox.information(self, "Personne modifiée", f"Les informations de « {new_name} » ont été enregistrées.")
 
     def _update_contact_in_xml(self, contact_id: str, new_name: str, new_email: Optional[str] = None) -> None:
         if not self.db:
@@ -434,6 +439,7 @@ class PicasaContactManagerDialog(QDialog):
         # Ref: picasa3.exe @ 0x0068AD1C (WriteContacts2Section "%s=%s;%s;\r\n")
         if self.current_person and getattr(self.current_person, "photo_paths", None):
             from picasa_py.ini.parser import PicasaIniParser
+            from picasa_py.ini.writer import PicasaIniWriter
             email_val = (new_email if new_email is not None else (existing.email if existing else "")) or ""
             seen_dirs = set()
             for pp in self.current_person.photo_paths:
@@ -451,6 +457,7 @@ class PicasaContactManagerDialog(QDialog):
                             csec = doc.get_section("Contacts2")
                             if csec is not None and csec.get(contact_id) is not None:
                                 csec.set(contact_id, f"{new_name};{email_val};")
+                                PicasaIniWriter.mark_internal_write(d)
                                 doc.write_file(ini_p)
                                 if hasattr(self.db, "invalidate_ini_cache"):
                                     self.db.invalidate_ini_cache(ini_p)

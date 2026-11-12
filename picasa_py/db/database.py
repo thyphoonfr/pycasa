@@ -3262,17 +3262,20 @@ class PicasaDatabase:
             if os.path.exists(orig_old) and not os.path.exists(orig_new):
                 try:
                     os.rename(orig_old, orig_new)
-                    b_ini = os.path.join(parent_dir, b_dir, ".picasa.ini")
-                    if os.path.exists(b_ini):
-                        b_doc = PicasaIniParser.parse_file(b_ini)
-                        old_b_sec = b_doc.get_section(old_fname)
-                        if old_b_sec is not None:
-                            b_doc.remove_section(new_fname)
-                            new_b_sec = b_doc.get_or_create_section(new_fname)
-                            for bk, bv in old_b_sec.items():
-                                new_b_sec.set(bk, bv)
-                            b_doc.remove_section(old_fname)
-                            b_doc.write_file(b_ini)
+                except Exception:
+                    pass
+            b_ini = os.path.join(parent_dir, b_dir, ".picasa.ini")
+            if os.path.exists(b_ini):
+                try:
+                    b_doc = PicasaIniParser.parse_file(b_ini)
+                    old_b_sec = b_doc.get_section(old_fname)
+                    if old_b_sec is not None:
+                        b_doc.remove_section(new_fname)
+                        new_b_sec = b_doc.get_or_create_section(new_fname)
+                        for bk, bv in old_b_sec.items():
+                            new_b_sec.set(bk, bv)
+                        b_doc.remove_section(old_fname)
+                        b_doc.write_file(b_ini)
                 except Exception:
                     pass
 
