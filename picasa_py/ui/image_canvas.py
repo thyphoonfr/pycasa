@@ -58,6 +58,7 @@ class PicasaImageCanvas(QWidget):
     redeye_applied = Signal(float, float)  # (norm_x, norm_y)
     redeye_box_applied = Signal(object)  # QRectF
     neutral_color_picked = Signal(object)  # Tuple[int, int, int] (r, g, b)
+    tool_cancelled = Signal()  # Ref: picasa3.exe @ 0x0057BB50, 0x005F8160 (editpanel/cancel)
 
     def __init__(self, style: Optional[PicasaStyle] = None, parent: Optional[QWidget] = None):
         """
@@ -2215,30 +2216,37 @@ class PicasaImageCanvas(QWidget):
         """
         FR: Gère la touche Échap pour annuler un outil interactif actif, ou propage les touches de navigation au parent.
         EN: Handles the Escape key to cancel an active interactive tool, or propagates navigation keys to the parent.
+        Ref: picasa3.exe @ 0x0057BB50, 0x005F8160 (editpanel/cancel)
         """
         if event.key() == Qt.Key.Key_Escape:
             if self.is_manual_face_add:
                 self.cancel_manual_face_add()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
             if self.is_cropping:
                 self.cancel_crop()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
             if self.is_straightening:
                 self.cancel_straighten()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
             if self.is_retouching:
                 self.cancel_retouch()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
             if self.is_redeye:
                 self.cancel_redeye()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
             if self.is_text_tool_active:
                 self.cancel_text_tool()
+                self.tool_cancelled.emit()
                 event.accept()
                 return
         if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
@@ -2250,7 +2258,7 @@ class PicasaImageCanvas(QWidget):
         """
         FR: Gère le clic droit sur le canevas en mode One-Up / Two-Up (annule l'outil actif ou ouvre le menu contextuel).
         EN: Handles right-click on the canvas in One-Up / Two-Up mode (cancels active tool or opens the context menu).
-        Ref: picasa3.exe @ TrackPopupMenu (0x005E7CD7), lb_rightclick (0x005D41F4)
+        Ref: picasa3.exe @ TrackPopupMenu (0x005E7CD7), lb_rightclick (0x005D41F4), 0x0057BB50
         """
         if self.is_any_tool_active():
             if self.is_manual_face_add:
@@ -2265,6 +2273,7 @@ class PicasaImageCanvas(QWidget):
                 self.cancel_redeye()
             elif self.is_text_tool_active:
                 self.cancel_text_tool()
+            self.tool_cancelled.emit()
             event.accept()
             return
         self.context_menu_requested.emit(event.globalPos())

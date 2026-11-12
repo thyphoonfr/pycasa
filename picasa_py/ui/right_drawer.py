@@ -1638,7 +1638,11 @@ class PicasaPeoplePanel(QWidget):
                     self.db.face_manager.reassign_face(
                         self.photo_path, fr, new_n, db_idx=db_i, source_image=getattr(self, "cached_source_img", None)
                     )
-                    updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+                    updated_faces = (
+                        self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+                        if (self.photo_index >= 0 or self.photo_path)
+                        else []
+                    )
                     self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
                     self.faces_updated.emit(updated_faces)
                     self.people_changed.emit()
@@ -1748,7 +1752,11 @@ class PicasaPeoplePanel(QWidget):
                             self.photo_path, fr, new_name, db_idx=db_i, source_image=src_img
                         )
 
-                    updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+                    updated_faces = (
+                        self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+                        if (self.photo_index >= 0 or self.photo_path)
+                        else []
+                    )
                     self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=src_img)
                     self.faces_updated.emit(updated_faces)
                     self.people_changed.emit()
@@ -1782,7 +1790,11 @@ class PicasaPeoplePanel(QWidget):
             self.db.face_manager.add_face(
                 self.photo_path, fr, name_to_apply, db_idx=db_i, source_image=getattr(self, "cached_source_img", None)
             )
-            updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+            updated_faces = (
+                self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+                if (self.photo_index >= 0 or self.photo_path)
+                else []
+            )
             self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
             self.faces_updated.emit(updated_faces)
             self.people_changed.emit()
@@ -1799,7 +1811,11 @@ class PicasaPeoplePanel(QWidget):
         self.db.face_manager.add_face(
             self.photo_path, fr, new_name, db_idx=db_i, source_image=getattr(self, "cached_source_img", None)
         )
-        updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+        updated_faces = (
+            self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+            if (self.photo_index >= 0 or self.photo_path)
+            else []
+        )
         self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
         self.faces_updated.emit(updated_faces)
         self.people_changed.emit()
@@ -1828,7 +1844,11 @@ class PicasaPeoplePanel(QWidget):
         else:
             self.db.face_manager.add_face(self.photo_path, fr, person_name, db_idx=db_i)
 
-        updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+        updated_faces = (
+            self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+            if (self.photo_index >= 0 or self.photo_path)
+            else []
+        )
         self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
         self.faces_updated.emit(updated_faces)
         self.people_changed.emit()
@@ -1848,7 +1868,11 @@ class PicasaPeoplePanel(QWidget):
 
         fr.contact_name = None
         fr.contact_id = ""
-        updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+        updated_faces = (
+            self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+            if (self.photo_index >= 0 or self.photo_path)
+            else []
+        )
         self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
         self.faces_updated.emit(updated_faces)
 
@@ -1861,7 +1885,11 @@ class PicasaPeoplePanel(QWidget):
             return
         db_i = self.photo_index if self.photo_index >= 0 else None
         self.db.face_manager.remove_face(self.photo_path, fr, db_idx=db_i)
-        updated_faces = self.db.face_manager.get_faces_for_photo(self.photo_index) if self.photo_index >= 0 else []
+        updated_faces = (
+            self.db.face_manager.get_faces_for_photo(self.photo_index, photo_path=self.photo_path)
+            if (self.photo_index >= 0 or self.photo_path)
+            else []
+        )
         self.set_photo_faces(self.db, self.photo_index, self.photo_path, updated_faces, source_img=getattr(self, "cached_source_img", None))
         self.faces_updated.emit(updated_faces)
         self.people_changed.emit()

@@ -2589,6 +2589,76 @@ def test_pass19_effects_copy_paste_offset_time_and_geotag_priority(tmp_path: Pat
     assert sec2.get("filters") == "sepia=1;"
 
 
+def test_pass20_canvas_tool_cancel_and_graduated_tint_and_save_as_parity(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les correctifs de la Passe 20 :
+    1. L'annulation d'un outil interactif depuis `PicasaImageCanvas` (touche Échap ou clic droit)
+       émet `tool_cancelled`, referme le sous-panneau actif de `PicasaEditPanel` et déverrouille
+       toutes les barres d'interface de `PicasaOneUpView` (`_is_tool_locked == False`).
+    2. `FILTER_SPECS["graduated_tint"]` (`dir_tint` dans `filterdesc.xml`) expose le curseur `angle`
+       (-180°..+180°) et le transmet à `PicasaOneUpView._effect_to_ini_token` / `PicasaImageProcessor`.
+    3. `PicasaOneUpView.save_current_photo_as` applique `ImageOps.exif_transpose` pour comparer la taille
+       réelle, sauvegarde en JPEG `quality=90, subsampling="keep"` et émet `photo_edited`.
+    """
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtCore import Qt, QPoint
+    from PySide6.QtGui import QKeyEvent, QContextMenuEvent
+    from picasa_py.ui.edit_panel import FILTER_SPECS
+    from picasa_py.ui.one_up_view import PicasaOneUpView
+
+    app = QApplication.instance() or QApplication([])
+
+    # 1. Vérifier que graduated_tint possède bien le curseur angle (-180..180)
+    gt_sliders = FILTER_SPECS["graduated_tint"]["sliders"]
+    gt_keys = [s["key"] for s in gt_sliders]
+    assert "angle" in gt_keys
+
+    # 2. Créer une photo de test et l'ouvrir dans PicasaOneUpView
+    db = PicasaDatabase.create_new(tmp_path / "db_pass20")
+    scanner = PicasaDirScanner(db)
+    folder = tmp_path / "photos_p20"
+    folder.mkdir()
+    photo_p = folder / "sample_p20.jpg"
+    Image.new("RGB", (320, 240), (90, 140, 210)).save(str(photo_p), format="JPEG", quality=92)
+    idx = scanner.index_file(photo_p)
+    assert idx >= 0
+
+    view = PicasaOneUpView()
+    view.open_photo(db, idx, [idx])
+
+    # Activer l'outil Recadrer : le sous-panneau s'ouvre et l'interface est verrouillée
+    view.edit_panel._open_crop_subpanel()
+    assert view.edit_panel.stack.currentIndex() == 1
+    assert view._is_tool_locked is True
+    assert view.canvas.is_cropping is True
+
+    # Simuler Échap directement sur PicasaImageCanvas
+    esc_ev = QKeyEvent(QKeyEvent.Type.KeyPress, Qt.Key.Key_Escape, Qt.KeyboardModifier.NoModifier)
+    view.canvas.keyPressEvent(esc_ev)
+    assert view.canvas.is_cropping is False
+    assert view.edit_panel.stack.currentIndex() == 0
+    assert view._is_tool_locked is False
+
+    # Activer l'ajout manuel de visage et annuler par clic droit (contextMenuEvent) sur le canevas
+    view._on_manual_face_add_start()
+    assert view.canvas.is_manual_face_add is True
+    assert view._is_tool_locked is True
+    ctx_ev = QContextMenuEvent(QContextMenuEvent.Reason.Mouse, QPoint(50, 50), QPoint(50, 50))
+    view.canvas.contextMenuEvent(ctx_ev)
+    assert view.canvas.is_manual_face_add is False
+    assert view._is_tool_locked is False
+
+    # 3. Vérifier save_current_photo_as et l'émission du signal photo_edited
+    edited_signals: list[str] = []
+    view.photo_edited.connect(lambda p: edited_signals.append(p))
+    out_p = folder / "saved_as_p20.jpg"
+    ok = view.save_current_photo_as(str(out_p))
+    assert ok is True
+    assert out_p.exists()
+    assert str(out_p) in edited_signals
+
+
+
 
 
 

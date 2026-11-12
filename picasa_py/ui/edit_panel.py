@@ -717,13 +717,14 @@ FILTER_SPECS: dict[str, dict] = {
     "graduated_tint": {
         "title": "🌅 Teinte dégradée",
         "title_id": "FilterName_dir_tint",
-        "desc": "Choisissez la couleur du filtre dégradé, son estompage et son intensité.",
+        "desc": "Choisissez la couleur du filtre dégradé, son estompage, son intensité et l'angle d'horizon.",
         "colors": [
             {"key": "color", "label": "Couleur du filtre", "default": (123, 180, 216)},
         ],
         "sliders": [
             {"key": "feather", "label": "Estomper", "min": 0, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
             {"key": "shade", "label": "Ombre / Intensité", "min": 0, "max": 100, "default": 50, "scale": 100.0, "unit": "%"},
+            {"key": "angle", "label": "Angle", "min": -180, "max": 180, "default": 0, "scale": 1.0, "unit": "°"},
         ],
     },
     "filtered_bw": {

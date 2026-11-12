@@ -179,6 +179,7 @@ class PicasaOneUpView(QWidget):
         self.canvas = PicasaImageCanvas(self.style, self)
         self.canvas.active_pane_changed.connect(self._on_active_pane_changed)
         self.canvas.context_menu_requested.connect(self._on_canvas_context_menu)
+        self.canvas.tool_cancelled.connect(self._on_canvas_tool_cancelled)
         self.canvas.straighten_interactive_angle_changed.connect(self.edit_panel.straighten_subpanel.set_angle_from_canvas)
         self.canvas.retouch_applied.connect(self._on_canvas_retouch)
         self.canvas.redeye_applied.connect(self._on_canvas_redeye_point)
@@ -836,6 +837,20 @@ class PicasaOneUpView(QWidget):
         self.canvas.start_manual_face_add()
         self._set_modal_tool_lock(True, 3, "manual_face")
 
+    def _on_canvas_tool_cancelled(self) -> None:
+        """
+        FR: Synchronise le panneau d'édition et déverrouille les barres d'interface lorsqu'un outil
+        interactif est annulé directement depuis le canevas (touche Échap ou clic droit).
+        EN: Synchronizes the edit panel and unlocks the UI bars when an interactive tool
+        is cancelled directly from the canvas (Escape key or right-click).
+
+        Ref: picasa3.exe @ 0x0057BB50, 0x005F8160 (editpanel/cancel)
+        """
+        if hasattr(self, "edit_panel") and self.edit_panel is not None and self.edit_panel.stack.currentIndex() != 0:
+            self.edit_panel.cancel_active_subpanel()
+        if getattr(self, "_is_tool_locked", False):
+            self._set_modal_tool_lock(False, 0, "")
+
     def _set_modal_tool_lock(self, locked: bool, mode: int = 0, tool_id: str = "") -> None:
         """
         FR: Verrouille ou déverrouille la barre supérieure (`viewer_top_bar` / `editpanel/oneup_controls`),
@@ -1004,7 +1019,11 @@ class PicasaOneUpView(QWidget):
                 self.db.face_manager.add_face(
                     target_path, face_rect, name, db_idx=db_i, source_image=source_img
                 )
-                updated_faces = self.db.face_manager.get_faces_for_photo(self.current_index) if db_i is not None else [face_rect]
+                updated_faces = self.db.face_manager.get_faces_for_photo(
+                    self.current_index, photo_path=target_path
+                )
+                if not updated_faces:
+                    updated_faces = [face_rect]
                 self.canvas.set_face_rects(updated_faces)
                 self.right_drawer.panel_people.set_photo_faces(
                     self.db, self.current_index, target_path, updated_faces, source_img=source_img
@@ -3416,7 +3435,10 @@ class PicasaOneUpView(QWidget):
         """
         FR: Enregistre l'image active vers un nouvel emplacement en pleine résolution avec métadonnées EXIF/ICC (ID_FILE_SAVEAS).
         EN: Saves the active image to a new file path at full resolution with EXIF/ICC metadata (ID_FILE_SAVEAS).
+
+        Ref: picasa3.exe @ 0x00A3D67B (quality=90 = 0x5A), 0x009D5432 (subsampling="keep")
         """
+        self._flush_pending_thumb_db_sync()
         if not self._history or self._history_idx < 0:
             return False
         try:
@@ -3425,10 +3447,17 @@ class PicasaOneUpView(QWidget):
             exif_bytes = None
             icc_profile = None
             target_path = getattr(self, "_current_photo_path", None)
+            if not target_path and self.db and 0 <= self.current_index < len(self.db.index):
+                target_path = self.db.get_media_full_path(self.current_index)
             if target_path and os.path.exists(target_path):
                 try:
+                    from PIL import ImageOps
                     with Image.open(target_path) as meta_im:
-                        raw_w, raw_h = meta_im.size
+                        try:
+                            tr_im = ImageOps.exif_transpose(meta_im)
+                            raw_w, raw_h = tr_im.size
+                        except Exception:
+                            raw_w, raw_h = meta_im.size
                         icc_profile = meta_im.info.get("icc_profile")
                         raw_exif = meta_im.getexif()
                         if raw_exif:
@@ -3448,7 +3477,11 @@ class PicasaOneUpView(QWidget):
                 save_kwargs["icc_profile"] = icc_profile
             ext = Path(output_path).suffix.lower()
             if ext in (".jpg", ".jpeg"):
-                img_to_save.convert("RGB").save(output_path, format="JPEG", quality=95, **save_kwargs)
+                rgb_to_save = img_to_save.convert("RGB")
+                try:
+                    rgb_to_save.save(output_path, format="JPEG", quality=90, subsampling="keep", **save_kwargs)
+                except Exception:
+                    rgb_to_save.save(output_path, format="JPEG", quality=90, **save_kwargs)
             elif ext == ".png":
                 img_to_save.save(output_path, format="PNG", **save_kwargs)
             else:
@@ -3459,6 +3492,7 @@ class PicasaOneUpView(QWidget):
                     PicasaDirScanner(self.db).index_file(output_path)
                 except Exception:
                     pass
+            self.photo_edited.emit(output_path)
             return True
         except Exception:
             return False

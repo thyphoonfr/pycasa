@@ -5278,11 +5278,20 @@ class PicasaThumbnailView(QWidget):
                     if ini_path.exists():
                         doc = PicasaIniParser.parse_file(str(ini_path))
                 if doc:
+                    sec = doc.get_section(p.name)
                     rot = doc.get_rotate(p.name)
                     tilt = doc.get_tilt(p.name)
                     crop_hex = doc.get_crop(p.name)
                     filters_str = doc.get_key(p.name, "filters")
-                    text_str = doc.get_text(p.name)
+                    # Ref: func_00456a15.c:3352-3460 — legacy fix=1 / bw=1 synthesis when filters= is absent
+                    if not (filters_str and filters_str.strip()) and sec is not None:
+                        if (sec.get("fix") or "").strip().lower() in ("1", "yes", "true") or (
+                            sec.get("bw") or ""
+                        ).strip().lower() in ("1", "yes", "true"):
+                            filters_str = "1"
+                    raw_ta = sec.get("textactive") if sec is not None else None
+                    text_is_active = raw_ta is None or raw_ta.strip().lower() not in ("0", "no", "false")
+                    text_str = doc.get_text(p.name) if text_is_active else None
                     has_ini_edits = bool(
                         rot
                         or (tilt and abs(tilt) >= 0.01)
