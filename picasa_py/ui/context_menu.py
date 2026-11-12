@@ -491,17 +491,17 @@ class PicasaContextMenuBuilder:
 
         menu.addSeparator()
 
-        # S&ort Folder By (SortFolderBy, 0x00CAE2A8)
+        # S&ort Folder By (SortFolderBy, 0x00CAE2A8, Ref: 0x007319F0)
         menu_sort = menu.addMenu(_tr("S&ort Folder By", "T&rier le dossier par", "Folder::SortFolderBy"))
         act_sort_name = menu_sort.addAction(_tr("Name", "&Nom", "Sort::ID_NAMESORT"))
         if main_win and hasattr(main_win, "action_sort_folder_by"):
-            act_sort_name.triggered.connect(lambda: main_win.action_sort_folder_by("name"))
+            act_sort_name.triggered.connect(lambda: main_win.action_sort_folder_by("name", target_folder=folder_path))
         act_sort_date = menu_sort.addAction(_tr("Date", "&Date", "Sort::ID_DATESORT"))
         if main_win and hasattr(main_win, "action_sort_folder_by"):
-            act_sort_date.triggered.connect(lambda: main_win.action_sort_folder_by("date"))
+            act_sort_date.triggered.connect(lambda: main_win.action_sort_folder_by("date", target_folder=folder_path))
         act_sort_size = menu_sort.addAction(_tr("Size", "&Taille", "Sort::ID_SIZESORT"))
         if main_win and hasattr(main_win, "action_sort_folder_by"):
-            act_sort_size.triggered.connect(lambda: main_win.action_sort_folder_by("size"))
+            act_sort_size.triggered.connect(lambda: main_win.action_sort_folder_by("size", target_folder=folder_path))
 
         menu.addSeparator()
 
@@ -598,17 +598,17 @@ class PicasaContextMenuBuilder:
 
         menu.addSeparator()
 
-        # Sort &Album By (SortAlbumBy, 0x00CAE418)
+        # Sort &Album By (SortAlbumBy, 0x00CAE418, Ref: 0x00732160)
         menu_sort = menu.addMenu(_tr("Sort &Album By", "Trier l'&album par", "Album::SortAlbumBy"))
         act_sort_name = menu_sort.addAction(_tr("Name", "&Nom", "Sort::ID_NAMESORT"))
         if main_win and hasattr(main_win, "action_sort_album_by"):
-            act_sort_name.triggered.connect(lambda: main_win.action_sort_album_by("name"))
+            act_sort_name.triggered.connect(lambda: main_win.action_sort_album_by("name", target_album=album_name))
         act_sort_date = menu_sort.addAction(_tr("Date", "&Date", "Sort::ID_DATESORT"))
         if main_win and hasattr(main_win, "action_sort_album_by"):
-            act_sort_date.triggered.connect(lambda: main_win.action_sort_album_by("date"))
+            act_sort_date.triggered.connect(lambda: main_win.action_sort_album_by("date", target_album=album_name))
         act_sort_size = menu_sort.addAction(_tr("Size", "&Taille", "Sort::ID_SIZESORT"))
         if main_win and hasattr(main_win, "action_sort_album_by"):
-            act_sort_size.triggered.connect(lambda: main_win.action_sort_album_by("size"))
+            act_sort_size.triggered.connect(lambda: main_win.action_sort_album_by("size", target_album=album_name))
 
         menu.addSeparator()
 

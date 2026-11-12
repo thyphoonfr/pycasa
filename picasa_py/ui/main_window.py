@@ -4971,7 +4971,11 @@ class PicasaMainWindow(QMainWindow):
         else:
             return
 
-        norm_target = target_folder.replace("\\", "/").rstrip("/").lower() if target_folder else None
+        norm_target = (
+            target_folder.replace("\\", "/").rstrip("/").lower()
+            if (target_folder and target_folder != "__all_sections__")
+            else None
+        )
         for sec_list in (getattr(self.thumb_view, "visible_sections", []), getattr(self.thumb_view, "sections", [])):
             for sec in sec_list:
                 if norm_target:
@@ -4999,7 +5003,13 @@ class PicasaMainWindow(QMainWindow):
         EN: Sorts the current album by name, date, or size (Album::SortAlbumBy) and persists the sorted order.
         Ref: picasa3.exe @ Album::SortAlbumBy (0x00CAE43C)
         """
-        self.action_sort_folder_by(criterion, target_folder=target_album)
+        effective_target = (
+            target_album
+            or getattr(self, "_current_selected_album", None)
+            or getattr(self, "_current_selected_folder", None)
+            or "__current_album__"
+        )
+        self.action_sort_folder_by(criterion, target_folder=effective_target if target_album or getattr(self, "_current_selected_album", None) or getattr(self, "_current_selected_folder", None) else "__all_sections__")
         if self.db is not None and hasattr(self.db, "get_albums"):
             try:
                 norm_t = (target_album or "").strip().lower()

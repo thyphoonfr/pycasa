@@ -2901,6 +2901,91 @@ def test_pass22_contacts2_email_preservation_cluster_reject_and_originals_ini_re
     assert sec_orig_new.get("filters") == "crop64=1,20002000e000e000;"
 
 
+def test_pass23_contacts2_email_restore_recent_sort_popup_and_scoped_folder_album_sort(tmp_path: Path):
+    """
+    FR: Vérifie les correctifs de la 23ème passe d'audit Ghidra :
+        1. Restauration du nom et de l'e-mail depuis `[Contacts2]` (`<cid>=<name>;<email>;`)
+           dans `self.db.contacts` lors de `_scan_ini_faces` (`Ref: picasa3.exe @ 0x0045A9D0 -> 0x00587110`).
+        2. Présence de l'option `AlbumList::ID_SORTBYMOST_RECENT_PHOTO` (`"recent"`) dans le menu
+           contextuel des dossiers de `PicasaTopBar` (`Ref: picasa3.exe @ 0x005E2070 - 0x005E2140`).
+        3. Isolation du tri par dossier (`Folder::SortFolderBy` @ `0x007319F0`) et par album
+           (`Album::SortAlbumBy` @ `0x00732160`) dans `PicasaContextMenuBuilder` afin de ne trier
+           que le dossier/album ciblé sans écraser le mode de tri global de la photothèque.
+    """
+    from PySide6.QtWidgets import QApplication
+    from PIL import Image
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.ui.context_menu import PicasaContextMenuBuilder
+
+    _app = QApplication.instance() or QApplication([])
+
+    db = PicasaDatabase.create_new(tmp_path / "db3_pass23")
+    scanner = PicasaDirScanner(db)
+
+    folder = tmp_path / "PhotosPass23"
+    folder.mkdir()
+    photo_p = folder / "portrait_c2.jpg"
+    Image.new("RGB", (320, 240), (120, 140, 160)).save(str(photo_p), format="JPEG")
+    photo_idx = scanner.index_file(photo_p)
+    assert photo_idx >= 0
+
+    # 1. Écriture d'un contact uniquement dans [Contacts2] de .picasa.ini (sans entrée préalable dans contacts.xml)
+    cid = "e4f5a6b7c8d9e0f1"
+    ini_content = (
+        f"[Contacts2]\r\n"
+        f"{cid}=Claire Martin;claire.martin@example.com;\r\n"
+        f"[portrait_c2.jpg]\r\n"
+        f"faces=rect64(2000200080008000),{cid}\r\n"
+    )
+    (folder / ".picasa.ini").write_bytes(ini_content.encode("utf-8"))
+
+    assert db.contacts.get(cid) is None
+    db.invalidate_ini_cache(str(folder / ".picasa.ini"))
+    db.face_manager._scan_ini_faces({})
+    restored_contact = db.contacts.get(cid)
+    assert restored_contact is not None
+    assert restored_contact.name == "Claire Martin"
+    assert restored_contact.email == "claire.martin@example.com"
+
+    # 2. Vérification des appels ciblés de Folder::SortFolderBy et Album::SortAlbumBy dans PicasaContextMenuBuilder
+    calls_folder: list[tuple[str, object]] = []
+    calls_album: list[tuple[str, object]] = []
+
+    class _DummyWin:
+        def action_sort_folder_by(self, criterion: str, target_folder=None):
+            calls_folder.append((criterion, target_folder))
+
+        def action_sort_album_by(self, criterion: str, target_album=None):
+            calls_album.append((criterion, target_album))
+
+    dummy_win = _DummyWin()
+    from PySide6.QtWidgets import QWidget
+    parent_w = QWidget()
+
+    f_menu = PicasaContextMenuBuilder.build_folder_context_menu(parent_w, str(folder), db=db, main_win=dummy_win)
+    sort_submenus = [a.menu() for a in f_menu.actions() if a.menu() is not None]
+    assert len(sort_submenus) == 1
+    for act in sort_submenus[0].actions():
+        act.trigger()
+    assert calls_folder == [
+        ("name", str(folder)),
+        ("date", str(folder)),
+        ("size", str(folder)),
+    ]
+
+    a_menu = PicasaContextMenuBuilder.build_album_context_menu(parent_w, "Vacances 2026", db=db, main_win=dummy_win)
+    alb_submenus = [a.menu() for a in a_menu.actions() if a.menu() is not None]
+    assert len(alb_submenus) == 1
+    for act in alb_submenus[0].actions():
+        act.trigger()
+    assert calls_album == [
+        ("name", "Vacances 2026"),
+        ("date", "Vacances 2026"),
+        ("size", "Vacances 2026"),
+    ]
+
+
+
 
 
 

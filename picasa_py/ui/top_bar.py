@@ -466,6 +466,17 @@ class PicasaTopBar(QWidget):
         act_sort_name.setChecked(cur_dsort == 2)
         act_sort_name.triggered.connect(lambda: self.folder_sort_requested.emit("name"))
 
+        # Ref: picasa3.exe @ 0x005E2070 - 0x005E2140 (AlbumList::ID_SORTBYMOST_RECENT_PHOTO 0x9DC8)
+        act_sort_recent = menu.addAction(
+            rm.get_stringres(
+                "AlbumList::ID_SORTBYMOST_RECENT_PHOTO",
+                "Trier les dossiers selon les photos les plus récentes",
+            )
+        )
+        act_sort_recent.setCheckable(True)
+        act_sort_recent.setChecked(cur_dsort in (4, 5))
+        act_sort_recent.triggered.connect(lambda: self.folder_sort_requested.emit("recent"))
+
         # FR : Options de tri de la collection Personnes (Ref: 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C)
         # EN : People collection sort options (Ref: 0x007336F5 - 0x00733772, 0x005E2157 - 0x005E218C)
         menu.addSeparator()

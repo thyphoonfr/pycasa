@@ -908,8 +908,30 @@ class PicasaFaceManager:
                             k_unpadded = k.lstrip("0") or "0"
                             k_padded = k.zfill(16)
                             val = entry.value
-                            cname = val.split(";")[0].strip() if ";" in val else val.strip()
+                            parts_c2 = val.split(";")
+                            cname = parts_c2[0].strip() if parts_c2 else val.strip()
+                            cemail = parts_c2[1].strip() if len(parts_c2) > 1 else ""
                             if cname and cname.lower() not in ("sans nom", "unnamed") and not self._is_unknown_person_placeholder(cname):
+                                # Ref: picasa3.exe @ 0x0045A9D0 -> 0x00587110 (LoadContactFromIniContacts2)
+                                if getattr(self.db, "contacts", None) is not None:
+                                    c_mgr = self.db.contacts
+                                    existing_c = c_mgr.get(k) if hasattr(c_mgr, "get") else None
+                                    if existing_c is None and hasattr(c_mgr, "contacts") and isinstance(c_mgr.contacts, dict):
+                                        existing_c = c_mgr.contacts.get(k) or c_mgr.contacts.get(k_unpadded) or c_mgr.contacts.get(k_padded)
+                                    if existing_c is None:
+                                        from picasa_py.db.contacts import Contact
+                                        new_c = Contact(id=k_unpadded, name=cname, email=cemail)
+                                        if hasattr(c_mgr, "add_contact"):
+                                            c_mgr.add_contact(new_c)
+                                        elif hasattr(c_mgr, "contacts") and isinstance(c_mgr.contacts, list):
+                                            c_mgr.contacts.append(new_c)
+                                        elif hasattr(c_mgr, "contacts") and isinstance(c_mgr.contacts, dict):
+                                            c_mgr.contacts[k_unpadded] = new_c
+                                    else:
+                                        if not getattr(existing_c, "name", "") or self._is_unknown_person_placeholder(existing_c.name):
+                                            existing_c.name = cname
+                                        if cemail and not getattr(existing_c, "email", ""):
+                                            existing_c.email = cemail
                                 matched_k = None
                                 for cand_k in (k, k_unpadded, k_padded):
                                     if cand_k in contact_id_to_name:
