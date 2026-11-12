@@ -2174,6 +2174,131 @@ def test_pass16_face_avatar_geo_invalidation_person_search_and_geotag_lifecycle(
     assert p_idx not in db.search("]geo")
 
 
+def test_pass17_picasaoriginals_ini_face_remap_and_rotate_thumb_parity(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les corrections de la 17e passe d'audit picasa3.exe vs PyCasa :
+    1. Lors de la gravure de retouches sur le disque (`record_picasaoriginals_bake` / `_bake_photo_edits_on_disk`),
+       création fidèle de `.picasaoriginals/.picasa.ini` avec `rotate=`, `crop=`, `filters=`, `moddate=<16-hex-le-filetime>`,
+       `width=`, `height=`, `textactive=` et sauvegarde des coordonnées `faces=` originales (`0x00463523`, `0x0046D9A7`,
+       `0x0068B539..0x0068B794`).
+    2. Projection automatique des rectangles `faces=` et des sous-enregistrements `1001` (`imagedata_facerect`,
+       `imagedata_crop64`, `imagedata_width`, `imagedata_height`) vers le repère de l'image gravée, puis restauration
+       intégrale et nettoyage de `.picasaoriginals/.picasa.ini` lors de l'annulation (`cleanup_picasaoriginals_entry`).
+    3. Migration/nettoyage de `.picasaoriginals/.picasa.ini` lors de `rename_photo`, `move_photo` et `delete_photo`.
+    4. Régénération immédiate des vignettes en mémoire lors de `db.set_rotate(idx, rot)` lorsque le fichier existe sur disque.
+    """
+    import shutil
+    import struct
+    from PIL import Image
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.faces.face_manager import PicasaFaceManager
+    from picasa_py.faces.facerect import FaceRect
+    from picasa_py.scanner.scanner import file_filetimes
+
+    db = PicasaDatabase.create_new(tmp_path / "db_root_p17")
+    folder_a = tmp_path / "PhotosP17A"
+    folder_b = tmp_path / "PhotosP17B"
+    folder_a.mkdir(parents=True, exist_ok=True)
+    folder_b.mkdir(parents=True, exist_ok=True)
+
+    photo_path = folder_a / "vacances_p17.jpg"
+    # Image rectangulaire 200x100 avec moitié gauche rouge et moitié droite bleue
+    img = Image.new("RGB", (200, 100), (220, 30, 30))
+    for x in range(100, 200):
+        for y in range(100):
+            img.putpixel((x, y), (30, 60, 220))
+    img.save(str(photo_path), format="JPEG", quality=95)
+
+    PicasaDirScanner(db).scan_directory(folder_a)
+    p_idx = db.find_photo_index(str(photo_path))
+    assert p_idx is not None
+
+    fm = PicasaFaceManager(db)
+    orig_fr = FaceRect(0.10, 0.20, 0.30, 0.60)
+    added_fr = fm.add_face(str(photo_path), orig_fr, "Jean Valjean", db_idx=p_idx)
+    orig_u64 = added_fr.to_uint64()
+    children = db._get_face_children(p_idx)
+    assert len(children) == 1
+    c_idx = children[0]
+    assert db.pmps["imagedata_facerect"].records[c_idx] == orig_u64
+
+    # 1. set_rotate régénère immédiatement les vignettes en mémoire lorsque le fichier existe sur disque
+    thumb_before = db.get_thumbnail(p_idx, "thumbs")
+    assert db.set_rotate(p_idx, 1) is True
+    thumb_after = db.get_thumbnail(p_idx, "thumbs")
+    assert thumb_before is not None and thumb_after is not None
+    assert thumb_before != thumb_after
+
+    # Ajouter un filtre en plus de rotate(1) dans .picasa.ini
+    db.update_photo_ini(str(photo_path), lambda d, fn: d.append_filter(fn, "autolight=1"))
+
+    # 2. Simuler la gravure sur disque (.picasaoriginals/vacances_p17.jpg + .picasaoriginals/.picasa.ini)
+    originals_dir = folder_a / ".picasaoriginals"
+    originals_dir.mkdir(parents=True, exist_ok=True)
+    backup_file = originals_dir / "vacances_p17.jpg"
+    shutil.copy2(str(photo_path), str(backup_file))
+
+    doc_pre = PicasaIniParser.parse_file(str(folder_a / ".picasa.ini"))
+    old_faces, tr_faces = PicasaDatabase.record_picasaoriginals_bake(
+        photo_path, backup_file, doc_pre, 200, 100
+    )
+    assert len(old_faces) == 1
+    assert len(tr_faces) == 1
+    # Après rotation 90° horaire (rotate(1)) : new_left = 1 - bottom = 0.40, new_top = left = 0.10, new_right = 1 - top = 0.80, new_bottom = right = 0.30
+    assert abs(tr_faces[0].left - 0.40) < 1e-3
+    assert abs(tr_faces[0].top - 0.10) < 1e-3
+    assert abs(tr_faces[0].right - 0.80) < 1e-3
+    assert abs(tr_faces[0].bottom - 0.30) < 1e-3
+
+    orig_ini_p = originals_dir / ".picasa.ini"
+    assert orig_ini_p.exists()
+    orig_ini_doc = PicasaIniParser.parse_file(str(orig_ini_p))
+    orig_sec = orig_ini_doc.get_section("vacances_p17.jpg")
+    assert orig_sec is not None
+    assert orig_sec.get("rotate") == "rotate(1)"
+    assert orig_sec.get("filters") == "autolight=1;"
+    assert orig_sec.get("width") == "200"
+    assert orig_sec.get("height") == "100"
+    assert orig_sec.get("textactive") == "0"
+    _, ft2_bak, _ = file_filetimes(backup_file)
+    expected_moddate = struct.pack("<Q", int(ft2_bak) & 0xFFFFFFFFFFFFFFFF).hex()
+    assert orig_sec.get("moddate") == expected_moddate
+    assert orig_sec.get("faces") is not None
+
+    # Mettre à jour les sous-enregistrements 1001 vers le repère gravé (100x200)
+    db.remap_photo_faces_after_geometry_change(p_idx, str(photo_path), tr_faces, 100, 200)
+    assert db.pmps["imagedata_facerect"].records[c_idx] == tr_faces[0].to_uint64()
+    assert db.pmps["imagedata_width"].records[c_idx] == 100
+    assert db.pmps["imagedata_height"].records[c_idx] == 200
+
+    # 3. Migration de .picasaoriginals/.picasa.ini lors de rename_photo et move_photo
+    assert db.rename_photo(p_idx, "vacances_renomme.jpg") is True
+    orig_ini_after_ren = PicasaIniParser.parse_file(str(originals_dir / ".picasa.ini"))
+    assert orig_ini_after_ren.get_section("vacances_renomme.jpg") is not None
+    assert orig_ini_after_ren.get_section("vacances_p17.jpg") is None
+
+    assert db.move_photo(p_idx, folder_b) is True
+    assert not (folder_a / ".picasaoriginals").exists()
+    moved_orig_ini = folder_b / ".picasaoriginals" / ".picasa.ini"
+    assert moved_orig_ini.exists()
+    moved_orig_doc = PicasaIniParser.parse_file(str(moved_orig_ini))
+    assert moved_orig_doc.get_section("vacances_renomme.jpg") is not None
+
+    # 4. Restauration depuis .picasaoriginals : cleanup_picasaoriginals_entry restitue faces= et supprime .picasa.ini vide
+    moved_backup_file = folder_b / ".picasaoriginals" / "vacances_renomme.jpg"
+    restored_faces_str = PicasaDatabase.cleanup_picasaoriginals_entry(moved_backup_file)
+    assert restored_faces_str is not None
+    assert not moved_orig_ini.exists()
+    restored_list = FaceRect.parse_ini_faces(restored_faces_str)
+    assert len(restored_list) == 1
+    db.remap_photo_faces_after_geometry_change(
+        p_idx, str(folder_b / "vacances_renomme.jpg"), restored_list, 200, 100
+    )
+    assert db.pmps["imagedata_facerect"].records[c_idx] == orig_u64
+    assert db.pmps["imagedata_width"].records[c_idx] == 200
+    assert db.pmps["imagedata_height"].records[c_idx] == 100
+
+
 
 
 

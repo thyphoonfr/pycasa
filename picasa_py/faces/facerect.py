@@ -147,6 +147,36 @@ class FaceRect:
         """
         return encode_rect64_uint64(self.left, self.top, self.right, self.bottom)
 
+    def to_ini_str(self) -> str:
+        """
+        FR : Sérialise le rectangle et son contact_id au format `rect64(%I64x),<contact_id>`.
+        EN: Serializes the rectangle and its contact_id as `rect64(%I64x),<contact_id>`.
+        Ref: picasa3.exe @ 0x009B9247, 0x009BD640
+        """
+        cid = self.contact_id or "0"
+        return f"{self.to_rect64()},{cid}"
+
+    @classmethod
+    def parse_ini_faces(cls, raw_faces: str) -> List[FaceRect]:
+        """
+        FR : Analyse une chaîne `faces=rect64(...),<cid>;...` en liste de `FaceRect`.
+        EN: Parses a `faces=rect64(...),<cid>;...` string into a list of `FaceRect`.
+        Ref: picasa3.exe @ 0x009B9247, 0x009BD640
+        """
+        res: List[FaceRect] = []
+        if not raw_faces:
+            return res
+        for part in str(raw_faces).split(";"):
+            p = part.strip()
+            if not p or "," not in p:
+                continue
+            r_s, cid_s = p.split(",", 1)
+            try:
+                res.append(cls.from_rect64(r_s.strip(), contact_id=cid_s.strip()))
+            except Exception:
+                pass
+        return res
+
     @property
     def width(self) -> float:
         """

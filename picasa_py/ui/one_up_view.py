@@ -462,10 +462,12 @@ class PicasaOneUpView(QWidget):
 
     def _on_caption_committed(self) -> None:
         """
-        FR: Enregistre la légende saisie dans .picasa.ini, imagedata_caption.pmp et wordhash.dat via PicasaDatabase.
-        EN: Saves the entered caption to .picasa.ini, imagedata_caption.pmp, and wordhash.dat via PicasaDatabase.
+        FR: Enregistre la légende saisie dans l'en-tête IPTC `2:120 Caption-Abstract` (si JPEG),
+        `.picasa.ini`, `imagedata_caption.pmp` et `wordhash.dat` via `PicasaDatabase.set_caption`.
+        EN: Saves the entered caption to JPEG IPTC `2:120 Caption-Abstract`, `.picasa.ini`,
+        `imagedata_caption.pmp`, and `wordhash.dat` via `PicasaDatabase.set_caption`.
 
-        Ref: picasa3.exe @ editpanel/captionbutton, 0x0068AC80, AGENTS.md §4 bis.3
+        Ref: picasa3.exe @ editpanel/captionbutton, 0x00438450..0x004385CE, 0x0057BDF2, 0x0068AC80, AGENTS.md §4 bis.3
         """
         target_path = self.current_photo_path
         if not target_path or not os.path.exists(target_path):
@@ -477,19 +479,27 @@ class PicasaOneUpView(QWidget):
             FR: Met à jour ou supprime la clé `caption` dans la section du fichier `.picasa.ini`.
             EN: Updates or removes the `caption` key in the `.picasa.ini` file section.
             """
-            sec = doc.get_or_create_section(fname)
-            if caption_val:
-                sec.set("caption", caption_val)
-            else:
-                sec.remove("caption")
+            doc.set_caption(fname, caption_val if caption_val else None)
 
         if self.db is not None:
-            self.db.update_photo_ini(target_path, _apply_caption)
+            rec_idx = self.db.find_photo_index(target_path) if hasattr(self.db, "find_photo_index") else None
+            if (rec_idx is None or rec_idx < 0) and self.current_index >= 0:
+                rec_idx = self._resolve_db_photo_index(self.db, self.current_index)
+            if rec_idx is not None and rec_idx >= 0 and hasattr(self.db, "set_caption"):
+                self.db.set_caption(rec_idx, caption_val)
+            else:
+                self.db.update_photo_ini(target_path, _apply_caption)
         else:
             parent_dir = os.path.dirname(target_path)
             ini_path = os.path.join(parent_dir, ".picasa.ini")
+            legacy_ini = os.path.join(parent_dir, "Picasa.ini")
             from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
-            doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+            if os.path.exists(ini_path):
+                doc = PicasaIniParser.parse_file(ini_path)
+            elif os.path.exists(legacy_ini):
+                doc = PicasaIniParser.parse_file(legacy_ini)
+            else:
+                doc = PicasaIniDocument()
             fname = os.path.basename(target_path)
             _apply_caption(doc, fname)
             doc.write_file(ini_path)
@@ -3225,36 +3235,62 @@ class PicasaOneUpView(QWidget):
             img_to_save = current_img
             exif_bytes = None
             icc_profile = None
+            raw_w, raw_h = current_img.size
+            doc_check = None
             try:
+                from PIL import ImageOps
                 with Image.open(target_path) as meta_im:
-                    raw_w, raw_h = meta_im.size
+                    try:
+                        tr_im = ImageOps.exif_transpose(meta_im)
+                        raw_w, raw_h = tr_im.size
+                    except Exception:
+                        raw_w, raw_h = meta_im.size
                     icc_profile = meta_im.info.get("icc_profile")
                     raw_exif = meta_im.getexif()
                     if raw_exif:
                         if 0x0112 in raw_exif:
                             raw_exif[0x0112] = 1
                         exif_bytes = raw_exif.tobytes()
-                if max(raw_w, raw_h) > max(current_img.size):
-                    from picasa_py.ini.parser import PicasaIniParser
-                    ini_p = folder / ".picasa.ini"
-                    if not ini_p.exists():
-                        alt_p = folder / "Picasa.ini"
-                        if alt_p.exists():
-                            ini_p = alt_p
-                    if ini_p.exists():
-                        doc_check = PicasaIniParser.parse_file(ini_p)
-                        sec_check = doc_check.get_section(target_p.name)
-                        if sec_check and any(
-                            sec_check.get(k)
-                            for k in ("filters", "crop", "rotate", "tilt", "text", "autolight", "backlight", "colorfix", "redeye", "retouch")
-                        ):
-                            full_rendered = PicasaImageProcessor.load_transformed_image(
-                                target_path, max_size=0, parsed_ini=doc_check
-                            )
-                            if full_rendered is not None:
-                                img_to_save = full_rendered
+                from picasa_py.ini.parser import PicasaIniParser
+                ini_p = folder / ".picasa.ini"
+                if not ini_p.exists():
+                    alt_p = folder / "Picasa.ini"
+                    if alt_p.exists():
+                        ini_p = alt_p
+                if ini_p.exists():
+                    doc_check = PicasaIniParser.parse_file(ini_p)
+                if max(raw_w, raw_h) > max(current_img.size) and doc_check is not None:
+                    sec_check = doc_check.get_section(target_p.name)
+                    if sec_check and any(
+                        sec_check.get(k)
+                        for k in ("filters", "crop", "rotate", "tilt", "text", "autolight", "backlight", "colorfix", "redeye", "retouch")
+                    ):
+                        full_rendered = PicasaImageProcessor.load_transformed_image(
+                            target_path, max_size=0, parsed_ini=doc_check
+                        )
+                        if full_rendered is not None:
+                            img_to_save = full_rendered
             except Exception:
                 pass
+
+            orig_w, orig_h = raw_w, raw_h
+            actual_backup_p = backup_file if backup_file.exists() else (legacy_backup if legacy_backup.exists() else backup_file)
+            if actual_backup_p.exists():
+                try:
+                    from PIL import ImageOps
+                    with Image.open(actual_backup_p) as bak_im:
+                        try:
+                            orig_w, orig_h = ImageOps.exif_transpose(bak_im).size
+                        except Exception:
+                            orig_w, orig_h = bak_im.size
+                except Exception:
+                    pass
+
+            # Enregistrer .picasaoriginals/.picasa.ini et projeter les visages éventuels (Ref: picasa3.exe @ 0x00463523, 0x0046D9A7)
+            from picasa_py.db.database import PicasaDatabase
+            _, transformed_faces = PicasaDatabase.record_picasaoriginals_bake(
+                target_path, actual_backup_p, doc_check, orig_w, orig_h
+            )
 
             save_kwargs: dict = {}
             if exif_bytes:
@@ -3294,10 +3330,12 @@ class PicasaOneUpView(QWidget):
 
             def _clear_baked_edits(doc, fname: str) -> None:
                 """
-                FR: Nettoie les clés de retouches non-destructives désormais gravées dans les pixels
-                    et enregistre `backuphash` comme `picasa3.exe` (`0x00456A15`).
-                EN: Clears non-destructive edit keys that have been baked into pixels
-                    and records `backuphash` like `picasa3.exe` (`0x00456A15`).
+                FR: Nettoie les clés de retouches non-destructives désormais gravées dans les pixels,
+                    met à jour `faces` dans le repère de l'image gravée et enregistre `backuphash`
+                    comme `picasa3.exe` (`0x00456A15`, `0x00463523`).
+                EN: Clears non-destructive edit keys that have been baked into pixels,
+                    updates `faces` in the baked image coordinate space, and records `backuphash`
+                    like `picasa3.exe` (`0x00456A15`, `0x00463523`).
                 """
                 doc.set_crop(fname, None)
                 doc.set_rotate(fname, 0)
@@ -3306,6 +3344,8 @@ class PicasaOneUpView(QWidget):
                 sec = doc.get_or_create_section(fname)
                 for k in ("filters", "redo", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch", "fix", "bw"):
                     sec.remove(k)
+                if transformed_faces and hasattr(doc, "set_faces"):
+                    doc.set_faces(fname, transformed_faces)
                 sec.set("backuphash", str(b_hash))
 
             self._update_ini(target_path, _clear_baked_edits)
@@ -3357,6 +3397,10 @@ class PicasaOneUpView(QWidget):
                             if pmp_c is not None and rec_idx < len(pmp_c.records):
                                 pmp_c.records[rec_idx] = col_v
                                 pmp_c.dirty = True
+                        if hasattr(self.db, "remap_photo_faces_after_geometry_change"):
+                            self.db.remap_photo_faces_after_geometry_change(
+                                rec_idx, target_path, transformed_faces, saved_w, saved_h
+                            )
                         if hasattr(self.db, "sync_file_stat_and_checksums"):
                             self.db.sync_file_stat_and_checksums(rec_idx)
                 except Exception:

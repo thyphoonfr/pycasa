@@ -2053,9 +2053,12 @@ class PicasaMainWindow(QMainWindow):
 
         norm_targets = {os.path.normcase(os.path.normpath(p)) for p in paths}
         for p in paths:
+            restored_faces_str: Optional[str] = None
+            restored_rw = 0
+            restored_rh = 0
             try:
                 p_obj = Path(p)
-                # Ref: picasa3.exe @ 0x00462BA0, 0x0054368A, 0x0085A0B0 (.picasaoriginals et dossier legacy Originals)
+                # Ref: picasa3.exe @ 0x00462BA0, 0x00463523, 0x0054368A, 0x0085A0B0 (.picasaoriginals et dossier legacy Originals)
                 orig_backup = p_obj.parent / ".picasaoriginals" / p_obj.name
                 if not orig_backup.exists():
                     legacy_backup = p_obj.parent / "Originals" / p_obj.name
@@ -2066,6 +2069,10 @@ class PicasaMainWindow(QMainWindow):
                     from picasa_py.ini.parser import PicasaIniWriter
                     PicasaIniWriter.mark_internal_write(str(p_obj.parent))
                     shutil.copy2(str(orig_backup), str(p_obj))
+                    try:
+                        restored_faces_str = PicasaDatabase.cleanup_picasaoriginals_entry(orig_backup)
+                    except Exception:
+                        restored_faces_str = None
                     try:
                         orig_backup.unlink()
                         if not any(orig_backup.parent.iterdir()):
@@ -2091,6 +2098,7 @@ class PicasaMainWindow(QMainWindow):
                                         rw, rh = tr_img.size
                                     except Exception:
                                         rw, rh = r_img.size
+                                restored_rw, restored_rh = int(rw), int(rh)
                                 for col_n, col_v in (
                                     ("imagedata_width", int(rw)),
                                     ("imagedata_height", int(rh)),
@@ -2131,7 +2139,25 @@ class PicasaMainWindow(QMainWindow):
                             pass
             except Exception:
                 pass
-            self._update_photo_ini(p, _reset_doc)
+
+            def _reset_photo_doc(doc: PicasaIniDocument, fname: str, _faces_restore: Optional[str] = restored_faces_str) -> None:
+                _reset_doc(doc, fname)
+                if _faces_restore:
+                    sec_r = doc.get_or_create_section(fname)
+                    sec_r.set("faces", _faces_restore)
+
+            self._update_photo_ini(p, _reset_photo_doc)
+            if self.db is not None and restored_faces_str and hasattr(self.db, "remap_photo_faces_after_geometry_change"):
+                try:
+                    from picasa_py.faces.facerect import FaceRect
+                    rec_idx_f = self.db.find_photo_index(p) if hasattr(self.db, "find_photo_index") else None
+                    if rec_idx_f is not None and rec_idx_f >= 0:
+                        restored_faces_list = FaceRect.parse_ini_faces(restored_faces_str)
+                        self.db.remap_photo_faces_after_geometry_change(
+                            rec_idx_f, p, restored_faces_list, restored_rw, restored_rh
+                        )
+                except Exception:
+                    pass
             if self.db is not None and hasattr(self.db, "sync_photo_ini_to_db"):
                 try:
                     self.db.sync_photo_ini_to_db(p)
@@ -2379,9 +2405,14 @@ class PicasaMainWindow(QMainWindow):
 
             exif_bytes = None
             icc_profile = None
+            orig_w, orig_h = full_rendered.size
             try:
-                from PIL import Image
+                from PIL import Image, ImageOps
                 with Image.open(target_path) as meta_im:
+                    try:
+                        orig_w, orig_h = ImageOps.exif_transpose(meta_im).size
+                    except Exception:
+                        orig_w, orig_h = meta_im.size
                     icc_profile = meta_im.info.get("icc_profile")
                     raw_exif = meta_im.getexif()
                     if raw_exif:
@@ -2390,6 +2421,22 @@ class PicasaMainWindow(QMainWindow):
                         exif_bytes = raw_exif.tobytes()
             except Exception:
                 pass
+            actual_backup_p = backup_file if backup_file.exists() else (legacy_backup if legacy_backup.exists() else backup_file)
+            if actual_backup_p.exists():
+                try:
+                    from PIL import Image, ImageOps
+                    with Image.open(actual_backup_p) as bak_im:
+                        try:
+                            orig_w, orig_h = ImageOps.exif_transpose(bak_im).size
+                        except Exception:
+                            orig_w, orig_h = bak_im.size
+                except Exception:
+                    pass
+
+            # Enregistrer .picasaoriginals/.picasa.ini et projeter les visages éventuels (Ref: picasa3.exe @ 0x00463523, 0x0046D9A7)
+            _, transformed_faces = PicasaDatabase.record_picasaoriginals_bake(
+                target_path, actual_backup_p, doc_check, orig_w, orig_h
+            )
             save_kwargs: dict = {}
             if exif_bytes:
                 save_kwargs["exif"] = exif_bytes
@@ -2432,6 +2479,8 @@ class PicasaMainWindow(QMainWindow):
                 sec = doc.get_or_create_section(fname)
                 for k in ("filters", "redo", "crop", "rotate", "tilt", "text", "textactive", "backlight", "autolight", "colorfix", "redeye", "retouch", "fix", "bw"):
                     sec.remove(k)
+                if transformed_faces and hasattr(doc, "set_faces"):
+                    doc.set_faces(fname, transformed_faces)
                 sec.set("backuphash", str(b_hash))
 
             self._update_photo_ini(target_path, _clear_baked)
@@ -2466,6 +2515,10 @@ class PicasaMainWindow(QMainWindow):
                             if pmp_c is not None and rec_idx < len(pmp_c.records):
                                 pmp_c.records[rec_idx] = col_v
                                 pmp_c.dirty = True
+                        if hasattr(self.db, "remap_photo_faces_after_geometry_change"):
+                            self.db.remap_photo_faces_after_geometry_change(
+                                rec_idx, target_path, transformed_faces, saved_w, saved_h
+                            )
                         if hasattr(self.db, "sync_file_stat_and_checksums"):
                             self.db.sync_file_stat_and_checksums(rec_idx)
                     except Exception:
@@ -2742,6 +2795,10 @@ class PicasaMainWindow(QMainWindow):
 
         for w in folders_to_check:
             ini_p = os.path.join(w, ".picasa.ini")
+            if not os.path.exists(ini_p):
+                alt_p = os.path.join(w, "Picasa.ini")
+                if os.path.exists(alt_p):
+                    ini_p = alt_p
             doc = (
                 self.db.get_parsed_ini(ini_p)
                 if hasattr(self.db, "get_parsed_ini")
@@ -2900,7 +2957,13 @@ class PicasaMainWindow(QMainWindow):
 
         if target_dir and os.path.exists(target_dir):
             ini_path = os.path.join(target_dir, ".picasa.ini")
-            doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+            legacy_ini = os.path.join(target_dir, "Picasa.ini")
+            if os.path.exists(ini_path):
+                doc = PicasaIniParser.parse_file(ini_path)
+            elif os.path.exists(legacy_ini):
+                doc = PicasaIniParser.parse_file(legacy_ini)
+            else:
+                doc = PicasaIniDocument()
             sec = doc.get_or_create_section(f".album:{album_uid}")
             sec.set("name", album_name)
             sec.set("token", album_uid)
@@ -3072,6 +3135,10 @@ class PicasaMainWindow(QMainWindow):
                             candidate_dirs.add(r.path.rstrip("\\/"))
                 for w in candidate_dirs:
                     ini_p = os.path.join(w, ".picasa.ini")
+                    if not os.path.exists(ini_p):
+                        alt_p = os.path.join(w, "Picasa.ini")
+                        if os.path.exists(alt_p):
+                            ini_p = alt_p
                     if os.path.exists(ini_p):
                         try:
                             from picasa_py.ini.parser import PicasaIniParser
@@ -3846,6 +3913,10 @@ class PicasaMainWindow(QMainWindow):
             if not p or not os.path.exists(p):
                 continue
             ini_p = os.path.join(os.path.dirname(p), ".picasa.ini")
+            if not os.path.exists(ini_p):
+                alt_p = os.path.join(os.path.dirname(p), "Picasa.ini")
+                if os.path.exists(alt_p):
+                    ini_p = alt_p
             lat, lon = None, None
             if os.path.exists(ini_p):
                 try:
@@ -3893,6 +3964,10 @@ class PicasaMainWindow(QMainWindow):
         """
         if collection_name and os.path.isdir(collection_name):
             ini_p = os.path.join(collection_name, ".picasa.ini")
+            if not os.path.exists(ini_p):
+                alt_p = os.path.join(collection_name, "Picasa.ini")
+                if os.path.exists(alt_p):
+                    ini_p = alt_p
             if os.path.exists(ini_p):
                 try:
                     doc = PicasaIniParser.parse_file(ini_p)
@@ -3926,7 +4001,13 @@ class PicasaMainWindow(QMainWindow):
         """
         if collection_name and os.path.isdir(collection_name):
             ini_p = os.path.join(collection_name, ".picasa.ini")
-            doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+            legacy_ini = os.path.join(collection_name, "Picasa.ini")
+            if os.path.exists(ini_p):
+                doc = PicasaIniParser.parse_file(ini_p)
+            elif os.path.exists(legacy_ini):
+                doc = PicasaIniParser.parse_file(legacy_ini)
+            else:
+                doc = PicasaIniDocument()
             sec = doc.get_or_create_section("Picasa")
             if pwd_hash:
                 sec.set("password", pwd_hash)
@@ -4115,7 +4196,13 @@ class PicasaMainWindow(QMainWindow):
             if folder_dir and os.path.isdir(folder_dir):
                 ini_p = os.path.join(folder_dir, ".picasa.ini")
                 if ini_p not in docs_by_ini:
-                    docs_by_ini[ini_p] = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+                    legacy_p = os.path.join(folder_dir, "Picasa.ini")
+                    if os.path.exists(ini_p):
+                        docs_by_ini[ini_p] = PicasaIniParser.parse_file(ini_p)
+                    elif os.path.exists(legacy_p):
+                        docs_by_ini[ini_p] = PicasaIniParser.parse_file(legacy_p)
+                    else:
+                        docs_by_ini[ini_p] = PicasaIniDocument()
                 doc = docs_by_ini[ini_p]
                 if hide:
                     sec = doc.get_or_create_section(fname)
@@ -4190,7 +4277,13 @@ class PicasaMainWindow(QMainWindow):
         # Ref: picasa3.exe @ 0x00446012 (Écrit P2category dans [Picasa] de .picasa.ini)
         try:
             ini_p = os.path.join(target, ".picasa.ini")
-            doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+            legacy_ini = os.path.join(target, "Picasa.ini")
+            if os.path.exists(ini_p):
+                doc = PicasaIniParser.parse_file(ini_p)
+            elif os.path.exists(legacy_ini):
+                doc = PicasaIniParser.parse_file(legacy_ini)
+            else:
+                doc = PicasaIniDocument()
             sec = doc.get_or_create_section("Picasa")
             sec.set("P2category", "Hidden Folders" if hide else "Folders on Disk")
             doc.write_file(ini_p)
@@ -4307,6 +4400,10 @@ class PicasaMainWindow(QMainWindow):
                 shutil.copy2(p, os.path.join(target_sub, os.path.basename(p)))
                 copied += 1
                 ini_src = os.path.join(os.path.dirname(p), ".picasa.ini")
+                if not os.path.exists(ini_src):
+                    alt_src = os.path.join(os.path.dirname(p), "Picasa.ini")
+                    if os.path.exists(alt_src):
+                        ini_src = alt_src
                 if os.path.exists(ini_src) and ini_src not in copied_inis:
                     shutil.copy2(ini_src, os.path.join(target_sub, ".picasa.ini"))
                     copied_inis.add(ini_src)
@@ -4929,19 +5026,35 @@ class PicasaMainWindow(QMainWindow):
                             if os.path.exists(orig_old) and not os.path.exists(orig_new):
                                 try:
                                     os.rename(orig_old, orig_new)
+                                    b_ini = os.path.join(parent_dir, b_dir, ".picasa.ini")
+                                    if os.path.exists(b_ini):
+                                        b_doc = PicasaIniParser.parse_file(b_ini)
+                                        b_sec = b_doc.get_section(old_fn)
+                                        if b_sec is not None:
+                                            b_doc.remove_section(new_fn)
+                                            new_b_sec = b_doc.get_or_create_section(new_fn)
+                                            for bk, bv in b_sec.items():
+                                                new_b_sec.set(bk, bv)
+                                            b_doc.remove_section(old_fn)
+                                            b_doc.write_file(b_ini)
                                 except Exception:
                                     pass
                         ini_p = os.path.join(parent_dir, ".picasa.ini")
+                        if not os.path.exists(ini_p):
+                            alt_p = os.path.join(parent_dir, "Picasa.ini")
+                            if os.path.exists(alt_p):
+                                ini_p = alt_p
                         if os.path.exists(ini_p):
                             try:
                                 doc = PicasaIniParser.parse_file(ini_p)
                                 sec = doc.get_section(old_fn)
                                 if sec is not None:
+                                    doc.remove_section(new_fn)
                                     new_sec = doc.get_or_create_section(new_fn)
                                     for k, v in sec.items():
                                         new_sec.set(k, v)
                                     doc.remove_section(old_fn)
-                                    doc.write_file(ini_p)
+                                    doc.write_file(os.path.join(parent_dir, ".picasa.ini"))
                             except Exception:
                                 pass
                     for item in self.thumb_view.items:

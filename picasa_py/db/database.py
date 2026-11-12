@@ -1956,7 +1956,13 @@ class PicasaDatabase:
         rot = int(rotation) % 4
         full_path = self.get_media_full_path(eff_idx)
         if full_path:
-            return self.update_photo_ini(full_path, lambda doc, fn: doc.set_rotate(fn, rot))
+            ok = self.update_photo_ini(full_path, lambda doc, fn: doc.set_rotate(fn, rot))
+            if ok and os.path.isfile(full_path):
+                try:
+                    self.update_photo_thumbnails_from_disk(eff_idx, persist_to_disk=False)
+                except Exception:
+                    pass
+            return ok
         pmp_rot = self.pmps.get("imagedata_rotate")
         if pmp_rot is not None:
             default_v = pmp_rot.default_value()
@@ -2708,13 +2714,25 @@ class PicasaDatabase:
                     os.remove(full_path)
                 except Exception:
                     pass
-            # Supprimer également la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> (Ref: 0x00462BA0)
+            # Supprimer également la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> (Ref: 0x00462BA0, 0x00463523)
             for b_dir in (".picasaoriginals", "Originals"):
                 b_file = os.path.join(parent_dir, b_dir, fname_del)
                 if os.path.exists(b_file):
                     try:
                         os.remove(b_file)
                         b_parent = os.path.dirname(b_file)
+                        b_ini = os.path.join(b_parent, ".picasa.ini")
+                        if os.path.exists(b_ini):
+                            try:
+                                from picasa_py.ini.parser import PicasaIniParser
+                                b_doc = PicasaIniParser.parse_file(b_ini)
+                                b_doc.remove_section(fname_del)
+                                if b_doc.sections:
+                                    b_doc.write_file(b_ini)
+                                else:
+                                    os.remove(b_ini)
+                            except Exception:
+                                pass
                         if os.path.isdir(b_parent) and not os.listdir(b_parent):
                             os.rmdir(b_parent)
                     except Exception:
@@ -2893,7 +2911,7 @@ class PicasaDatabase:
             except Exception:
                 pass
 
-        # Transférer la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> si présente (Ref: picasa3.exe @ 0x00462BA0, 0x0068AC80)
+        # Transférer la sauvegarde .picasaoriginals/<fname> ou Originals/<fname> si présente (Ref: picasa3.exe @ 0x00462BA0, 0x00463523, 0x0068AC80)
         for b_dir in (".picasaoriginals", "Originals"):
             src_orig_backup = os.path.join(src_dir, b_dir, fname)
             if os.path.exists(src_orig_backup):
@@ -2902,6 +2920,26 @@ class PicasaDatabase:
                     os.makedirs(dest_orig_dir, exist_ok=True)
                     shutil.move(src_orig_backup, os.path.join(dest_orig_dir, fname))
                     src_b_parent = os.path.dirname(src_orig_backup)
+                    src_b_ini = os.path.join(src_b_parent, ".picasa.ini")
+                    if os.path.exists(src_b_ini):
+                        try:
+                            src_b_doc = PicasaIniParser.parse_file(src_b_ini)
+                            src_b_sec = src_b_doc.get_section(fname)
+                            if src_b_sec is not None:
+                                dest_b_ini = os.path.join(dest_orig_dir, ".picasa.ini")
+                                dest_b_doc = PicasaIniParser.parse_file(dest_b_ini) if os.path.exists(dest_b_ini) else PicasaIniDocument()
+                                dest_b_doc.remove_section(fname)
+                                dest_b_sec = dest_b_doc.get_or_create_section(fname)
+                                for bk, bv in src_b_sec.items():
+                                    dest_b_sec.set(bk, bv)
+                                dest_b_doc.write_file(dest_b_ini)
+                                src_b_doc.remove_section(fname)
+                                if src_b_doc.sections:
+                                    src_b_doc.write_file(src_b_ini)
+                                else:
+                                    os.remove(src_b_ini)
+                        except Exception:
+                            pass
                     if os.path.isdir(src_b_parent) and not os.listdir(src_b_parent):
                         os.rmdir(src_b_parent)
                 except Exception:
@@ -3076,13 +3114,24 @@ class PicasaDatabase:
             except Exception:
                 return False
 
-        # Migrer .picasaoriginals/<old_fname> ou Originals/<old_fname> (Ref: 0x00462BA0)
+        # Migrer .picasaoriginals/<old_fname> ou Originals/<old_fname> (Ref: 0x00462BA0, 0x00463523)
         for b_dir in (".picasaoriginals", "Originals"):
             orig_old = os.path.join(parent_dir, b_dir, old_fname)
             orig_new = os.path.join(parent_dir, b_dir, new_fname)
             if os.path.exists(orig_old) and not os.path.exists(orig_new):
                 try:
                     os.rename(orig_old, orig_new)
+                    b_ini = os.path.join(parent_dir, b_dir, ".picasa.ini")
+                    if os.path.exists(b_ini):
+                        b_doc = PicasaIniParser.parse_file(b_ini)
+                        old_b_sec = b_doc.get_section(old_fname)
+                        if old_b_sec is not None:
+                            b_doc.remove_section(new_fname)
+                            new_b_sec = b_doc.get_or_create_section(new_fname)
+                            for bk, bv in old_b_sec.items():
+                                new_b_sec.set(bk, bv)
+                            b_doc.remove_section(old_fname)
+                            b_doc.write_file(b_ini)
                 except Exception:
                     pass
 
@@ -3191,6 +3240,260 @@ class PicasaDatabase:
             return True
         except Exception:
             return False
+
+    @staticmethod
+    def record_picasaoriginals_bake(
+        target_path: str | Path,
+        backup_file: str | Path,
+        pre_bake_doc: Optional[Any],
+        orig_w: int,
+        orig_h: int,
+    ) -> Tuple[List[Any], List[Any]]:
+        """
+        FR: Enregistre l'état des retouches gravées dans `.picasaoriginals/.picasa.ini`
+        (`rotate`, `crop`, `filters`, `text`, `moddate`, `width`, `height`, `textactive`,
+        ainsi que `faces` original avant gravure) exactement comme `picasa3.exe`
+        (`0x00463523`, `0x0046B89B`, `0x0046D9A7`, `0x0047020D`, `0x0068B539..0x0068B794`),
+        et projette les rectangles `faces` vers l'espace de l'image gravée lorsqu'une
+        transformation géométrique (`crop`, `rotate`, `tilt`) est gravée sur disque.
+        Retourne `(old_faces_list, transformed_faces_list)`.
+        EN: Records baked edit state into `.picasaoriginals/.picasa.ini` (`rotate`, `crop`,
+        `filters`, `text`, `moddate`, `width`, `height`, `textactive`, and pre-bake `faces`)
+        exactly like `picasa3.exe` (`0x00463523`, `0x0046B89B`, `0x0046D9A7`, `0x0047020D`,
+        `0x0068B539..0x0068B794`), and projects `faces` rectangles into the baked image
+        coordinate space when a geometric transform (`crop`, `rotate`, `tilt`) is baked to disk.
+        Returns `(old_faces_list, transformed_faces_list)`.
+        """
+        from picasa_py.ini.parser import PicasaIniParser, PicasaIniDocument
+        from picasa_py.scanner.scanner import file_filetimes
+        import re
+
+        target_p = Path(target_path)
+        backup_p = Path(backup_file)
+        fname = target_p.name
+        old_faces: List[Any] = []
+        transformed_faces: List[Any] = []
+
+        try:
+            doc = pre_bake_doc
+            if doc is None:
+                folder = target_p.parent
+                ini_p = folder / ".picasa.ini"
+                if not ini_p.exists():
+                    alt_p = folder / "Picasa.ini"
+                    if alt_p.exists():
+                        ini_p = alt_p
+                doc = PicasaIniParser.parse_file(ini_p) if ini_p.exists() else PicasaIniDocument()
+
+            sec = doc.get_section(fname) if hasattr(doc, "get_section") else None
+            orig_ini_path = backup_p.parent / ".picasa.ini"
+            orig_doc = (
+                PicasaIniParser.parse_file(orig_ini_path)
+                if orig_ini_path.exists()
+                else PicasaIniDocument()
+            )
+            orig_sec = orig_doc.get_or_create_section(fname)
+
+            if sec is not None:
+                # Conserver les coordonnées faces d'origine (avant la toute première gravure)
+                if orig_sec.get("faces") is None and sec.get("faces"):
+                    orig_sec.set("faces", sec.get("faces") or "")
+                for k in ("rotate", "crop", "filters", "text"):
+                    v = sec.get(k)
+                    if v:
+                        orig_sec.set(k, v)
+
+            if backup_p.exists():
+                try:
+                    _, ft2_bak, _ = file_filetimes(backup_p)
+                    moddate_hex = struct.pack("<Q", int(ft2_bak) & 0xFFFFFFFFFFFFFFFF).hex()
+                    orig_sec.set("moddate", moddate_hex)
+                except Exception:
+                    pass
+
+            if orig_w > 0 and orig_h > 0:
+                orig_sec.set("width", str(int(orig_w)))
+                orig_sec.set("height", str(int(orig_h)))
+
+            raw_ta = sec.get("textactive") if sec is not None else None
+            if raw_ta is not None:
+                orig_sec.set("textactive", raw_ta)
+            elif sec is not None and sec.get("text"):
+                orig_sec.set("textactive", "1")
+            else:
+                orig_sec.set("textactive", "0")
+
+            orig_doc.write_file(orig_ini_path)
+
+            if sec is not None and sec.get("faces"):
+                from picasa_py.faces.facerect import FaceRect
+                old_faces = FaceRect.parse_ini_faces(sec.get("faces") or "")
+                if old_faces:
+                    c_rect_obj = doc.get_crop_rect64(fname) if hasattr(doc, "get_crop_rect64") else None
+                    crop_tuple = (
+                        (c_rect_obj.left, c_rect_obj.top, c_rect_obj.right, c_rect_obj.bottom)
+                        if c_rect_obj is not None
+                        else None
+                    )
+                    rot_steps = int(doc.get_rotate(fname) if hasattr(doc, "get_rotate") else 0) % 4
+                    tilt_val = float(doc.get_tilt(fname) or 0.0) if hasattr(doc, "get_tilt") else 0.0
+                    if abs(tilt_val) <= 1e-6:
+                        f_str = sec.get("filters") or ""
+                        m_tilt = re.search(r"tilt=1,([-+]?\d*\.?\d+)", f_str)
+                        if m_tilt:
+                            try:
+                                tilt_val = float(m_tilt.group(1))
+                            except Exception:
+                                tilt_val = 0.0
+                    if crop_tuple is not None or rot_steps != 0 or abs(tilt_val) > 1e-6:
+                        aspect = float(orig_w) / float(orig_h) if (orig_w > 0 and orig_h > 0) else 1.0
+                        for fr in old_faces:
+                            if hasattr(fr, "transform_to_display"):
+                                tr_fr = fr.transform_to_display(
+                                    crop_rect=crop_tuple,
+                                    rotation=rot_steps,
+                                    tilt_angle=tilt_val,
+                                    aspect_ratio=aspect,
+                                )
+                                if tr_fr is not None:
+                                    transformed_faces.append(tr_fr)
+        except Exception:
+            pass
+        return old_faces, transformed_faces
+
+    @staticmethod
+    def cleanup_picasaoriginals_entry(orig_backup: str | Path) -> Optional[str]:
+        """
+        FR: Retire la section `[<filename>]` de `.picasaoriginals/.picasa.ini` lors de la
+        restauration de l'original (`ID_PICTURE_REVERT`), supprime `.picasaoriginals/.picasa.ini`
+        s'il ne contient plus aucune section, et retourne la chaîne `faces=` originale d'avant
+        gravure si elle y était mémorisée.
+        EN: Removes the `[<filename>]` section from `.picasaoriginals/.picasa.ini` when
+        reverting to the original (`ID_PICTURE_REVERT`), deletes `.picasaoriginals/.picasa.ini`
+        if no sections remain, and returns the pre-bake `faces=` string if stored.
+        Ref: picasa3.exe @ 0x00462BA0, 0x00463523, 0x00C8D849
+        """
+        from picasa_py.ini.parser import PicasaIniParser
+
+        backup_p = Path(orig_backup)
+        fname = backup_p.name
+        orig_ini_path = backup_p.parent / ".picasa.ini"
+        restored_faces_str: Optional[str] = None
+        if orig_ini_path.exists():
+            try:
+                orig_doc = PicasaIniParser.parse_file(orig_ini_path)
+                orig_sec = orig_doc.get_section(fname)
+                if orig_sec is not None:
+                    restored_faces_str = orig_sec.get("faces")
+                    orig_doc.remove_section(fname)
+                if orig_doc.sections:
+                    orig_doc.write_file(orig_ini_path)
+                else:
+                    orig_ini_path.unlink()
+            except Exception:
+                pass
+        return restored_faces_str
+
+    def remap_photo_faces_after_geometry_change(
+        self,
+        rec_idx: int,
+        photo_path: str,
+        new_faces: List[Any],
+        new_w: int,
+        new_h: int,
+    ) -> None:
+        """
+        FR: Met à jour les coordonnées `imagedata_facerect.pmp`, `imagedata_crop64.pmp`,
+        `imagedata_width.pmp`, `imagedata_height.pmp` et `imagedata_rotate.pmp` des
+        sous-enregistrements `1001` d'une photo (ainsi que `self._face_manager`) après
+        gravure sur disque ou restauration depuis `.picasaoriginals`.
+        EN: Updates `imagedata_facerect.pmp`, `imagedata_crop64.pmp`, `imagedata_width.pmp`,
+        `imagedata_height.pmp`, and `imagedata_rotate.pmp` on a photo's `1001` face
+        sub-records (and in `self._face_manager`) after baking edits to disk or reverting
+        from `.picasaoriginals`.
+        Ref: picasa3.exe @ 0x00414584, 0x008AAD76, 0x009B93F0
+        """
+        eff_idx = self._resolve_photo_record_index(rec_idx)
+        if eff_idx is None:
+            return
+        children = self._get_face_children(eff_idx)
+        pmp_fr = self.pmps.get("imagedata_facerect")
+        pmp_crop = self.pmps.get("imagedata_crop64")
+        pmp_w = self.pmps.get("imagedata_width")
+        pmp_h = self.pmps.get("imagedata_height")
+        pmp_rot = self.pmps.get("imagedata_rotate")
+        pmp_pid = self.pmps.get("imagedata_personalbumid")
+        pmp_sid = self.pmps.get("imagedata_suggestionpersonalbumid")
+
+        rot_default: Any = "" if (pmp_rot is not None and int(getattr(pmp_rot, "pmp_type", 1)) in (0, 6)) else 0
+
+        for c_idx in children:
+            if pmp_w is not None and c_idx < len(pmp_w.records) and new_w > 0:
+                pmp_w.records[c_idx] = int(new_w)
+                pmp_w.dirty = True
+            if pmp_h is not None and c_idx < len(pmp_h.records) and new_h > 0:
+                pmp_h.records[c_idx] = int(new_h)
+                pmp_h.dirty = True
+            if pmp_rot is not None and c_idx < len(pmp_rot.records):
+                pmp_rot.records[c_idx] = rot_default
+                pmp_rot.dirty = True
+
+        if children and new_faces:
+            used_children: Set[int] = set()
+            fm = getattr(self, "_face_manager", None)
+            for nf in new_faces:
+                u64 = nf.to_uint64() if hasattr(nf, "to_uint64") else 0
+                if not u64:
+                    continue
+                nf_cid = (getattr(nf, "contact_id", "") or "").strip().lower()
+                matched_c: Optional[int] = None
+                if nf_cid and fm is not None and hasattr(fm, "_contact_id_to_album_id"):
+                    target_aid = fm._contact_id_to_album_id.get(nf_cid)
+                    if target_aid:
+                        for c_idx in children:
+                            if c_idx in used_children:
+                                continue
+                            c_aid = (
+                                pmp_pid.records[c_idx]
+                                if (pmp_pid is not None and c_idx < len(pmp_pid.records))
+                                else 0
+                            ) or (
+                                pmp_sid.records[c_idx]
+                                if (pmp_sid is not None and c_idx < len(pmp_sid.records))
+                                else 0
+                            )
+                            if c_aid == target_aid:
+                                matched_c = c_idx
+                                break
+                if matched_c is None:
+                    for c_idx in children:
+                        if c_idx not in used_children:
+                            matched_c = c_idx
+                            break
+                if matched_c is not None:
+                    used_children.add(matched_c)
+                    if pmp_fr is not None and matched_c < len(pmp_fr.records):
+                        pmp_fr.records[matched_c] = u64
+                        pmp_fr.dirty = True
+                    if pmp_crop is not None and matched_c < len(pmp_crop.records):
+                        pmp_crop.records[matched_c] = u64
+                        pmp_crop.dirty = True
+                    if fm is not None and hasattr(fm, "photo_to_faces"):
+                        c_list = fm.photo_to_faces.get(matched_c)
+                        if c_list:
+                            c_list[0].left = nf.left
+                            c_list[0].top = nf.top
+                            c_list[0].right = nf.right
+                            c_list[0].bottom = nf.bottom
+
+        fm = getattr(self, "_face_manager", None)
+        if fm is not None:
+            if hasattr(fm, "photo_to_faces") and new_faces:
+                fm.photo_to_faces[eff_idx] = list(new_faces)
+                if photo_path:
+                    fm.photo_to_faces[photo_path] = list(new_faces)
+            if getattr(fm, "_avatar_cache", None):
+                fm._avatar_cache.clear()
 
     def save_contacts(self) -> bool:
         """
