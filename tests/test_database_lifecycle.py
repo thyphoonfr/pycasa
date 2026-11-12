@@ -2073,6 +2073,108 @@ def test_pass15_move_rename_photo_folder_legacy_ini_and_thumb_save_parity(tmp_pa
     assert idx1 in wh_on_disk.words.get("color:blue", set())
 
 
+def test_pass16_face_avatar_geo_invalidation_person_search_and_geotag_lifecycle(tmp_path):
+    """
+    FR : Test de régression de la 16e passe d'audit `picasa3.exe` vs `PyCasa` :
+    1. `PicasaFaceManager.add_face` / `rename_person` / `remove_face` sur un dossier ayant
+       uniquement `Picasa.ini` préserve toutes les sections héritées lors de l'écriture de `.picasa.ini`.
+    2. `PicasaDatabase.search()` résout les enregistrements enfants `type == 1001` vers leur photo
+       parente et est invalidé par `notify_people_changed()` lors d'un renommage de personne.
+    3. `sync_photo_ini_to_db` propage `imagedata_rotate` aux enfants `1001` et invalide `_avatar_cache`
+       (`("face_1001", ...)` et `("person_avatar", ...)`) ainsi que `_updated_thumb_indices` ;
+       `update_thumbnails_from_pil` évince également ces clés du cache d'avatars.
+    4. `set_geotag`, `get_geotag` et `clear_geotag` synchronisent `.picasa.ini`, `imagedata_lat` /
+       `imagedata_long` et le jeton `]geo` dans `wordhash.dat`.
+    """
+    from PIL import Image
+    from picasa_py.db.database import PicasaDatabase
+    from picasa_py.faces.face_manager import FaceRect, PicasaFaceManager
+    from picasa_py.ini.parser import PicasaIniParser
+    from picasa_py.scanner.scanner import PicasaDirScanner
+
+    db_dir = tmp_path / "db3_pass16"
+    contacts_dir = tmp_path / "contacts_pass16"
+    db = PicasaDatabase.create_new(db_dir, contacts_dir)
+
+    folder = tmp_path / "PhotosPass16"
+    folder.mkdir(parents=True, exist_ok=True)
+    photo_path = folder / "portrait_famille.jpg"
+    other_path = folder / "paysage.jpg"
+    Image.new("RGB", (120, 120), (220, 100, 60)).save(str(photo_path), format="JPEG", quality=95)
+    Image.new("RGB", (120, 120), (40, 140, 220)).save(str(other_path), format="JPEG", quality=95)
+
+    # Dossier avec un fichier Picasa.ini hérité uniquement
+    legacy_ini = folder / "Picasa.ini"
+    legacy_ini.write_text(
+        "[paysage.jpg]\r\n"
+        "star=yes\r\n"
+        "caption=Belle montagne\r\n",
+        encoding="utf-8",
+    )
+
+    scanner = PicasaDirScanner(db)
+    scanner.scan_directory(folder)
+
+    p_idx = db.find_photo_index(str(photo_path))
+    assert p_idx is not None
+
+    fm = PicasaFaceManager(db)
+    frect = FaceRect(0.2, 0.2, 0.6, 0.6)
+    added_fr = fm.add_face(str(photo_path), frect, "Alice Martin", db_idx=p_idx)
+    cid = added_fr.contact_id
+    assert cid
+
+    # 1. Picasa.ini a été migré sans perte vers .picasa.ini lors de add_face
+    dot_ini = folder / ".picasa.ini"
+    assert dot_ini.exists()
+    doc = PicasaIniParser.parse_file(str(dot_ini))
+    assert doc.is_starred("paysage.jpg") is True
+    assert doc.get_caption("paysage.jpg") == "Belle montagne"
+
+    # 2. Recherche par nom de personne via les enregistrements enfants 1001 + invalidation au renommage
+    assert p_idx in db.search("alice")
+    assert fm.rename_person(cid, "Alicia Dupont") is True
+    assert p_idx in db.search("alicia")
+    assert p_idx not in db.search("alice")
+
+    # 3. Propagation de imagedata_rotate aux enfants 1001 et invalidation de _avatar_cache ("face_1001" / "person_avatar")
+    child_1001_list = db._get_face_children(p_idx)
+    assert len(child_1001_list) == 1
+    c_idx = child_1001_list[0]
+
+    fm._avatar_cache[("face_1001", c_idx, 68, False)] = "cached_1001"
+    fm._avatar_cache[("person_avatar", cid, 68, False)] = "cached_person"
+    assert db.rotate_photo(p_idx, 1) is True
+    pmp_rot = db.pmps.get("imagedata_rotate")
+    assert pmp_rot is not None
+    assert pmp_rot.records[c_idx] == pmp_rot.records[p_idx]
+    assert ("face_1001", c_idx, 68, False) not in fm._avatar_cache
+    assert ("person_avatar", cid, 68, False) not in fm._avatar_cache
+
+    fm._avatar_cache[("face_1001", c_idx, 68, False)] = "cached_1001_v2"
+    fm._avatar_cache[("person_avatar", cid, 68, False)] = "cached_person_v2"
+    assert db.update_thumbnails_from_pil(
+        p_idx, Image.new("RGB", (120, 120), (10, 200, 50)), persist_to_disk=False
+    ) is True
+    assert ("face_1001", c_idx, 68, False) not in fm._avatar_cache
+    assert ("person_avatar", cid, 68, False) not in fm._avatar_cache
+    assert c_idx in db._updated_thumb_indices
+
+    # 4. Cycle complet set_geotag -> get_geotag -> search("]geo") -> clear_geotag
+    assert db.get_geotag(p_idx) is None
+    assert db.set_geotag(p_idx, 48.858370, 2.294481) is True
+    gt = db.get_geotag(p_idx)
+    assert gt is not None
+    assert abs(gt[0] - 48.858370) < 1e-5
+    assert abs(gt[1] - 2.294481) < 1e-5
+    assert p_idx in db.search("]geo")
+
+    assert db.clear_geotag(p_idx) is True
+    assert db.get_geotag(p_idx) is None
+    assert p_idx not in db.search("]geo")
+
+
+
 
 
 

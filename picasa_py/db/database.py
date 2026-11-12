@@ -1007,6 +1007,35 @@ class PicasaDatabase:
                 cap_len = len(cap_recs)
 
                 person_names_by_idx: Dict[int, List[str]] = {}
+                rec_len = len(recs)
+
+                def _add_pname_for_idx(raw_idx: int, pname_str: str) -> None:
+                    eff_p_idx = raw_idx
+                    if 0 <= raw_idx < rec_len and recs[raw_idx].type == 1001:
+                        p_parent = recs[raw_idx].parent_idx
+                        if 0 <= p_parent < rec_len and p_parent != 0xFFFFFFFF:
+                            eff_p_idx = p_parent
+                    lst = person_names_by_idx.get(eff_p_idx)
+                    if lst is None:
+                        person_names_by_idx[eff_p_idx] = [pname_str]
+                    elif pname_str not in lst:
+                        lst.append(pname_str)
+
+                # Indexation directe depuis imagedata_personalbumid -> albumdata_name (cat=8)
+                pmp_palb = self.pmps.get("imagedata_personalbumid")
+                ad_names_col = self.pmps.get("albumdata_name")
+                ad_cats_col = self.pmps.get("albumdata_category")
+                if pmp_palb is not None and ad_names_col is not None:
+                    ad_names_recs = ad_names_col.records
+                    ad_cats_recs = ad_cats_col.records if ad_cats_col is not None else None
+                    ad_len = len(ad_names_recs)
+                    for r_idx, alb_id in enumerate(pmp_palb.records):
+                        if alb_id and 0 < alb_id < ad_len:
+                            if ad_cats_recs is None or (alb_id < len(ad_cats_recs) and ad_cats_recs[alb_id] == 8):
+                                aname_s = str(ad_names_recs[alb_id] or "").strip().lower()
+                                if aname_s and aname_s not in ("<personne inconnue>", "<unknown person>"):
+                                    _add_pname_for_idx(r_idx, aname_s)
+
                 if self._face_manager is not None:
                     people_dict = getattr(self._face_manager, "people", None)
                     if isinstance(people_dict, dict):
@@ -1015,23 +1044,14 @@ class PicasaDatabase:
                             if not pname:
                                 continue
                             for p_idx in getattr(person, "photo_indices", ()):
-                                lst = person_names_by_idx.get(p_idx)
-                                if lst is None:
-                                    person_names_by_idx[p_idx] = [pname]
-                                else:
-                                    lst.append(pname)
+                                _add_pname_for_idx(p_idx, pname)
                     for p_idx, flist in getattr(self._face_manager, "photo_to_faces", {}).items():
                         for f in flist:
                             cid = getattr(f, "contact_id", "")
                             if cid and cid != "ffffffffffffffff":
                                 p = self._face_manager.get_person(cid)
                                 if p and p.name:
-                                    pname = p.name.lower()
-                                    lst = person_names_by_idx.get(p_idx)
-                                    if lst is None:
-                                        person_names_by_idx[p_idx] = [pname]
-                                    elif pname not in lst:
-                                        lst.append(pname)
+                                    _add_pname_for_idx(p_idx, p.name.lower())
 
                 deleted_set = self._deleted_or_reset_indices
                 for i, r in enumerate(recs):
@@ -1502,10 +1522,27 @@ class PicasaDatabase:
             if rot < 0:
                 rot = 0
         pmp_rot_col = self.pmps.get("imagedata_rotate")
+        old_rot_cell = (
+            pmp_rot_col.records[idx]
+            if pmp_rot_col is not None and 0 <= idx < len(pmp_rot_col.records)
+            else None
+        )
         if pmp_rot_col is not None and int(getattr(pmp_rot_col, "pmp_type", 1)) in (0, 6):
-            _set_pmp("imagedata_rotate", f"rotate({rot})" if rot > 0 else "")
+            new_rot_cell: Any = f"rotate({rot})" if rot > 0 else ""
         else:
-            _set_pmp("imagedata_rotate", rot if rot > 0 else 0)
+            new_rot_cell = rot if rot > 0 else 0
+        _set_pmp("imagedata_rotate", new_rot_cell)
+
+        # Ref: db3 (1458/1458 enregistrements 1001) — propager imagedata_rotate aux enfants 1001
+        child_1001_indices = self._get_face_children(idx)
+        if pmp_rot_col is not None and child_1001_indices:
+            for c_idx in child_1001_indices:
+                while len(pmp_rot_col.records) <= c_idx:
+                    pmp_rot_col.records.append(pmp_rot_col.default_value())
+                    pmp_rot_col.dirty = True
+                if pmp_rot_col.records[c_idx] != new_rot_cell:
+                    pmp_rot_col.records[c_idx] = new_rot_cell
+                    pmp_rot_col.dirty = True
 
         # 2. Star / Favori (uniquement si une table synthétique de test imagedata_star existe dans self.pmps)
         if "imagedata_star" in self.pmps:
@@ -1525,7 +1562,31 @@ class PicasaDatabase:
                     crop_u64 = int(crop_hex, 16)
                 except Exception:
                     crop_u64 = 0
+        pmp_crop_col = self.pmps.get("imagedata_crop64")
+        old_crop_cell = (
+            pmp_crop_col.records[idx]
+            if pmp_crop_col is not None and 0 <= idx < len(pmp_crop_col.records)
+            else 0
+        )
         _set_pmp("imagedata_crop64", crop_u64)
+
+        if old_rot_cell != new_rot_cell or old_crop_cell != crop_u64:
+            affected_geo_idxs = {idx, *child_1001_indices}
+            upd_thumbs = getattr(self, "_updated_thumb_indices", None)
+            if isinstance(upd_thumbs, set):
+                upd_thumbs.difference_update(affected_geo_idxs)
+            fm_inst = getattr(self, "_face_manager", None)
+            if fm_inst is not None and getattr(fm_inst, "_avatar_cache", None):
+                norm_p = os.path.normcase(os.path.abspath(photo_path_str)) if photo_path_str else ""
+                for k in list(fm_inst._avatar_cache.keys()):
+                    if isinstance(k, tuple) and len(k) >= 2:
+                        if (
+                            k[0] in affected_geo_idxs
+                            or (k[0] == "face_1001" and k[1] in affected_geo_idxs)
+                            or k[0] == "person_avatar"
+                            or (isinstance(k[1], str) and k[1] and norm_p and os.path.normcase(os.path.abspath(k[1])) == norm_p)
+                        ):
+                            fm_inst._avatar_cache.pop(k, None)
 
         # 4. Filters, Text, Keywords, Caption, BackupHash, DeferredFace, Geotag
         def _get_old_pmp_str(col_name: str) -> str:
@@ -1537,6 +1598,20 @@ class PicasaDatabase:
         old_tags_val = _get_old_pmp_str("imagedata_tags")
         old_cap_val = _get_old_pmp_str("imagedata_caption")
         old_text_val = _get_old_pmp_str("imagedata_text")
+
+        def _restore_exif_gps_or_zero() -> Tuple[float, float]:
+            if photo_path_str and os.path.exists(photo_path_str):
+                try:
+                    from PIL import Image as _PilImg
+                    from picasa_py.scanner.scanner import _extract_exif_gps
+                    with _PilImg.open(photo_path_str) as _im:
+                        _ex = _im.getexif() if hasattr(_im, "getexif") else None
+                        _lat, _lon = _extract_exif_gps(_ex, _im)
+                        if _lat is not None and _lon is not None:
+                            return float(_lat), float(_lon)
+                except Exception:
+                    pass
+            return 0.0, 0.0
 
         edited_val = 0
         lat_val: Optional[float] = None
@@ -1553,6 +1628,11 @@ class PicasaDatabase:
             _set_pmp("imagedata_caption", "")
             _set_pmp("imagedata_deferredface", "")
             _set_pmp("imagedata_backuphash", 0)
+            pmp_lat_c = self.pmps.get("imagedata_lat")
+            if pmp_lat_c is not None and idx < len(pmp_lat_c.records) and float(pmp_lat_c.records[idx] or 0.0) != 0.0:
+                lat_val, lon_val = _restore_exif_gps_or_zero()
+                _set_pmp("imagedata_lat", lat_val)
+                _set_pmp("imagedata_long", lon_val)
             # Ref: picasa3.exe @ 0x00462BA0 (.picasaoriginals et dossier legacy Originals)
             has_orig_backup = bool(
                 photo_path_str
@@ -1693,6 +1773,12 @@ class PicasaDatabase:
                     _set_pmp("imagedata_long", lon_val)
                 except Exception:
                     pass
+            else:
+                pmp_lat_c = self.pmps.get("imagedata_lat")
+                if pmp_lat_c is not None and idx < len(pmp_lat_c.records) and float(pmp_lat_c.records[idx] or 0.0) != 0.0:
+                    lat_val, lon_val = _restore_exif_gps_or_zero()
+                    _set_pmp("imagedata_lat", lat_val)
+                    _set_pmp("imagedata_long", lon_val)
 
             # Indexation dans wordhash.dat (Ref: FUN_00456a15 -> func_0x004d9aa0, CIndexer @ 0x00987DA0)
             if self.wordhash is not None:
@@ -1878,12 +1964,19 @@ class PicasaDatabase:
                 pmp_rot.records.append(default_v)
                 pmp_rot.dirty = True
             if int(getattr(pmp_rot, "pmp_type", 1)) in (0, 6):
-                pmp_rot.records[eff_idx] = f"rotate({rot})" if rot > 0 else ""
+                new_rot_val: Any = f"rotate({rot})" if rot > 0 else ""
             else:
-                pmp_rot.records[eff_idx] = rot
+                new_rot_val = rot
+            pmp_rot.records[eff_idx] = new_rot_val
             pmp_rot.dirty = True
+            for c_idx in self._get_face_children(eff_idx):
+                while len(pmp_rot.records) <= c_idx:
+                    pmp_rot.records.append(default_v)
+                pmp_rot.records[c_idx] = new_rot_val
             return True
         return False
+
+    rotate_photo = set_rotate
 
     def is_starred(self, idx: int) -> bool:
         """
@@ -2374,6 +2467,117 @@ class PicasaDatabase:
         clean_kw = str(keyword or "").strip().lower()
         current = [k for k in self.get_tags(idx) if k.strip().lower() != clean_kw]
         return self.set_tags(idx, current)
+
+    def get_geotag(self, idx: int) -> Optional[Tuple[float, float]]:
+        """
+        FR: Retourne les coordonnées GPS `(lat, lon)` d'une photo depuis `.picasa.ini` (`geotag=`)
+        avec repli sur `imagedata_lat.pmp` / `imagedata_long.pmp` en base.
+        EN: Returns a photo's GPS coordinates `(lat, lon)` from `.picasa.ini` (`geotag=`)
+        with fallback to `imagedata_lat.pmp` / `imagedata_long.pmp` in the database.
+        Ref: picasa3.exe @ 0x00456A15, 0x009D97A4 (geotag)
+        """
+        eff_idx = self._resolve_photo_record_index(idx)
+        if eff_idx is None:
+            return None
+        full_path = self.get_media_full_path(eff_idx)
+        if full_path:
+            dir_p = os.path.dirname(full_path)
+            fname = os.path.basename(full_path)
+            doc = self.get_parsed_ini(os.path.join(dir_p, ".picasa.ini"))
+            if doc is None:
+                doc = self.get_parsed_ini(os.path.join(dir_p, "Picasa.ini"))
+            if doc is not None and fname:
+                sec = doc.get_section(fname)
+                if sec is not None:
+                    gt = (sec.get("geotag") or "").strip()
+                    if gt and "," in gt:
+                        try:
+                            lat_s, lon_s = gt.split(",", 1)
+                            return float(lat_s.strip()), float(lon_s.strip())
+                        except Exception:
+                            pass
+        pmp_lat = self.pmps.get("imagedata_lat")
+        pmp_lon = self.pmps.get("imagedata_long")
+        if (
+            pmp_lat is not None
+            and pmp_lon is not None
+            and eff_idx < len(pmp_lat.records)
+            and eff_idx < len(pmp_lon.records)
+        ):
+            try:
+                lat_v = float(pmp_lat.records[eff_idx] or 0.0)
+                lon_v = float(pmp_lon.records[eff_idx] or 0.0)
+                if abs(lat_v) > 1e-7 or abs(lon_v) > 1e-7:
+                    return lat_v, lon_v
+            except Exception:
+                pass
+        return None
+
+    def set_geotag(self, idx: int, lat: float, lon: float) -> bool:
+        """
+        FR: Définit la géolocalisation (`geotag=<lat>,<lon>`) d'une photo dans `.picasa.ini`
+        et synchronise `imagedata_lat.pmp`, `imagedata_long.pmp` et le jeton `]geo` dans `wordhash.dat`.
+        EN: Sets a photo's geolocation (`geotag=<lat>,<lon>`) in `.picasa.ini` and synchronizes
+        `imagedata_lat.pmp`, `imagedata_long.pmp`, and the `]geo` token in `wordhash.dat`.
+        Ref: picasa3.exe @ 0x00456A15, 0x009D97A4 (geotag), 0x0041D358 (]geo)
+        """
+        eff_idx = self._resolve_photo_record_index(idx)
+        if eff_idx is None:
+            return False
+        lat_f = float(lat)
+        lon_f = float(lon)
+        geotag_val = f"{lat_f:.6f},{lon_f:.6f}"
+        full_path = self.get_media_full_path(eff_idx)
+        if full_path and os.path.exists(os.path.dirname(full_path)):
+            return self.update_photo_ini(
+                full_path,
+                lambda doc, fn: doc.get_or_create_section(fn).set("geotag", geotag_val),
+            )
+        for col_name, val in (("imagedata_lat", lat_f), ("imagedata_long", lon_f)):
+            pmp = self.pmps.get(col_name)
+            if pmp is not None:
+                while len(pmp.records) <= eff_idx:
+                    pmp.records.append(pmp.default_value())
+                    pmp.dirty = True
+                pmp.records[eff_idx] = val
+                pmp.dirty = True
+        if self.wordhash is not None:
+            if abs(lat_f) > 1e-7 or abs(lon_f) > 1e-7:
+                self.wordhash.add_word("]geo", eff_idx)
+            elif hasattr(self.wordhash, "remove_word"):
+                self.wordhash.remove_word("]geo", eff_idx)
+        self.invalidate_search_cache()
+        return True
+
+    def clear_geotag(self, idx: int) -> bool:
+        """
+        FR: Supprime la géolocalisation (`geotag=`) d'une photo dans `.picasa.ini` et synchronise
+        `imagedata_lat.pmp`, `imagedata_long.pmp` et le jeton `]geo` dans `wordhash.dat`.
+        EN: Clears a photo's geolocation (`geotag=`) in `.picasa.ini` and synchronizes
+        `imagedata_lat.pmp`, `imagedata_long.pmp`, and the `]geo` token in `wordhash.dat`.
+        Ref: picasa3.exe @ 0x00456A15, 0x009D97A4 (geotag), 0x0041D358 (]geo)
+        """
+        eff_idx = self._resolve_photo_record_index(idx)
+        if eff_idx is None:
+            return False
+        full_path = self.get_media_full_path(eff_idx)
+        if full_path and os.path.exists(os.path.dirname(full_path)):
+            def _rm_geo(doc: PicasaIniDocument, fn: str) -> None:
+                sec = doc.get_section(fn)
+                if sec is not None:
+                    sec.remove("geotag")
+                    if not sec.entries:
+                        doc.remove_section(fn)
+            return self.update_photo_ini(full_path, _rm_geo)
+        for col_name in ("imagedata_lat", "imagedata_long"):
+            pmp = self.pmps.get(col_name)
+            if pmp is not None and eff_idx < len(pmp.records):
+                pmp.records[eff_idx] = 0.0
+                pmp.dirty = True
+        if self.wordhash is not None and hasattr(self.wordhash, "remove_word"):
+            self.wordhash.remove_word("]geo", eff_idx)
+        self.invalidate_search_cache()
+        return True
 
     def delete_photo(self, idx_or_path: int | str | Path, delete_from_disk: bool = False) -> bool:
         """
@@ -5410,7 +5614,11 @@ class PicasaDatabase:
                         norm_p = os.path.normcase(os.path.abspath(full_path)) if full_path else ""
                         for k in list(fm._avatar_cache.keys()):
                             if isinstance(k, tuple) and len(k) >= 2:
-                                if k[0] in affected_indices:
+                                if (
+                                    k[0] in affected_indices
+                                    or (k[0] == "face_1001" and k[1] in affected_indices)
+                                    or k[0] == "person_avatar"
+                                ):
                                     fm._avatar_cache.pop(k, None)
                                 elif isinstance(k[1], str) and k[1] and norm_p and os.path.normcase(os.path.abspath(k[1])) == norm_p:
                                     fm._avatar_cache.pop(k, None)
@@ -5418,6 +5626,8 @@ class PicasaDatabase:
                 if not hasattr(self, "_updated_thumb_indices") or not isinstance(self._updated_thumb_indices, set):
                     self._updated_thumb_indices = set()
                 self._updated_thumb_indices.add(resolved_idx)
+                for c_idx in child_face_indices:
+                    self._updated_thumb_indices.add(c_idx)
 
             if persist_to_disk:
                 self.save_thumbnails_only()

@@ -3259,18 +3259,32 @@ class PicasaTagsPanel(QWidget):
         for p in self.photo_paths:
             if not os.path.exists(p):
                 continue
-            folder = os.path.dirname(p)
-            filename = os.path.basename(p)
-            ini_path = os.path.join(folder, ".picasa.ini")
-            if os.path.exists(ini_path):
+            found_via_db = False
+            if self.db is not None and hasattr(self.db, "find_photo_index") and hasattr(self.db, "get_tags"):
                 try:
-                    doc = self.db.get_parsed_ini(ini_path) if (self.db and hasattr(self.db, "get_parsed_ini")) else PicasaIniParser.parse_file(ini_path)
-                    if doc:
-                        for kw in doc.get_keywords(filename):
-                            if kw not in seen_tags:
+                    p_idx = self.db.find_photo_index(p)
+                    if p_idx is not None:
+                        for kw in self.db.get_tags(p_idx):
+                            if kw and kw not in seen_tags:
                                 seen_tags.append(kw)
+                        found_via_db = True
                 except Exception:
                     pass
+            if not found_via_db:
+                folder = os.path.dirname(p)
+                filename = os.path.basename(p)
+                ini_path = os.path.join(folder, ".picasa.ini")
+                if not os.path.exists(ini_path):
+                    ini_path = os.path.join(folder, "Picasa.ini")
+                if os.path.exists(ini_path):
+                    try:
+                        doc = self.db.get_parsed_ini(ini_path) if (self.db and hasattr(self.db, "get_parsed_ini")) else PicasaIniParser.parse_file(ini_path)
+                        if doc:
+                            for kw in doc.get_keywords(filename):
+                                if kw not in seen_tags:
+                                    seen_tags.append(kw)
+                    except Exception:
+                        pass
         self.current_tags = seen_tags
         self._update_tags_display()
 
@@ -3443,13 +3457,27 @@ class PicasaTagsPanel(QWidget):
                     kws.remove(remove_tag)
                 doc.set_keywords(fname, kws)
 
+            if self.db is not None and hasattr(self.db, "find_photo_index"):
+                p_idx = self.db.find_photo_index(p)
+                if p_idx is not None:
+                    if add_tag and hasattr(self.db, "add_keyword"):
+                        self.db.add_keyword(p_idx, add_tag)
+                    if remove_tag and hasattr(self.db, "remove_keyword"):
+                        self.db.remove_keyword(p_idx, remove_tag)
+                    continue
             if self.db is not None and hasattr(self.db, "update_photo_ini"):
                 self.db.update_photo_ini(p, _mod)
             else:
                 folder = os.path.dirname(p)
                 filename = os.path.basename(p)
                 ini_path = os.path.join(folder, ".picasa.ini")
-                doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+                legacy_path = os.path.join(folder, "Picasa.ini")
+                if os.path.exists(ini_path):
+                    doc = PicasaIniParser.parse_file(ini_path)
+                elif os.path.exists(legacy_path):
+                    doc = PicasaIniParser.parse_file(legacy_path)
+                else:
+                    doc = PicasaIniDocument()
                 _mod(doc, filename)
                 try:
                     doc.write_file(ini_path)
@@ -4212,8 +4240,21 @@ class PicasaRightDrawer(QWidget):
         if not photo_path or not os.path.exists(photo_path):
             return None, None
 
-        # 1. Priorité au tag geotag= de .picasa.ini (rapide et reflète les modifications Picasa)
-        ini_p = os.path.join(os.path.dirname(photo_path), ".picasa.ini")
+        # 1. Priorité au tag geotag= de .picasa.ini / Picasa.ini et aux colonnes PMP (imagedata_lat/long)
+        if db is not None and hasattr(db, "find_photo_index") and hasattr(db, "get_geotag"):
+            try:
+                p_idx = db.find_photo_index(photo_path)
+                if p_idx is not None:
+                    gt = db.get_geotag(p_idx)
+                    if gt is not None:
+                        return gt
+            except Exception:
+                pass
+
+        folder_p = os.path.dirname(photo_path)
+        ini_p = os.path.join(folder_p, ".picasa.ini")
+        if not os.path.exists(ini_p):
+            ini_p = os.path.join(folder_p, "Picasa.ini")
         if os.path.exists(ini_p):
             try:
                 doc = (
@@ -4230,7 +4271,7 @@ class PicasaRightDrawer(QWidget):
             except Exception:
                 pass
 
-        # 2. Métadonnées EXIF GPS
+        # 2. Métadonnées EXIF GPS sur disque
         if check_exif:
             try:
                 meta = _get_cached_full_metadata(photo_path)
@@ -4543,11 +4584,22 @@ class PicasaRightDrawer(QWidget):
                 sec = doc.get_or_create_section(fname)
                 sec.set("geotag", f"{lat:.6f},{lon:.6f}")
 
+            if self._active_db is not None and hasattr(self._active_db, "find_photo_index") and hasattr(self._active_db, "set_geotag"):
+                p_idx = self._active_db.find_photo_index(p)
+                if p_idx is not None:
+                    self._active_db.set_geotag(p_idx, lat, lon)
+                    continue
             if self._active_db is not None and hasattr(self._active_db, "update_photo_ini"):
                 self._active_db.update_photo_ini(p, _set_geo)
             else:
-                ini_p = os.path.join(os.path.dirname(p), ".picasa.ini")
-                doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else PicasaIniDocument()
+                folder_p = os.path.dirname(p)
+                ini_p = os.path.join(folder_p, ".picasa.ini")
+                leg_p = os.path.join(folder_p, "Picasa.ini")
+                doc = (
+                    PicasaIniParser.parse_file(ini_p)
+                    if os.path.exists(ini_p)
+                    else (PicasaIniParser.parse_file(leg_p) if os.path.exists(leg_p) else PicasaIniDocument())
+                )
                 _set_geo(doc, os.path.basename(p))
                 try:
                     doc.write_file(ini_p)
@@ -4581,13 +4633,20 @@ class PicasaRightDrawer(QWidget):
                 if sec:
                     sec.remove("geotag")
 
+            if self._active_db is not None and hasattr(self._active_db, "find_photo_index") and hasattr(self._active_db, "clear_geotag"):
+                p_idx = self._active_db.find_photo_index(p)
+                if p_idx is not None:
+                    self._active_db.clear_geotag(p_idx)
+                    continue
             if self._active_db is not None and hasattr(self._active_db, "update_photo_ini"):
                 self._active_db.update_photo_ini(p, _clear_geo)
             else:
-                ini_p = os.path.join(os.path.dirname(p), ".picasa.ini")
-                if os.path.exists(ini_p):
+                folder_p = os.path.dirname(p)
+                ini_p = os.path.join(folder_p, ".picasa.ini")
+                leg_p = os.path.join(folder_p, "Picasa.ini")
+                if os.path.exists(ini_p) or os.path.exists(leg_p):
                     try:
-                        doc = PicasaIniParser.parse_file(ini_p)
+                        doc = PicasaIniParser.parse_file(ini_p if os.path.exists(ini_p) else leg_p)
                         _clear_geo(doc, os.path.basename(p))
                         doc.write_file(ini_p)
                     except Exception:

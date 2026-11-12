@@ -142,6 +142,8 @@ class PicasaFaceManager:
 
     def __init__(self, db: PicasaDatabase):
         self.db = db
+        if db is not None:
+            db._face_manager = self
         self.detector = PicasaFaceDetector.get()
         self.people: Dict[str, PersonCluster] = {}  # contact_id -> PersonCluster
         self.photo_to_faces: Dict[int, List[FaceRect]] = {}  # db_idx -> List[FaceRect]
@@ -212,6 +214,38 @@ class PicasaFaceManager:
             pass
         return False
 
+    def _load_folder_ini_doc(self, parent_dir: str, require_existing: bool = False) -> Tuple[str, Optional[str], Optional[PicasaIniDocument]]:
+        """
+        FR : Charge le fichier `.picasa.ini` d'un dossier avec repli sans perte sur `Picasa.ini`
+        lorsque `.picasa.ini` n'existe pas encore (`Ref: picasa3.exe @ 0x00480D10, 0x004A1F30`).
+        EN: Load a folder's `.picasa.ini` with lossless fallback to legacy `Picasa.ini`
+        when `.picasa.ini` does not exist yet (`Ref: picasa3.exe @ 0x00480D10, 0x004A1F30`).
+        """
+        ini_path = os.path.join(parent_dir, ".picasa.ini")
+        legacy_path = os.path.join(parent_dir, "Picasa.ini")
+        if os.path.exists(ini_path):
+            return ini_path, None, PicasaIniParser.parse_file(ini_path)
+        if os.path.exists(legacy_path):
+            return ini_path, legacy_path, PicasaIniParser.parse_file(legacy_path)
+        if require_existing:
+            return ini_path, None, None
+        return ini_path, None, PicasaIniDocument()
+
+    def _invalidate_folder_ini_cache(self, ini_path: str, legacy_ini_path: Optional[str] = None) -> None:
+        """
+        FR : Invalide le cache `.picasa.ini` (et `Picasa.ini` si migré) de `PicasaDatabase`.
+        EN: Invalidate `PicasaDatabase`'s `.picasa.ini` (and legacy `Picasa.ini`) cache.
+        """
+        if not self.db or not hasattr(self.db, "invalidate_ini_cache"):
+            return
+        for p in (ini_path, legacy_ini_path):
+            if not p:
+                continue
+            try:
+                self.db.invalidate_ini_cache(p, invalidate_albums_starred=False)
+            except TypeError:
+                self.db.invalidate_ini_cache(p)
+
     @staticmethod
     def _get_unknown_person_label() -> str:
         """
@@ -262,7 +296,7 @@ class PicasaFaceManager:
         FR : Résout un identifiant de contact vers la clé correspondante dans `self.people` ou `self.suggestions`.
         EN: Resolves a contact ID to its matching key in `self.people` or `self.suggestions`.
         """
-        raw = (contact_id.contact_id if isinstance(contact_id, PersonCluster) else str(contact_id or "")).strip().lower()
+        raw = (contact_id.contact_id if hasattr(contact_id, "contact_id") else str(contact_id or "")).strip().lower()
         if not raw or raw in self.people:
             return raw
         for v in self._cid_variants(raw):
@@ -1992,13 +2026,51 @@ class PicasaFaceManager:
                 face_rec_idx = self._find_matching_1001_child(db_idx, face_rect)
                 is_direct_1001 = face_rec_idx is not None
 
-        # FR : Chemin ultra-rapide O(1) lorsque db_idx est un enregistrement 1001 :
-        # lit directement la miniature pré-découpée dans thumbs_0.db / bigthumbs_0.db via QImage.fromData
-        # AVANT d'interroger .picasa.ini ou de décoder previews_0.db avec PIL.
-        # EN: Ultra-fast O(1) path when db_idx is a 1001 face record:
-        # reads the pre-cropped face thumbnail directly from thumbs_0.db / bigthumbs_0.db via QImage.fromData
-        # BEFORE querying .picasa.ini or decoding previews_0.db with PIL.
-        if is_direct_1001 and face_rec_idx is not None and self.db and size <= 288:
+        if not photo_path and parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
+            try:
+                photo_path = self.db.get_media_full_path(parent_photo_idx) or ""
+            except Exception:
+                photo_path = ""
+
+        has_geo_edits = False
+        geo_sig = (0, "", 0.0)
+        if photo_path and (allow_disk_fallback or not is_direct_1001):
+            parent_dir = os.path.dirname(photo_path)
+            if self.db and hasattr(self.db, "get_parsed_ini"):
+                doc = self.db.get_parsed_ini(os.path.join(parent_dir, ".picasa.ini"))
+                if doc is None:
+                    doc = self.db.get_parsed_ini(os.path.join(parent_dir, "Picasa.ini"))
+            else:
+                ini_p = os.path.join(parent_dir, ".picasa.ini")
+                if not os.path.exists(ini_p):
+                    ini_p = os.path.join(parent_dir, "Picasa.ini")
+                doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else None
+            if doc is not None:
+                try:
+                    bname = os.path.basename(photo_path)
+                    rot_v = (doc.get_rotate(bname) or 0) % 4
+                    crop_v = doc.get_crop(bname) or ""
+                    tilt_v = round(float(doc.get_tilt(bname) or 0.0), 3)
+                    geo_sig = (rot_v, crop_v, tilt_v)
+                    has_geo_edits = bool(rot_v != 0 or crop_v or abs(tilt_v) >= 0.01)
+                except Exception:
+                    pass
+
+        updated_thumbs = getattr(self.db, "_updated_thumb_indices", set()) if self.db else set()
+        has_unrendered_geo_edits = bool(
+            has_geo_edits
+            and allow_disk_fallback
+            and parent_photo_idx not in updated_thumbs
+            and face_rec_idx not in updated_thumbs
+            and photo_path
+            and os.path.exists(photo_path)
+        )
+
+        # FR : Chemin ultra-rapide O(1) lorsque db_idx est un enregistrement 1001 et qu'aucune
+        # édition géométrique non régénérée dans thumbs_0.db/bigthumbs_0.db n'est en attente.
+        # EN: Ultra-fast O(1) path when db_idx is a 1001 face record and no unrendered geometric
+        # edit is pending for thumbs_0.db/bigthumbs_0.db.
+        if is_direct_1001 and face_rec_idx is not None and self.db and size <= 288 and not has_unrendered_geo_edits:
             fast_cache_key = ("face_1001", face_rec_idx, size, circular)
             if fast_cache_key in self._avatar_cache:
                 return self._avatar_cache[fast_cache_key]
@@ -2039,36 +2111,6 @@ class PicasaFaceManager:
                             self._avatar_cache[fast_cache_key] = pix
                             return pix
 
-        if not photo_path and parent_photo_idx is not None and parent_photo_idx >= 0 and self.db:
-            try:
-                photo_path = self.db.get_media_full_path(parent_photo_idx) or ""
-            except Exception:
-                photo_path = ""
-
-        has_geo_edits = False
-        geo_sig = (0, "", 0.0)
-        if photo_path:
-            parent_dir = os.path.dirname(photo_path)
-            if self.db and hasattr(self.db, "get_parsed_ini"):
-                doc = self.db.get_parsed_ini(os.path.join(parent_dir, ".picasa.ini"))
-                if doc is None:
-                    doc = self.db.get_parsed_ini(os.path.join(parent_dir, "Picasa.ini"))
-            else:
-                ini_p = os.path.join(parent_dir, ".picasa.ini")
-                if not os.path.exists(ini_p):
-                    ini_p = os.path.join(parent_dir, "Picasa.ini")
-                doc = PicasaIniParser.parse_file(ini_p) if os.path.exists(ini_p) else None
-            if doc is not None:
-                try:
-                    bname = os.path.basename(photo_path)
-                    rot_v = (doc.get_rotate(bname) or 0) % 4
-                    crop_v = doc.get_crop(bname) or ""
-                    tilt_v = round(float(doc.get_tilt(bname) or 0.0), 3)
-                    geo_sig = (rot_v, crop_v, tilt_v)
-                    has_geo_edits = bool(rot_v != 0 or crop_v or abs(tilt_v) >= 0.01)
-                except Exception:
-                    pass
-
         cache_key = (db_idx, photo_path, round(face_rect.left, 4), round(face_rect.top, 4), size, circular, geo_sig)
         if cache_key in self._avatar_cache:
             return self._avatar_cache[cache_key]
@@ -2077,7 +2119,7 @@ class PicasaFaceManager:
         # de transformation géométrique non répercutée, utiliser bigthumbs_0.db (240x288) ou thumbs_0.db (120x144).
         # EN: 1. When a face sub-record (type == 1001) is available and no unapplied geometric edit is active,
         # use bigthumbs_0.db (240x288) or thumbs_0.db (120x144).
-        if face_rec_idx is not None and self.db and (not has_geo_edits or not allow_disk_fallback or not (photo_path and os.path.exists(photo_path))):
+        if face_rec_idx is not None and self.db and not has_unrendered_geo_edits:
             raw_face = (
                 self.db.get_thumbnail(face_rec_idx, size="large" if size > 144 else "small")
                 or self.db.get_thumbnail(face_rec_idx, size="small")
@@ -3566,14 +3608,13 @@ class PicasaFaceManager:
                             if old_sug and old_sug != alb_idx and getattr(self.db, "wordhash", None) is not None and hasattr(self.db.wordhash, "remove_word"):
                                 self.db.wordhash.remove_word(f"]facealbum:{old_sug}", t_idx)
 
-        # FR : Écriture bit-exacte dans le .picasa.ini
-        # EN: Bit-exact write to .picasa.ini
+        # FR : Écriture bit-exacte dans le .picasa.ini (avec préservation d'un Picasa.ini hérité)
+        # EN: Bit-exact write to .picasa.ini (preserving any legacy Picasa.ini)
         if photo_path:
             parent_dir = os.path.dirname(photo_path)
             fname = os.path.basename(photo_path)
-            ini_path = os.path.join(parent_dir, ".picasa.ini")
-
-            doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+            ini_path, legacy_ini_path, doc_opt = self._load_folder_ini_doc(parent_dir, require_existing=False)
+            doc = doc_opt if doc_opt is not None else PicasaIniDocument()
 
             sec_c2 = doc.get_or_create_section("Contacts2")
             sec_c2.set(contact_id, f"{clean_name};;")
@@ -3599,11 +3640,7 @@ class PicasaFaceManager:
 
             doc.set_faces(fname, faces)
             doc.write_file(ini_path)
-            if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                try:
-                    self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
-                except TypeError:
-                    self.db.invalidate_ini_cache(ini_path)
+            self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
             if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
                 try:
                     self.db.sync_photo_ini_to_db(photo_path, doc)
@@ -3854,15 +3891,14 @@ class PicasaFaceManager:
                 self.db.wordhash.add_word("]ignoreface", face_rec_idx)
             self._ignored_rec_ids.add(face_rec_idx)
 
-        # FR : Mise à jour du .picasa.ini
-        # EN: Update .picasa.ini
+        # FR : Mise à jour du .picasa.ini (avec repli sur Picasa.ini)
+        # EN: Update .picasa.ini (with fallback to Picasa.ini)
         if photo_path:
             parent_dir = os.path.dirname(photo_path)
             fname = os.path.basename(photo_path)
-            ini_path = os.path.join(parent_dir, ".picasa.ini")
+            ini_path, legacy_ini_path, doc = self._load_folder_ini_doc(parent_dir, require_existing=True)
 
-            if os.path.exists(ini_path):
-                doc = PicasaIniParser.parse_file(ini_path)
+            if doc is not None:
                 faces = doc.get_faces(fname)
                 rem_hex = face_rect.to_rect64()[7:-1].lower()
                 new_faces: List[FaceItem] = []
@@ -3879,8 +3915,7 @@ class PicasaFaceManager:
 
                 doc.set_faces(fname, new_faces)
                 doc.write_file(ini_path)
-                if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                    self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
                 if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
                     try:
                         self.db.sync_photo_ini_to_db(photo_path, doc)
@@ -3992,10 +4027,9 @@ class PicasaFaceManager:
             for ppath in list(cluster.photo_paths):
                 if not ppath:
                     continue
-                ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
-                if os.path.exists(ini_path):
-                    try:
-                        doc = PicasaIniParser.parse_file(ini_path)
+                try:
+                    ini_path, legacy_ini_path, doc = self._load_folder_ini_doc(os.path.dirname(ppath), require_existing=True)
+                    if doc is not None:
                         sec_c2 = doc.get_or_create_section("Contacts2")
                         for v in cid_vars:
                             sec_c2.remove(v)
@@ -4010,15 +4044,14 @@ class PicasaFaceManager:
                         if changed_f:
                             doc.set_faces(fname, faces)
                         doc.write_file(ini_path)
-                        if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                            self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                        self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
                         if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
                             try:
                                 self.db.sync_photo_ini_to_db(ppath, doc)
                             except Exception:
                                 pass
-                    except Exception:
-                        pass
+                except Exception:
+                    pass
 
             # FR : Fusionner aussi les colonnes PMP (imagedata_personalbumid, suggestionpersonalbumid, personalbumrecs, personalbumrecs2),
             # wordhash.dat (]facealbum:<id>) et albumdata_* pour que Picasa3.exe voie la fusion
@@ -4129,20 +4162,22 @@ class PicasaFaceManager:
         for ppath in cluster.photo_paths:
             if not ppath:
                 continue
-            ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
-            if ini_path in updated_inis or not os.path.exists(ini_path):
+            pdir = os.path.dirname(ppath)
+            ini_path = os.path.join(pdir, ".picasa.ini")
+            if ini_path in updated_inis:
                 continue
-            updated_inis.add(ini_path)
             try:
-                doc = PicasaIniParser.parse_file(ini_path)
+                ini_path, legacy_ini_path, doc = self._load_folder_ini_doc(pdir, require_existing=True)
+                if doc is None:
+                    continue
+                updated_inis.add(ini_path)
                 sec_c2 = doc.get_or_create_section("Contacts2")
                 for v in cid_vars:
                     if v != cid:
                         sec_c2.remove(v)
                 sec_c2.set(cid, f"{clean_new};;")
                 doc.write_file(ini_path)
-                if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                    self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
             except Exception:
                 pass
 
@@ -4225,11 +4260,10 @@ class PicasaFaceManager:
             for ppath in list(cluster.photo_paths):
                 if not ppath:
                     continue
-                ini_path = os.path.join(os.path.dirname(ppath), ".picasa.ini")
-                if not os.path.exists(ini_path):
-                    continue
                 try:
-                    doc = PicasaIniParser.parse_file(ini_path)
+                    ini_path, legacy_ini_path, doc = self._load_folder_ini_doc(os.path.dirname(ppath), require_existing=True)
+                    if doc is None:
+                        continue
                     sec_c2 = doc.get_section("Contacts2")
                     if sec_c2:
                         for v in cid_vars:
@@ -4240,8 +4274,7 @@ class PicasaFaceManager:
                     if len(remaining) != len(faces):
                         doc.set_faces(fname, remaining)
                     doc.write_file(ini_path)
-                    if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                        self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+                    self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
                     if self.db and hasattr(self.db, "sync_photo_ini_to_db"):
                         try:
                             self.db.sync_photo_ini_to_db(ppath, doc)
@@ -4462,15 +4495,14 @@ class PicasaFaceManager:
                                 if getattr(self.db, "is_face_record", lambda i: False)(t_idx):
                                     self.db.wordhash.add_word("]unknownface", t_idx)
 
-        # FR : Si .picasa.ini contenait une entrée obsolète faces=rect64(...),cid pour ce visage rejeté, la nettoyer
-        # EN: If .picasa.ini had a stale faces=rect64(...),cid entry for this rejected face, clean it up
+        # FR : Si .picasa.ini (ou Picasa.ini) contenait une entrée obsolète faces=rect64(...),cid pour ce visage rejeté, la nettoyer
+        # EN: If .picasa.ini (or Picasa.ini) had a stale faces=rect64(...),cid entry for this rejected face, clean it up
         if suggestion.photo_path and os.path.exists(os.path.dirname(suggestion.photo_path)):
             try:
                 pdir = os.path.dirname(suggestion.photo_path)
                 pfname = os.path.basename(suggestion.photo_path)
-                ini_p = os.path.join(pdir, ".picasa.ini")
-                if os.path.exists(ini_p):
-                    doc = PicasaIniParser.parse_file(ini_p)
+                ini_p, legacy_ini_p, doc = self._load_folder_ini_doc(pdir, require_existing=True)
+                if doc is not None:
                     sec = doc.get_section(pfname)
                     if sec is not None:
                         faces_str = sec.get("faces")
@@ -4496,8 +4528,7 @@ class PicasaFaceManager:
                                 else:
                                     sec.remove("faces")
                                 doc.write_file(ini_p)
-                                if self.db and hasattr(self.db, "invalidate_ini_cache"):
-                                    self.db.invalidate_ini_cache(ini_p)
+                                self._invalidate_folder_ini_cache(ini_p, legacy_ini_p)
             except Exception:
                 pass
 
@@ -4662,8 +4693,8 @@ class PicasaFaceManager:
             return
         parent_dir = os.path.dirname(photo_path)
         fname = os.path.basename(photo_path)
-        ini_path = os.path.join(parent_dir, ".picasa.ini")
-        doc = PicasaIniParser.parse_file(ini_path) if os.path.exists(ini_path) else PicasaIniDocument()
+        ini_path, legacy_ini_path, doc_opt = self._load_folder_ini_doc(parent_dir, require_existing=False)
+        doc = doc_opt if doc_opt is not None else PicasaIniDocument()
         faces_list = self.get_faces_for_photo(db_idx) if db_idx is not None else []
         sec_c2 = doc.get_or_create_section("Contacts2")
         items: List[FaceItem] = []
@@ -4697,8 +4728,7 @@ class PicasaFaceManager:
                             items.append(FaceItem(rect64=r64_ign, contact_id="ffffffffffffffff"))
         doc.set_faces(fname, items)
         doc.write_file(ini_path)
-        if self.db and hasattr(self.db, "invalidate_ini_cache"):
-            self.db.invalidate_ini_cache(ini_path, invalidate_albums_starred=False)
+        self._invalidate_folder_ini_cache(ini_path, legacy_ini_path)
 
 
 # Ref: picasa3.exe @ 0x0087ECD6 (BgFaceDetectThread), 0x0093B9CE (CFaceDetector), 0x008C1F34 (FaceSyncer)
