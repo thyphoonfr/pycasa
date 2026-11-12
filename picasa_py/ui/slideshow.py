@@ -329,10 +329,23 @@ class PicasaSlideshowWindow(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """
-        FR: Gère les raccourcis clavier du diaporama (navigation, lecture/pause, quitter).
-        EN: Handles slideshow keyboard shortcuts (navigation, play/pause, exit).
+        FR: Gère les raccourcis clavier du diaporama (navigation, lecture/pause, rotation, étoile, quitter).
+        EN: Handles slideshow keyboard shortcuts (navigation, play/pause, rotation, star, exit).
+        Ref: picasa3.exe @ 0x0074E843 (SlideshowBaseHandler), SHORTCUTS.XML
         """
         k = event.key()
+        mods = event.modifiers()
+        if (mods & Qt.KeyboardModifier.ControlModifier) and k == Qt.Key.Key_R:
+            if mods & Qt.KeyboardModifier.ShiftModifier:
+                self.rotate_current_ccw()
+            else:
+                self.rotate_current_cw()
+            event.accept()
+            return
+        if (mods & Qt.KeyboardModifier.ControlModifier) and k in (Qt.Key.Key_S, Qt.Key.Key_T):
+            self.toggle_star_current()
+            event.accept()
+            return
         if k in (Qt.Key.Key_Escape, Qt.Key.Key_Q):
             self.close()
         elif k in (Qt.Key.Key_Right, Qt.Key.Key_Down, Qt.Key.Key_PageDown):
@@ -548,10 +561,13 @@ class PicasaSlideshowWindow(QWidget):
             self._prev_pixmap = None
         self.update()
 
-    def rotate_current_cw(self) -> None:
+    def _rotate_current_by(self, step: int) -> None:
         """
-        FR: Pivote la photo courante de 90° dans le sens horaire et persiste dans .picasa.ini (et la base si présente).
-        EN: Rotates the current photo 90° clockwise and persists the change to .picasa.ini (and database if present).
+        FR: Pivote la photo courante de `step * 90°` et persiste dans `.picasa.ini`, la base de données
+        et les vues parentes (grille de vignettes, bac à photos, pellicule).
+        EN: Rotates the current photo by `step * 90°` and persists the change to `.picasa.ini`,
+        the database, and parent views (thumbnail grid, photo tray, filmstrip).
+        Ref: picasa3.exe @ 0x0074E843, 0x0068B5E0
         """
         if not self.photo_paths:
             return
@@ -559,15 +575,26 @@ class PicasaSlideshowWindow(QWidget):
         src = Path(path_str)
         parent_dir = str(src.parent)
         ini_p = Path(parent_dir) / ".picasa.ini"
+        legacy_p = Path(parent_dir) / "Picasa.ini"
 
         doc = self._ini_cache.get(parent_dir)
         if not doc:
-            doc = PicasaIniParser.parse_file(str(ini_p)) if ini_p.exists() else PicasaIniDocument()
+            if ini_p.exists():
+                doc = PicasaIniParser.parse_file(str(ini_p))
+            elif legacy_p.exists():
+                doc = PicasaIniParser.parse_file(str(legacy_p))
+            else:
+                doc = PicasaIniDocument()
             self._ini_cache[parent_dir] = doc
 
         current_rot = doc.get_rotate(src.name)
-        new_rot = (current_rot + 1) % 4
+        new_rot = (current_rot + step) % 4
         doc.set_rotate(src.name, new_rot)
+        try:
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(parent_dir)
+        except Exception:
+            pass
         doc.write_file(str(ini_p))
 
         # FR: Synchroniser avec la base de données et la vue de vignettes si disponibles
@@ -578,17 +605,49 @@ class PicasaSlideshowWindow(QWidget):
             try:
                 if hasattr(db, "invalidate_ini_cache"):
                     db.invalidate_ini_cache(str(ini_p))
-                if hasattr(db, "find_media_index_by_path") and hasattr(db, "set_rotate"):
+                db_idx = None
+                if hasattr(db, "find_media_index_by_path"):
                     db_idx = db.find_media_index_by_path(path_str)
-                    if db_idx is not None and db_idx >= 0:
-                        db.set_rotate(db_idx, new_rot)
+                if db_idx is None and hasattr(db, "find_photo_index"):
+                    db_idx = db.find_photo_index(path_str)
+                if db_idx is not None and db_idx >= 0 and hasattr(db, "set_rotate"):
+                    db.set_rotate(db_idx, new_rot)
                 if hasattr(db, "sync_photo_ini_to_db"):
                     db.sync_photo_ini_to_db(path_str, doc)
+                if hasattr(db, "update_photo_thumbnails_from_disk"):
+                    db.update_photo_thumbnails_from_disk(path_str, persist_to_disk=False)
+                if hasattr(db, "schedule_save_thumbnails"):
+                    db.schedule_save_thumbnails(1500)
+            except Exception:
+                pass
+
+        if parent_win is not None:
+            try:
+                if hasattr(parent_win, "thumb_view") and hasattr(parent_win.thumb_view, "invalidate_item"):
+                    parent_win.thumb_view.invalidate_item(path_str)
+                if hasattr(parent_win, "photo_tray") and hasattr(parent_win.photo_tray, "invalidate_item"):
+                    parent_win.photo_tray.invalidate_item(path_str)
+                if hasattr(parent_win, "one_up_view") and hasattr(parent_win.one_up_view, "filmstrip"):
+                    parent_win.one_up_view.filmstrip.clear_cache()
             except Exception:
                 pass
 
         self._preload_cache.pop(path_str, None)
         self._load_current_photo(animate=False)
+
+    def rotate_current_cw(self) -> None:
+        """
+        FR: Pivote la photo courante de 90° dans le sens horaire et persiste dans .picasa.ini (et la base si présente).
+        EN: Rotates the current photo 90° clockwise and persists the change to .picasa.ini (and database if present).
+        """
+        self._rotate_current_by(1)
+
+    def rotate_current_ccw(self) -> None:
+        """
+        FR: Pivote la photo courante de 90° dans le sens anti-horaire et persiste dans .picasa.ini (et la base si présente).
+        EN: Rotates the current photo 90° counterclockwise and persists the change to .picasa.ini (and database if present).
+        """
+        self._rotate_current_by(-1)
 
     def toggle_star_current(self) -> None:
         """
@@ -601,14 +660,26 @@ class PicasaSlideshowWindow(QWidget):
         src = Path(path_str)
         parent_dir = str(src.parent)
         ini_p = Path(parent_dir) / ".picasa.ini"
+        legacy_p = Path(parent_dir) / "Picasa.ini"
 
         doc = self._ini_cache.get(parent_dir)
         if not doc:
-            doc = PicasaIniParser.parse_file(str(ini_p)) if ini_p.exists() else PicasaIniDocument()
+            if ini_p.exists():
+                doc = PicasaIniParser.parse_file(str(ini_p))
+            elif legacy_p.exists():
+                doc = PicasaIniParser.parse_file(str(legacy_p))
+            else:
+                doc = PicasaIniDocument()
             self._ini_cache[parent_dir] = doc
 
         is_star = doc.is_starred(src.name)
-        doc.set_starred(src.name, not is_star)
+        new_star = not is_star
+        doc.set_starred(src.name, new_star)
+        try:
+            from picasa_py.ini.writer import PicasaIniWriter
+            PicasaIniWriter.mark_internal_write(parent_dir)
+        except Exception:
+            pass
         doc.write_file(str(ini_p))
 
         parent_win = self.parentWidget()
@@ -617,16 +688,40 @@ class PicasaSlideshowWindow(QWidget):
             try:
                 if hasattr(db, "invalidate_ini_cache"):
                     db.invalidate_ini_cache(str(ini_p), invalidate_albums_starred=True)
-                if hasattr(db, "find_media_index_by_path") and hasattr(db, "set_starred"):
+                db_idx = None
+                if hasattr(db, "find_media_index_by_path"):
                     db_idx = db.find_media_index_by_path(path_str)
-                    if db_idx is not None and db_idx >= 0:
-                        db.set_starred(db_idx, not is_star)
+                if db_idx is None and hasattr(db, "find_photo_index"):
+                    db_idx = db.find_photo_index(path_str)
+                if db_idx is not None and db_idx >= 0 and hasattr(db, "set_starred"):
+                    db.set_starred(db_idx, new_star)
                 if hasattr(db, "sync_photo_ini_to_db"):
                     db.sync_photo_ini_to_db(path_str, doc)
             except Exception:
                 pass
 
-        self.hud.set_starred(not is_star)
+        if parent_win is not None:
+            try:
+                norm_target = os.path.normcase(os.path.normpath(path_str))
+                if hasattr(parent_win, "thumb_view") and hasattr(parent_win.thumb_view, "items"):
+                    for it in parent_win.thumb_view.items:
+                        if it.path == path_str or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target):
+                            it.starred = new_star
+                    parent_win.thumb_view.update()
+                if hasattr(parent_win, "photo_tray"):
+                    eff = parent_win.photo_tray.get_effective_items() if hasattr(parent_win.photo_tray, "get_effective_items") else []
+                    if any(
+                        getattr(it, "path", None) == path_str
+                        or (getattr(it, "path", None) and os.path.normcase(os.path.normpath(it.path)) == norm_target)
+                        for it in eff
+                    ):
+                        parent_win.photo_tray.update_star_state(new_star)
+                if hasattr(parent_win, "library_tree") and hasattr(parent_win.library_tree, "refresh_albums"):
+                    parent_win.library_tree.refresh_albums()
+            except Exception:
+                pass
+
+        self.hud.set_starred(new_star)
 
     def paintEvent(self, event) -> None:
         """

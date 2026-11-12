@@ -217,6 +217,18 @@ class PicasaEmailDialog(QDialog):
         for p in self.photo_paths:
             try:
                 src_stem, src_ext = os.path.splitext(os.path.basename(p))
+                from picasa_py.scanner.scanner import VIDEO_EXTENSIONS
+                if src_ext.lower() in VIDEO_EXTENSIONS and os.path.isfile(p):
+                    import shutil
+                    dest_vid = os.path.join(out_dir, f"{src_stem}{src_ext}")
+                    counter = 1
+                    while os.path.exists(dest_vid):
+                        dest_vid = os.path.join(out_dir, f"{src_stem}-{counter:03d}{src_ext}")
+                        counter += 1
+                    shutil.copy2(p, dest_vid)
+                    exported_files.append(dest_vid)
+                    continue
+
                 out_ext = src_ext if src_ext.lower() in (".jpg", ".jpeg") else ".jpg"
                 dest_path = os.path.join(out_dir, f"{src_stem}{out_ext}")
                 counter = 1
@@ -228,9 +240,21 @@ class PicasaEmailDialog(QDialog):
                     p, max_size=target_size if target_size > 0 else 0
                 )
                 if img_copy is not None:
-                    if img_copy.mode in ("RGBA", "P"):
+                    if img_copy.mode != "RGB":
                         img_copy = img_copy.convert("RGB")
-                    img_copy.save(dest_path, "JPEG", quality=85 if target_size > 0 else 95)
+                    save_kwargs: dict = {"quality": 85 if target_size > 0 else 95}
+                    try:
+                        with Image.open(p) as src_raw:
+                            icc = src_raw.info.get("icc_profile")
+                            if icc:
+                                save_kwargs["icc_profile"] = icc
+                            exif_obj = src_raw.getexif()
+                            if exif_obj:
+                                exif_obj[0x0112] = 1
+                                save_kwargs["exif"] = exif_obj.tobytes()
+                    except Exception:
+                        pass
+                    img_copy.save(dest_path, "JPEG", **save_kwargs)
                     exported_files.append(dest_path)
             except Exception:
                 pass

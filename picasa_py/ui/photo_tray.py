@@ -368,6 +368,10 @@ def _resolve_item_pixmap(item: Any, db: Optional[Any] = None) -> Optional[QPixma
         try:
             from PySide6.QtGui import QImage
             raw_db = eff_db.get_thumbnail(item_idx, size="small") or eff_db.get_thumbnail(item_idx, size="large")
+            if not raw_db and hasattr(eff_db, "is_face_record") and eff_db.is_face_record(item_idx):
+                parent_idx = eff_db.get_face_parent_photo_idx(item_idx)
+                if parent_idx is not None and parent_idx >= 0:
+                    raw_db = eff_db.get_thumbnail(parent_idx, size="small") or eff_db.get_thumbnail(parent_idx, size="large")
             if raw_db:
                 qimg_db = QImage.fromData(raw_db)
                 if not qimg_db.isNull():
@@ -381,10 +385,23 @@ def _resolve_item_pixmap(item: Any, db: Optional[Any] = None) -> Optional[QPixma
         except Exception:
             pass
 
-    # FR: 2. Charger depuis le chemin disque avec QPixmap / PIL draft rapide
-    # EN: 2. Load from disk path using fast QPixmap / PIL draft
+    # FR: 2. Charger depuis le chemin disque avec PicasaImageProcessor (respecte .picasa.ini) ou PIL draft rapide
+    # EN: 2. Load from disk path using PicasaImageProcessor (respects .picasa.ini) or fast PIL draft
     path = getattr(item, "path", None)
     if path and isinstance(path, str) and os.path.isfile(path):
+        try:
+            from picasa_py.ui.image_processor import PicasaImageProcessor
+            pil_tr = PicasaImageProcessor.load_transformed_image(path, max_size=96)
+            if pil_tr is not None:
+                p_tr = PicasaImageProcessor.pil_to_qpixmap(pil_tr)
+                if not p_tr.isNull():
+                    try:
+                        setattr(item, "pixmap", p_tr)
+                    except Exception:
+                        pass
+                    return p_tr
+        except Exception:
+            pass
         try:
             from PIL import Image, ImageOps
             from PySide6.QtGui import QImage
@@ -1782,6 +1799,45 @@ class PicasaPhotoTray(QWidget):
         self._db = db
         _ACTIVE_TRAY_DB = db
 
+    def invalidate_item(self, path: Optional[str] = None) -> None:
+        """
+        FR: Invalide le cache de miniature (`pixmap` et `_tray_scaled_*`) pour le chemin donné
+        (ou pour tous les éléments du bac si `path is None`) et redessine la bande du bac
+        ainsi que le texte d'information (`thumbui/infotext`).
+        EN: Invalidates the thumbnail cache (`pixmap` and `_tray_scaled_*`) for the given path
+        (or all tray items if `path is None`) and repaints the tray strip and info text (`thumbui/infotext`).
+        Ref: picasa3.exe @ 0x0088C3EC (CScratchPad::DrawItem), 0x0056FA50 (UpdateSelectionInfoText)
+        """
+        norm_target = os.path.normcase(os.path.normpath(path)) if path else None
+        all_candidates: List[Any] = list(self.active_items) + list(self.held_items)
+        if hasattr(self, "thumb_strip") and self.thumb_strip is not None:
+            all_candidates.extend(getattr(self.thumb_strip, "items", []))
+            for w in getattr(self.thumb_strip, "_item_widgets", []):
+                w_it = getattr(w, "item", None)
+                if w_it is not None:
+                    all_candidates.append(w_it)
+
+        for it in all_candidates:
+            it_path = getattr(it, "path", "") or ""
+            if norm_target is None or (
+                it_path and (it_path == path or os.path.normcase(os.path.normpath(it_path)) == norm_target)
+            ):
+                try:
+                    setattr(it, "pixmap", None)
+                except Exception:
+                    pass
+                try:
+                    for attr_name in [a for a in dir(it) if a.startswith("_tray_scaled_")]:
+                        delattr(it, attr_name)
+                except Exception:
+                    pass
+
+        if hasattr(self, "thumb_strip") and self.thumb_strip is not None:
+            for w in getattr(self.thumb_strip, "_item_widgets", []):
+                w.update()
+            self.thumb_strip.update()
+        self.update_info_text()
+
     @staticmethod
     def format_file_size(size_bytes: int) -> str:
         """
@@ -1824,9 +1880,13 @@ class PicasaPhotoTray(QWidget):
             folder_path = os.path.dirname(path)
             folder_name = os.path.basename(folder_path.rstrip("\\/")) if folder_path else ""
             db_idx = -1
-            if db is not None and hasattr(db, "find_media_index_by_path"):
+            if db is not None:
                 try:
-                    found_idx = db.find_media_index_by_path(path)
+                    found_idx = None
+                    if hasattr(db, "find_media_index_by_path"):
+                        found_idx = db.find_media_index_by_path(path)
+                    if found_idx is None and hasattr(db, "find_photo_index"):
+                        found_idx = db.find_photo_index(path)
                     if found_idx is not None:
                         db_idx = int(found_idx)
                 except Exception:
@@ -1839,6 +1899,17 @@ class PicasaPhotoTray(QWidget):
                 os.path.basename(folder_path.rstrip("\\/")) if folder_path else ""
             )
             db_idx = int(getattr(item_or_path, "index", -1) if getattr(item_or_path, "index", None) is not None else -1)
+            if db_idx < 0 and path and db is not None:
+                try:
+                    found_idx = None
+                    if hasattr(db, "find_media_index_by_path"):
+                        found_idx = db.find_media_index_by_path(path)
+                    if found_idx is None and hasattr(db, "find_photo_index"):
+                        found_idx = db.find_photo_index(path)
+                    if found_idx is not None:
+                        db_idx = int(found_idx)
+                except Exception:
+                    pass
 
         dt_obj: Optional[datetime] = None
         width = 0
@@ -1847,10 +1918,18 @@ class PicasaPhotoTray(QWidget):
         tags: List[str] = []
 
         if db is not None and db_idx >= 0:
+            eff_idx = db_idx
+            try:
+                if hasattr(db, "is_face_record") and db.is_face_record(db_idx):
+                    p_idx = db.get_face_parent_photo_idx(db_idx)
+                    if p_idx is not None and p_idx >= 0:
+                        eff_idx = int(p_idx)
+            except Exception:
+                eff_idx = db_idx
             try:
                 ti = getattr(db, "thumbindex", None)
-                if ti is not None and 0 <= db_idx < len(ti.records):
-                    rec = ti.records[db_idx]
+                if ti is not None and 0 <= eff_idx < len(ti.records):
+                    rec = ti.records[eff_idx]
                     if not fname and rec.path:
                         fname = rec.path
                     if rec.size and rec.size > 0:
@@ -1862,15 +1941,15 @@ class PicasaPhotoTray(QWidget):
                 pass
             try:
                 if hasattr(db, "get_property"):
-                    ew = int(db.get_property("imagedata_edit_width", db_idx) or 0)
-                    eh = int(db.get_property("imagedata_edit_height", db_idx) or 0)
-                    w = int(db.get_property("imagedata_width", db_idx) or 0)
-                    h = int(db.get_property("imagedata_height", db_idx) or 0)
+                    ew = int(db.get_property("imagedata_edit_width", eff_idx) or 0)
+                    eh = int(db.get_property("imagedata_edit_height", eff_idx) or 0)
+                    w = int(db.get_property("imagedata_width", eff_idx) or 0)
+                    h = int(db.get_property("imagedata_height", eff_idx) or 0)
                     if ew > 0 and eh > 0:
                         width, height = ew, eh
                     elif w > 0 and h > 0:
                         width, height = w, h
-                    raw_tags = db.get_property("imagedata_tags", db_idx)
+                    raw_tags = db.get_property("imagedata_tags", eff_idx)
                     if raw_tags and isinstance(raw_tags, str):
                         for t in raw_tags.split(","):
                             ts = t.strip()

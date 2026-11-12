@@ -2658,6 +2658,133 @@ def test_pass20_canvas_tool_cancel_and_graduated_tint_and_save_as_parity(tmp_pat
     assert str(out_p) in edited_signals
 
 
+def test_pass21_tray_slideshow_filmstrip_and_rename_parity(tmp_path: Path) -> None:
+    """
+    FR: Vérifie les correctifs de la Passe 21 :
+    1. `PicasaPhotoTray.invalidate_item` efface les miniatures mises en cache (`pixmap` et `_tray_scaled_*`),
+       et `_get_item_metadata` résout les sous-enregistrements `1001` de visages vers leur photo parente
+       pour afficher les vraies dimensions, la taille en octets et les tags dans `thumbui/infotext`.
+    2. `PicasaFilmstrip.invalidate_thumbnail(parent_idx)` invalide également les sous-enregistrements `1001`
+       de visages rattachés à cette photo parente.
+    3. `PicasaSlideshowWindow` gère les raccourcis clavier `Ctrl+R`, `Ctrl+Shift+R` et `Ctrl+T` (`SHORTCUTS.XML`)
+       et synchronise `.picasa.ini` ainsi que la base de données.
+    4. `PicasaRenameDialog.execute_rename` prend en charge le repli sur `Picasa.ini` legacy et migre
+       la section INI vers le nouveau nom de fichier.
+    """
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QKeyEvent, QPixmap
+    from picasa_py.ui.photo_tray import PicasaPhotoTray
+    from picasa_py.ui.filmstrip import PicasaFilmstrip
+    from picasa_py.ui.slideshow import PicasaSlideshowWindow
+    from picasa_py.ui.rename_dialog import PicasaRenameDialog
+    from picasa_py.ui.thumbnail_view import ThumbnailItem
+    from picasa_py.db.thumbindex import ThumbIndexRecord
+    from picasa_py.ini.parser import PicasaIniParser
+
+    app = QApplication.instance() or QApplication([])
+
+    db = PicasaDatabase.create_new(tmp_path / "db_pass21")
+    scanner = PicasaDirScanner(db)
+    folder = tmp_path / "photos_p21"
+    folder.mkdir()
+    photo_p = folder / "portrait_p21.jpg"
+    Image.new("RGB", (400, 300), (120, 80, 60)).save(str(photo_p), format="JPEG", quality=92)
+    parent_idx = scanner.index_file(photo_p)
+    assert parent_idx >= 0
+
+    # Créer un sous-enregistrement de visage 1001 rattaché à parent_idx
+    assert db.thumbindex is not None
+    face_idx = len(db.thumbindex.records)
+    db.thumbindex.records.append(
+        ThumbIndexRecord(
+            path="",
+            flags=0x40,
+            ft1=0,
+            ft2=0,
+            type=1001,
+            size=0,
+            parent_idx=parent_idx,
+        )
+    )
+    for pmp in db.pmps.values():
+        while len(pmp.records) <= face_idx:
+            pmp.records.append(0 if pmp.pmp_type != 0 else "")
+
+    # 1. PicasaPhotoTray: _get_item_metadata sur un item 1001 et invalidate_item
+    tray = PicasaPhotoTray()
+    tray.set_database(db)
+    face_item = ThumbnailItem(
+        index=face_idx,
+        path=str(photo_p),
+        filename=photo_p.name,
+        folder=folder.name,
+        folder_path=str(folder),
+    )
+    face_item.pixmap = QPixmap(32, 32)
+    setattr(face_item, "_tray_scaled_48", QPixmap(48, 48))
+    tray.set_selected_items([face_item])
+
+    fname, fol, dt_obj, w, h, sz, tags = tray._get_item_metadata(face_item)
+    assert fname == "portrait_p21.jpg"
+    assert (w, h) == (400, 300)
+    assert sz > 0
+
+    tray.invalidate_item(str(photo_p))
+    assert face_item.pixmap is None
+    assert not hasattr(face_item, "_tray_scaled_48")
+
+    # 2. PicasaFilmstrip: invalidate_thumbnail(parent_idx) évince aussi face_idx
+    strip = PicasaFilmstrip()
+    strip.db = db
+    strip._thumb_cache[parent_idx] = QPixmap(64, 64)
+    strip._thumb_cache[face_idx] = QPixmap(64, 64)
+    strip.invalidate_thumbnail(parent_idx)
+    assert parent_idx not in strip._thumb_cache
+    assert face_idx not in strip._thumb_cache
+
+    # 3. PicasaSlideshowWindow: raccourcis Ctrl+R, Ctrl+Shift+R et Ctrl+T
+    slide_win = PicasaSlideshowWindow([str(photo_p)], start_index=0)
+    ev_cw = QKeyEvent(QKeyEvent.Type.KeyPress, Qt.Key.Key_R, Qt.KeyboardModifier.ControlModifier)
+    slide_win.keyPressEvent(ev_cw)
+    doc_s1 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    assert doc_s1.get_rotate(photo_p.name) == 1
+
+    ev_ccw = QKeyEvent(
+        QKeyEvent.Type.KeyPress,
+        Qt.Key.Key_R,
+        Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier,
+    )
+    slide_win.keyPressEvent(ev_ccw)
+    doc_s2 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    assert doc_s2.get_rotate(photo_p.name) == 0
+
+    ev_star = QKeyEvent(QKeyEvent.Type.KeyPress, Qt.Key.Key_T, Qt.KeyboardModifier.ControlModifier)
+    slide_win.keyPressEvent(ev_star)
+    doc_s3 = PicasaIniParser.parse_file(str(folder / ".picasa.ini"))
+    assert doc_s3.is_starred(photo_p.name) is True
+
+    # 4. PicasaRenameDialog: repli sur Picasa.ini legacy
+    legacy_folder = tmp_path / "legacy_rename_p21"
+    legacy_folder.mkdir()
+    leg_photo = legacy_folder / "old_name.jpg"
+    Image.new("RGB", (60, 60), (20, 40, 60)).save(str(leg_photo), format="JPEG")
+    leg_doc = PicasaIniParser.parse_bytes(b"[old_name.jpg]\r\nstar=yes\r\ncaption=Souvenir\r\n")
+    leg_doc.write_file(str(legacy_folder / "Picasa.ini"))
+
+    ren_dlg = PicasaRenameDialog([str(leg_photo)])
+    ren_dlg.edit_basename.setText("vacances")
+    pairs = ren_dlg.execute_rename()
+    assert len(pairs) == 1
+    new_photo_p = Path(pairs[0][1])
+    assert new_photo_p.exists()
+    migrated_doc = PicasaIniParser.parse_file(str(legacy_folder / ".picasa.ini"))
+    assert migrated_doc.is_starred(new_photo_p.name) is True
+    sec_mig = migrated_doc.get_section(new_photo_p.name)
+    assert sec_mig is not None and sec_mig.get("caption") == "Souvenir"
+
+
+
 
 
 

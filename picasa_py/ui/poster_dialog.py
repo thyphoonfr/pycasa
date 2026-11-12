@@ -339,7 +339,7 @@ class PicasaPosterDialog(QDialog):
                         tile_img = img.crop(box)
                         tile_name = f"page_{r+1:02d}_{c+1:02d}.jpg"
                         tile_path = out_dir / tile_name
-                        if tile_img.mode in ("RGBA", "P"):
+                        if tile_img.mode != "RGB":
                             tile_img = tile_img.convert("RGB")
                         tile_img.save(str(tile_path), "JPEG", **save_kwargs)
                         count += 1

@@ -1006,6 +1006,8 @@ class PicasaMainWindow(QMainWindow):
                     if db_idx is not None and db_idx >= 0:
                         self.one_up_view.filmstrip.invalidate_thumbnail(db_idx)
             self.thumb_view.invalidate_item(photo_path)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(photo_path)
             self.thumb_view.update()
             if self.stack.currentWidget() == self.one_up_view:
                 self._sync_one_up_info_bar()
@@ -1740,6 +1742,8 @@ class PicasaMainWindow(QMainWindow):
                 except Exception:
                     pass
             self.thumb_view.invalidate_item(p)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(p)
         if self.db is not None and hasattr(self.db, "schedule_save_thumbnails"):
             self.db.schedule_save_thumbnails(1500)
 
@@ -1947,7 +1951,9 @@ class PicasaMainWindow(QMainWindow):
                 )
             ):
                 self.one_up_view._on_rotate_right()
-                if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "thumb_strip"):
+                if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                    self.photo_tray.invalidate_item(self.one_up_view.current_photo_path)
+                elif hasattr(self, "photo_tray") and hasattr(self.photo_tray, "thumb_strip"):
                     self.photo_tray.thumb_strip.update()
                 self.status_bar.showMessage("Rotation horaire : 1 photo(s).")
                 return
@@ -1962,6 +1968,8 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(p)
         if self.db is not None:
             if hasattr(self.db, "schedule_save_thumbnails"):
                 self.db.schedule_save_thumbnails(1500)
@@ -1995,7 +2003,9 @@ class PicasaMainWindow(QMainWindow):
                 )
             ):
                 self.one_up_view._on_rotate_left()
-                if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "thumb_strip"):
+                if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                    self.photo_tray.invalidate_item(self.one_up_view.current_photo_path)
+                elif hasattr(self, "photo_tray") and hasattr(self.photo_tray, "thumb_strip"):
                     self.photo_tray.thumb_strip.update()
                 self.status_bar.showMessage("Rotation anti-horaire : 1 photo(s).")
                 return
@@ -2010,6 +2020,8 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(p)
         if self.db is not None:
             if hasattr(self.db, "schedule_save_thumbnails"):
                 self.db.schedule_save_thumbnails(1500)
@@ -2181,6 +2193,8 @@ class PicasaMainWindow(QMainWindow):
             if self.db is not None and hasattr(self.db, "update_photo_thumbnails_from_disk"):
                 self.db.update_photo_thumbnails_from_disk(p, persist_to_disk=False)
             self.thumb_view.invalidate_item(p)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(p)
         if self.db is not None:
             if hasattr(self.db, "schedule_save_thumbnails"):
                 self.db.schedule_save_thumbnails(1500)
@@ -2541,6 +2555,8 @@ class PicasaMainWindow(QMainWindow):
                 if hasattr(self.db, "update_photo_thumbnails_from_disk"):
                     self.db.update_photo_thumbnails_from_disk(target_path, persist_to_disk=False)
             self.thumb_view.invalidate_item(target_path)
+            if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                self.photo_tray.invalidate_item(target_path)
             return True
         except Exception:
             return False
@@ -2555,6 +2571,8 @@ class PicasaMainWindow(QMainWindow):
             if ok:
                 if self.one_up_view.current_photo_path:
                     self.thumb_view.invalidate_item(self.one_up_view.current_photo_path)
+                    if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+                        self.photo_tray.invalidate_item(self.one_up_view.current_photo_path)
                 self.thumb_view.update()
                 self.status_bar.showMessage("Modifications enregistrées (.picasaoriginals sauvegardé).")
             else:
@@ -2756,6 +2774,12 @@ class PicasaMainWindow(QMainWindow):
         EN: Refreshes the photo library thumbnails (ID_REFRESH_THUMB).
         """
         self.thumb_view._pixmap_cache.clear()
+        if hasattr(self.thumb_view, "_db_pixmap_cache"):
+            self.thumb_view._db_pixmap_cache.clear()
+        if hasattr(self.thumb_view, "_scaled_pixmap_cache"):
+            self.thumb_view._scaled_pixmap_cache.clear()
+        if hasattr(self, "photo_tray") and hasattr(self.photo_tray, "invalidate_item"):
+            self.photo_tray.invalidate_item(None)
         self.thumb_view.update()
         self.status_bar.showMessage("Miniatures actualisées.")
 

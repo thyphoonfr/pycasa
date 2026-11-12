@@ -124,17 +124,27 @@ class PicasaFilmstrip(QWidget):
 
     def invalidate_thumbnail(self, db_idx: int) -> None:
         """
-        FR: Invalide la miniature mise en cache pour l'enregistrement db_idx (ainsi que sa photo parente)
-        afin de forcer son rechargement depuis la base de données après l'application d'un effet.
-        EN: Invalidates the cached thumbnail for record db_idx (and its parent photo)
-        so it is reloaded from the database after an effect or edit is applied.
+        FR: Invalide la miniature mise en cache pour l'enregistrement db_idx (ainsi que sa photo parente
+        et tous ses sous-enregistrements de visages 1001) afin de forcer son rechargement depuis la base
+        de données après l'application d'un effet.
+        EN: Invalidates the cached thumbnail for record db_idx (as well as its parent photo
+        and all its 1001 face sub-records) so it is reloaded from the database after an effect or edit is applied.
         Ref: picasa3.exe @ 0x00579680 -> 0x005A6950 (editpanel/filmstrip invalidate)
         """
         self._thumb_cache.pop(db_idx, None)
+        target_parent = db_idx
         if self.db is not None and hasattr(self.db, "is_face_record") and self.db.is_face_record(db_idx):
             p_idx = self.db.get_face_parent_photo_idx(db_idx)
             if p_idx is not None:
                 self._thumb_cache.pop(p_idx, None)
+                target_parent = p_idx
+        if self.db is not None and hasattr(self.db, "is_face_record") and hasattr(self.db, "get_face_parent_photo_idx"):
+            for k in list(self._thumb_cache.keys()):
+                try:
+                    if self.db.is_face_record(k) and self.db.get_face_parent_photo_idx(k) == target_parent:
+                        self._thumb_cache.pop(k, None)
+                except Exception:
+                    pass
         self.update()
 
     def invalidate_index(self, idx: int) -> None:

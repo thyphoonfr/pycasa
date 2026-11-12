@@ -389,6 +389,10 @@ class PicasaRenameDialog(QDialog):
             parent_dir = str(src_p.parent)
             if parent_dir not in ini_docs:
                 ini_p = Path(parent_dir) / ".picasa.ini"
+                if not ini_p.exists():
+                    alt_p = Path(parent_dir) / "Picasa.ini"
+                    if alt_p.exists():
+                        ini_p = alt_p
                 if ini_p.exists():
                     ini_docs[parent_dir] = PicasaIniParser.parse_file(str(ini_p))
                 else:
@@ -459,6 +463,8 @@ class PicasaRenameDialog(QDialog):
         for p_dir, doc in ini_docs.items():
             if doc:
                 try:
+                    from picasa_py.ini.writer import PicasaIniWriter
+                    PicasaIniWriter.mark_internal_write(p_dir)
                     ini_p = Path(p_dir) / ".picasa.ini"
                     doc.write_file(str(ini_p))
                 except Exception:

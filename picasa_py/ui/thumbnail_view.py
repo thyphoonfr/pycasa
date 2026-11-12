@@ -5063,12 +5063,52 @@ class PicasaThumbnailView(QWidget):
 
         return self._get_thumbnail_pixmap(item_idx)
 
+    def _compute_item_has_edits(self, it: ThumbnailItem) -> bool:
+        """
+        FR: Détermine si un élément possède des retouches non-destructives actives dans la base ou dans `.picasa.ini`.
+        EN: Determines whether an item has active non-destructive edits in the database or `.picasa.ini`.
+        """
+        if self.db is not None and it.index >= 0 and hasattr(self.db, "pmps"):
+            pmp_ed = self.db.pmps.get("imagedata_edited")
+            if pmp_ed is not None and it.index < len(pmp_ed.records):
+                return bool(pmp_ed.records[it.index])
+        if it.path:
+            p = Path(it.path)
+            ini_p = p.parent / ".picasa.ini"
+            if not ini_p.exists():
+                ini_p = p.parent / "Picasa.ini"
+            if ini_p.exists():
+                try:
+                    from picasa_py.ini.parser import PicasaIniParser
+                    doc = (
+                        self.db.get_parsed_ini(str(ini_p))
+                        if (self.db is not None and hasattr(self.db, "get_parsed_ini"))
+                        else PicasaIniParser.parse_file(str(ini_p))
+                    )
+                    if doc:
+                        sec = doc.get_section(p.name)
+                        if sec:
+                            return any(
+                                bool(sec.get(k))
+                                for k in (
+                                    "filters", "crop", "rotate", "tilt", "text",
+                                    "autolight", "backlight", "colorfix", "redeye", "retouch", "fix", "bw"
+                                )
+                            )
+                    return False
+                except Exception:
+                    pass
+        return True
+
     def invalidate_item(self, item_idx_or_path: Union[int, str]) -> None:
         """
-        FR: Invalide le cache d'une miniature modifiée pour forcer son rafraîchissement visuel.
-        EN: Invalidates the cached pixmap of a modified thumbnail to force a visual refresh.
+        FR: Invalide le cache d'une miniature modifiée pour forcer son rafraîchissement visuel
+        dans la grille et dans le bac à photos (`thumbui/scratch`).
+        EN: Invalidates the cached pixmap of a modified thumbnail to force a visual refresh
+        in the grid and in the photo tray (`thumbui/scratch`).
         """
         self._folder_backups_cache.clear()
+        invalidated_paths: List[str] = []
         if isinstance(item_idx_or_path, int):
             self._thumb_worker._failed_items.discard(item_idx_or_path)
             self._pixmap_cache.pop(item_idx_or_path, None)
@@ -5079,11 +5119,18 @@ class PicasaThumbnailView(QWidget):
                 self._db_pixmap_cache.pop(it.index, None)
                 it.pixmap = None
                 it.face_pixmap = None
+                for attr_name in [a for a in dir(it) if a.startswith("_tray_scaled_")]:
+                    try:
+                        delattr(it, attr_name)
+                    except Exception:
+                        pass
                 if it.path:
+                    invalidated_paths.append(it.path)
                     p = Path(it.path)
                     it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists() or (p.parent / "Originals" / p.name).exists()
-                    it.has_edits = True
+                    it.has_edits = self._compute_item_has_edits(it)
         else:
+            invalidated_paths.append(item_idx_or_path)
             norm_target = os.path.normcase(os.path.normpath(item_idx_or_path))
             for idx, it in enumerate(self.items):
                 if it.path == item_idx_or_path or (it.path and os.path.normcase(os.path.normpath(it.path)) == norm_target):
@@ -5094,9 +5141,21 @@ class PicasaThumbnailView(QWidget):
                         self._scaled_pixmap_cache.pop(k, None)
                     it.pixmap = None
                     it.face_pixmap = None
+                    for attr_name in [a for a in dir(it) if a.startswith("_tray_scaled_")]:
+                        try:
+                            delattr(it, attr_name)
+                        except Exception:
+                            pass
                     p = Path(it.path)
                     it.has_backup = (p.parent / ".picasaoriginals" / p.name).exists() or (p.parent / "Originals" / p.name).exists()
-                    it.has_edits = True
+                    it.has_edits = self._compute_item_has_edits(it)
+        main_win = self.window()
+        if main_win is not None and hasattr(main_win, "photo_tray") and hasattr(main_win.photo_tray, "invalidate_item"):
+            for p_str in invalidated_paths:
+                try:
+                    main_win.photo_tray.invalidate_item(p_str)
+                except Exception:
+                    pass
         self.update()
 
     def _flush_async_thumbnails(self) -> None:

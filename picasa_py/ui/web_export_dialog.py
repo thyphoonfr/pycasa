@@ -265,14 +265,14 @@ class PicasaWebExportDialog(QDialog):
                     img_full = img.copy()
                     if target_size > 0:
                         img_full.thumbnail((target_size, target_size), Image.Resampling.LANCZOS)
-                    if img_full.mode in ("RGBA", "P"):
+                    if img_full.mode != "RGB":
                         img_full = img_full.convert("RGB")
                     img_full.save(str(img_dest), "JPEG", quality=90)
 
                     # Miniature carrée centrée
                     thumb_img = img.copy()
                     thumb_img.thumbnail((250, 250), Image.Resampling.LANCZOS)
-                    if thumb_img.mode in ("RGBA", "P"):
+                    if thumb_img.mode != "RGB":
                         thumb_img = thumb_img.convert("RGB")
                     thumb_img.save(str(thumb_dest), "JPEG", quality=85)
 
