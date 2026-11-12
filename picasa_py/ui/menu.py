@@ -93,6 +93,7 @@ MENU_I18N = {
         "ID_CREATE_DATABASE": "&Créer une nouvelle base de données...",
         "ID_OPEN_DATABASE": "&Ouvrir une base de données existante...",
         "ID_HELP_DEFAULT": "&Rubriques d'aide et index",
+        "ID_HELP_CHECK_UPDATES": "Rechercher les &mises à jour...",
         "ID_HELP_ABOUT": "À &propos de PyCasa...",
         "ID_HELP_KEYBOARD_SHORTCUTS": "Raccourcis &clavier",
         "ID_HELP_PRIVACY": "Règles de &confidentialité",
@@ -414,6 +415,7 @@ class PicasaMenuBuilder:
         # 8. &Help
         menu_help = mb.addMenu(self._tr("menu_help", "&Help"))
         self._add_action(menu_help, self._tr("ID_HELP_DEFAULT", "&Help Contents and Index"), "ID_HELP_DEFAULT", self.win.action_help_contents if hasattr(self.win, "action_help_contents") else None)
+        self._add_action(menu_help, self._tr("ID_HELP_CHECK_UPDATES", "Check for &Updates..."), "ID_HELP_CHECK_UPDATES", (lambda _checked=False: self.win.action_check_for_updates(manual=True)) if hasattr(self.win, "action_check_for_updates") else None)
         self._add_action(menu_help, self._tr("ID_HELP_ABOUT", "&About Picasa..."), "ID_HELP_ABOUT", self.win.action_about if hasattr(self.win, "action_about") else None)
         self._add_action(menu_help, self._tr("ID_HELP_KEYBOARD_SHORTCUTS", "&Keyboard Shortcuts"), "ID_HELP_KEYBOARD_SHORTCUTS", self.win.action_keyboard_shortcuts if hasattr(self.win, "action_keyboard_shortcuts") else None)
         self._add_action(menu_help, self._tr("ID_HELP_PRIVACY", "&Privacy Policy"), "ID_HELP_PRIVACY", self.win.action_privacy_policy if hasattr(self.win, "action_privacy_policy") else None)

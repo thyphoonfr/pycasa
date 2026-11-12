@@ -221,6 +221,8 @@ Tout écart (même un octet) est un **bug** jusqu'à preuve, dans le désassembl
       - **`z` et `y`** (ex. `3.9`) : **réservés exclusivement à l'utilisateur**. Aucun agent ne doit jamais modifier `z` ou `y` sans demande explicite de l'utilisateur.
       - **`x`** (initialisé à `145`) : incrémenté à chaque **demande d'ajout de fonctionnalité**.
       - **`w`** : incrémenté à **chaque changement dans le code** (correction, ajustement, refactoring ou modification quelconque du code).
+11. **Synchronisation obligatoire de l'aide des raccourcis clavier (`action_keyboard_shortcuts`)** :
+    - À chaque ajout, modification ou suppression d'un raccourci clavier dans le code (`picasa_py/ui/menu.py`, `context_menu.py`, `main_window.py`, `thumbnail_view.py`, `one_up_view.py`, `image_canvas.py`, `right_drawer.py`, `slideshow.py`, `video_player.py`, etc.), la liste affichée dans l'aide (`PicasaMainWindow.action_keyboard_shortcuts` dans `picasa_py/ui/main_window.py`) **doit impérativement être mise à jour simultanément** afin de toujours refléter exactement les raccourcis actifs dans le code et ce à quoi ils correspondent.
 
 ---
 

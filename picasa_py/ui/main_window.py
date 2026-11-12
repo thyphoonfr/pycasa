@@ -225,7 +225,10 @@ class PicasaMainWindow(QMainWindow):
         self.apply_theme(self.style.theme_id, persist=False)
         self.db: Optional[PicasaDatabase] = None
         self._effects_clipboard: Optional[Dict[str, str]] = None
+        self._update_controller: Optional[Any] = None
         self._init_database(db_path)
+        if "PYTEST_CURRENT_TEST" not in os.environ:
+            QTimer.singleShot(2500, lambda: self.action_check_for_updates(manual=False))
 
     def apply_theme(self, theme_id: str, persist: bool = True) -> None:
         """
@@ -3123,10 +3126,25 @@ class PicasaMainWindow(QMainWindow):
 
     def action_edit_folder_description(self, folder_path: str) -> None:
         """
-        FR: Modifie le nom / la description d'un dossier dans la section [Picasa] de .picasa.ini.
-        EN: Edits a folder's name / description in the [Picasa] section of .picasa.ini.
-        Ref: picasa3.exe @ Folder::ID_ALBUM_EDITDESCRIPTION (0x00CAE244)
+        FR: Modifie le nom / la description d'un dossier dans la section [Picasa] de .picasa.ini,
+        ou redirige vers l'édition d'album (`album:`) ou de personne (`person:`).
+        EN: Edits a folder's name / description in the [Picasa] section of .picasa.ini,
+        or dispatches to album (`album:`) or person (`person:`) editing.
+        Ref: picasa3.exe @ Folder::ID_ALBUM_EDITDESCRIPTION (0x00CAE244), 0x006DB730
         """
+        if folder_path and folder_path.startswith("person:"):
+            cid = folder_path.split(":", 1)[1].strip()
+            pname = ""
+            if self.db and getattr(self.db, "face_manager", None):
+                p_obj = self.db.face_manager.get_person(cid)
+                if p_obj is not None:
+                    pname = p_obj.name
+            self.action_edit_person(cid, pname)
+            return
+        if folder_path and folder_path.startswith("album:"):
+            alb_name = folder_path.split(":", 1)[1].strip()
+            self.action_edit_album_description(alb_name)
+            return
         if not folder_path or not os.path.isdir(folder_path):
             return
         ini_path = os.path.join(folder_path, ".picasa.ini")
@@ -3309,16 +3327,34 @@ class PicasaMainWindow(QMainWindow):
             self.notify_albums_changed()
             self.status_bar.showMessage(f"Propriétés de l'album « {new_name} » mises à jour.")
 
-    def action_edit_person(self, contact_id: str, person_name: str) -> None:
+    def action_edit_person(self, contact_id: str, person_name: str = "") -> None:
         """
-        FR: Ouvre une boîte de dialogue pour renommer une personne existante.
-        EN: Opens a dialog to rename an existing person.
+        FR: Ouvre la boîte de dialogue Gestionnaire de personnes (`ContactManagerDlg` / `contactmgr.fen`)
+        pré-sélectionnée sur la personne `contact_id`, permettant de modifier son nom, ses adresses e-mail,
+        de consulter son nombre de photos dans Picasa (`%d photo(s) dans Picasa`) et ses options de contact.
+        EN: Opens the People Manager dialog (`ContactManagerDlg` / `contactmgr.fen`) pre-selected on
+        `contact_id`, allowing editing their name, email address(es), viewing their photo count in Picasa,
+        and contact options.
+        Ref: picasa3.exe @ 0x006DB730 (PplAlbum::ID_ALBUM_EDITCAPTIONS), 0x007B8F80, 0x007B9240
         """
-        new_name, ok = QInputDialog.getText(self, "Modifier la personne", "Nom de la personne :", text=person_name)
-        if ok and new_name.strip() and self.db and self.db.face_manager:
-            self.db.face_manager.rename_person(contact_id, new_name.strip())
-            self.library_tree.populate_from_database(self.db)
-            self.status_bar.showMessage(f"Personne renommée : {new_name.strip()}")
+        if not self.db:
+            return
+        dlg = PicasaContactManagerDialog(
+            self.db,
+            style=getattr(self, "style", None),
+            parent=self,
+            initial_contact_id=contact_id,
+            initial_person_name=person_name,
+        )
+        dlg.exec()
+        if hasattr(self, "library_tree"):
+            self.library_tree.refresh_people()
+        if hasattr(self, "thumb_view"):
+            self.thumb_view.update()
+        updated_name = person_name
+        if dlg.current_person and dlg.current_person.name:
+            updated_name = dlg.current_person.name
+        self.status_bar.showMessage(f"Personne mise à jour : {updated_name}")
 
     def action_delete_folder(self, folder_path: str) -> None:
         """
@@ -5036,31 +5072,62 @@ class PicasaMainWindow(QMainWindow):
 
     def action_keyboard_shortcuts(self) -> None:
         """
-        FR: Affiche la liste des raccourcis clavier de Picasa (ID_HELP_KEYBOARD_SHORTCUTS).
-        EN: Displays the list of Picasa keyboard shortcuts (ID_HELP_KEYBOARD_SHORTCUTS).
-        Ref: picasa3.exe @ 0x0088C3EC, SHORTCUTS.XML
+        FR: Affiche la liste complète des raccourcis clavier actifs dans PyCasa (ID_HELP_KEYBOARD_SHORTCUTS).
+        EN: Displays the full list of active keyboard shortcuts in PyCasa (ID_HELP_KEYBOARD_SHORTCUTS).
+        Ref: picasa3.exe @ 0x0088C3EC, SHORTCUTS.XML, menu.py, thumbnail_view.py, one_up_view.py, slideshow.py, right_drawer.py
         """
         shortcuts_text = (
-            "<b>Raccourcis clavier Picasa 3 :</b><br><br>"
-            "<table>"
+            "<b>Raccourcis clavier PyCasa (Picasa 3) :</b><br><br>"
+            "<b><u>Menus &amp; Actions générales</u></b>"
+            "<table cellspacing='3'>"
             "<tr><td><b>Ctrl+O</b></td><td>Ajouter un fichier à Picasa...</td></tr>"
             "<tr><td><b>Ctrl+N</b></td><td>Nouvel album...</td></tr>"
             "<tr><td><b>Ctrl+S</b></td><td>Enregistrer les retouches</td></tr>"
             "<tr><td><b>Ctrl+Shift+S</b></td><td>Enregistrer sous...</td></tr>"
+            "<tr><td><b>Ctrl+P</b></td><td>Imprimer...</td></tr>"
+            "<tr><td><b>Ctrl+Shift+P</b></td><td>Imprimer la planche-contact...</td></tr>"
             "<tr><td><b>F2</b></td><td>Renommer la sélection...</td></tr>"
-            "<tr><td><b>Suppr</b></td><td>Supprimer du disque...</td></tr>"
-            "<tr><td><b>Ctrl+R</b></td><td>Faire pivoter vers la droite</td></tr>"
-            "<tr><td><b>Ctrl+Shift+R</b></td><td>Faire pivoter vers la gauche</td></tr>"
-            "<tr><td><b>Ctrl+T</b></td><td>Ajouter / Supprimer une étoile</td></tr>"
+            "<tr><td><b>Suppr</b></td><td>Supprimer du disque... (ou retirer de l'album)</td></tr>"
+            "<tr><td><b>Ctrl+X</b></td><td>Couper la sélection</td></tr>"
             "<tr><td><b>Ctrl+C</b></td><td>Copier la photo</td></tr>"
             "<tr><td><b>Ctrl+Shift+C</b></td><td>Copier tous les effets</td></tr>"
-            "<tr><td><b>Ctrl+Shift+V</b></td><td>Coller tous les effets</td></tr>"
             "<tr><td><b>Ctrl+Shift+Y</b></td><td>Copier le chemin complet</td></tr>"
+            "<tr><td><b>Ctrl+V</b></td><td>Coller la sélection</td></tr>"
+            "<tr><td><b>Ctrl+Shift+V</b></td><td>Coller tous les effets</td></tr>"
             "<tr><td><b>Ctrl+A</b></td><td>Tout sélectionner</td></tr>"
             "<tr><td><b>Ctrl+4</b></td><td>Lancer le diaporama</td></tr>"
+            "<tr><td><b>Ctrl+K</b></td><td>Afficher / Masquer le panneau Mots-clés (Tags)</td></tr>"
+            "<tr><td><b>Ctrl+R</b></td><td>Faire pivoter vers la droite</td></tr>"
+            "<tr><td><b>Ctrl+Shift+R</b></td><td>Faire pivoter vers la gauche</td></tr>"
+            "<tr><td><b>Ctrl+T</b></td><td>Ajouter / Supprimer une étoile (Favori)</td></tr>"
             "<tr><td><b>Alt+Entrée</b></td><td>Propriétés de l'image</td></tr>"
-            "<tr><td><b>Ctrl+P</b></td><td>Imprimer</td></tr>"
-            "<tr><td><b>Ctrl+Shift+P</b></td><td>Imprimer la planche-contact</td></tr>"
+            "</table><br>"
+            "<b><u>Photothèque (Grille de vignettes) &amp; Mots-clés</u></b>"
+            "<table cellspacing='3'>"
+            "<tr><td><b>Entrée</b></td><td>Ouvrir la photo ou vidéo sélectionnée (vue Édition / Lecteur)</td></tr>"
+            "<tr><td><b>Échap</b></td><td>Désélectionner toutes les photos</td></tr>"
+            "<tr><td><b>← → ↑ ↓</b></td><td>Se déplacer d'une vignette à l'autre</td></tr>"
+            "<tr><td><b>Début / Fin</b></td><td>Aller à la première / dernière vignette</td></tr>"
+            "<tr><td><b>Maj + Flèches / Début / Fin</b></td><td>Étendre la sélection de vignettes</td></tr>"
+            "<tr><td><b>Alt+1 … Alt+9, Alt+0</b></td><td>Appliquer le mot-clé rapide correspondant (emplacements 1 à 10)</td></tr>"
+            "</table><br>"
+            "<b><u>Vue Édition (One-Up / Comparaison A|B)</u></b>"
+            "<table cellspacing='3'>"
+            "<tr><td><b>← / →</b></td><td>Photo précédente / Photo suivante</td></tr>"
+            "<tr><td><b>Entrée / Échap</b></td><td>Revenir à la photothèque (Échap annule d'abord l'outil de retouche actif)</td></tr>"
+            "<tr><td><b>A</b></td><td>Basculer en mode affichage simple (1 photo)</td></tr>"
+            "<tr><td><b>B</b></td><td>Basculer en mode comparaison côte à côte (A|B)</td></tr>"
+            "<tr><td><b>Ctrl+T</b></td><td>Ajouter / Supprimer une étoile sur la photo affichée</td></tr>"
+            "</table><br>"
+            "<b><u>Diaporama plein écran &amp; Lecteur vidéo</u></b>"
+            "<table cellspacing='3'>"
+            "<tr><td><b>Espace</b></td><td>Lecture / Pause (diaporama ou vidéo)</td></tr>"
+            "<tr><td><b>→ / ↓ / Page suiv.</b></td><td>Photo suivante (ou avancer de 5 s en vidéo avec →)</td></tr>"
+            "<tr><td><b>← / ↑ / Page préc.</b></td><td>Photo précédente (ou reculer de 5 s en vidéo avec ←)</td></tr>"
+            "<tr><td><b>Début / Fin</b></td><td>Première / Dernière photo du diaporama</td></tr>"
+            "<tr><td><b>Ctrl+R / Ctrl+Shift+R</b></td><td>Faire pivoter vers la droite / vers la gauche (diaporama)</td></tr>"
+            "<tr><td><b>Ctrl+T ou Ctrl+S</b></td><td>Ajouter / Supprimer une étoile (diaporama)</td></tr>"
+            "<tr><td><b>Échap / Q / Entrée</b></td><td>Quitter le diaporama (Échap / Q) ou quitter la vidéo (Échap / Entrée)</td></tr>"
             "</table>"
         )
         QMessageBox.information(self, "Raccourcis clavier Picasa", shortcuts_text)
@@ -5100,6 +5167,20 @@ class PicasaMainWindow(QMainWindow):
         Ref: picasa3.exe @ eMenuHelp::ID_HELP_DEFAULT
         """
         self.action_keyboard_shortcuts()
+
+    def action_check_for_updates(self, manual: bool = True) -> None:
+        """
+        FR: Vérifie sur GitHub Releases si une nouvelle version de PyCasa est disponible
+            et propose de télécharger et installer la mise à jour (Windows, macOS, Linux).
+        EN: Checks GitHub Releases for a newer PyCasa version and offers to download
+            and install the update (Windows, macOS, Linux).
+        Ref: picasa3.exe @ 0x0088C3EC (ID_HELP_CHECKFORUPDATES / options.fen item22..item24)
+        """
+        from picasa_py.ui.updater import PicasaUpdateController
+
+        if getattr(self, "_update_controller", None) is None:
+            self._update_controller = PicasaUpdateController(self)
+        self._update_controller.check_for_updates(manual=manual)
 
     def action_slideshow(self) -> None:
         """

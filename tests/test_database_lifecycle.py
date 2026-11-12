@@ -2985,6 +2985,111 @@ def test_pass23_contacts2_email_restore_recent_sort_popup_and_scoped_folder_albu
     ]
 
 
+def test_github_release_updater_windows_macos_linux(tmp_path: Path):
+    """
+    FR: Vérifie la sélection d'assets et la mise à jour autonome multi-OS (Windows, macOS, Linux)
+        de `picasa_py.ui.updater`.
+    """
+    import io
+    import tarfile
+    import zipfile
+    from picasa_py.ui.updater import (
+        apply_downloaded_update,
+        is_newer_version,
+        parse_version_tuple,
+        select_asset_for_platform,
+    )
+
+    assert parse_version_tuple("v3.9.175.424") == (3, 9, 175, 424)
+    assert is_newer_version("v3.9.175.425", "3.9.175.424") is True
+    assert is_newer_version("v3.9.175.424", "3.9.175.424") is False
+
+    assets = [
+        {"name": "PyCasa.exe", "browser_download_url": "https://example.com/PyCasa.exe"},
+        {"name": "PyCasa-3.9.175.425-Windows-x64.zip", "browser_download_url": "https://example.com/win.zip"},
+        {"name": "PyCasa-macOS.zip", "browser_download_url": "https://example.com/mac.zip"},
+        {"name": "PyCasa-Linux-x64.tar.gz", "browser_download_url": "https://example.com/lin.tar.gz"},
+    ]
+    assert select_asset_for_platform(assets, "win32")["name"] == "PyCasa.exe"
+    assert select_asset_for_platform(assets, "darwin")["name"] == "PyCasa-macOS.zip"
+    assert select_asset_for_platform(assets, "linux")["name"] == "PyCasa-Linux-x64.tar.gz"
+
+    # 1. Test Windows (PyCasa.exe -> PyCasa.exe.new)
+    win_dir = tmp_path / "win"
+    win_dir.mkdir()
+    win_exe = win_dir / "PyCasa.exe"
+    win_exe.write_bytes(b"OLD_WIN_EXE")
+    dl_win = win_dir / "PyCasa.exe.download"
+    dl_win.write_bytes(b"NEW_WIN_EXE")
+    ok_w, staged_w = apply_downloaded_update(str(dl_win), target_executable=str(win_exe), platform_name="win32", relaunch=False)
+    assert ok_w is True
+    assert Path(staged_w).read_bytes() == b"NEW_WIN_EXE"
+
+    # 2. Test Linux (PyCasa-Linux-x64.tar.gz -> remplacement atomique de PyCasa)
+    lin_dir = tmp_path / "linux"
+    lin_dir.mkdir()
+    lin_bin = lin_dir / "PyCasa"
+    lin_bin.write_bytes(b"OLD_LINUX_BIN")
+    lin_tar = lin_dir / "PyCasa-Linux-x64.tar.gz"
+    with tarfile.open(lin_tar, "w:gz") as tf:
+        payload = b"NEW_LINUX_BIN"
+        ti = tarfile.TarInfo(name="PyCasa")
+        ti.size = len(payload)
+        tf.addfile(ti, io.BytesIO(payload))
+    ok_l, target_l = apply_downloaded_update(str(lin_tar), target_executable=str(lin_bin), platform_name="linux", relaunch=False)
+    assert ok_l is True
+    assert Path(target_l).read_bytes() == b"NEW_LINUX_BIN"
+
+    # 3. Test macOS (PyCasa-macOS.zip -> script de remplacement de PyCasa.app)
+    mac_dir = tmp_path / "macos"
+    mac_app_exe = mac_dir / "PyCasa.app" / "Contents" / "MacOS" / "PyCasa"
+    mac_app_exe.parent.mkdir(parents=True)
+    mac_app_exe.write_bytes(b"OLD_MAC_BIN")
+    mac_zip = mac_dir / "PyCasa-macOS.zip"
+    with zipfile.ZipFile(mac_zip, "w") as zf:
+        zf.writestr("PyCasa.app/Contents/MacOS/PyCasa", b"NEW_MAC_BIN")
+    ok_m, target_m = apply_downloaded_update(str(mac_zip), target_executable=str(mac_app_exe), platform_name="darwin", relaunch=False)
+    assert ok_m is True
+    assert Path(target_m).name == "PyCasa.app"
+
+
+def test_edit_person_album_opens_contact_manager_with_emails_and_photo_count(tmp_path: Path, qapp):
+    """
+    FR: Vérifie que l'édition d'un album de personne (PplAlbum::ID_ALBUM_EDITCAPTIONS @ 0x006DB730)
+    ouvre `PicasaContactManagerDialog` pré-sélectionné sur la personne, affiche le nombre exact de photos
+    (`%d photo(s) dans Picasa`), permet la saisie de plusieurs adresses e-mail (`email0`, `email1`)
+    et sauvegarde automatiquement lors du clic sur OK (`0x007B99D3`).
+    """
+    from picasa_py.ui.contact_manager_dialog import PicasaContactManagerDialog
+
+    db = PicasaDatabase.create_new(tmp_path / "db_root")
+    p1 = db.face_manager.create_person("Alice Martin")
+    p2 = db.face_manager.create_person("Bruno Lefèvre")
+    p2.photo_indices = [10, 20, 30]
+
+    dlg = PicasaContactManagerDialog(
+        db,
+        initial_contact_id=p2.contact_id,
+        initial_person_name=p2.name,
+    )
+    assert dlg.current_person is not None
+    assert dlg.current_person.contact_id == p2.contact_id
+    assert dlg.edit_name.text() == "Bruno Lefèvre"
+    assert "3" in dlg.lbl_photo_count.text() and "Picasa" in dlg.lbl_photo_count.text()
+
+    # Saisir plusieurs adresses e-mail et valider avec OK
+    dlg.edit_email.setText("bruno.pro@example.com\nbruno.perso@example.com")
+    dlg._on_ok_clicked()
+
+    saved = db.contacts.get(p2.contact_id)
+    assert saved is not None
+    assert saved.emails == ["bruno.pro@example.com", "bruno.perso@example.com"]
+    assert saved.extra_attrs.get("email0") == "bruno.pro@example.com"
+    assert saved.extra_attrs.get("email1") == "bruno.perso@example.com"
+
+
+
+
 
 
 

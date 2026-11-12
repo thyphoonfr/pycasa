@@ -74,6 +74,63 @@ class Contact:
             and self.extra_attrs == other.extra_attrs
         )
 
+    @staticmethod
+    def _parse_email_list(raw: str) -> List[str]:
+        """
+        FR: Découpe une chaîne contenant une ou plusieurs adresses e-mail (séparées par retour à la ligne,
+        virgule ou point-virgule) en liste ordonnée d'adresses nettoyées.
+        EN: Splits a string containing one or more email addresses (separated by newline, comma, or semicolon)
+        into an ordered list of trimmed addresses.
+        Ref: picasa3.exe @ 0x007B8E54, 0x00939690
+        """
+        if not raw:
+            return []
+        import re
+        parts = re.split(r"[\r\n,;]+", raw)
+        out: List[str] = []
+        for p in parts:
+            s = p.strip()
+            if s and s not in out:
+                out.append(s)
+        return out
+
+    @property
+    def emails(self) -> List[str]:
+        """
+        FR: Retourne toutes les adresses e-mail (`email0`, `email1`, ... ou `email`) du contact.
+        EN: Returns all email addresses (`email0`, `email1`, ... or `email`) for the contact.
+        Ref: picasa3.exe @ 0x00580403, 0x00580DB5, 0x007B7B97
+        """
+        res: List[str] = []
+        idx = 0
+        while True:
+            val = self.extra_attrs.get(f"email{idx}")
+            if val is None:
+                break
+            if val.strip():
+                res.append(val.strip())
+            idx += 1
+        if not res:
+            for k, v in self.extra_attrs.items():
+                if (k == "email" or (k.startswith("email") and k[5:].isdigit())) and v.strip():
+                    if v.strip() not in res:
+                        res.append(v.strip())
+        return res
+
+    @emails.setter
+    def emails(self, values: List[str]) -> None:
+        keys_to_remove = [
+            k for k in self.extra_attrs
+            if k == "email" or (k.startswith("email") and k[5:].isdigit())
+        ]
+        for k in keys_to_remove:
+            self.extra_attrs.pop(k, None)
+        clean_idx = 0
+        for v in values:
+            for parsed in self._parse_email_list(v):
+                self.extra_attrs[f"email{clean_idx}"] = parsed
+                clean_idx += 1
+
     @property
     def email(self) -> str:
         """
@@ -86,10 +143,18 @@ class Contact:
     @email.setter
     def email(self, value: str) -> None:
         if value:
-            self.extra_attrs["email0"] = value
+            parsed = self._parse_email_list(value)
+            if len(parsed) > 1:
+                self.emails = parsed
+            else:
+                self.extra_attrs["email0"] = parsed[0] if parsed else value.strip()
         else:
-            self.extra_attrs.pop("email0", None)
-            self.extra_attrs.pop("email", None)
+            keys_to_remove = [
+                k for k in self.extra_attrs
+                if k == "email" or (k.startswith("email") and k[5:].isdigit())
+            ]
+            for k in keys_to_remove:
+                self.extra_attrs.pop(k, None)
 
 
 class ContactsFile:
