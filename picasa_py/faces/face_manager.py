@@ -545,17 +545,29 @@ class PicasaFaceManager:
                             cluster.primary_face_rect = fr
                 elif sug_idx and sug_idx in album_idx_to_contact_id:
                     # FR : Priorité 2 : Suggestion de visage pour une personne (Ref: 0x00880B94 suggestionpersonalbumid)
+                    # La similarité est lue depuis imagedata_personalbumrecvalues (entier uint16 = sim * 10000.0, Ref: 0x0048C72F..0x0048C753).
                     # EN: Priority 2: Face suggestion for a person (Ref: 0x00880B94 suggestionpersonalbumid)
+                    # Similarity is read from imagedata_personalbumrecvalues (uint16 = sim * 10000.0, Ref: 0x0048C72F..0x0048C753).
                     cid = album_idx_to_contact_id[sug_idx]
                     cluster = self.people.get(cid)
                     cname = cluster.name if cluster else cid
                     fr = FaceRect.from_uint64(rect_val, contact_id="", contact_name=f"? {cname}")
+                    raw_recval = (
+                        pmp_parecvals.records[db_idx]
+                        if (pmp_parecvals and db_idx < len(pmp_parecvals.records))
+                        else 0
+                    )
+                    sim_loaded = (
+                        min(1.0, max(0.0, float(raw_recval) / 10000.0))
+                        if raw_recval and raw_recval > 0
+                        else FR_SUGGESTION_THRESHOLD
+                    )
                     sug = FaceSuggestion(
                         contact_id=cid,
                         contact_name=cname,
                         photo_path=photo_path,
                         face_rect=fr,
-                        similarity=0.85,
+                        similarity=sim_loaded,
                         db_idx=db_idx,
                     )
                     self.suggestions.setdefault(cid, []).append(sug)
@@ -574,6 +586,9 @@ class PicasaFaceManager:
                         parent_photo_idx = self.db.get_face_parent_photo_idx(db_idx)
                         if parent_photo_idx is not None and parent_photo_idx >= 0:
                             self.photo_to_faces.setdefault(parent_photo_idx, []).append(fr_unnamed)
+
+            for s_list in self.suggestions.values():
+                s_list.sort(key=lambda s: s.similarity, reverse=True)
 
         elif pmp_personalbum:
             # FR : Fallback si imagedata_facerect est absent
@@ -1577,10 +1592,29 @@ class PicasaFaceManager:
     ) -> int:
         """
         FR : Compare de façon vectorisée (`U @ R.T`) les empreintes `vqc_Cue` des visages sans nom
-        (`unnamed_faces`) avec celles des personnes connues pour alimenter `self.suggestions`.
+        (`unnamed_faces`) avec celles des personnes connues pour alimenter `self.suggestions`,
+        en reproduisant à l'identique l'algorithme de `picasa3.exe` (`0x0048AAB0..0x0048FAFC`) :
+        1. Compétition globale sur toutes les personnes connues (`0x0048E370..0x0048E398`) : un visage
+           sans nom n'est suggéré qu'à la personne ayant la plus forte similarité globale (`best_sim`).
+        2. Seuils de base (`0x0048AABC..0x0048ACDF`, `0x0048E422..0x0048E446`, `0x0048FAD3`) :
+           - `FRSuggestionSingleThreshold = 0.90` (`0x5A / 100`) si la personne a `<= 1` visage confirmé ;
+           - `FRSuggestionThreshold = 0.85` (`0x55 / 100`) si la personne a `>= 2` visages confirmés.
+        3. Exclusion même photo (`0x0048E3B7..0x0048E3D8`) : un visage sans nom ne peut pas être suggéré
+           à une personne qui possède déjà un visage confirmé sur la même photo parente.
+        4. Filtrage et pénalité de résolution en largeur de pixels (`0x0048D75D..0x0048D7B7`) :
+           - `width_px < 64` : rejeté (`jl 0x48dab7`) ;
+           - `64 <= width_px < 128` : `seuil + 0.10` (`[0x00C7DD30] = 0.10`) ;
+           - `128 <= width_px < 256` : `seuil + 0.05` (`[0x00C7CDB0] = 0.05`) ;
+           - `width_px >= 256` : `seuil` nominal (`0.85` ou `0.90`).
+        5. Respect des évaluations/rejets déjà enregistrés dans `imagedata_personalbumrecvalues`
+           (`0x0048CF63..0x0048CF69` : `cmp ecx, dword ptr [eax]; jbe 0x48d345`) : si `imagedata_suggestionpersonalbumid == 0`
+           et qu'un score `personalbumrecvalues > 0` existe déjà pour ce visage, il n'est suggéré que si
+           `int(round(sim * 10000)) > personalbumrecvalues[u_db_idx]`.
+
         EN: Vectorized comparison (`U @ R.T`) of unnamed face `vqc_Cue` templates (`unnamed_faces`)
-        against known people's templates to populate `self.suggestions`.
-        Ref: picasa3.exe @ 0x0048AA80..0x0048AE80, Red.dll @ 0x10100A10 (vqc_Relator::sim)
+        against known people's templates to populate `self.suggestions`, matching `picasa3.exe`
+        (`0x0048AAB0..0x0048FAFC`).
+        Ref: picasa3.exe @ 0x0048AAB0..0x0048FAFC, 0x0048C570, 0x0048D740..0x0048D7B7, Red.dll @ 0x10100A10
         """
         if not self.unnamed_faces or not self.people or not self.db:
             return 0
@@ -1588,11 +1622,54 @@ class PicasaFaceManager:
         vec_cache: Dict[int, np.ndarray] = getattr(self, "_unnamed_vec_cache", {})
         setattr(self, "_unnamed_vec_cache", vec_cache)
 
-        u_entries: List[Tuple[int, int, str, FaceRect]] = []
+        pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid") if hasattr(self.db, "pmps") else None
+        pmp_parecvals = self.db.pmps.get("imagedata_personalbumrecvalues") if hasattr(self.db, "pmps") else None
+        pmp_width = self.db.pmps.get("imagedata_width") if hasattr(self.db, "pmps") else None
+        is_face_fn = getattr(self.db, "is_face_record", lambda i: False)
+        get_parent_fn = getattr(self.db, "get_face_parent_photo_idx", lambda i: None)
+
+        u_entries: List[Tuple[int, int, str, FaceRect, Optional[int], float, int]] = []
         u_vecs: List[np.ndarray] = []
         for pos_i, (u_idx, u_path, u_fr) in enumerate(self.unnamed_faces):
             if u_idx is None or u_idx < 0 or u_fr is None:
                 continue
+            parent_idx: Optional[int] = u_idx
+            if is_face_fn(u_idx):
+                p_idx = get_parent_fn(u_idx)
+                if p_idx is not None and p_idx >= 0:
+                    parent_idx = p_idx
+
+            # Ref: picasa3.exe @ 0x0048D75D..0x0048D7B7 : vérification de la largeur en pixels du visage
+            width_penalty = 0.0
+            if (
+                min_similarity is None
+                and pmp_width is not None
+                and parent_idx is not None
+                and 0 <= parent_idx < len(pmp_width.records)
+            ):
+                img_w = int(pmp_width.records[parent_idx] or 0)
+                if img_w >= 256:
+                    face_w_px = int(round(max(0.0, u_fr.right - u_fr.left) * img_w))
+                    if face_w_px < 64:
+                        # Ref: 0x0048D761 (cmp ecx, 0x40; jl 0x48dab7)
+                        continue
+                    elif face_w_px < 128:
+                        # Ref: 0x0048D776..0x0048D783 (cmp edx, 0x80; fadd [0x00C7DD30] = 0.10)
+                        width_penalty = 0.10
+                    elif face_w_px < 256:
+                        # Ref: 0x0048D7A2..0x0048D7AF (cmp ecx, 0x100; fadd [0x00C7CDB0] = 0.05)
+                        width_penalty = 0.05
+
+            prev_recval = 0
+            if (
+                min_similarity is None
+                and pmp_parecvals is not None
+                and 0 <= u_idx < len(pmp_parecvals.records)
+            ):
+                sug_v = pmp_sug.records[u_idx] if (pmp_sug is not None and u_idx < len(pmp_sug.records)) else 0
+                if sug_v == 0:
+                    prev_recval = int(pmp_parecvals.records[u_idx] or 0)
+
             vec = vec_cache.get(u_idx)
             if vec is None:
                 raw = self.db.get_thumbnail(u_idx, size="facetemplatesV2")
@@ -1603,7 +1680,7 @@ class PicasaFaceManager:
                     continue
                 vec = np.asarray(v_list, dtype=np.float32)
                 vec_cache[u_idx] = vec
-            u_entries.append((pos_i, u_idx, u_path, u_fr))
+            u_entries.append((pos_i, u_idx, u_path, u_fr, parent_idx, width_penalty, prev_recval))
             u_vecs.append(vec)
 
         if not u_vecs:
@@ -1613,18 +1690,17 @@ class PicasaFaceManager:
         rejected_set = getattr(self, "_rejected_suggestions", set())
         target_cid_low = target_contact_id.lower() if target_contact_id else None
 
-        clusters = [
-            c for cid, c in self.people.items()
-            if (target_cid_low is None or cid.lower() == target_cid_low) and c.feature_vectors
-        ]
-        if not clusters:
+        # Ref: picasa3.exe @ 0x0048E370..0x0048E398 : toujours mettre en compétition TOUTES les personnes
+        # connues afin qu'un visage ne soit proposé qu'à son meilleur contact global.
+        all_clusters = [c for c in self.people.values() if c.feature_vectors]
+        if not all_clusters:
             return 0
 
-        # Pour chaque visage sans nom, trouver le meilleur contact correspondant
+        # Pour chaque visage sans nom, trouver le meilleur contact global correspondant
         best_sim_per_u = np.full(len(u_entries), -1.0, dtype=np.float32)
         best_cluster_per_u: List[Optional[PersonCluster]] = [None] * len(u_entries)
 
-        for cluster in clusters:
+        for cluster in all_clusters:
             r_list = [np.asarray(rv, dtype=np.float32) for rv in cluster.feature_vectors if len(rv) == 2000]
             if not r_list:
                 continue
@@ -1632,27 +1708,51 @@ class PicasaFaceManager:
             dots = U @ R.T
             max_dots = dots.max(axis=1)
             sims = 1.0 / (1.0 + np.exp(-np.clip(13.5 * max_dots - 0.45, -30.0, 30.0)))
-            req_t = (
-                min_similarity
-                if min_similarity is not None
-                else (0.85 if cluster.photo_count <= 1 else FR_SUGGESTION_THRESHOLD)
-            )
             cid_low = cluster.contact_id.lower()
-            for idx_u, (_, u_db_idx, _, _) in enumerate(u_entries):
+            cluster_photos_norm = {
+                os.path.normpath(p).lower() for p in cluster.photo_paths if p
+            }
+            for idx_u, (_, u_db_idx, u_path, _, u_parent_idx, _, _) in enumerate(u_entries):
                 sim_val = float(sims[idx_u])
-                if sim_val >= req_t and sim_val > best_sim_per_u[idx_u]:
-                    if (u_db_idx, cid_low) in rejected_set:
-                        continue
-                    best_sim_per_u[idx_u] = sim_val
-                    best_cluster_per_u[idx_u] = cluster
+                if sim_val <= best_sim_per_u[idx_u]:
+                    continue
+                if (u_db_idx, cid_low) in rejected_set:
+                    continue
+                # Ref: picasa3.exe @ 0x0048E3B7..0x0048E3D8 : exclure si la personne possède déjà un visage confirmé sur la même photo
+                if u_parent_idx is not None and u_parent_idx in cluster.face_rects_by_photo:
+                    continue
+                if u_db_idx in cluster.face_rects_by_photo:
+                    continue
+                if u_path and os.path.normpath(u_path).lower() in cluster_photos_norm:
+                    continue
+                best_sim_per_u[idx_u] = sim_val
+                best_cluster_per_u[idx_u] = cluster
 
         added_count = 0
         removed_positions: Set[int] = set()
-        for idx_u, (pos_i, u_db_idx, u_path, u_fr) in enumerate(u_entries):
+        for idx_u, (pos_i, u_db_idx, u_path, u_fr, _, u_w_pen, u_prev_recval) in enumerate(u_entries):
             matched = best_cluster_per_u[idx_u]
             if matched is None:
                 continue
             cid_low = matched.contact_id.lower()
+            if target_cid_low is not None and cid_low != target_cid_low:
+                continue
+            sim_val = float(best_sim_per_u[idx_u])
+            base_t = (
+                min_similarity
+                if min_similarity is not None
+                else (FR_SUGGESTION_SINGLE_THRESHOLD if matched.photo_count <= 1 else FR_SUGGESTION_THRESHOLD)
+            )
+            req_t = base_t + u_w_pen
+            if sim_val < req_t:
+                continue
+            # Ref: picasa3.exe @ 0x0048CF63..0x0048CF69 (cmp ecx, dword ptr [eax]; jbe 0x48d345) :
+            # si ce visage a déjà été évalué (ou rejeté) dans la base à un score >= sim_val et que
+            # suggestionpersonalbumid vaut 0, ne pas le re-suggérer.
+            sim_int = int(round(max(0.0, min(1.0, sim_val)) * 10000.0))
+            if min_similarity is None and u_prev_recval > 0 and sim_int <= u_prev_recval:
+                continue
+
             existing_sugs = self.suggestions.setdefault(cid_low, [])
             if any(
                 (s.db_idx is not None and s.db_idx == u_db_idx)
@@ -1668,7 +1768,7 @@ class PicasaFaceManager:
                     contact_name=matched.name,
                     photo_path=u_path,
                     face_rect=u_fr,
-                    similarity=float(best_sim_per_u[idx_u]),
+                    similarity=sim_val,
                     db_idx=u_db_idx,
                 )
             )
@@ -1686,18 +1786,21 @@ class PicasaFaceManager:
     def find_suggestions_for_person(
         self,
         contact_id: str | PersonCluster,
-        min_similarity: float = 0.60,
+        min_similarity: Optional[float] = None,
     ) -> List[FaceSuggestion]:
         """
-        FR : Recherche activement des suggestions parmi les visages sans nom pour une personne donnée
-        (en abaissant légèrement le seuil à `min_similarity` si aucune suggestion n'était présente).
-        EN: Actively searches unnamed faces for suggestions matching a given person.
+        FR : Recherche des suggestions parmi les visages sans nom pour une personne donnée
+        en utilisant les seuils exacts de `picasa3.exe` (`FRSuggestionThreshold = 0.85`,
+        `FRSuggestionSingleThreshold = 0.90`), sauf si `min_similarity` est fourni explicitement.
+        EN: Searches unnamed faces for suggestions matching a given person using exact `picasa3.exe`
+        thresholds (`0.85` / `0.90`), unless `min_similarity` is explicitly provided.
+        Ref: picasa3.exe @ 0x0048AAB0..0x0048FAFC
         """
         cid = self._resolve_person_key(contact_id)
         if not self._suggestions_rebuilt:
             self._rebuild_suggestions_from_templates()
         sugs = self.suggestions.get(cid, [])
-        if not sugs:
+        if not sugs and min_similarity is not None:
             self._match_unnamed_faces_to_people_vectorized(target_contact_id=cid, min_similarity=min_similarity)
             sugs = self.suggestions.get(cid, [])
         return sugs
@@ -4524,12 +4627,18 @@ class PicasaFaceManager:
         if self.db:
             with self.db._lock:
                 pmp_sug = self.db.pmps.get("imagedata_suggestionpersonalbumid")
+                pmp_parecvals = self.db.pmps.get("imagedata_personalbumrecvalues")
+                sim_int_rej = int(round(max(0.0, min(1.0, float(suggestion.similarity or 0.85))) * 10000.0)) & 0xFFFF
                 if pmp_sug is not None:
                     for t_idx in {idx for idx in (face_rec_idx, db_idx) if idx is not None}:
                         if 0 <= t_idx < len(pmp_sug.records):
                             old_sug = pmp_sug.records[t_idx]
                             pmp_sug.records[t_idx] = 0
                             pmp_sug.dirty = True
+                            if pmp_parecvals is not None and 0 <= t_idx < len(pmp_parecvals.records):
+                                if int(pmp_parecvals.records[t_idx] or 0) < sim_int_rej:
+                                    pmp_parecvals.records[t_idx] = sim_int_rej
+                                    pmp_parecvals.dirty = True
                             if getattr(self.db, "wordhash", None) is not None:
                                 if old_sug and hasattr(self.db.wordhash, "remove_word"):
                                     self.db.wordhash.remove_word(f"]facealbum:{old_sug}", t_idx)

@@ -3087,6 +3087,25 @@ def test_edit_person_album_opens_contact_manager_with_emails_and_photo_count(tmp
     assert saved.extra_attrs.get("email0") == "bruno.pro@example.com"
     assert saved.extra_attrs.get("email1") == "bruno.perso@example.com"
 
+    # Vérifier le bouton crayon dans l'en-tête de l'album de personne (PicasaThumbnailView)
+    from picasa_py.ui.thumbnail_view import PicasaThumbnailView
+    tv = PicasaThumbnailView()
+    tv.db = db
+    tv.resize(800, 600)
+    tv.filter_by_person(p2.contact_id, p2.name, [])
+    assert len(tv.visible_sections) == 1
+    sec = tv.visible_sections[0]
+    assert sec.is_person is True
+
+    emitted = []
+    tv.edit_person_requested.connect(lambda cid, pname: emitted.append((cid, pname)))
+    pencil_rect = tv._get_edit_person_btn_rect(0, sec)
+    assert pencil_rect.width() == 22 and pencil_rect.height() == 22
+    tv._handle_header_click(sec, 0, pencil_rect.center())
+    assert emitted == [(p2.contact_id, "Bruno Lefèvre")]
+    tv.close()
+
+
 
 
 

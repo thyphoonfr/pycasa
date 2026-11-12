@@ -385,6 +385,7 @@ class PicasaMainWindow(QMainWindow):
         self.thumb_view.collage_section_requested.connect(self._on_section_collage_requested)
         self.thumb_view.movie_section_requested.connect(self._on_section_movie_requested)
         self.thumb_view.save_section_requested.connect(self._on_section_save_requested)
+        self.thumb_view.edit_person_requested.connect(self.action_edit_person)
         self.thumb_view.active_folder_changed.connect(self._on_active_folder_scrolled)
 
         # Retour à la bibliothèque & Diaporama
@@ -3347,13 +3348,20 @@ class PicasaMainWindow(QMainWindow):
             initial_person_name=person_name,
         )
         dlg.exec()
-        if hasattr(self, "library_tree"):
-            self.library_tree.refresh_people()
-        if hasattr(self, "thumb_view"):
-            self.thumb_view.update()
         updated_name = person_name
         if dlg.current_person and dlg.current_person.name:
             updated_name = dlg.current_person.name
+        if hasattr(self, "thumb_view"):
+            for sec in getattr(self.thumb_view, "visible_sections", []):
+                if getattr(sec, "is_person", False) and (
+                    sec.contact_id == contact_id
+                    or (dlg.current_person and sec.contact_id == dlg.current_person.contact_id)
+                ):
+                    if updated_name:
+                        sec.name = updated_name
+            self.thumb_view.update()
+        if hasattr(self, "library_tree"):
+            self.library_tree.refresh_people()
         self.status_bar.showMessage(f"Personne mise à jour : {updated_name}")
 
     def action_delete_folder(self, folder_path: str) -> None:

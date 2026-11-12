@@ -28,7 +28,7 @@ Image.MAX_IMAGE_PIXELS = None
 from PySide6.QtWidgets import QWidget, QMessageBox, QApplication, QLineEdit, QCompleter
 from PySide6.QtCore import Qt, QRect, QSize, Signal, QPoint, QThread, QObject, QMimeData, QUrl, QTimer, QEvent, QStringListModel
 from PySide6.QtGui import (
-    QPainter, QColor, QFont, QPen, QBrush, QPixmap, QImage, QImageReader,
+    QPainter, QColor, QFont, QFontMetrics, QPen, QBrush, QPixmap, QImage, QImageReader,
     QMouseEvent, QWheelEvent, QPaintEvent, QResizeEvent, QPolygon, QContextMenuEvent,
     QKeyEvent, QDrag, QLinearGradient
 )
@@ -448,6 +448,7 @@ class PicasaThumbnailView(QWidget):
     collage_section_requested = Signal(list)  # Liste des chemins de photos pour Montage (headerpanel/create_collage)
     movie_section_requested = Signal(list)  # Liste des chemins de photos pour Film (headerpanel/create_movie)
     save_section_requested = Signal(str)  # Chemin du dossier pour Enregistrer (headerpanel/save_edits)
+    edit_person_requested = Signal(str, str)  # (contact_id, person_name) -> ouvre ContactManagerDlg @ 0x007B8F80
     active_folder_changed = Signal(str)  # Émis lors du défilement multi-albums pour synchroniser l'arborescence
     star_toggled = Signal(str, bool)  # file_path, is_starred (Ref: ID_PICTURE_STAR, star=yes)
 
@@ -1687,12 +1688,10 @@ class PicasaThumbnailView(QWidget):
             self.items.append(item)
             person_item_indices.append(len(self.items) - 1)
 
-        # 2. Suggestions en attente pour cette personne (Ref: FRSuggestionThreshold ~0.60)
+        # 2. Suggestions en attente pour cette personne (Ref: picasa3.exe @ 0x0048AABC FRSuggestionThreshold = 0.85, FRSuggestionSingleThreshold = 0.90)
         suggestions = []
         if self.db and getattr(self.db, "face_manager", None):
             suggestions = self.db.face_manager.get_suggestions(contact_id)
-            if not suggestions and hasattr(self.db.face_manager, "find_suggestions_for_person"):
-                suggestions = self.db.face_manager.find_suggestions_for_person(contact_id)
 
         # 3. Créer des ThumbnailItems synthétiques pour les suggestions
         suggestion_item_indices: List[int] = []
@@ -1736,6 +1735,13 @@ class PicasaThumbnailView(QWidget):
             all_person_indices=list(person_item_indices),
             suggestion_item_indices=list(suggestion_item_indices),
         )
+        if contact_id and self.db and getattr(self.db, "face_manager", None):
+            try:
+                self.db.face_manager.get_person_avatar(
+                    contact_id, size=56, circular=False, allow_disk_fallback=True
+                )
+            except Exception:
+                pass
 
         self.visible_sections = [person_sec]
         self._unfiltered_special_sections = self._clone_special_sections(self.visible_sections)
@@ -1759,29 +1765,28 @@ class PicasaThumbnailView(QWidget):
         """
         self._cancel_inline_face_name_edit()
         if not sec.only_suggestions and not sec.suggestions and sec.contact_id and self.db and getattr(self.db, "face_manager", None):
-            if hasattr(self.db.face_manager, "find_suggestions_for_person"):
-                found = self.db.face_manager.find_suggestions_for_person(sec.contact_id)
-                if found:
-                    sec.suggestions = found
-                    new_sug_indices: List[int] = []
-                    for sug in found:
-                        s_fname = os.path.basename(sug.photo_path) if sug.photo_path else "Suggestion"
-                        s_fdir = os.path.dirname(sug.photo_path) if sug.photo_path else ""
-                        s_fol = os.path.basename(s_fdir) if s_fdir else sec.name
-                        sug_item = ThumbnailItem(
-                            index=sug.db_idx if sug.db_idx is not None else -1,
-                            path=sug.photo_path,
-                            filename=s_fname,
-                            folder=s_fol,
-                            folder_path=s_fdir,
-                            face_rect=sug.face_rect,
-                            is_person_item=True,
-                            is_synthetic_suggestion=True,
-                            suggestion=sug,
-                        )
-                        self.items.append(sug_item)
-                        new_sug_indices.append(len(self.items) - 1)
-                    sec.suggestion_item_indices = new_sug_indices
+            found = self.db.face_manager.get_suggestions(sec.contact_id)
+            if found:
+                sec.suggestions = found
+                new_sug_indices: List[int] = []
+                for sug in found:
+                    s_fname = os.path.basename(sug.photo_path) if sug.photo_path else "Suggestion"
+                    s_fdir = os.path.dirname(sug.photo_path) if sug.photo_path else ""
+                    s_fol = os.path.basename(s_fdir) if s_fdir else sec.name
+                    sug_item = ThumbnailItem(
+                        index=sug.db_idx if sug.db_idx is not None else -1,
+                        path=sug.photo_path,
+                        filename=s_fname,
+                        folder=s_fol,
+                        folder_path=s_fdir,
+                        face_rect=sug.face_rect,
+                        is_person_item=True,
+                        is_synthetic_suggestion=True,
+                        suggestion=sug,
+                    )
+                    self.items.append(sug_item)
+                    new_sug_indices.append(len(self.items) - 1)
+                sec.suggestion_item_indices = new_sug_indices
 
         sec.only_suggestions = not sec.only_suggestions
         if sec.only_suggestions:
@@ -2629,6 +2634,18 @@ class PicasaThumbnailView(QWidget):
         btn_w = 28
         return QRect(star_r.x() - btn_w - 6, y + 35, btn_w, 24)
 
+    def _get_edit_person_btn_rect(self, y: int, sec: AlbumSection) -> QRect:
+        """
+        FR: Retourne le rectangle du bouton icône crayon placé juste après le nom de la personne
+        sur la 1re ligne de l'en-tête d'album de personne (ouvre `ContactManagerDlg` @ `0x007B8F80`).
+        EN: Returns the bounding rectangle of the pencil icon button right after the person's name
+        on line 1 of the person album header (opens `ContactManagerDlg` @ `0x007B8F80`).
+        """
+        title_x = 78 if sec.is_person else 42
+        font = QFont(self.style.alayout_titleFont, 11, QFont.Weight.Bold)
+        title_w = QFontMetrics(font).horizontalAdvance(sec.name or "")
+        return QRect(title_x + title_w + 8, y + 5, 22, 22)
+
     def _get_face_zoom_btn_rect(self, y: int) -> QRect:
         """
         FR: Retourne le rectangle du bouton de bascule 'Visages' (face_zoom) sur la 2e ligne de l'en-tête de personne.
@@ -3263,6 +3280,10 @@ class PicasaThumbnailView(QWidget):
                     return True
 
         elif sec.is_person and not sec.is_unnamed:
+            if self._get_edit_person_btn_rect(hdr_y, sec).contains(pos):
+                if sec.contact_id:
+                    self.edit_person_requested.emit(sec.contact_id, sec.name or "")
+                return True
             if self._get_sug_filter_btn_rect(hdr_y).contains(pos):
                 self._toggle_suggestions_only(sec)
                 return True
@@ -3622,6 +3643,8 @@ class PicasaThumbnailView(QWidget):
                     if self._get_cluster_action_btn_rect(hdr_y).contains(pos):
                         return ("cluster", sec_idx)
             elif sec.is_person:
+                if self._get_edit_person_btn_rect(hdr_y, sec).contains(pos):
+                    return ("edit_person", sec_idx)
                 if self._get_face_zoom_btn_rect(hdr_y).contains(pos):
                     return ("face_zoom", sec_idx)
                 if self._get_picture_zoom_btn_rect(hdr_y).contains(pos):
@@ -4335,7 +4358,8 @@ class PicasaThumbnailView(QWidget):
             else:
                 painter.fillRect(sticky_rect, st_start)
             painter.setPen(div_col)
-            painter.drawLine(14, y + 31, header_w - 14, y + 31)
+            div_left = 76 if (sec.is_person and not sec.is_unnamed) else 14
+            painter.drawLine(div_left, y + 31, header_w - 14, y + 31)
             painter.setPen(sep_col)
             painter.drawLine(0, y + 63, header_w, y + 63)
             # Ombre portée douce sous l'en-tête flottant
@@ -4358,12 +4382,13 @@ class PicasaThumbnailView(QWidget):
             else:
                 painter.fillRect(header_rect, bg_col)
             painter.setPen(div_col)
-            painter.drawLine(14, y + 31, header_w - 14, y + 31)
+            div_left = 76 if (sec.is_person and not sec.is_unnamed) else 14
+            painter.drawLine(div_left, y + 31, header_w - 14, y + 31)
             painter.setPen(sep_col)
             painter.drawLine(6, y, header_w - 6, y)
             painter.drawLine(6, y + 63, header_w - 6, y + 63)
 
-        # --- LIGNE 1 (y + 4 .. y + 30) : Icône / Avatar + Titre + Sous-titre sur toute la largeur ---
+        # --- LIGNE 1 (y + 4 .. y + 30) : Icône / Couverture + Titre + Crayon + Sous-titre sur toute la largeur ---
         icon_x = 18
         icon_y = y + 8
         painter.setPen(Qt.PenStyle.NoPen)
@@ -4376,20 +4401,53 @@ class PicasaThumbnailView(QWidget):
             painter.setPen(QColor("#FFFFFF"))
             painter.drawText(QRect(icon_x + 3, icon_y, 10, 10), Qt.AlignmentFlag.AlignCenter, "?")
         elif sec.is_person:
-            # Avatar circulaire de la personne si disponible, sinon icône personne stylisée
+            # Photo de couverture de la personne sur toute la hauteur de l'en-tête d'album (56x56 px)
+            cover_rect = QRect(12, y + 4, 56, 56)
+            mat_col = QColor("#2D323E") if is_dark else QColor("#FFFFFF")
+            painter.fillRect(cover_rect.adjusted(-1, -1, 1, 1), mat_col)
+            painter.setPen(QPen(sep_col, 1))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawRect(cover_rect.adjusted(-1, -1, 0, 0))
+            painter.setPen(Qt.PenStyle.NoPen)
+
             avatar_drawn = False
             if sec.contact_id and self.db and getattr(self.db, "face_manager", None):
                 av = self.db.face_manager.get_person_avatar(
-                    sec.contact_id, size=22, allow_disk_fallback=not self._in_paint_event
+                    sec.contact_id, size=56, circular=False, allow_disk_fallback=True
                 )
+                if (av is None or av.isNull()):
+                    av = self.db.face_manager.get_person_avatar(
+                        sec.contact_id, size=64, circular=True, allow_disk_fallback=True
+                    )
                 if av and not av.isNull():
-                    painter.drawPixmap(icon_x - 2, icon_y - 2, 22, 22, av)
+                    scaled_av = av.scaled(
+                        56,
+                        56,
+                        Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                        Qt.TransformationMode.SmoothTransformation,
+                    )
+                    painter.drawPixmap(cover_rect, scaled_av)
                     avatar_drawn = True
 
+            if not avatar_drawn and sec.item_indices:
+                first_idx = sec.item_indices[0]
+                if 0 <= first_idx < len(self.items):
+                    fallback_pix = self._get_thumbnail_pixmap(first_idx)
+                    if fallback_pix and not fallback_pix.isNull():
+                        scaled_fb = fallback_pix.scaled(
+                            56,
+                            56,
+                            Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                            Qt.TransformationMode.SmoothTransformation,
+                        )
+                        painter.drawPixmap(cover_rect, scaled_fb)
+                        avatar_drawn = True
+
             if not avatar_drawn:
+                painter.fillRect(cover_rect, QColor("#3A404D") if is_dark else QColor("#EAE6DF"))
                 painter.setBrush(QColor("#E67E22"))
-                painter.drawEllipse(QRect(icon_x + 3, icon_y, 10, 10))
-                painter.drawRoundedRect(QRect(icon_x, icon_y + 8, 16, 9), 3, 3)
+                painter.drawEllipse(QRect(cover_rect.x() + 19, cover_rect.y() + 10, 18, 18))
+                painter.drawRoundedRect(QRect(cover_rect.x() + 12, cover_rect.y() + 30, 32, 18), 6, 6)
         elif sec.is_album:
             # Icône album virtuel Picasa
             painter.setBrush(QColor("#4A7EBB"))
@@ -4410,7 +4468,7 @@ class PicasaThumbnailView(QWidget):
             painter.drawRoundedRect(QRect(icon_x + 1, icon_y, 7, 5), 1, 1)
 
         # Titre de l'album / dossier (Georgia gras #634B45, Ref: constants.ui alayout_titleFont / alayout_titleColor)
-        title_x = icon_x + 24
+        title_x = 78 if (sec.is_person and not sec.is_unnamed) else (icon_x + 24)
         painter.setFont(QFont(self.style.alayout_titleFont, 11, QFont.Weight.Bold))
         painter.setPen(self.style.alayout_titleColor)
         painter.drawText(title_x, y + 22, sec.name)
@@ -4419,7 +4477,25 @@ class PicasaThumbnailView(QWidget):
         metrics = painter.fontMetrics()
         title_width = metrics.horizontalAdvance(sec.name)
 
-        date_x = title_x + title_width + 14
+        if sec.is_person and not sec.is_unnamed:
+            # Bouton icône crayon juste après le nom pour ouvrir la fenêtre « Personnes » (ContactManagerDlg @ 0x007B8F80)
+            edit_btn_rect = self._get_edit_person_btn_rect(y, sec)
+            hov_edit = (self._hovered_header_btn == ("edit_person", sec_idx))
+            accent_c = getattr(self.style, "accent_color", QColor("#3879D9"))
+            if hov_edit:
+                painter.setPen(QPen(accent_c, 1))
+                painter.setBrush(QColor("#2D3748") if is_dark else QColor("#EBF4FF"))
+                painter.drawRoundedRect(edit_btn_rect, 3, 3)
+            else:
+                painter.setPen(QPen(QColor(128, 128, 128, 90), 1))
+                painter.setBrush(QColor(255, 255, 255, 18) if is_dark else QColor(255, 255, 255, 140))
+                painter.drawRoundedRect(edit_btn_rect, 3, 3)
+            painter.setFont(QFont("Segoe UI Symbol", 10, QFont.Weight.Bold if hov_edit else QFont.Weight.Normal))
+            painter.setPen(accent_c if hov_edit else self.style.alayout_titleColor)
+            painter.drawText(edit_btn_rect, Qt.AlignmentFlag.AlignCenter, "✎")
+            date_x = edit_btn_rect.right() + 10
+        else:
+            date_x = title_x + title_width + 14
         count_str = f"{len(sec.item_indices)} photos"
         meta_str = f"—   {sec.date_str}   •   {count_str}" if sec.date_str else f"—   {count_str}"
 

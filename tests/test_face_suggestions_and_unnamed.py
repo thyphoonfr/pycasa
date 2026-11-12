@@ -479,3 +479,75 @@ def test_grouped_face_albums_inline_naming_and_ignore(qapp, temp_face_env):
     assert len(thumb_view.visible_sections[0].item_indices) == 0
     thumb_view.close()
 
+
+def test_picasa3_exact_suggestion_thresholds_and_filters(qapp, temp_face_env):
+    """
+    FR : Vérifie la parité stricte de l'algorithme de suggestion de visages avec `picasa3.exe`
+    (`0x0048AAB0..0x0048FAFC`, `0x0048C570`, `0x0048D740..0x0048D7B7`) :
+    1. Pas de repli sur `min_similarity=0.60` dans `filter_by_person` lorsqu'une personne a 0 suggestion.
+    2. Seuil `FRSuggestionSingleThreshold = 0.90` pour 1 photo confirmée vs `FRSuggestionThreshold = 0.85` pour >= 2 photos.
+    3. Exclusion des visages sans nom situés sur une photo où la personne est déjà confirmée (`0x0048E3B7`).
+    4. Rejet des visages `< 64 px` de large et pénalité `+0.10` (`< 128 px`) / `+0.05` (`< 256 px`) (`0x0048D75D..0x0048D7B7`).
+    5. Non-resuggestion d'un visage déjà évalué/rejeté dans `imagedata_personalbumrecvalues` avec `suggestionpersonalbumid == 0` (`0x0048CF63`).
+    """
+    import math
+    import numpy as np
+    from picasa_py.db.pmp import PmpFile, PmpType
+
+    db = temp_face_env["db"]
+    fm = db.face_manager
+    fm._person_vectors_loaded = True
+    fm._suggestions_rebuilt = True
+
+    # Créer une personne avec 1 seule photo confirmée -> seuil requis = 0.90 (FRSuggestionSingleThreshold)
+    alice = fm.create_person("Alice")
+    v_ref = np.zeros(2000, dtype=np.float32)
+    v_ref[0] = 1.0
+    alice.feature_vectors = [v_ref]
+    alice.photo_indices = [0]
+    alice.photo_paths = [temp_face_env["photo1"]]
+    alice.face_rects_by_photo[0] = [FaceRect(0.1, 0.1, 0.4, 0.4, contact_id=alice.contact_id, contact_name="Alice")]
+
+    def _make_vec_for_sim(target_sim: float) -> np.ndarray:
+        dot = (math.log(target_sim / (1.0 - target_sim)) + 0.45) / 13.5
+        v = np.zeros(2000, dtype=np.float32)
+        v[0] = float(dot)
+        v[1] = float(math.sqrt(max(0.0, 1.0 - dot * dot)))
+        return v
+
+    # Visage sans nom avec similarité 0.87 (< 0.90 pour 1 photo confirmée, et bien > 0.60)
+    vec_cache = {}
+    fm._unnamed_vec_cache = vec_cache
+    vec_cache[1] = _make_vec_for_sim(0.87)
+    fm.unnamed_faces = [(1, temp_face_env["photo2"], FaceRect(0.2, 0.2, 0.5, 0.5))]
+    db.pmps["imagedata_width"] = PmpFile(PmpType.UINT32, [1000, 1000, 1000])
+    db.pmps["imagedata_suggestionpersonalbumid"] = PmpFile(PmpType.UINT32, [0, 0, 0])
+    db.pmps["imagedata_personalbumrecvalues"] = PmpFile(PmpType.UINT16, [0, 0, 0])
+
+    # 1. Avec 1 seule photo confirmée, 0.87 < 0.90 -> 0 suggestion (et filter_by_person ne doit pas abaisser à 0.60 !)
+    fm._match_unnamed_faces_to_people_vectorized()
+    assert len(fm.get_suggestions(alice.contact_id)) == 0
+    view = PicasaThumbnailView()
+    view.set_database(db)
+    view.filter_by_person(alice.contact_id, "Alice", [0])
+    assert len(view.visible_sections[0].suggestions) == 0
+
+    # 2. Si Alice a >= 2 photos confirmées, le seuil passe à 0.85 -> 0.87 est accepté (largeur = 300px >= 256px)
+    alice.photo_indices = [0, 99]
+    fm._match_unnamed_faces_to_people_vectorized()
+    assert len(fm.get_suggestions(alice.contact_id)) == 1
+
+    # 3. Mais si le visage fait < 64px de large (ex. 0.04 * 1000 = 40px), il est rejeté même à sim = 0.96
+    fm.suggestions.clear()
+    vec_cache[2] = _make_vec_for_sim(0.96)
+    fm.unnamed_faces = [(2, temp_face_env["photo2"], FaceRect(0.2, 0.2, 0.24, 0.24))]
+    fm._match_unnamed_faces_to_people_vectorized()
+    assert len(fm.get_suggestions(alice.contact_id)) == 0
+
+    # 4. Et si le visage est sur la même photo qu'un visage déjà confirmé d'Alice (photo1 / idx 0), il est exclu
+    vec_cache[0] = _make_vec_for_sim(0.96)
+    fm.unnamed_faces = [(0, temp_face_env["photo1"], FaceRect(0.5, 0.5, 0.8, 0.8))]
+    fm._match_unnamed_faces_to_people_vectorized()
+    assert len(fm.get_suggestions(alice.contact_id)) == 0
+
+
